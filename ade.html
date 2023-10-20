@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>retire</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,600,300italic">
+    <link rel="stylesheet" type="text/css" href="css/ade.css">
+</head>
+<body>
+    <script>
+
+    CountDownTimer('04/06/2029 5:00 PM', 'lefttogo');
+
+    function CountDownTimer(dt, id)
+    {
+        var end = new Date(dt);
+        var _second = 1000;
+        var _minute = _second * 60;
+        var _hour = _minute * 60;
+        var _day = _hour * 24;
+        var timer;
+
+        function showRemaining() {
+            var now = new Date();
+            var distance = end - now;
+            if (distance < 0) {
+
+                clearInterval(timer);
+                document.getElementById(id).innerHTML = 'Hit the road man!';
+
+                return;
+            }
+            var days = Math.floor(distance / _day);
+            var hours = Math.floor((distance % _day) / _hour);
+            var minutes = Math.floor((distance % _hour) / _minute);
+            var seconds = Math.floor((distance % _minute) / _second);
+
+            document.getElementById(id).innerHTML = days + ' days ';
+            document.getElementById(id).innerHTML += hours + ' hrs ';
+            document.getElementById(id).innerHTML += minutes + ' mins ';
+            document.getElementById(id).innerHTML += seconds + ' secs ';
+        }
+
+        timer = setInterval(showRemaining, 1000);
+    }
+
+    </script>
+    <div class="container">
+        <ul>
+            <li id="answer">Ade retires in</li>
+            <li id="lefttogo"></li>
+        </ul>
+    </div>
+</body>
+</html>
