@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Permission Converter</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+        .chmod-example {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border-left: 4px solid #0066cc;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+        .special-modes {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .special-mode {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .special-mode input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        .mode-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Linux Permission Converter</h1>
+        
+        <div class="special-modes">
+            <div class="special-mode">
+                <input type="checkbox" id="setuid" name="setuid">
+                <label for="setuid">SetUID (s)</label>
+            </div>
+            <div class="special-mode">
+                <input type="checkbox" id="setgid" name="setgid">
+                <label for="setgid">SetGID (s)</label>
+            </div>
+            <div class="special-mode">
+                <input type="checkbox" id="sticky" name="sticky">
+                <label for="sticky">Sticky (t)</label>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="numeric">Numeric Mode (e.g., 755 or 4755):</label>
+            <input type="text" id="numeric" placeholder="Enter numeric mode (e.g., 755 or 4755)" maxlength="4">
+            <div id="numericError" class="error">Please enter a valid numeric mode (0000-7777)</div>
+            <div class="mode-info">First digit (optional): 4 for setuid, 2 for setgid, 1 for sticky bit</div>
+        </div>
+
+        <div class="input-group">
+            <label for="symbolic">Symbolic Mode:</label>
+            <input type="text" id="symbolic" placeholder="Enter symbolic mode (e.g., u+rwxs,g+rx,o+rx)">
+            <div id="symbolicError" class="error">Please enter a valid symbolic mode</div>
+            <div class="mode-info">Use 's' for setuid/setgid, 't' for sticky bit</div>
+        </div>
+
+        <div class="chmod-example">
+            <strong>chmod Command Examples:</strong>
+            <div id="chmodFile"></div>
+            <div id="chmodDir"></div>
+        </div>
+    </div>
+
+    <script>
+        const numericInput = document.getElementById('numeric');
+        const symbolicInput = document.getElementById('symbolic');
+        const setuidCheckbox = document.getElementById('setuid');
+        const setgidCheckbox = document.getElementById('setgid');
+        const stickyCheckbox = document.getElementById('sticky');
+        const numericError = document.getElementById('numericError');
+        const symbolicError = document.getElementById('symbolicError');
+        const chmodFile = document.getElementById('chmodFile');
+        const chmodDir = document.getElementById('chmodDir');
+
+        function updateChmodExamples(numeric) {
+            if (numeric && numeric.length >= 3) {
+                chmodFile.textContent = `For a file: chmod ${numeric} example.txt`;
+                chmodDir.textContent = `For a directory: chmod ${numeric} example_directory`;
+            } else {
+                chmodFile.textContent = '';
+                chmodDir.textContent = '';
+            }
+        }
+
+        function getSpecialBits() {
+            let specialBits = 0;
+            if (setuidCheckbox.checked) specialBits += 4;
+            if (setgidCheckbox.checked) specialBits += 2;
+            if (stickyCheckbox.checked) specialBits += 1;
+            return specialBits;
+        }
+
+        function numericToSymbolic(numeric) {
+            let parts = numeric.padStart(4, '0').split('');
+            if (parts.length === 3) parts.unshift('0');
+            
+            const specialBits = parseInt(parts[0]);
+            const [user, group, other] = parts.slice(1);
+
+            const permissions = {
+                0: '---',
+                1: '--x',
+                2: '-w-',
+                3: '-wx',
+                4: 'r--',
+                5: 'r-x',
+                6: 'rw-',
+                7: 'rwx'
+            };
+
+            let result = [];
+            
+            // Handle regular permissions
+            let userPerms = permissions[user].split('');
+            let groupPerms = permissions[group].split('');
+            let otherPerms = permissions[other].split('');
+
+            // Apply special bits
+            if (specialBits & 4) userPerms[2] = userPerms[2] === 'x' ? 's' : 'S';
+            if (specialBits & 2) groupPerms[2] = groupPerms[2] === 'x' ? 's' : 'S';
+            if (specialBits & 1) otherPerms[2] = otherPerms[2] === 'x' ? 't' : 'T';
+
+            // Construct symbolic notation
+            let userStr = userPerms.join('').replace(/-/g, '');
+            let groupStr = groupPerms.join('').replace(/-/g, '');
+            let otherStr = otherPerms.join('').replace(/-/g, '');
+
+            if (userStr) result.push(`u+${userStr}`);
+            if (groupStr) result.push(`g+${groupStr}`);
+            if (otherStr) result.push(`o+${otherStr}`);
+            
+            return result.join(',');
+        }
+
+        function symbolicToNumeric(symbolic) {
+            if (!symbolic) return '';
+            
+            let permissions = {
+                u: 0,
+                g: 0,
+                o: 0
+            };
+            
+            let specialBits = 0;
+
+            const parts = symbolic.split(',');
+            
+            for (let part of parts) {
+                const match = part.match(/^([ugo])\+(([rwxst]+))$/);
+                if (!match) return '';
+
+                const [, who, perms] = match;
+                
+                if (perms.includes('r')) permissions[who] += 4;
+                if (perms.includes('w')) permissions[who] += 2;
+                if (perms.includes('x')) permissions[who] += 1;
+
+                // Handle special bits
+                if (who === 'u' && perms.includes('s')) specialBits |= 4;
+                if (who === 'g' && perms.includes('s')) specialBits |= 2;
+                if (who === 'o' && perms.includes('t')) specialBits |= 1;
+            }
+
+            return `${specialBits}${permissions.u}${permissions.g}${permissions.o}`;
+        }
+
+        function updateFromNumeric() {
+            const value = numericInput.value;
+            if (value.length >= 3) {
+                numericError.style.display = 'none';
+                const symbolic = numericToSymbolic(value);
+                symbolicInput.value = symbolic;
+                updateChmodExamples(value);
+
+                // Update checkboxes
+                const specialBits = parseInt(value.padStart(4, '0')[0]);
+                setuidCheckbox.checked = !!(specialBits & 4);
+                setgidCheckbox.checked = !!(specialBits & 2);
+                stickyCheckbox.checked = !!(specialBits & 1);
+            } else {
+                symbolicInput.value = '';
+                updateChmodExamples('');
+            }
+        }
+
+        function updateFromSymbolic() {
+            const value = symbolicInput.value.toLowerCase();
+            const numeric = symbolicToNumeric(value);
+            
+            if (numeric) {
+                symbolicError.style.display = 'none';
+                numericInput.value = numeric;
+                updateChmodExamples(numeric);
+
+                // Update checkboxes
+                const specialBits = parseInt(numeric[0]);
+                setuidCheckbox.checked = !!(specialBits & 4);
+                setgidCheckbox.checked = !!(specialBits & 2);
+                stickyCheckbox.checked = !!(specialBits & 1);
+            } else {
+                numericInput.value = '';
+                updateChmodExamples('');
+            }
+        }
+
+        function updateFromCheckboxes() {
+            const currentNumeric = numericInput.value;
+            if (currentNumeric.length >= 3) {
+                const specialBits = getSpecialBits();
+                const basePerms = currentNumeric.slice(-3);
+                numericInput.value = `${specialBits}${basePerms}`;
+                updateFromNumeric();
+            }
+        }
+
+        numericInput.addEventListener('input', function() {
+            const value = this.value;
+            if (!/^[0-7]{0,4}$/.test(value)) {
+                this.value = value.slice(0, -1);
+                return;
+            }
+            updateFromNumeric();
+        });
+
+        symbolicInput.addEventListener('input', updateFromSymbolic);
+        setuidCheckbox.addEventListener('change', updateFromCheckboxes);
+        setgidCheckbox.addEventListener('change', updateFromCheckboxes);
+        stickyCheckbox.addEventListener('change', updateFromCheckboxes);
+    </script>
+</body>
+</html>

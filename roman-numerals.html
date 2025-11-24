@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #f0f0f0;
+        }
+        
+        .conversion-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        input {
+            padding: 8px;
+            margin: 10px 0;
+            width: 200px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        .rules {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Roman Numeral Converter</h1>
+        
+        <h2>Reference Table</h2>
+        <table>
+            <tr>
+                <th>Roman Numeral</th>
+                <th>Number</th>
+                <th>Roman Numeral</th>
+                <th>Number</th>
+            </tr>
+            <tr>
+                <td>I</td><td>1</td>
+                <td>V</td><td>5</td>
+            </tr>
+            <tr>
+                <td>X</td><td>10</td>
+                <td>L</td><td>50</td>
+            </tr>
+            <tr>
+                <td>C</td><td>100</td>
+                <td>D</td><td>500</td>
+            </tr>
+            <tr>
+                <td>M</td><td>1000</td>
+                <td></td><td></td>
+            </tr>
+        </table>
+        
+        <div class="conversion-section">
+            <h2>Converter</h2>
+            <input type="text" id="input" placeholder="Enter number or Roman numeral">
+            <button onclick="convert()">Convert</button>
+            <div id="result" class="result"></div>
+        </div>
+        
+        <div class="rules">
+            <h3>Rules for Roman Numerals:</h3>
+            <ol>
+                <li>Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.</li>
+                <li>Numbers are formed by combining symbols and adding their values.</li>
+                <li>Symbols are placed from left to right in order of value, starting with the largest.</li>
+                <li>When a smaller value appears before a larger value, it is subtracted:
+                    <ul>
+                        <li>IV = 4 (5-1)</li>
+                        <li>IX = 9 (10-1)</li>
+                        <li>XL = 40 (50-10)</li>
+                        <li>XC = 90 (100-10)</li>
+                        <li>CD = 400 (500-100)</li>
+                        <li>CM = 900 (1000-100)</li>
+                    </ul>
+                </li>
+                <li>A symbol cannot be repeated more than three times in succession.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function convert() {
+            const input = document.getElementById('input').value.trim();
+            const result = document.getElementById('result');
+            
+            if (!input) {
+                result.textContent = "Please enter a value";
+                return;
+            }
+            
+            // Check if input is a number
+            if (/^\d+$/.test(input)) {
+                const num = parseInt(input);
+                if (num > 3999) {
+                    result.textContent = "Please enter a number less than 4000";
+                    return;
+                }
+                result.textContent = `Roman Numeral: ${numberToRoman(num)}`;
+            } else {
+                // Assume it's a Roman numeral
+                const num = romanToNumber(input.toUpperCase());
+                if (num === -1) {
+                    result.textContent = "Invalid Roman numeral";
+                    return;
+                }
+                result.textContent = `Number: ${num}`;
+            }
+        }
+        
+        function numberToRoman(num) {
+            const romanNumerals = [
+                { value: 1000, numeral: 'M' },
+                { value: 900, numeral: 'CM' },
+                { value: 500, numeral: 'D' },
+                { value: 400, numeral: 'CD' },
+                { value: 100, numeral: 'C' },
+                { value: 90, numeral: 'XC' },
+                { value: 50, numeral: 'L' },
+                { value: 40, numeral: 'XL' },
+                { value: 10, numeral: 'X' },
+                { value: 9, numeral: 'IX' },
+                { value: 5, numeral: 'V' },
+                { value: 4, numeral: 'IV' },
+                { value: 1, numeral: 'I' }
+            ];
+            
+            let result = '';
+            for (let i = 0; i < romanNumerals.length; i++) {
+                while (num >= romanNumerals[i].value) {
+                    result += romanNumerals[i].numeral;
+                    num -= romanNumerals[i].value;
+                }
+            }
+            return result;
+        }
+        
+        function romanToNumber(roman) {
+            const romanValues = {
+                'I': 1,
+                'V': 5,
+                'X': 10,
+                'L': 50,
+                'C': 100,
+                'D': 500,
+                'M': 1000
+            };
+            
+            let result = 0;
+            
+            // Validate Roman numeral format
+            if (!/^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/.test(roman)) {
+                return -1;
+            }
+            
+            for (let i = 0; i < roman.length; i++) {
+                const current = romanValues[roman[i]];
+                const next = romanValues[roman[i + 1]];
+                
+                if (next > current) {
+                    result += next - current;
+                    i++;
+                } else {
+                    result += current;
+                }
+            }
+            
+            return result;
+        }
+    </script>
+</body>
+</html>

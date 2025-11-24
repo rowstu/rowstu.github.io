@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAT Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f0f2f5;
+        }
+
+        .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .results {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .math-box {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .checkbox-group {
+            margin: 20px 0;
+        }
+
+        .custom-vat {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .custom-vat.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .calculator {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1 style="margin-bottom: 20px;">VAT Calculator</h1>
+        
+        <div class="input-group">
+            <label for="price">Enter Price (£)</label>
+            <input type="number" id="price" step="0.01" min="0" placeholder="0.00">
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="customVatToggle">
+            <label for="customVatToggle">Use custom VAT rate</label>
+            
+            <div class="custom-vat" id="customVatInput">
+                <label for="vatRate">VAT Rate (%)</label>
+                <input type="number" id="vatRate" min="1" max="99" value="20" step="1">
+            </div>
+        </div>
+
+        <div class="results">
+            <div class="result-item">
+                <span>Original Price:</span>
+                <span id="originalPrice">£0.00</span>
+            </div>
+            <div class="result-item">
+                <span>VAT Amount:</span>
+                <span id="vatAmount">£0.00</span>
+            </div>
+            <div class="result-item" style="font-weight: bold;">
+                <span>Total Price:</span>
+                <span id="totalPrice">£0.00</span>
+            </div>
+        </div>
+
+        <div class="math-box">
+            <h3 style="margin-bottom: 10px;">How to Calculate VAT</h3>
+            <p>To add VAT:</p>
+            <ul style="margin-left: 20px;">
+                <li>Multiply the original price by (1 + VAT%/100)</li>
+                <li>Example: £100 × (1 + 20/100) = £120</li>
+            </ul>
+            <p style="margin-top: 10px;">To remove VAT:</p>
+            <ul style="margin-left: 20px;">
+                <li>Divide the total price by (1 + VAT%/100)</li>
+                <li>Example: £120 ÷ (1 + 20/100) = £100</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const priceInput = document.getElementById('price');
+        const vatRateInput = document.getElementById('vatRate');
+        const customVatToggle = document.getElementById('customVatToggle');
+        const customVatInput = document.getElementById('customVatInput');
+        const originalPriceDisplay = document.getElementById('originalPrice');
+        const vatAmountDisplay = document.getElementById('vatAmount');
+        const totalPriceDisplay = document.getElementById('totalPrice');
+
+        function formatPrice(price) {
+            return `£${price.toFixed(2)}`;
+        }
+
+        function calculateVAT() {
+            const price = parseFloat(priceInput.value) || 0;
+            const vatRate = customVatToggle.checked ? 
+                (parseFloat(vatRateInput.value) || 20) : 20;
+
+            const vatAmount = price * (vatRate / 100);
+            const totalPrice = price + vatAmount;
+
+            originalPriceDisplay.textContent = formatPrice(price);
+            vatAmountDisplay.textContent = formatPrice(vatAmount);
+            totalPriceDisplay.textContent = formatPrice(totalPrice);
+        }
+
+        customVatToggle.addEventListener('change', function() {
+            customVatInput.classList.toggle('show');
+            calculateVAT();
+        });
+
+        priceInput.addEventListener('input', calculateVAT);
+        vatRateInput.addEventListener('input', calculateVAT);
+
+        // Initial calculation
+        calculateVAT();
+    </script>
+</body>
+</html>
