@@ -1,0 +1,337 @@
+import React, { useState } from 'react';
+import { Download, Upload, FileJson } from 'lucide-react';
+
+const ScratchJsonToSb3Converter = () => {
+  const [jsonInput, setJsonInput] = useState('');
+  const [status, setStatus] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Default Scratch assets (SVG data)
+  const defaultAssets = {
+    'cd21514d0531fdffb22204e0ec5ed84a.svg': `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="360" viewBox="0,0,480,360"><g transform="translate(240,180)"><g data-paper-data="{&quot;isPaintingLayer&quot;:true}" fill="none" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" style="mix-blend-mode: normal"><path d="M-240,-180h480v360h-480z" fill="#ffffff"/></g></g></svg>`,
+    'bcf454acf82e4504149f7ffe07081dbc.svg': `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="96" height="100" viewBox="0,0,96,100"><g transform="translate(-240,-140)"><g data-paper-data="{&quot;isPaintingLayer&quot;:true}" fill-rule="nonzero" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" style="mix-blend-mode: normal"><path d="M240,140l96,0l0,100l-96,0z" fill="#4a90e2" stroke="#000000" stroke-width="2" stroke-linecap="butt"/><circle cx="264" cy="164" r="8" fill="#ffffff" stroke="none" stroke-width="0" stroke-linecap="butt"/><circle cx="312" cy="164" r="8" fill="#ffffff" stroke="none" stroke-width="0" stroke-linecap="butt"/><path d="M264,200c0,13.25 10.75,24 24,24c13.25,0 24,-10.75 24,-24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round"/></g></g></svg>`
+  };
+
+  const createZipBlob = async (projectData) => {
+    // We'll use a simple ZIP implementation
+    const files = {};
+    
+    // Add project.json
+    files['project.json'] = new TextEncoder().encode(JSON.stringify(projectData, null, 2));
+    
+    // Collect all asset references
+    const assetIds = new Set();
+    
+    projectData.targets.forEach(target => {
+      target.costumes?.forEach(costume => {
+        if (costume.md5ext) {
+          assetIds.add(costume.md5ext);
+        }
+      });
+      target.sounds?.forEach(sound => {
+        if (sound.md5ext) {
+          assetIds.add(sound.md5ext);
+        }
+      });
+    });
+    
+    // Add asset files
+    assetIds.forEach(assetFile => {
+      if (defaultAssets[assetFile]) {
+        files[assetFile] = new TextEncoder().encode(defaultAssets[assetFile]);
+      }
+    });
+    
+    // Create ZIP structure
+    return createZip(files);
+  };
+
+  const createZip = (files) => {
+    // Simple ZIP file creation
+    const encoder = new TextEncoder();
+    const chunks = [];
+    const centralDirectory = [];
+    let offset = 0;
+
+    Object.entries(files).forEach(([filename, content]) => {
+      const filenameBytes = encoder.encode(filename);
+      const uncompressedSize = content.length;
+      const crc32 = calculateCRC32(content);
+      
+      // Local file header
+      const localHeader = new Uint8Array(30 + filenameBytes.length);
+      const view = new DataView(localHeader.buffer);
+      
+      view.setUint32(0, 0x04034b50, true); // signature
+      view.setUint16(4, 20, true); // version needed
+      view.setUint16(6, 0, true); // flags
+      view.setUint16(8, 0, true); // compression method (0 = no compression)
+      view.setUint16(10, 0, true); // modification time
+      view.setUint16(12, 0, true); // modification date
+      view.setUint32(14, crc32, true); // crc32
+      view.setUint32(18, uncompressedSize, true); // compressed size
+      view.setUint32(22, uncompressedSize, true); // uncompressed size
+      view.setUint16(26, filenameBytes.length, true); // filename length
+      view.setUint16(28, 0, true); // extra field length
+      
+      localHeader.set(filenameBytes, 30);
+      
+      chunks.push(localHeader);
+      chunks.push(content);
+      
+      // Store info for central directory
+      centralDirectory.push({
+        filename: filenameBytes,
+        crc32,
+        uncompressedSize,
+        offset
+      });
+      
+      offset += localHeader.length + content.length;
+    });
+
+    // Central directory
+    const centralDirStart = offset;
+    centralDirectory.forEach(({ filename, crc32, uncompressedSize, offset: fileOffset }) => {
+      const header = new Uint8Array(46 + filename.length);
+      const view = new DataView(header.buffer);
+      
+      view.setUint32(0, 0x02014b50, true); // signature
+      view.setUint16(4, 20, true); // version made by
+      view.setUint16(6, 20, true); // version needed
+      view.setUint16(8, 0, true); // flags
+      view.setUint16(10, 0, true); // compression method
+      view.setUint16(12, 0, true); // modification time
+      view.setUint16(14, 0, true); // modification date
+      view.setUint32(16, crc32, true); // crc32
+      view.setUint32(20, uncompressedSize, true); // compressed size
+      view.setUint32(24, uncompressedSize, true); // uncompressed size
+      view.setUint16(28, filename.length, true); // filename length
+      view.setUint16(30, 0, true); // extra field length
+      view.setUint16(32, 0, true); // file comment length
+      view.setUint16(34, 0, true); // disk number
+      view.setUint16(36, 0, true); // internal attributes
+      view.setUint32(38, 0, true); // external attributes
+      view.setUint32(42, fileOffset, true); // offset
+      
+      header.set(filename, 46);
+      chunks.push(header);
+    });
+
+    const centralDirSize = offset - centralDirStart + chunks.slice(centralDirectory.length).reduce((sum, chunk) => sum + chunk.length, 0);
+    
+    // End of central directory
+    const endRecord = new Uint8Array(22);
+    const endView = new DataView(endRecord.buffer);
+    endView.setUint32(0, 0x06054b50, true); // signature
+    endView.setUint16(4, 0, true); // disk number
+    endView.setUint16(6, 0, true); // central directory disk
+    endView.setUint16(8, centralDirectory.length, true); // entries on this disk
+    endView.setUint16(10, centralDirectory.length, true); // total entries
+    endView.setUint32(12, centralDirSize, true); // central directory size
+    endView.setUint32(16, centralDirStart, true); // central directory offset
+    endView.setUint16(20, 0, true); // comment length
+    
+    chunks.push(endRecord);
+    
+    // Combine all chunks
+    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    const result = new Uint8Array(totalLength);
+    let position = 0;
+    chunks.forEach(chunk => {
+      result.set(chunk, position);
+      position += chunk.length;
+    });
+    
+    return new Blob([result], { type: 'application/zip' });
+  };
+
+  const calculateCRC32 = (data) => {
+    const table = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let j = 0; j < 8; j++) {
+        c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      }
+      table[i] = c;
+    }
+    
+    let crc = 0xFFFFFFFF;
+    for (let i = 0; i < data.length; i++) {
+      crc = table[(crc ^ data[i]) & 0xFF] ^ (crc >>> 8);
+    }
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  };
+
+  const handleConvert = async () => {
+    if (!jsonInput.trim()) {
+      setStatus('Please paste JSON data');
+      return;
+    }
+
+    setIsProcessing(true);
+    setStatus('Processing...');
+
+    try {
+      const projectData = JSON.parse(jsonInput);
+      
+      // Validate basic structure
+      if (!projectData.targets || !Array.isArray(projectData.targets)) {
+        throw new Error('Invalid Scratch project structure');
+      }
+
+      const zipBlob = await createZipBlob(projectData);
+      
+      // Create download link
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'project.sb3';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setStatus('✓ SB3 file created and downloaded successfully!');
+    } catch (error) {
+      setStatus(`Error: ${error.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const loadExample = () => {
+    const exampleJson = {
+      "targets": [
+        {
+          "isStage": true,
+          "name": "Stage",
+          "variables": {},
+          "lists": {},
+          "broadcasts": {},
+          "blocks": {},
+          "comments": {},
+          "currentCostume": 0,
+          "costumes": [
+            {
+              "name": "backdrop1",
+              "dataFormat": "svg",
+              "assetId": "cd21514d0531fdffb22204e0ec5ed84a",
+              "md5ext": "cd21514d0531fdffb22204e0ec5ed84a.svg",
+              "rotationCenterX": 240,
+              "rotationCenterY": 180
+            }
+          ],
+          "sounds": [],
+          "volume": 100,
+          "layerOrder": 0,
+          "tempo": 60,
+          "videoTransparency": 50,
+          "videoState": "on",
+          "textToSpeechLanguage": null
+        },
+        {
+          "isStage": false,
+          "name": "Sprite1",
+          "variables": {},
+          "lists": {},
+          "broadcasts": {},
+          "blocks": {},
+          "comments": {},
+          "currentCostume": 0,
+          "costumes": [
+            {
+              "name": "costume1",
+              "dataFormat": "svg",
+              "assetId": "bcf454acf82e4504149f7ffe07081dbc",
+              "md5ext": "bcf454acf82e4504149f7ffe07081dbc.svg",
+              "rotationCenterX": 48,
+              "rotationCenterY": 50
+            }
+          ],
+          "sounds": [],
+          "volume": 100,
+          "layerOrder": 1,
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "size": 100,
+          "direction": 90,
+          "draggable": false,
+          "rotationStyle": "all around"
+        }
+      ],
+      "monitors": [],
+      "extensions": [],
+      "meta": {
+        "semver": "3.0.0",
+        "vm": "0.2.0",
+        "agent": "Generated by Claude"
+      }
+    };
+    setJsonInput(JSON.stringify(exampleJson, null, 2));
+    setStatus('Example loaded');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <FileJson className="w-8 h-8 text-orange-500" />
+            <h1 className="text-2xl font-bold text-gray-800">Scratch JSON to SB3 Converter</h1>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Paste Scratch Project JSON
+            </label>
+            <textarea
+              value={jsonInput}
+              onChange={(e) => setJsonInput(e.target.value)}
+              className="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm"
+              placeholder='{"targets": [...], "monitors": [], ...}'
+            />
+          </div>
+
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={handleConvert}
+              disabled={isProcessing}
+              className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              {isProcessing ? 'Converting...' : 'Convert & Download SB3'}
+            </button>
+            
+            <button
+              onClick={loadExample}
+              className="flex items-center gap-2 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              <Upload className="w-4 h-4" />
+              Load Example
+            </button>
+          </div>
+
+          {status && (
+            <div className={`p-3 rounded-lg ${status.startsWith('✓') ? 'bg-green-100 text-green-800' : status.startsWith('Error') ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`}>
+              {status}
+            </div>
+          )}
+
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h2 className="font-semibold text-gray-700 mb-2">Instructions:</h2>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
+              <li>Paste your Scratch project JSON in the textarea above</li>
+              <li>Click "Convert & Download SB3" to generate the file</li>
+              <li>The .sb3 file will be downloaded automatically</li>
+              <li>Open the file in Scratch 3.0 to view your project</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ScratchJsonToSb3Converter;
