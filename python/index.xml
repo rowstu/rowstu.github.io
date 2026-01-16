@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Python Notes on rowstu.net</title><link>https://rowstu.net/python/</link><description>Recent content in Python Notes on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/python/index.xml" rel="self" type="application/rss+xml"/><item><title>More Regex</title><link>https://rowstu.net/python/more-regex/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/more-regex/</guid><description>&lt;h1 id="python-regex-examples-using-the-re-module"&gt;Python regex examples using the &lt;code&gt;re&lt;/code&gt; module&lt;/h1&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;import re
+
+# 1. **Finding all matches in a string**:
+# Example: Find all email addresses in a text.
+
+text = &amp;#34;Contact us at support@example.com or sales@example.org.&amp;#34;
+emails = re.findall(r&amp;#39;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&amp;#39;, text)
+print(&amp;#34;Emails:&amp;#34;, emails) # Output: [&amp;#39;support@example.com&amp;#39;, &amp;#39;sales@example.org&amp;#39;]
+
+# 2. **Replacing patterns**:
+# Example: Replace all digits in a string with &amp;#39;X&amp;#39;.
+
+text = &amp;#34;My phone number is 123-456-7890.&amp;#34;
+masked_text = re.sub(r&amp;#39;\d&amp;#39;, &amp;#39;X&amp;#39;, text)
+print(&amp;#34;Masked Text:&amp;#34;, masked_text) # Output: &amp;#39;My phone number is XXX-XXX-XXXX.&amp;#39;
+
+# 3. **Checking if a string starts or ends with a pattern**:
+# Example: Check if a string starts with &amp;#39;Hello&amp;#39; and ends with &amp;#39;!&amp;#39;.
+
+text = &amp;#34;Hello, world!&amp;#34;
+if re.match(r&amp;#39;^Hello&amp;#39;, text) and re.search(r&amp;#39;!$&amp;#39;, text):
+ print(&amp;#34;String starts with &amp;#39;Hello&amp;#39; and ends with &amp;#39;!&amp;#39;&amp;#34;) # Output: String starts with &amp;#39;Hello&amp;#39; and ends with &amp;#39;!&amp;#39;
+
+# 4. **Extracting groups**:
+# Example: Extract area code from a phone number.
+
+phone_number = &amp;#34;(123) 456-7890&amp;#34;
+match = re.search(r&amp;#39;\((\d{3})\) \d{3}-\d{4}&amp;#39;, phone_number)
+if match:
+ print(&amp;#34;Area Code:&amp;#34;, match.group(1)) # Output: &amp;#39;123&amp;#39;
+
+# 5. **Splitting a string based on a pattern**:
+# Example: Split a string by commas and whitespace.
+
+text = &amp;#34;apple, orange, banana,grape&amp;#34;
+fruits = re.split(r&amp;#39;\s*,\s*&amp;#39;, text)
+print(&amp;#34;Fruits:&amp;#34;, fruits) # Output: [&amp;#39;apple&amp;#39;, &amp;#39;orange&amp;#39;, &amp;#39;banana&amp;#39;, &amp;#39;grape&amp;#39;]
+
+# 6. **Validating input with regex**:
+# Example: Validate if a string is a valid URL.
+
+url = &amp;#34;https://www.example.com&amp;#34;
+is_valid_url = re.match(r&amp;#39;https?://[a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})+&amp;#39;, url)
+print(&amp;#34;Valid URL?&amp;#34; , bool(is_valid_url)) # Output: True
+
+# 7. **Ignoring case in matching**:
+# Example: Case-insensitive search for the word &amp;#34;python&amp;#34;.
+
+text = &amp;#34;I love Python programming.&amp;#34;
+match = re.search(r&amp;#39;python&amp;#39;, text, re.IGNORECASE)
+if match:
+ print(&amp;#34;Found &amp;#39;python&amp;#39; regardless of case!&amp;#34;) # Output: Found &amp;#39;python&amp;#39; regardless of case!
+
+# 8. **Greedy vs. Non-greedy matching**:
+# Example: Extracting content between HTML tags.
+
+html = &amp;#34;&amp;lt;div&amp;gt;Welcome to &amp;lt;b&amp;gt;Python&amp;lt;/b&amp;gt;!&amp;lt;/div&amp;gt;&amp;#34;
+greedy_match = re.search(r&amp;#39;&amp;lt;.*&amp;gt;&amp;#39;, html) # Greedy
+nongreedy_match = re.search(r&amp;#39;&amp;lt;.*?&amp;gt;&amp;#39;, html) # Non-greedy
+print(&amp;#34;Greedy:&amp;#34;, greedy_match.group()) # Output: &amp;lt;div&amp;gt;Welcome to &amp;lt;b&amp;gt;Python&amp;lt;/b&amp;gt;!&amp;lt;/div&amp;gt;
+print(&amp;#34;Non-greedy:&amp;#34;, nongreedy_match.group()) # Output: &amp;lt;div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Regex Examples</title><link>https://rowstu.net/python/regex-examples/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/regex-examples/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import re
+
+def regex_examples():
+ # 1. Basic Pattern Matching
+ print(&amp;#34;1. Basic Pattern Matching:&amp;#34;)
+ text = &amp;#34;Hello, my phone number is 123-456-7890&amp;#34;
+ pattern = r&amp;#34;phone number&amp;#34;
+ match = re.search(pattern, text)
+ if match:
+ print(f&amp;#34;Found &amp;#39;{match.group()}&amp;#39; at position {match.start()}&amp;#34;)
+
+ # 2. Extracting Specific Patterns
+ print(&amp;#34;\n2. Extracting Specific Patterns:&amp;#34;)
+ # Phone number extraction
+ phone_pattern = r&amp;#34;\d{3}-\d{3}-\d{4}&amp;#34;
+ phone_match = re.search(phone_pattern, text)
+ if phone_match:
+ print(f&amp;#34;Phone number: {phone_match.group()}&amp;#34;)
+
+ # 3. Finding All Matches
+ print(&amp;#34;\n3. Finding All Matches:&amp;#34;)
+ text_with_emails = &amp;#34;Contact us at support@example.com or info@company.org&amp;#34;
+ email_pattern = r&amp;#34;\w+@\w+\.\w+&amp;#34;
+ emails = re.findall(email_pattern, text_with_emails)
+ print(&amp;#34;Emails found:&amp;#34;, emails)
+
+ # 4. Replacing Text
+ print(&amp;#34;\n4. Replacing Text:&amp;#34;)
+ text_to_replace = &amp;#34;My old number is 555-123-4567&amp;#34;
+ replaced_text = re.sub(r&amp;#34;\d{3}-\d{3}-\d{4}&amp;#34;, &amp;#34;REDACTED&amp;#34;, text_to_replace)
+ print(&amp;#34;Replaced text:&amp;#34;, replaced_text)
+
+ # 5. Splitting Text
+ print(&amp;#34;\n5. Splitting Text:&amp;#34;)
+ text_to_split = &amp;#34;apple,banana;cherry:date&amp;#34;
+ split_result = re.split(r&amp;#39;[,;:]&amp;#39;, text_to_split)
+ print(&amp;#34;Split result:&amp;#34;, split_result)
+
+ # 6. Validating Patterns
+ print(&amp;#34;\n6. Validating Patterns:&amp;#34;)
+ def validate_email(email):
+ pattern = r&amp;#39;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&amp;#39;
+ return re.match(pattern, email) is not None
+
+ test_emails = [
+ &amp;#34;user@example.com&amp;#34;,
+ &amp;#34;invalid.email&amp;#34;,
+ &amp;#34;another.valid@test.co.uk&amp;#34;
+ ]
+ for email in test_emails:
+ print(f&amp;#34;{email}: {&amp;#39;Valid&amp;#39; if validate_email(email) else &amp;#39;Invalid&amp;#39;}&amp;#34;)
+
+ # 7. Capturing Groups
+ print(&amp;#34;\n7. Capturing Groups:&amp;#34;)
+ date_text = &amp;#34;Date: 2023-11-28&amp;#34;
+ date_pattern = r&amp;#34;(\d{4})-(\d{2})-(\d{2})&amp;#34;
+ date_match = re.search(date_pattern, date_text)
+ if date_match:
+ year, month, day = date_match.groups()
+ print(f&amp;#34;Year: {year}, Month: {month}, Day: {day}&amp;#34;)
+
+ # 8. Greedy vs. Non-Greedy Matching
+ print(&amp;#34;\n8. Greedy vs. Non-Greedy Matching:&amp;#34;)
+ text_greedy = &amp;#34;&amp;lt;div&amp;gt;First content&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;Second content&amp;lt;/div&amp;gt;&amp;#34;
+ # Greedy (matches entire string)
+ greedy_match = re.findall(r&amp;#39;&amp;lt;div&amp;gt;.*&amp;lt;/div&amp;gt;&amp;#39;, text_greedy)
+ # Non-greedy (matches each div separately)
+ non_greedy_match = re.findall(r&amp;#39;&amp;lt;div&amp;gt;.*?&amp;lt;/div&amp;gt;&amp;#39;, text_greedy)
+ print(&amp;#34;Greedy match:&amp;#34;, greedy_match)
+ print(&amp;#34;Non-greedy match:&amp;#34;, non_greedy_match)
+
+# Run the examples
+regex_examples()
+&lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>

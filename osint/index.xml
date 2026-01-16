@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Osints on rowstu.net</title><link>https://rowstu.net/osint/</link><description>Recent content in Osints on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/osint/index.xml" rel="self" type="application/rss+xml"/><item><title>Resources</title><link>https://rowstu.net/osint/resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/osint/resources/</guid><description>&lt;h1 id="osint-recon-sites"&gt;OSINT Recon sites&lt;/h1&gt;
+&lt;h3 id="resources"&gt;Resources&lt;/h3&gt;
+&lt;p&gt;inteltechniques.com
+Google Dorks Database: &lt;a href="https://www.exploit-db.com/google-hac"&gt;https://www.exploit-db.com/google-hac&lt;/a&gt;&amp;hellip;&lt;/p&gt;
+&lt;h3 id="search-for-people"&gt;Search For People:&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.spokeo.com"&gt;https://www.spokeo.com&lt;/a&gt;
+&lt;a href="https://thatsthem.com"&gt;https://thatsthem.com&lt;/a&gt;
+&lt;a href="https://www.beenverified.com"&gt;https://www.beenverified.com&lt;/a&gt;
+&lt;a href="https://www.fastpeoplesearch.com"&gt;https://www.fastpeoplesearch.com&lt;/a&gt;
+&lt;a href="https://www.truepeoplesearch.com"&gt;https://www.truepeoplesearch.com&lt;/a&gt;
+&lt;a href="https://www.familytreenow.com"&gt;https://www.familytreenow.com&lt;/a&gt;
+&lt;a href="https://people.yandex.ru"&gt;https://people.yandex.ru&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id="databases-breaches"&gt;Databases Breaches:&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.haveibeenpwned.com"&gt;https://www.haveibeenpwned.com&lt;/a&gt;
+&lt;a href="https://www.dehashed.com"&gt;https://www.dehashed.com&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id="phone-numbers"&gt;Phone Numbers:&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.whocalledme.com"&gt;https://www.whocalledme.com&lt;/a&gt;
+&lt;a href="https://github.com/sundowndev/phonein"&gt;https://github.com/sundowndev/phonein&lt;/a&gt;&amp;hellip;&lt;/p&gt;
+&lt;h3 id="images"&gt;Images:&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.google.com/imghp?hl=en"&gt;https://www.google.com/imghp?hl=en&lt;/a&gt;
+&lt;a href="https://www.Tineye.com"&gt;https://www.Tineye.com&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id="exif-tools"&gt;Exif Tools:&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://exiftool.org/"&gt;https://exiftool.org/&lt;/a&gt;
+&lt;a href="https://exifdata.com/"&gt;https://exifdata.com/&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id="socmint"&gt;SOCMINT:&lt;/h3&gt;
+&lt;p&gt;Facebook Sleep Stats: &lt;a href="https://github.com/sqren/fb-sleep-stats"&gt;https://github.com/sqren/fb-sleep-stats&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id="automating-osint"&gt;Automating OSINT:&lt;/h3&gt;
+&lt;p&gt;SpiderFoot: &lt;a href="https://github.com/smicallef/spiderfoot"&gt;https://github.com/smicallef/spiderfoot&lt;/a&gt;
+theHarvester: &lt;a href="https://github.com/laramies/theHarvester"&gt;https://github.com/laramies/theHarvester&lt;/a&gt;
+Recon-ng: &lt;a href="https://github.com/lanmaster53/recon-ng"&gt;https://github.com/lanmaster53/recon-ng&lt;/a&gt;
+Maltego: &lt;a href="https://www.maltego.com/"&gt;https://www.maltego.com/&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>

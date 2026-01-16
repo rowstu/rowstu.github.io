@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Today I Learned on rowstu.net</title><link>https://rowstu.net/til/</link><description>Recent content in Today I Learned on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/til/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows Systeminfo</title><link>https://rowstu.net/til/windows-systeminfo/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/til/windows-systeminfo/</guid><description>&lt;p&gt;TIL three things, Windows has a comprehensive systeminfo[0] command, and also because I have WSL installed I have access to the grep command. You can also pipe[1] commands:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;C:\Users\me&amp;gt;systeminfo | grep -i &amp;#34;boot time&amp;#34;
+System Boot Time: 20/11/2024, 20:36:53
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Searching around it looks like the correct PowerShell way to do this is with Select-String&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;PS C:\Users\me&amp;gt; systeminfo.exe | Select-String &amp;#34;Boot Time&amp;#34;
+
+System Boot Time: 20/11/2024, 20:36:53
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;[0] systeminfo.exe was introduced as part of Windows XP&lt;/p&gt;</description></item></channel></rss>

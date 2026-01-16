@@ -1,0 +1,120 @@
+{
+    "jokes": [
+        {
+            "title": "batman",
+            "type": "pun",
+            "body": "My boss said “dress for the job you want, not for the job you have.” So I went in as Batman."
+        },
+        {
+            "title": "aquarium",
+            "type": "pun",
+            "body": "I went to the aquarium this weekend, but I didn’t stay long. There’s something fishy about that place."
+        },
+        {
+            "title": "sheep",
+            "type": "question",
+            "body": "What do you call a sheep who can sing and dance?",
+            "answer": "Lady Ba Ba"
+        },
+        {
+            "title": "french man shoes",
+            "type": "question",
+            "body": "What do you call a French man wearing sandals?",
+            "answer": "Philipe Fallop."
+        },
+        {
+            "title": "dinosaur",
+            "type": "question",
+            "body": "Why can't dinosaurs clap their hands?",
+            "answer": "Because they're extinct."
+        },
+        {
+            "title": "odd job man",
+            "type": "pun",
+            "body": "I gave my handyman a to-do list, but he only did jobs 1, 3, and 5. Turns out he only does odd jobs."
+        },
+        {
+            "title": "wolf",
+            "type": "question",
+            "body": "What do you call a dog who meditates?",
+            "answer": "Aware wolf."
+        },
+        {
+            "title": "old lady",
+            "type": "pun",
+            "body": "Today at the bank, an old lady asked me to check her balance... So I pushed her over."
+        },
+        {
+            "title": "darkside",
+            "type": "question",
+            "body": "How many storm troopers does it take to change a lightbulb?",
+            "answer": "None, because they are all on the dark side."
+        },
+        {
+            "title": "cold house",
+            "type": "pun",
+            "body": "If your house is cold, just stand in the corner. It’s always 90 degrees there."
+        },
+        {
+            "title": "thesaurus",
+            "type": "pun",
+            "body": "The other day I bought a thesaurus, but when I got home and opened it, all the pages were blank. I have no word to describe how angry I am."
+        },
+        {
+            "title": "broken drums",
+            "type": "pun",
+            "body": "What is the best present? Broken drums! You can't beat them."
+        },
+        {
+            "title": "tortilla",
+            "type": "pun",
+            "body": "I tried to make song about a tortilla once, but it was more like a wrap."
+        },
+        {
+            "title": "shorter",
+            "type": "question",
+            "body": "What word can you make shorter by adding two letters?",
+            "answer": "Short"
+        },
+        {
+            "title": "dawn",
+            "type": "pun",
+            "body": "I stayed up all night wondering where the sun went, and then it dawned on me."
+        },
+        {
+            "title": "shorter",
+            "type": "question",
+            "body": "How do you make holy water?",
+            "answer": "You boil the hell out of it."
+        },
+        {
+            "title": "elvis",
+            "type": "question",
+            "body": "What did Elvis say to his landscaper?",
+            "answer": "Thank you for the mulch!"
+        },
+        {
+            "title": "circus clowns",
+            "type": "pun",
+            "body": "The other day I was attacked by a bunch of circus clowns in a parking lot. I won though, cause I went right for the juggler."
+        },
+        {
+            "title": "pterodactyl",
+            "type": "question",
+            "body": "Why can’t you hear a pterodactyl go to the bathroom?",
+            "answer": "The P is silent."
+        },
+        {
+            "title": "pterodactyl",
+            "type": "question",
+            "body": "What’s a dog’s favorite Marvel character?",
+            "answer": "Labra-Thor."
+        },
+        {
+            "title": "chicken",
+            "type": "question",
+            "body": "What do you say when a chicken is looking at salad?",
+            "answer": "Chicken sees a salad."
+        }
+    ]
+}

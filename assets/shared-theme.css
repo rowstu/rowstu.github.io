@@ -1,0 +1,226 @@
+/**
+ * Shared theme for rowstu.net interactive applications
+ * Consistent dark theme with accent colors
+ */
+
+:root {
+	/* Color palette */
+	--bg-dark: #0d1117;
+	--bg-medium: #161b22;
+	--bg-light: #21262d;
+	--accent-orange: #ff6b35;
+	--accent-teal: #00d9ff;
+	--accent-purple: #b794f6;
+	--accent-yellow: #ffd23f;
+	--accent-green: #7fd962;
+	--text-primary: #e6edf3;
+	--text-secondary: #8b949e;
+	--border: #30363d;
+	--error: #f85149;
+	--success: #56d364;
+	--warning: #d29922;
+}
+
+/* Base reset */
+* {
+	box-sizing: border-box;
+}
+
+/* Body defaults */
+body {
+	margin: 0;
+	padding: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+	background: var(--bg-dark);
+	color: var(--text-primary);
+	line-height: 1.6;
+}
+
+/* Shared button styles */
+.btn {
+	padding: 0.75rem 1.5rem;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: var(--bg-medium);
+	color: var(--text-primary);
+	font-size: 1rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	text-decoration: none;
+	display: inline-block;
+}
+
+.btn:hover {
+	background: var(--bg-light);
+	border-color: var(--accent-teal);
+	transform: translateY(-1px);
+}
+
+.btn:active {
+	transform: translateY(0);
+}
+
+.btn-primary {
+	background: var(--accent-teal);
+	border-color: var(--accent-teal);
+	color: var(--bg-dark);
+}
+
+.btn-primary:hover {
+	background: #00b8db;
+	border-color: #00b8db;
+}
+
+.btn-danger {
+	background: var(--error);
+	border-color: var(--error);
+	color: white;
+}
+
+.btn-danger:hover {
+	background: #da3633;
+	border-color: #da3633;
+}
+
+/* Input styles */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+textarea,
+select {
+	padding: 0.75rem;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: var(--bg-medium);
+	color: var(--text-primary);
+	font-size: 1rem;
+	transition: border-color 0.2s;
+	font-family: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+	outline: none;
+	border-color: var(--accent-teal);
+	box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+}
+
+/* Card/panel styles */
+.card {
+	background: var(--bg-medium);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 1.5rem;
+}
+
+.card-title {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin-bottom: 1rem;
+	color: var(--text-primary);
+}
+
+/* Container */
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 2rem;
+}
+
+/* Header styles */
+.app-header {
+	text-align: center;
+	padding: 2rem 1rem;
+	border-bottom: 1px solid var(--border);
+	background: var(--bg-medium);
+}
+
+.app-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-bottom: 0.5rem;
+	background: linear-gradient(135deg, var(--accent-teal), var(--accent-orange));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.app-subtitle {
+	color: var(--text-secondary);
+	font-size: 1.1rem;
+}
+
+/* Alert/message styles */
+.alert {
+	padding: 1rem 1.5rem;
+	border-radius: 6px;
+	margin: 1rem 0;
+	border-left: 4px solid;
+}
+
+.alert-info {
+	background: rgba(0, 217, 255, 0.1);
+	border-left-color: var(--accent-teal);
+	color: var(--accent-teal);
+}
+
+.alert-success {
+	background: rgba(86, 211, 100, 0.1);
+	border-left-color: var(--success);
+	color: var(--success);
+}
+
+.alert-error {
+	background: rgba(248, 81, 73, 0.1);
+	border-left-color: var(--error);
+	color: var(--error);
+}
+
+.alert-warning {
+	background: rgba(210, 153, 34, 0.1);
+	border-left-color: var(--warning);
+	color: var(--warning);
+}
+
+/* Loading spinner */
+.spinner {
+	border: 3px solid var(--bg-light);
+	border-top: 3px solid var(--accent-teal);
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	animation: spin 1s linear infinite;
+	margin: 2rem auto;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.text-muted { color: var(--text-secondary); }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+
+/* Responsive */
+@media (max-width: 768px) {
+	.container {
+		padding: 1rem;
+	}
+
+	.app-title {
+		font-size: 2rem;
+	}
+
+	.app-header {
+		padding: 1.5rem 1rem;
+	}
+}

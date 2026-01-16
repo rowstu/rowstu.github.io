@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux Notes on rowstu.net</title><link>https://rowstu.net/linux/</link><description>Recent content in Linux Notes on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>Lockdown Firefox</title><link>https://rowstu.net/linux/lockdown-firefox/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/lockdown-firefox/</guid><description>&lt;h1 id="aboutconfig-settings-to-make-firefox-more-secure"&gt;about:config settings to make Firefox more secure&lt;/h1&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;geo.enabled: FALSE: This disables Firefox from sharing your location. 
+browser.safebrowsing.malware.enabled: FALSE: This disables Google’s malware monitoring. 
+dom.battery.enabled: FALSE: This setting blocks sending battery level information. 
+extensions.pocket.enabled: FALSE: This disables the proprietary Pocket service. 
+browser.newtabpage.activity-stream.section.highlights.includePocket: FALSE: Disables ‘Pocket’. 
+browser.newtabpage.activity-stream.feeds.telemetry: FALSE: Disables Telemetry. 
+browser.ping-centre.telemetry: FALSE: Disables Telemetry.
+toolkit.telemetry.server: (Delete URL): Disables Telemetry.
+toolkit.telemetry.enabled: FALSE: Disables Telemetry.
+toolkit.telemetry.unified: FALSE: Disables Telemetry.
+devtools.onboarding.telemeltorggye.d: FALSE: Disables Telemetry.
+media.autoplay.default: 5: Disables audio and video from playing automatically. 
+dom.webnotifications.enabled: FALSE: Disables embedded notifications.
+webgl.disabled: TRUE: Disables some fingerprinting.
+network.http.sendRefererHeader: 0: Disables referring website notifications. 
+identity.fxaccounts.enabled: FALSE: Disables any embedded Firefox accounts. 
+browser.tabs.crashReporting.sendReport: FALSE: Disables crash reporting
+pdfjs.enableScripting: FALSE: Prevents some malicious PDF actions. 
+network.dns.disablePrefetch: TRUE: Disables prefetching. 
+network.dns.disablePrefetchFromHTTPS: TRUE: Disables prefetching.
+network.prefetch-next: FALSE: Disables prefetching.
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Namespaces</title><link>https://rowstu.net/linux/namespaces/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/namespaces/</guid><description>&lt;h1 id="isolating-nginx-in-a-linux-namespace-with-cpu-memory-limits-and-custom-networking"&gt;Isolating NGINX in a Linux Namespace with CPU, Memory Limits, and Custom Networking&lt;/h1&gt;
+&lt;p&gt;Based on: &lt;a href="https://blog.nginx.org/blog/what-are-namespaces-cgroups-how-do-they-work"&gt;https://blog.nginx.org/blog/what-are-namespaces-cgroups-how-do-they-work&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id="1-create-a-directory-for-the-static-hello-world-page"&gt;1. Create a Directory for the Static &amp;ldquo;Hello World&amp;rdquo; Page&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;mkdir -p /tmp/hello-world
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;echo &lt;span style="color:#e6db74"&gt;&amp;#34;&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&amp;lt;h1&amp;gt;Hello World&amp;lt;/h1&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;&amp;#34;&lt;/span&gt; &amp;gt; /tmp/hello-world/index.html
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="2-set-up-cpu-and-memory-limits-using-cgroups"&gt;2. Set Up CPU and Memory Limits using Cgroups&lt;/h3&gt;
+&lt;h4 id="21-create-and-configure-the-cpu-cgroup"&gt;2.1 Create and Configure the CPU Cgroup&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Create a cgroup for limiting CPU usage (20%)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo mkdir /sys/fs/cgroup/cpu/hello-world-cgroup
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;echo &lt;span style="color:#ae81ff"&gt;20000&lt;/span&gt; | sudo tee /sys/fs/cgroup/cpu/hello-world-cgroup/cpu.cfs_quota_us
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;echo &lt;span style="color:#ae81ff"&gt;100000&lt;/span&gt; | sudo tee /sys/fs/cgroup/cpu/hello-world-cgroup/cpu.cfs_period_us
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="22-create-and-configure-the-memory-cgroup"&gt;2.2 Create and Configure the Memory Cgroup&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Create a cgroup for limiting memory usage (1GB)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo mkdir /sys/fs/cgroup/memory/hello-world-cgroup
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;echo &lt;span style="color:#66d9ef"&gt;$((&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt; &lt;span style="color:#f92672"&gt;*&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;1024&lt;/span&gt; &lt;span style="color:#f92672"&gt;*&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;1024&lt;/span&gt; &lt;span style="color:#f92672"&gt;*&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;1024&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;))&lt;/span&gt; | sudo tee /sys/fs/cgroup/memory/hello-world-cgroup/memory.limit_in_bytes
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="3-create-a-network-namespace-and-run-nginx-inside-it"&gt;3. Create a Network Namespace and Run NGINX Inside It&lt;/h3&gt;
+&lt;h4 id="31-create-a-new-network-namespace"&gt;3.1 Create a New Network Namespace&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Create a new network namespace and run NGINX&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo unshare --net --fork --mount-proc /bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This command will open a new shell inside a new network namespace.&lt;/p&gt;</description></item><item><title>Pdf</title><link>https://rowstu.net/linux/pdf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/pdf/</guid><description>&lt;h1 id="working-with-pdf-files"&gt;Working with pdf files&lt;/h1&gt;
+&lt;p&gt;reduce the file size of a pdf&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# ensure ghostscript is installed to use postscript tools
+pacman -S ghostscript
+
+ps2pdf -dPDFSETTINGS=/ebook input.pdf output.pdf
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Ssh Agent</title><link>https://rowstu.net/linux/ssh-agent/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/ssh-agent/</guid><description>&lt;h1 id="using-ssh-agent-to-securely-store-private-keys"&gt;Using ssh-agent to securely store private keys&lt;/h1&gt;
+&lt;p&gt;Be sure to set a passphrase on your private key, then you can use ssh-agent to keep the key in memory for the life of you terminal session.&lt;/p&gt;
+&lt;p&gt;start the agent running&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;eval $(ssh-agent)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;add your key&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;ssh-add /home/user/.ssh/id_rsa
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;run ssh-add again to check your key is listed&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;ssh-add
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;check the path to your ssh-agent socket&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;echo $SSH_AUTH_SOCK
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;configure a config entry to use the key&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Host *
+ AddKeysToAgent yes
+ IdentityAgent /path/to/ssh-agent-socket
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;then you can ssh as normal.&lt;/p&gt;</description></item><item><title>Sssd</title><link>https://rowstu.net/linux/sssd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/sssd/</guid><description>&lt;p&gt;sssd configuration and troubleshooting notes for sudo&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;ipa sudorule-add --cmd &amp;#34;/bin/su - deployer&amp;#34; --hostcat all --users=username --no-passwd
+ipa sudorule-add-option &amp;lt;rule-name&amp;gt; --sudooption &amp;#39;!authenticate&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;/etc/nsswitch.conf&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;sudoers: files sss
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;check sudo rule is applied&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;sudo -l
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;if not, flush the cache&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# sss_cache -E
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;sssd.conf&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;[sssd]
+services = nss, pam, sudo, ssh
+
+[domain/your_idm_domain]
+sudo_provider = ipa
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;check the rule&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;sudo su - deployer
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;more checks&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;sudo sssctl cache-expire
+sudo sssctl domain-list
+sudo sssctl user-checks username
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;add debug to logging sssd.conf&lt;/p&gt;</description></item><item><title>Yt Dlp</title><link>https://rowstu.net/linux/yt-dlp/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/yt-dlp/</guid><description>&lt;h1 id="notes-for-yt-dlp"&gt;Notes for yt-dlp&lt;/h1&gt;
+&lt;p&gt;download playlist&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;yt-dlp --yes-playlist --format &amp;#39;bestvideo*+bestaudio&amp;#39; -S res,ext:mp4:m4a --recode mp4 https://www.youtube.com/playlist\?list=&amp;lt;list id&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>

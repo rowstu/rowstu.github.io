@@ -1,0 +1,46 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Cli // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Cli</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/windowscli/>Windowscli</a></div><div class="card markdown-content"><h1 id=windows-cli-commands-that-have-similar-functionality-to-linux-utilities>Windows CLI commands that have similar functionality to Linux utilities</h1><p>sed find and replace</p><pre tabindex=0><code>Get-Content file.txt | ForEach-Object { $_ -replace &#39;old&#39;, &#39;new&#39; } | Set-Content file.txt
+</code></pre><p>awk split a csv</p><pre tabindex=0><code>Get-Content file.txt | ForEach-Object { $_.Split(&#34;,&#34;)[1] }
+</code></pre><p>grep in cmd.exe</p><pre tabindex=0><code>findstr &#34;search_term&#34; file.txt
+</code></pre><p>grep in powershell.exe</p><pre tabindex=0><code>Select-String -Pattern &#34;search_term&#34; -Path file.txt
+</code></pre><p>curl</p><pre tabindex=0><code>Invoke-WebRequest -Uri https://example.com -OutFile file.html
+</code></pre><p>find</p><pre tabindex=0><code># cmd
+dir /s /p &#34;filename&#34;
+# ps
+Get-ChildItem -Path C:\ -Recurse -Filter &#34;*.txt&#34;
+</code></pre><p>start/stop services</p><pre tabindex=0><code># cmd
+net start &#34;ServiceName&#34;
+net stop &#34;ServiceName&#34;
+# ps
+Start-Service -Name &#34;ServiceName&#34;
+Stop-Service -Name &#34;ServiceName&#34;
+Restart-Service -Name &#34;ServiceName&#34;
+Get-Service -Name &#34;ServiceName&#34;
+</code></pre><p>logs</p><pre tabindex=0><code>Get-EventLog -LogName Application
+Get-WinEvent -LogName System
+</code></pre><p>tail</p><pre tabindex=0><code>Get-Content C:\Path\To\Logfile.log -Wait
+</code></pre><p>get logged in users</p><pre tabindex=0><code># cmd
+query user
+# ps
+Get-LocalUser | Where-Object { $_.Enabled -eq $true }
+quser
+</code></pre><p>windows update</p><pre tabindex=0><code>Install-Module -Name PSWindowsUpdate
+Get-WindowsUpdate
+Install-WindowsUpdate -AcceptAll -AutoReboot
+</code></pre><p>installing applications</p><pre tabindex=0><code># winget
+winget install Mozilla.Firefox
+</code></pre><p>choco</p><pre tabindex=0><code>choco install packagename
+</code></pre><p>show processes</p><pre tabindex=0><code>Get-Process
+</code></pre><p>du</p><pre tabindex=0><code># cmd
+dir /s
+# ps 
+Get-PSDrive -PSProvider FileSystem
+</code></pre><p>ifconfig</p><pre tabindex=0><code># cmd
+ipconfig /all
+netstat -an
+# ps
+Get-NetIPAddress
+Get-NetTCPConnection
+</code></pre><p>Format drive</p><pre tabindex=0><code>format E: /FS:FAT32 /Q
+</code></pre><p>Create user</p><pre tabindex=0><code>net user &lt;username&gt; &lt;password&gt; /add
+net localgroup administrators &lt;username&gt; /add
+</code></pre></div></div><script src=/assets/shared-nav.js></script></body></html>

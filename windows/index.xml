@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Windows Notes on rowstu.net</title><link>https://rowstu.net/windows/</link><description>Recent content in Windows Notes on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/windows/index.xml" rel="self" type="application/rss+xml"/><item><title>Cli</title><link>https://rowstu.net/windows/cli/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/windows/cli/</guid><description>&lt;h1 id="windows-cli-commands-that-have-similar-functionality-to-linux-utilities"&gt;Windows CLI commands that have similar functionality to Linux utilities&lt;/h1&gt;
+&lt;p&gt;sed find and replace&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Get-Content file.txt | ForEach-Object { $_ -replace &amp;#39;old&amp;#39;, &amp;#39;new&amp;#39; } | Set-Content file.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;awk split a csv&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Get-Content file.txt | ForEach-Object { $_.Split(&amp;#34;,&amp;#34;)[1] }
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;grep in cmd.exe&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;findstr &amp;#34;search_term&amp;#34; file.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;grep in powershell.exe&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Select-String -Pattern &amp;#34;search_term&amp;#34; -Path file.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;curl&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Invoke-WebRequest -Uri https://example.com -OutFile file.html
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;find&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# cmd
+dir /s /p &amp;#34;filename&amp;#34;
+# ps
+Get-ChildItem -Path C:\ -Recurse -Filter &amp;#34;*.txt&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;start/stop services&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# cmd
+net start &amp;#34;ServiceName&amp;#34;
+net stop &amp;#34;ServiceName&amp;#34;
+# ps
+Start-Service -Name &amp;#34;ServiceName&amp;#34;
+Stop-Service -Name &amp;#34;ServiceName&amp;#34;
+Restart-Service -Name &amp;#34;ServiceName&amp;#34;
+Get-Service -Name &amp;#34;ServiceName&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;logs&lt;/p&gt;</description></item><item><title>Windows11</title><link>https://rowstu.net/windows/windows11/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/windows/windows11/</guid><description>&lt;h1 id="windows-11-notes"&gt;Windows 11 notes&lt;/h1&gt;
+&lt;p&gt;Bypass network requirement on setup. Press Shift+F10 to bring up the command prompt and enter:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;oobe\bypassnro
+&lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>

@@ -1,0 +1,74 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Regex Examples // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Regex Examples</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/pythonregex-examples/>Pythonregex Examples</a></div><div class="card markdown-content"><pre tabindex=0><code>import re
+
+def regex_examples():
+    # 1. Basic Pattern Matching
+    print(&#34;1. Basic Pattern Matching:&#34;)
+    text = &#34;Hello, my phone number is 123-456-7890&#34;
+    pattern = r&#34;phone number&#34;
+    match = re.search(pattern, text)
+    if match:
+        print(f&#34;Found &#39;{match.group()}&#39; at position {match.start()}&#34;)
+
+    # 2. Extracting Specific Patterns
+    print(&#34;\n2. Extracting Specific Patterns:&#34;)
+    # Phone number extraction
+    phone_pattern = r&#34;\d{3}-\d{3}-\d{4}&#34;
+    phone_match = re.search(phone_pattern, text)
+    if phone_match:
+        print(f&#34;Phone number: {phone_match.group()}&#34;)
+
+    # 3. Finding All Matches
+    print(&#34;\n3. Finding All Matches:&#34;)
+    text_with_emails = &#34;Contact us at support@example.com or info@company.org&#34;
+    email_pattern = r&#34;\w+@\w+\.\w+&#34;
+    emails = re.findall(email_pattern, text_with_emails)
+    print(&#34;Emails found:&#34;, emails)
+
+    # 4. Replacing Text
+    print(&#34;\n4. Replacing Text:&#34;)
+    text_to_replace = &#34;My old number is 555-123-4567&#34;
+    replaced_text = re.sub(r&#34;\d{3}-\d{3}-\d{4}&#34;, &#34;REDACTED&#34;, text_to_replace)
+    print(&#34;Replaced text:&#34;, replaced_text)
+
+    # 5. Splitting Text
+    print(&#34;\n5. Splitting Text:&#34;)
+    text_to_split = &#34;apple,banana;cherry:date&#34;
+    split_result = re.split(r&#39;[,;:]&#39;, text_to_split)
+    print(&#34;Split result:&#34;, split_result)
+
+    # 6. Validating Patterns
+    print(&#34;\n6. Validating Patterns:&#34;)
+    def validate_email(email):
+        pattern = r&#39;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&#39;
+        return re.match(pattern, email) is not None
+
+    test_emails = [
+        &#34;user@example.com&#34;,
+        &#34;invalid.email&#34;,
+        &#34;another.valid@test.co.uk&#34;
+    ]
+    for email in test_emails:
+        print(f&#34;{email}: {&#39;Valid&#39; if validate_email(email) else &#39;Invalid&#39;}&#34;)
+
+    # 7. Capturing Groups
+    print(&#34;\n7. Capturing Groups:&#34;)
+    date_text = &#34;Date: 2023-11-28&#34;
+    date_pattern = r&#34;(\d{4})-(\d{2})-(\d{2})&#34;
+    date_match = re.search(date_pattern, date_text)
+    if date_match:
+        year, month, day = date_match.groups()
+        print(f&#34;Year: {year}, Month: {month}, Day: {day}&#34;)
+
+    # 8. Greedy vs. Non-Greedy Matching
+    print(&#34;\n8. Greedy vs. Non-Greedy Matching:&#34;)
+    text_greedy = &#34;&lt;div&gt;First content&lt;/div&gt;&lt;div&gt;Second content&lt;/div&gt;&#34;
+    # Greedy (matches entire string)
+    greedy_match = re.findall(r&#39;&lt;div&gt;.*&lt;/div&gt;&#39;, text_greedy)
+    # Non-greedy (matches each div separately)
+    non_greedy_match = re.findall(r&#39;&lt;div&gt;.*?&lt;/div&gt;&#39;, text_greedy)
+    print(&#34;Greedy match:&#34;, greedy_match)
+    print(&#34;Non-greedy match:&#34;, non_greedy_match)
+
+# Run the examples
+regex_examples()
+</code></pre></div></div><script src=/assets/shared-nav.js></script></body></html>

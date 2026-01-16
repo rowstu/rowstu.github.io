@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Problem Generator // rowstu.net</title>
+    <link rel="stylesheet" href="/assets/shared-theme.css">
+    <style>
+        .game-container {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        #problem {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            color: var(--accent-teal);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #answer {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 1rem 0;
+            width: 100%;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .button-group button {
+            flex: 1;
+        }
+        .feedback {
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .feedback.correct {
+            background: rgba(86, 211, 100, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+        .feedback.incorrect {
+            background: rgba(248, 81, 73, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <h1 class="app-title">Math Problem Generator</h1>
+        <p class="app-subtitle">Practice addition, subtraction, and multiplication</p>
+    </div>
+
+    <div class="container game-container">
+        <div class="card">
+            <div id="problem">Press "Generate" to start!</div>
+            <input type="number" id="answer" placeholder="Your answer here" />
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="checkAnswer()">Submit</button>
+                <button class="btn" onclick="generateProblem()">Generate</button>
+            </div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentProblem;
+        let currentAnswer;
+
+        function generateProblem() {
+            const num1 = Math.floor(Math.random() * 20) + 1;
+            const num2 = Math.floor(Math.random() * 20) + 1;
+            const operations = ['+', '-', '*'];
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+
+            currentProblem = `${num1} ${operation} ${num2}`;
+            currentAnswer = eval(currentProblem);
+
+            document.getElementById('problem').textContent = `${currentProblem} = ?`;
+            document.getElementById('answer').value = '';
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+        }
+
+        function checkAnswer() {
+            if (currentAnswer === undefined) {
+                return;
+            }
+
+            const userAnswer = Number(document.getElementById('answer').value);
+            const feedback = document.getElementById('feedback');
+
+            if (userAnswer === currentAnswer) {
+                feedback.textContent = 'Correct! Well done!';
+                feedback.className = 'feedback correct';
+                setTimeout(generateProblem, 1500);
+            } else {
+                feedback.textContent = `Incorrect. The correct answer is ${currentAnswer}.`;
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        document.getElementById('answer').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+    </script>
+    <script src="/assets/shared-nav.js"></script>
+</body>
+</html>

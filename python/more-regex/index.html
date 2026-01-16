@@ -1,0 +1,62 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>More Regex // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>More Regex</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/pythonmore-regex/>Pythonmore Regex</a></div><div class="card markdown-content"><h1 id=python-regex-examples-using-the-re-module>Python regex examples using the <code>re</code> module</h1><pre tabindex=0><code>import re
+
+# 1. **Finding all matches in a string**:
+# Example: Find all email addresses in a text.
+
+text = &#34;Contact us at support@example.com or sales@example.org.&#34;
+emails = re.findall(r&#39;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&#39;, text)
+print(&#34;Emails:&#34;, emails)  # Output: [&#39;support@example.com&#39;, &#39;sales@example.org&#39;]
+
+# 2. **Replacing patterns**:
+# Example: Replace all digits in a string with &#39;X&#39;.
+
+text = &#34;My phone number is 123-456-7890.&#34;
+masked_text = re.sub(r&#39;\d&#39;, &#39;X&#39;, text)
+print(&#34;Masked Text:&#34;, masked_text)  # Output: &#39;My phone number is XXX-XXX-XXXX.&#39;
+
+# 3. **Checking if a string starts or ends with a pattern**:
+# Example: Check if a string starts with &#39;Hello&#39; and ends with &#39;!&#39;.
+
+text = &#34;Hello, world!&#34;
+if re.match(r&#39;^Hello&#39;, text) and re.search(r&#39;!$&#39;, text):
+    print(&#34;String starts with &#39;Hello&#39; and ends with &#39;!&#39;&#34;)  # Output: String starts with &#39;Hello&#39; and ends with &#39;!&#39;
+
+# 4. **Extracting groups**:
+# Example: Extract area code from a phone number.
+
+phone_number = &#34;(123) 456-7890&#34;
+match = re.search(r&#39;\((\d{3})\) \d{3}-\d{4}&#39;, phone_number)
+if match:
+    print(&#34;Area Code:&#34;, match.group(1))  # Output: &#39;123&#39;
+
+# 5. **Splitting a string based on a pattern**:
+# Example: Split a string by commas and whitespace.
+
+text = &#34;apple, orange, banana,grape&#34;
+fruits = re.split(r&#39;\s*,\s*&#39;, text)
+print(&#34;Fruits:&#34;, fruits)  # Output: [&#39;apple&#39;, &#39;orange&#39;, &#39;banana&#39;, &#39;grape&#39;]
+
+# 6. **Validating input with regex**:
+# Example: Validate if a string is a valid URL.
+
+url = &#34;https://www.example.com&#34;
+is_valid_url = re.match(r&#39;https?://[a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})+&#39;, url)
+print(&#34;Valid URL?&#34; , bool(is_valid_url))  # Output: True
+
+# 7. **Ignoring case in matching**:
+# Example: Case-insensitive search for the word &#34;python&#34;.
+
+text = &#34;I love Python programming.&#34;
+match = re.search(r&#39;python&#39;, text, re.IGNORECASE)
+if match:
+    print(&#34;Found &#39;python&#39; regardless of case!&#34;)  # Output: Found &#39;python&#39; regardless of case!
+
+# 8. **Greedy vs. Non-greedy matching**:
+# Example: Extracting content between HTML tags.
+
+html = &#34;&lt;div&gt;Welcome to &lt;b&gt;Python&lt;/b&gt;!&lt;/div&gt;&#34;
+greedy_match = re.search(r&#39;&lt;.*&gt;&#39;, html)  # Greedy
+nongreedy_match = re.search(r&#39;&lt;.*?&gt;&#39;, html)  # Non-greedy
+print(&#34;Greedy:&#34;, greedy_match.group())      # Output: &lt;div&gt;Welcome to &lt;b&gt;Python&lt;/b&gt;!&lt;/div&gt;
+print(&#34;Non-greedy:&#34;, nongreedy_match.group())  # Output: &lt;div&gt;
+</code></pre></div></div><script src=/assets/shared-nav.js></script></body></html>

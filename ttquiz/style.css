@@ -1,0 +1,95 @@
+/* General Page Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #333;
+}
+
+/* Containers */
+#setup, #quiz, #scoreBoard {
+  width: 90%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Quiz Section */
+#quiz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Inputs and Buttons */
+select, input[type="text"], input[type="number"], button {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+input[type="number"], input[type="text"] {
+  display: block;
+  margin: 10px auto;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+button {
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  transition: background-color 0.3s;
+  margin: 20px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Feedback and Score Display */
+#feedback {
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+#scoreDisplay {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+/* Custom Range Div */
+#customRangeDiv {
+  display: none;
+}
+
+/* Play Again Button */
+#playAgain {
+  background-color: #28a745;
+}
+
+#playAgain:hover {
+  background-color: #218838;
+}

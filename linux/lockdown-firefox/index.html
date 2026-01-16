@@ -1,0 +1,22 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Lockdown Firefox // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Lockdown Firefox</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/linuxlockdown-firefox/>Linuxlockdown Firefox</a></div><div class="card markdown-content"><h1 id=aboutconfig-settings-to-make-firefox-more-secure>about:config settings to make Firefox more secure</h1><pre tabindex=0><code>geo.enabled: FALSE: This disables Firefox from sharing your location. 
+browser.safebrowsing.malware.enabled: FALSE: This disables Google’s malware monitoring. 
+dom.battery.enabled: FALSE: This setting blocks sending battery level information. 
+extensions.pocket.enabled: FALSE: This disables the proprietary Pocket service. 
+browser.newtabpage.activity-stream.section.highlights.includePocket: FALSE: Disables ‘Pocket’. 
+browser.newtabpage.activity-stream.feeds.telemetry: FALSE: Disables Telemetry. 
+browser.ping-centre.telemetry: FALSE: Disables Telemetry.
+toolkit.telemetry.server: (Delete URL): Disables Telemetry.
+toolkit.telemetry.enabled: FALSE: Disables Telemetry.
+toolkit.telemetry.unified: FALSE: Disables Telemetry.
+devtools.onboarding.telemeltorggye.d: FALSE: Disables Telemetry.
+media.autoplay.default: 5: Disables audio and video from playing automatically. 
+dom.webnotifications.enabled: FALSE: Disables embedded notifications.
+webgl.disabled: TRUE: Disables some fingerprinting.
+network.http.sendRefererHeader: 0: Disables referring website notifications. 
+identity.fxaccounts.enabled: FALSE: Disables any embedded Firefox accounts. 
+browser.tabs.crashReporting.sendReport: FALSE: Disables crash reporting
+pdfjs.enableScripting: FALSE: Prevents some malicious PDF actions. 
+network.dns.disablePrefetch: TRUE: Disables prefetching. 
+network.dns.disablePrefetchFromHTTPS: TRUE: Disables prefetching.
+network.prefetch-next: FALSE: Disables prefetching.
+</code></pre></div></div><script src=/assets/shared-nav.js></script></body></html>
