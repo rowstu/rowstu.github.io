@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Jokes</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #333;
+            text-align: center;
+        }
+        #container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .joke {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .answer {
+            font-size: 1.2em;
+            color: #555;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="content"></div>
+        <button id="refresh-button">Refresh</button>
+    </div>
+    <script>
+        // Function to fetch the JSON file and display a random joke
+        function fetchAndDisplayJoke() {
+            fetch('jokes.json')
+                .then(response => response.json())
+                .then(data => {
+                    const jokes = data.jokes;
+                    const randomIndex = Math.floor(Math.random() * jokes.length);
+                    const joke = jokes[randomIndex];
+                    const contentDiv = document.getElementById("content");
+
+                    if (joke.type === "pun") {
+                        contentDiv.innerHTML = `<div class="joke">${joke.body}</div>`;
+                    } else if (joke.type === "question") {
+                        contentDiv.innerHTML = `
+                            <div class="joke">${joke.body}</div>
+                            <div class="answer">${joke.answer}</div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching jokes:", error);
+                });
+        }
+
+        // Add event listener to the button
+        document.getElementById("refresh-button").addEventListener("click", fetchAndDisplayJoke);
+
+        // Fetch and display a random joke on page load
+        fetchAndDisplayJoke();
+    </script>
+</body>
+</html>

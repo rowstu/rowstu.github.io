@@ -1,5 +1,78 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>rowstu.net</title><link>https://rowstu.net/</link><description>Recent content on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/index.xml" rel="self" type="application/rss+xml"/><item><title>About</title><link>https://rowstu.net/docs/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/docs/about/</guid><description>&lt;h1 id="about"&gt;About&lt;/h1&gt;
-&lt;p&gt;This is the about page&lt;/p&gt;</description></item><item><title>Book.Thinking</title><link>https://rowstu.net/books/book.thinking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/book.thinking/</guid><description>&lt;h1 id="key-lessons-from-dont-believe-everything-you-think"&gt;Key lessons from Don&amp;rsquo;t Believe Everything You Think&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>rowstu.net</title><link>https://rowstu.net/</link><description>Recent content on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/index.xml" rel="self" type="application/rss+xml"/><item><title>A Case Of Snakes</title><link>https://rowstu.net/hackattic/a-case-of-snakes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/a-case-of-snakes/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+import re
+
+def main():
+ 
+ input = (sys.stdin.read().split())
+ 
+ for i in input:
+ 
+ # remove the initial prefix
+ prefix_removed = re.sub(r&amp;#39;^(f|p|b|n|d|dw|i16|i64|i32|u64|u32|ch|w)+&amp;#39;, &amp;#39;&amp;#39;, i)
+
+ # do a lookback and insert the underscore
+ underscore_added = re.sub(r&amp;#39;(?&amp;lt;!^)([A-Z])&amp;#39;, r&amp;#39;_\1&amp;#39;, prefix_removed)
+
+ # convert all of that to lowercase
+ print(underscore_added.lower()) 
+ 
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://chatgpt.com/c/6745e36e-a18c-8005-a99b-f0a45a742423"&gt;https://chatgpt.com/c/6745e36e-a18c-8005-a99b-f0a45a742423&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;a lambda version&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;import re
+
+def clean_and_format(input_string):
+ return re.sub(
+ r&amp;#39;^(f|p|b|dw|i32|u64|ch|w)+|(?&amp;lt;!^)([A-Z])&amp;#39;,
+ lambda m: &amp;#39;_&amp;#39; + m.group(2) if m.group(2) else &amp;#39;&amp;#39;,
+ input_string
+ )
+
+# Test examples
+examples = [
+ &amp;#34;fAir2DangerLevel&amp;#34;,
+ &amp;#34;u32Air2Ratio&amp;#34;,
+ &amp;#34;fnMixtureParam&amp;#34;,
+ &amp;#34;szWindowContents&amp;#34;,
+ &amp;#34;WindowContents&amp;#34;,
+ &amp;#34;thrustMass&amp;#34;,
+ &amp;#34;dwPlane&amp;#34;,
+ &amp;#34;i32VectorSettings&amp;#34;,
+ &amp;#34;chBufferZone&amp;#34;,
+]
+
+cleaned_examples = [clean_and_format(example) for example in examples]
+print(cleaned_examples)
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>About</title><link>https://rowstu.net/docs/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/docs/about/</guid><description>&lt;h1 id="about"&gt;About&lt;/h1&gt;
+&lt;p&gt;This is the about page&lt;/p&gt;</description></item><item><title>Almost Binary</title><link>https://rowstu.net/hackattic/almost-binary/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/almost-binary/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+
+def main():
+ input = (sys.stdin.read().split())
+ 
+ 
+ 
+ for i in input:
+ 
+ binary = []
+ 
+ for t in i:
+ if t == &amp;#34;#&amp;#34;:
+ binary.append(&amp;#34;1&amp;#34;)
+ if t == &amp;#34;.&amp;#34;:
+ binary.append(&amp;#34;0&amp;#34;)
+ x = &amp;#39;&amp;#39;.join(binary)
+ decimal_number = int(x, 2)
+ print(decimal_number)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.javatpoint.com/how-to-convert-binary-to-decimal-numbers-in-python"&gt;https://www.javatpoint.com/how-to-convert-binary-to-decimal-numbers-in-python&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The second parameter of int() function indicates that the number is in base-2 (binary) format.&lt;/p&gt;</description></item><item><title>Book.Thinking</title><link>https://rowstu.net/books/book.thinking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/book.thinking/</guid><description>&lt;h1 id="key-lessons-from-dont-believe-everything-you-think"&gt;Key lessons from Don&amp;rsquo;t Believe Everything You Think&lt;/h1&gt;
 &lt;p&gt;Thinking is an active process.&lt;/p&gt;
 &lt;p&gt;Thoughts happen all by them selves.&lt;/p&gt;
 &lt;p&gt;The two are similar but not the same thing.&lt;/p&gt;
@@ -319,7 +392,24 @@ Nuns: superfluity
 Cobblers: drunkship
 Merchants: faith
 Cooks: hastiness
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Dictionary</title><link>https://rowstu.net/personal/dictionary/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/dictionary/</guid><description>&lt;h1 id="a"&gt;A&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Debasing 64</title><link>https://rowstu.net/hackattic/debasing_64/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/debasing_64/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import base64
+import sys
+
+
+def main():
+ for encoded in sys.stdin:
+ decoded_bytes = base64.b64decode(encoded)
+ decoded_string = decoded_bytes.decode(&amp;#39;utf-8&amp;#39;)
+ print(decoded_string)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Sites used to solve this:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.digitalocean.com/community/tutorials/read-stdin-python"&gt;https://www.digitalocean.com/community/tutorials/read-stdin-python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.geeksforgeeks.org/encoding-and-decoding-base64-strings-in-python/"&gt;https://www.geeksforgeeks.org/encoding-and-decoding-base64-strings-in-python/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://docs.python.org/3/library/base64.html#base64.b64decode"&gt;https://docs.python.org/3/library/base64.html#base64.b64decode&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Dictionary</title><link>https://rowstu.net/personal/dictionary/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/dictionary/</guid><description>&lt;h1 id="a"&gt;A&lt;/h1&gt;
 &lt;p&gt;Adroitly - skillful&lt;/p&gt;
 &lt;p&gt;arduous - requiring much effort&lt;/p&gt;
 &lt;p&gt;abstruseness - hard to understand or obsolete, secret or hidden&lt;/p&gt;
@@ -363,7 +453,39 @@ passionate about.&lt;/p&gt;
 &lt;p&gt;Why is it that inspiration suddenly appears and then dissapears?&lt;/p&gt;
 &lt;p&gt;The truth is, it doesn&amp;rsquo;t dissapear. In fact, it doesn&amp;rsquo;t appear either. It is
 simply freed up when importance is dropped. Desire will not help you achieve
-your goals.&lt;/p&gt;</description></item><item><title>Jim</title><link>https://rowstu.net/books/jim/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/jim/</guid><description>&lt;h1 id="notes-from-the-book-jim-and-the-universe"&gt;Notes from the Book Jim and the Universe&lt;/h1&gt;
+your goals.&lt;/p&gt;</description></item><item><title>Its Almost Compression</title><link>https://rowstu.net/hackattic/its-almost-compression/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/its-almost-compression/</guid><description>&lt;p&gt;first broken attempt&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+
+def main():
+ input = (sys.stdin.read().split())
+
+ char = &amp;#39;&amp;#39;
+ word = &amp;#39;&amp;#39;
+ 
+ for i in input:
+ # print(i)
+ 
+ count = 0
+ 
+ # count the number of chars in the string
+ 
+ if i == char:
+ count += 1
+ elif count &amp;gt;= 1 and char != i:
+ word = count + i
+ else:
+ char = i
+ count = 0
+ 
+ print(word)
+ 
+ 
+ # if the count is 1+x substitute the count and x
+ # move on to next x
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Jim</title><link>https://rowstu.net/books/jim/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/jim/</guid><description>&lt;h1 id="notes-from-the-book-jim-and-the-universe"&gt;Notes from the Book Jim and the Universe&lt;/h1&gt;
 &lt;p&gt;have faith that the universe knows what it is doing and it is so. Don&amp;rsquo;t doubt, doubt wil kill it. Live your life like it is so. Feel happy about it. Feeling is everything.&lt;/p&gt;
 &lt;p&gt;Be grateful, say thank you to the universe all the time. Say it with sincerity and dont say it until you can feeeeeel the sincerity.&lt;/p&gt;
 &lt;p&gt;trust the universe. you don&amp;rsquo;t know, the universe knows.&lt;/p&gt;</description></item><item><title>Jordan Peterson Ideas</title><link>https://rowstu.net/personal/jordan-peterson-ideas/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/jordan-peterson-ideas/</guid><description>&lt;p&gt;&lt;strong&gt;SUMMARY&lt;/strong&gt;
@@ -1053,7 +1175,31 @@ print(&amp;#34;Non-greedy:&amp;#34;, nongreedy_match.group()) # Output: &amp;lt;
 &lt;h2 id="web-links"&gt;Web links&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://www.brianlinkletter.com/2023/02/network-emulators-and-network-simulators-2023/"&gt;https://www.brianlinkletter.com/2023/02/network-emulators-and-network-simulators-2023/&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Ocsp Stapling</title><link>https://rowstu.net/sec/ocsp-stapling/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/sec/ocsp-stapling/</guid><description>&lt;h1 id="ocsp-stapling"&gt;OCSP Stapling&lt;/h1&gt;
 &lt;p&gt;OCSP stapling, also known as TLS Certificate Status Request extension or the Online Certificate Status Protocol (OCSP) Stapling, is a security feature in the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is designed to enhance the security and performance of SSL/TLS connections, particularly in web servers.&lt;/p&gt;
-&lt;p&gt;When you visit a website secured with SSL/TLS, your browser typically checks the validity of the SSL/TLS certificate presented by the web server. One way to do this is by using OCSP (Online Certificate Status Protocol), which allows the browser to ask the certificate authority (CA) whether the certificate is still valid.&lt;/p&gt;</description></item><item><title>Pdf</title><link>https://rowstu.net/linux/pdf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/pdf/</guid><description>&lt;h1 id="working-with-pdf-files"&gt;Working with pdf files&lt;/h1&gt;
+&lt;p&gt;When you visit a website secured with SSL/TLS, your browser typically checks the validity of the SSL/TLS certificate presented by the web server. One way to do this is by using OCSP (Online Certificate Status Protocol), which allows the browser to ask the certificate authority (CA) whether the certificate is still valid.&lt;/p&gt;</description></item><item><title>Open Parens</title><link>https://rowstu.net/hackattic/open-parens/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/open-parens/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+
+def main():
+ 
+ input = (sys.stdin.read().split())
+ for t in input:
+ left = t.count(&amp;#34;(&amp;#34;)
+ right = t.count(&amp;#34;)&amp;#34;)
+ 
+ if left == right:
+ print(&amp;#34;yes&amp;#34;)
+ else:
+ print(&amp;#34;no&amp;#34;)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Every line you read in from STDIN will contain a bunch of parentheses.&lt;/p&gt;
+&lt;p&gt;Your task is to determine if they are properly nested – i.e. if every opening parenthesis has a closing one.&lt;/p&gt;
+&lt;p&gt;Sample input&lt;/p&gt;
+&lt;p&gt;(())&lt;/p&gt;
+&lt;p&gt;()))&lt;/p&gt;
+&lt;p&gt;(()((())))&lt;/p&gt;
+&lt;p&gt;(()(()(()))&lt;/p&gt;
+&lt;p&gt;Sample output&lt;/p&gt;
+&lt;p&gt;yes&lt;/p&gt;</description></item><item><title>Pdf</title><link>https://rowstu.net/linux/pdf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/pdf/</guid><description>&lt;h1 id="working-with-pdf-files"&gt;Working with pdf files&lt;/h1&gt;
 &lt;p&gt;reduce the file size of a pdf&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;# ensure ghostscript is installed to use postscript tools
 pacman -S ghostscript
@@ -1943,7 +2089,7 @@ sudo sssctl user-checks username
 &lt;p&gt;&lt;a href="https://ifelse.io/2019/01/12/secure-ad-free-internet-anywhere-with-streisand-and-pi-hole/"&gt;https://ifelse.io/2019/01/12/secure-ad-free-internet-anywhere-with-streisand-and-pi-hole/&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id="bash"&gt;BASH&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://github.com/onceupon/Bash-Oneliner"&gt;https://github.com/onceupon/Bash-Oneliner&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://github.com/metal3d/bashsimplecurses"&gt;https://github.com/metal3d/bashsimplecurses&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Tape List</title><link>https://rowstu.net/games/tape-list/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/games/tape-list/</guid><description>&lt;h1 id="spectrum-games-list"&gt;Spectrum Games List&lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://github.com/metal3d/bashsimplecurses"&gt;https://github.com/metal3d/bashsimplecurses&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Tape List</title><link>https://rowstu.net/retro/the-spectrum-tape-list/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/retro/the-spectrum-tape-list/</guid><description>&lt;h1 id="spectrum-games-list"&gt;Spectrum Games List&lt;/h1&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;Atic Atac
 Back To Skool
 Batman
@@ -2044,7 +2190,50 @@ Turbo Esprit
 &lt;/ul&gt;
 &lt;p&gt;Happiness is not just a byproduct of success, but it is a key driver of it.&lt;/p&gt;</description></item><item><title>The Last Time</title><link>https://rowstu.net/personal/the-last-time/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/the-last-time/</guid><description>&lt;h1 id="the-last-time"&gt;The Last Time&lt;/h1&gt;
 &lt;p&gt;From the moment you hold your baby in your arms, you will never be the same. You might long for the person you were before, When you have freedom and time, And nothing in particular to worry about.&lt;/p&gt;
-&lt;p&gt;You will know tiredness like you never knew it before, And days will run into days that are exactly the same, Full of feedings and burping, Nappy changes and crying, Whining and fighting, Naps or a lack of naps, It might seem like a never-ending cycle.&lt;/p&gt;</description></item><item><title>Thoughts.On.Immortality</title><link>https://rowstu.net/personal/thoughts.on.immortality/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/thoughts.on.immortality/</guid><description>&lt;h1 id="thoughts-on-immortality---collected-thoughts-of-paramahansa-yogananda"&gt;Thoughts on Immortality - collected thoughts of Paramahansa Yogananda&lt;/h1&gt;
+&lt;p&gt;You will know tiredness like you never knew it before, And days will run into days that are exactly the same, Full of feedings and burping, Nappy changes and crying, Whining and fighting, Naps or a lack of naps, It might seem like a never-ending cycle.&lt;/p&gt;</description></item><item><title>The Sum Of Things</title><link>https://rowstu.net/hackattic/the-sum-of-things/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/the-sum-of-things/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+import re
+
+def main():
+
+ 
+ input = (sys.stdin.read().split(sep=&amp;#34;\n&amp;#34;, maxsplit=-1))
+ 
+ for i in input:
+ 
+ total = 0
+ 
+ for j in i.split():
+ 
+ # check if number and add to total
+ if j.isnumeric():
+ total += int(j)
+ 
+ 
+ # check if hex 0x, convert to integer and add to total
+ if re.fullmatch(r&amp;#34;^0x[0-9A-Fa-f]+$&amp;#34;, j):
+ # print(f&amp;#34;it looks like {j} is hex&amp;#34;)
+ total = total + int(j, 16)
+ 
+ # check if binary, convert to integer and add to total
+ if re.fullmatch(r&amp;#34;^0b[0-1]+$&amp;#34;, j):
+ # print(f&amp;#34;it looks like {j} is binary&amp;#34;)
+ total = total + int(j, 2)
+ 
+ # check if octal, convert to integer and add to total
+ if re.fullmatch(r&amp;#34;^0o[0-9]+$&amp;#34;, j):
+ # print(f&amp;#34;it looks like {j} is binary&amp;#34;)
+ total = total + int(j, 8)
+ 
+ # check if ascii, convert to integer and add to total
+ if len(j) == 1 and j.isascii() and not j.isdigit():
+ #print(f&amp;#34;it looks like {j} is ascii&amp;#34;)
+ total = total + ord(j)
+ 
+ print(total)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;experimenting to check for ASCII character:&lt;/p&gt;</description></item><item><title>Thoughts.On.Immortality</title><link>https://rowstu.net/personal/thoughts.on.immortality/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/thoughts.on.immortality/</guid><description>&lt;h1 id="thoughts-on-immortality---collected-thoughts-of-paramahansa-yogananda"&gt;Thoughts on Immortality - collected thoughts of Paramahansa Yogananda&lt;/h1&gt;
 &lt;p&gt;“If you tune in with the thought of God and hit the nail of delusion with the hammer of right thoughts of Truth, you can overcome delusion.&lt;/p&gt;
 &lt;p&gt;“Destroy all mortal thoughts by substituting a thought of immortality.”&lt;/p&gt;
 &lt;p&gt;The italicized passages in this compilation from Paramahansaji’s talks and writings are affirmations and soul perceptions—“thoughts of immortality”—that you can use for a greater awareness of the Eternal, Blissful Reality within yourself and pervading all creation.&lt;/p&gt;</description></item><item><title>To Watch List</title><link>https://rowstu.net/personal/to-watch-list/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/to-watch-list/</guid><description>&lt;h1 id="sci-fi-films-to-watch-again"&gt;Sci-fi Films to watch again&lt;/h1&gt;
@@ -2142,7 +2331,28 @@ Vault password:
 New Vault password:
 Confirm New Vault password:
 Rekey successful
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Windows Systeminfo</title><link>https://rowstu.net/til/windows-systeminfo/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/til/windows-systeminfo/</guid><description>&lt;p&gt;TIL three things, Windows has a comprehensive systeminfo[0] command, and also because I have WSL installed I have access to the grep command. You can also pipe[1] commands:&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>What Day Was It</title><link>https://rowstu.net/hackattic/what_day_was_it/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/what_day_was_it/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;zimport datetime
+from datetime import date,timedelta
+import sys
+
+def main():
+ 
+ epoch = date(1970,1,1)
+ input = (sys.stdin.read().split())
+
+ for t in input:
+ d = epoch + timedelta(days=int(t))
+ # print(d)
+ print(d.strftime(&amp;#39;%A&amp;#39;))
+
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://stackoverflow.com/questions/9847213/how-do-i-get-the-day-of-week-given-a-date"&gt;https://stackoverflow.com/questions/9847213/how-do-i-get-the-day-of-week-given-a-date&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://docs.python.org/3/library/datetime.html#datetime.date.isoweekday"&gt;https://docs.python.org/3/library/datetime.html#datetime.date.isoweekday&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://stackoverflow.com/questions/6871016/adding-days-to-a-date-in-python"&gt;https://stackoverflow.com/questions/6871016/adding-days-to-a-date-in-python&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Windows Systeminfo</title><link>https://rowstu.net/til/windows-systeminfo/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/til/windows-systeminfo/</guid><description>&lt;p&gt;TIL three things, Windows has a comprehensive systeminfo[0] command, and also because I have WSL installed I have access to the grep command. You can also pipe[1] commands:&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;C:\Users\me&amp;gt;systeminfo | grep -i &amp;#34;boot time&amp;#34;
 System Boot Time: 20/11/2024, 20:36:53
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Searching around it looks like the correct PowerShell way to do this is with Select-String&lt;/p&gt;
@@ -2161,7 +2371,30 @@ And yet I cling to the idea of one
 How do you clear the dust of experience
 How do I know the difference
 If thoughts are not the answer why do they flow so well
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Yt Dlp</title><link>https://rowstu.net/linux/yt-dlp/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/yt-dlp/</guid><description>&lt;h1 id="notes-for-yt-dlp"&gt;Notes for yt-dlp&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Yes It Fizz</title><link>https://rowstu.net/hackattic/yes-it-fizz/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/yes-it-fizz/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+
+def main():
+ 
+ low,high = (sys.stdin.read().split())
+ 
+ for i in range(int(low),int(high)+1):
+ if i % 3 == 0 and i % 5 == 0:
+ print(&amp;#34;FizzBuzz&amp;#34;)
+ elif i % 3 == 0:
+ print(&amp;#34;Fizz&amp;#34;)
+ elif i % 5 == 0:
+ print(&amp;#34;Buzz&amp;#34;)
+ else:
+ print(i)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;resources used to solve this:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.digitalocean.com/community/tutorials/python-add-to-list"&gt;https://www.digitalocean.com/community/tutorials/python-add-to-list&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.geeksforgeeks.org/iterate-over-a-list-in-python/"&gt;https://www.geeksforgeeks.org/iterate-over-a-list-in-python/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://docs.python.org/3/library/io.html#"&gt;https://docs.python.org/3/library/io.html#&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Yt Dlp</title><link>https://rowstu.net/linux/yt-dlp/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/yt-dlp/</guid><description>&lt;h1 id="notes-for-yt-dlp"&gt;Notes for yt-dlp&lt;/h1&gt;
 &lt;p&gt;download playlist&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;yt-dlp --yes-playlist --format &amp;#39;bestvideo*+bestaudio&amp;#39; -S res,ext:mp4:m4a --recode mp4 https://www.youtube.com/playlist\?list=&amp;lt;list id&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>

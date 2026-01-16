@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mobile Spaceship Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            touch-action: none;
+        }
+        
+        #gameCanvas {
+            background: linear-gradient(to bottom, #0a0a2e 0%, #16213e 50%, #0f3460 100%);
+            display: block;
+            touch-action: none;
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        🚀 Tap and drag to fly!
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game state object
+        const game = {
+            vx: 0,
+            vy: 0,
+            x: 400,
+            y: 300,
+            spriteSize: 50,
+            friction: 0.95,
+            acceleration: 1.2,
+            maxSpeed: 10,
+            isTouching: false,
+            touchX: 0,
+            touchY: 0,
+            stars: []
+        };
+        
+        // Set canvas to full screen
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            game.x = canvas.width / 2;
+            game.y = canvas.height / 2;
+            generateStars();
+        }
+        
+        // Generate stars
+        function generateStars() {
+            game.stars = [];
+            for (let i = 0; i < 150; i++) {
+                game.stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2,
+                    opacity: Math.random()
+                });
+            }
+        }
+        
+        // Draw spaceship sprite (8-bit style)
+        function drawSpaceship(x, y, size) {
+            const scale = size / 40;
+            
+            // Main body (triangle)
+            ctx.fillStyle = '#00FFFF';
+            ctx.beginPath();
+            ctx.moveTo(x, y - 15 * scale);
+            ctx.lineTo(x - 12 * scale, y + 15 * scale);
+            ctx.lineTo(x + 12 * scale, y + 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Cockpit window
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(x, y - 5 * scale, 4 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Left wing
+            ctx.fillStyle = '#FF0000';
+            ctx.beginPath();
+            ctx.moveTo(x - 12 * scale, y + 5 * scale);
+            ctx.lineTo(x - 20 * scale, y + 10 * scale);
+            ctx.lineTo(x - 12 * scale, y + 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Right wing
+            ctx.fillStyle = '#FF0000';
+            ctx.beginPath();
+            ctx.moveTo(x + 12 * scale, y + 5 * scale);
+            ctx.lineTo(x + 20 * scale, y + 10 * scale);
+            ctx.lineTo(x + 12 * scale, y + 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Engine glow (animated)
+            if (Math.abs(game.vx) > 0.5 || Math.abs(game.vy) > 0.5) {
+                const glowSize = 3 + Math.random() * 2;
+                ctx.fillStyle = '#FFA500';
+                ctx.beginPath();
+                ctx.arc(x - 8 * scale, y + 15 * scale, glowSize * scale, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 8 * scale, y + 15 * scale, glowSize * scale, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Inner glow
+                ctx.fillStyle = '#FFFF00';
+                ctx.beginPath();
+                ctx.arc(x - 8 * scale, y + 15 * scale, glowSize * scale * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 8 * scale, y + 15 * scale, glowSize * scale * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Pixelated outline effect
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x, y - 15 * scale);
+            ctx.lineTo(x - 12 * scale, y + 15 * scale);
+            ctx.lineTo(x + 12 * scale, y + 15 * scale);
+            ctx.closePath();
+            ctx.stroke();
+        }
+        
+        // Draw stars
+        function drawStars() {
+            game.stars.forEach(star => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Twinkle effect
+                star.opacity += (Math.random() - 0.5) * 0.02;
+                star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+            });
+        }
+        
+        // Touch controls
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            game.isTouching = true;
+            const touch = e.touches[0];
+            game.touchX = touch.clientX;
+            game.touchY = touch.clientY;
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (game.isTouching) {
+                const touch = e.touches[0];
+                game.touchX = touch.clientX;
+                game.touchY = touch.clientY;
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            game.isTouching = false;
+        });
+        
+        canvas.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            game.isTouching = false;
+        });
+        
+        // Mouse controls for desktop testing
+        canvas.addEventListener('mousedown', (e) => {
+            game.isTouching = true;
+            game.touchX = e.clientX;
+            game.touchY = e.clientY;
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (game.isTouching) {
+                game.touchX = e.clientX;
+                game.touchY = e.clientY;
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            game.isTouching = false;
+        });
+        
+        // Game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw stars
+            drawStars();
+            
+            // Handle touch input
+            if (game.isTouching) {
+                const dx = game.touchX - game.x;
+                const dy = game.touchY - game.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 10) {
+                    // Accelerate towards touch point
+                    game.vx += (dx / distance) * game.acceleration;
+                    game.vy += (dy / distance) * game.acceleration;
+                }
+            }
+            
+            // Limit max speed
+            const speed = Math.sqrt(game.vx * game.vx + game.vy * game.vy);
+            if (speed > game.maxSpeed) {
+                game.vx = (game.vx / speed) * game.maxSpeed;
+                game.vy = (game.vy / speed) * game.maxSpeed;
+            }
+            
+            // Apply friction
+            game.vx *= game.friction;
+            game.vy *= game.friction;
+            
+            // Stop completely when velocity is very small
+            if (Math.abs(game.vx) < 0.1) game.vx = 0;
+            if (Math.abs(game.vy) < 0.1) game.vy = 0;
+            
+            // Update position
+            game.x += game.vx;
+            game.y += game.vy;
+            
+            // Boundary collision with bounce
+            if (game.x - game.spriteSize/2 < 0) {
+                game.x = game.spriteSize/2;
+                game.vx *= -0.5;
+            }
+            if (game.x + game.spriteSize/2 > canvas.width) {
+                game.x = canvas.width - game.spriteSize/2;
+                game.vx *= -0.5;
+            }
+            if (game.y - game.spriteSize/2 < 0) {
+                game.y = game.spriteSize/2;
+                game.vy *= -0.5;
+            }
+            if (game.y + game.spriteSize/2 > canvas.height) {
+                game.y = canvas.height - game.spriteSize/2;
+                game.vy *= -0.5;
+            }
+            
+            // Draw spaceship sprite
+            drawSpaceship(game.x, game.y, game.spriteSize);
+            
+            // Display velocity
+            ctx.fillStyle = 'white';
+            ctx.font = '16px Arial';
+            ctx.fillText(`Speed: ${speed.toFixed(1)}`, 10, canvas.height - 15);
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Initialize and start
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        gameLoop();
+    </script>
+</body>
+</html>

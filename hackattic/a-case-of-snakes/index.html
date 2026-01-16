@@ -1,0 +1,45 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>A Case Of Snakes // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>A Case Of Snakes</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/hackattica-case-of-snakes/>Hackattica Case of Snakes</a></div><div class="card markdown-content"><pre tabindex=0><code>import sys
+import re
+
+def main():
+    
+    input = (sys.stdin.read().split())
+    
+    for i in input:
+        
+        # remove the initial prefix
+        prefix_removed = re.sub(r&#39;^(f|p|b|n|d|dw|i16|i64|i32|u64|u32|ch|w)+&#39;, &#39;&#39;, i)
+
+        # do a lookback and insert the underscore
+        underscore_added = re.sub(r&#39;(?&lt;!^)([A-Z])&#39;, r&#39;_\1&#39;, prefix_removed)
+
+        # convert all of that to lowercase
+        print(underscore_added.lower())    
+    
+if __name__ == &#34;__main__&#34;:
+    main()
+</code></pre><ul><li><a href=https://chatgpt.com/c/6745e36e-a18c-8005-a99b-f0a45a742423>https://chatgpt.com/c/6745e36e-a18c-8005-a99b-f0a45a742423</a></li></ul><p>a lambda version</p><pre tabindex=0><code>import re
+
+def clean_and_format(input_string):
+    return re.sub(
+        r&#39;^(f|p|b|dw|i32|u64|ch|w)+|(?&lt;!^)([A-Z])&#39;,
+        lambda m: &#39;_&#39; + m.group(2) if m.group(2) else &#39;&#39;,
+        input_string
+    )
+
+# Test examples
+examples = [
+    &#34;fAir2DangerLevel&#34;,
+    &#34;u32Air2Ratio&#34;,
+    &#34;fnMixtureParam&#34;,
+    &#34;szWindowContents&#34;,
+    &#34;WindowContents&#34;,
+    &#34;thrustMass&#34;,
+    &#34;dwPlane&#34;,
+    &#34;i32VectorSettings&#34;,
+    &#34;chBufferZone&#34;,
+]
+
+cleaned_examples = [clean_and_format(example) for example in examples]
+print(cleaned_examples)
+</code></pre></div></div><script src=/assets/shared-nav.js></script></body></html>

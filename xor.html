@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOR Encryption/Decryption</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4 text-center">XOR Encryption/Decryption</h1>
+        
+        <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Plain Text</label>
+            <input 
+                type="text" 
+                id="plainText" 
+                class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter plain text"
+            >
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Encryption Key</label>
+            <input 
+                type="text" 
+                id="key" 
+                class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter encryption key"
+            >
+        </div>
+        
+        <div id="encryptionResults" class="mt-6 bg-gray-50 p-4 rounded-md">
+            <h2 class="font-semibold mb-2">Encryption Details</h2>
+            <div id="outputDetails" class="text-sm text-gray-700">
+                Provide plain text and key to see encryption details
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h2 class="text-xl font-bold mb-4 text-center">Decryption</h2>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Encrypted Text (Base64)</label>
+                <input 
+                    type="text" 
+                    id="encryptedText" 
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter encrypted text"
+                >
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Decryption Key</label>
+                <input 
+                    type="text" 
+                    id="decryptionKey" 
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter decryption key"
+                >
+            </div>
+            
+            <div id="decryptionResults" class="mt-6 bg-gray-50 p-4 rounded-md">
+                <h2 class="font-semibold mb-2">Decryption Details</h2>
+                <div id="decryptedOutputDetails" class="text-sm text-gray-700">
+                    Provide encrypted text and key to see decryption details
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function xorStrings(input, key, isEncryption = true) {
+            // Ensure key is at least as long as input
+            const extendedKey = key.repeat(Math.ceil(input.length / key.length)).slice(0, input.length);
+            
+            let inputBytes;
+            if (isEncryption) {
+                // For encryption, convert input text to bytes
+                inputBytes = new TextEncoder().encode(input);
+            } else {
+                // For decryption, convert Base64 to bytes
+                inputBytes = new Uint8Array(atob(input).split('').map(char => char.charCodeAt(0)));
+            }
+            
+            const keyBytes = new TextEncoder().encode(extendedKey);
+            
+            // XOR the bytes
+            const xoredBytes = new Uint8Array(inputBytes.length);
+            for (let i = 0; i < inputBytes.length; i++) {
+                xoredBytes[i] = inputBytes[i] ^ keyBytes[i];
+            }
+            
+            // Convert XORed bytes to output
+            let output, explanation;
+            if (isEncryption) {
+                // For encryption, convert to Base64
+                output = btoa(String.fromCharCode.apply(null, xoredBytes));
+                
+                // Prepare explanation
+                explanation = 'XOR Encryption Details:\n\n';
+                inputBytes.forEach((inputByte, i) => {
+                    const keyByte = keyBytes[i];
+                    const xoredByte = xoredBytes[i];
+                    
+                    explanation += `Byte ${i + 1}:\n`;
+                    explanation += `Plain: Dec ${inputByte}, Hex ${inputByte.toString(16).padStart(2, '0')}\n`;
+                    explanation += `Key:   Dec ${keyByte}, Hex ${keyByte.toString(16).padStart(2, '0')}\n`;
+                    explanation += `XOR:   Dec ${xoredByte}, Hex ${xoredByte.toString(16).padStart(2, '0')}\n\n`;
+                });
+            } else {
+                // For decryption, convert to text
+                output = new TextDecoder().decode(xoredBytes);
+                
+                // Prepare explanation
+                explanation = 'XOR Decryption Details:\n\n';
+                inputBytes.forEach((inputByte, i) => {
+                    const keyByte = keyBytes[i];
+                    const xoredByte = xoredBytes[i];
+                    
+                    explanation += `Byte ${i + 1}:\n`;
+                    explanation += `Encrypted: Dec ${inputByte}, Hex ${inputByte.toString(16).padStart(2, '0')}\n`;
+                    explanation += `Key:       Dec ${keyByte}, Hex ${keyByte.toString(16).padStart(2, '0')}\n`;
+                    explanation += `Decrypted: Dec ${xoredByte}, Hex ${xoredByte.toString(16).padStart(2, '0')}\n\n`;
+                });
+            }
+            
+            return { output, explanation };
+        }
+
+        function updateEncryption() {
+            const plainText = document.getElementById('plainText').value;
+            const key = document.getElementById('key').value;
+            const outputDetails = document.getElementById('outputDetails');
+
+            if (plainText && key) {
+                const { output, explanation } = xorStrings(plainText, key, true);
+                
+                outputDetails.innerHTML = `
+                    <p><strong>Encrypted Text (Base64):</strong> ${output}</p>
+                    <p class="mt-2"><strong>Decryption Note:</strong> Use the same key to decrypt</p>
+                    <pre class="mt-2 text-xs overflow-x-auto">${explanation}</pre>
+                `;
+            } else {
+                outputDetails.innerHTML = 'Provide plain text and key to see encryption details';
+            }
+        }
+
+        function updateDecryption() {
+            const encryptedText = document.getElementById('encryptedText').value;
+            const decryptionKey = document.getElementById('decryptionKey').value;
+            const decryptedOutputDetails = document.getElementById('decryptedOutputDetails');
+
+            if (encryptedText && decryptionKey) {
+                const { output, explanation } = xorStrings(encryptedText, decryptionKey, false);
+                
+                decryptedOutputDetails.innerHTML = `
+                    <p><strong>Decrypted Text:</strong> ${output}</p>
+                    <pre class="mt-2 text-xs overflow-x-auto">${explanation}</pre>
+                `;
+            } else {
+                decryptedOutputDetails.innerHTML = 'Provide encrypted text and key to see decryption details';
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('plainText').addEventListener('input', updateEncryption);
+        document.getElementById('key').addEventListener('input', updateEncryption);
+        document.getElementById('encryptedText').addEventListener('input', updateDecryption);
+        document.getElementById('decryptionKey').addEventListener('input', updateDecryption);
+    </script>
+</body>
+</html>

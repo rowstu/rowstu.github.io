@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Gravity Cargo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            touch-action: none;
+        }
+        
+        #gameCanvas {
+            display: block;
+            touch-action: none;
+        }
+        
+        .hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #00FF00;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 2px solid #00FF00;
+            border-radius: 5px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .mission {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #FFD700;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FF0000;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border: 3px solid #FF0000;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+        }
+        
+        .level-complete {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00FF00;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border: 3px solid #00FF00;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+        }
+        
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            background: #00FF00;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Gravity Cargo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            touch-action: none;
+        }
+        
+        #gameCanvas {
+            display: block;
+            touch-action: none;
+        }
+        
+        .hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #00FF00;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 2px solid #00FF00;
+            border-radius: 5px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .mission {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #FFD700;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FF0000;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border: 3px solid #FF0000;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+        }
+        
+        .level-complete {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00FF00;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border: 3px solid #00FF00;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+        }
+        
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            background: #00FF00;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="hud">
+        <div>FUEL: <span id="fuel">100</span>%</div>
+        <div>CARGO: <span id="cargo">0</span></div>
+        <div>SPEED: <span id="speed">0</span></div>
+    </div>
+    
+    <div class="mission">
+        <div>MISSION: COLLECT CARGO</div>
+        <div>DELIVER TO BASE</div>
+        <div id="remaining">Remaining: 0</div>
+    </div>
+    
+    <div class="game-over" id="gameOver">
+        <div>MISSION FAILED</div>
+        <div style="font-size: 16px; margin-top: 10px;">Ship Destroyed</div>
+        <button onclick="restartGame()">TRY AGAIN</button>
+    </div>
+    
+    <div class="level-complete" id="levelComplete">
+        <div>MISSION COMPLETE!</div>
+        <div style="font-size: 16px; margin-top: 10px;">All cargo delivered</div>
+        <button onclick="nextLevel()">NEXT LEVEL</button>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game state
+        const game = {
+            ship: {
+                x: 100,
+                y: 100,
+                vx: 0,
+                vy: 0,
+                angle: 0,
+                size: 30,
+                fuel: 1000,
+                hasCargo: false
+            },
+            gravity: 0.15,
+            thrust: 0.3,
+            maxSpeed: 12,
+            friction: 0.98,
+            cargoBoxes: [],
+            walls: [],
+            base: null,
+            level: 1,
+            gameOver: false,
+            levelComplete: false,
+            totalCargo: 0,
+            collectedCargo: 0,
+            isTouching: false,
+            touchX: 0,
+            touchY: 0
+        };
+        
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Level designs
+        function loadLevel(levelNum) {
+            game.level = levelNum;
+            game.gameOver = false;
+            game.levelComplete = false;
+            game.ship.fuel = 1000;
+            game.ship.hasCargo = false;
+            game.collectedCargo = 0;
+            
+            if (levelNum === 1) {
+                // Simple first level
+                game.ship.x = 100;
+                game.ship.y = 100;
+                game.ship.vx = 0;
+                game.ship.vy = 0;
+                
+                // Base (landing pad)
+                game.base = {
+                    x: 100,
+                    y: canvas.height - 80,
+                    width: 100,
+                    height: 20
+                };
+                
+                // Cargo boxes
+                game.cargoBoxes = [
+                    { x: canvas.width - 150, y: 100, size: 20, collected: false },
+                    { x: canvas.width / 2, y: 200, size: 20, collected: false },
+                    { x: canvas.width - 200, y: canvas.height - 200, size: 20, collected: false }
+                ];
+                
+                game.totalCargo = game.cargoBoxes.length;
+                
+                // Walls/obstacles
+                game.walls = [
+                    // Floor
+                    { x: 0, y: canvas.height - 50, width: canvas.width, height: 50 },
+                    // Ceiling
+                    { x: 0, y: 0, width: canvas.width, height: 30 },
+                    // Left wall
+                    { x: 0, y: 0, width: 30, height: canvas.height },
+                    // Right wall
+                    { x: canvas.width - 30, y: 0, width: 30, height: canvas.height },
+                    // Platform obstacle
+                    { x: canvas.width / 2 - 100, y: canvas.height / 2, width: 200, height: 20 }
+                ];
+            } else if (levelNum === 2) {
+                // Level 2 - More challenging
+                game.ship.x = 100;
+                game.ship.y = 100;
+                game.ship.vx = 0;
+                game.ship.vy = 0;
+                game.gravity = 0.2;
+                
+                game.base = {
+                    x: canvas.width - 150,
+                    y: canvas.height - 80,
+                    width: 100,
+                    height: 20
+                };
+                
+                game.cargoBoxes = [
+                    { x: 100, y: canvas.height - 200, size: 20, collected: false },
+                    { x: canvas.width / 2, y: 100, size: 20, collected: false },
+                    { x: canvas.width / 2 + 150, y: canvas.height / 2, size: 20, collected: false },
+                    { x: 200, y: canvas.height / 2 + 100, size: 20, collected: false }
+                ];
+                
+                game.totalCargo = game.cargoBoxes.length;
+                
+                game.walls = [
+                    { x: 0, y: canvas.height - 50, width: canvas.width, height: 50 },
+                    { x: 0, y: 0, width: canvas.width, height: 30 },
+                    { x: 0, y: 0, width: 30, height: canvas.height },
+                    { x: canvas.width - 30, y: 0, width: 30, height: canvas.height },
+                    // More obstacles
+                    { x: 200, y: 200, width: 150, height: 20 },
+                    { x: canvas.width / 2, y: canvas.height / 2 - 50, width: 150, height: 20 },
+                    { x: canvas.width / 2 + 100, y: canvas.height - 200, width: 20, height: 150 }
+                ];
+            }
+        }
+        
+        // Draw spaceship
+        function drawShip() {
+            const s = game.ship;
+            const scale = s.size / 40;
+            
+            ctx.save();
+            ctx.translate(s.x, s.y);
+            
+            // Main body
+            ctx.fillStyle = '#00FFFF';
+            ctx.beginPath();
+            ctx.moveTo(0, -15 * scale);
+            ctx.lineTo(-12 * scale, 15 * scale);
+            ctx.lineTo(12 * scale, 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Cockpit
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(0, -5 * scale, 4 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Wings
+            ctx.fillStyle = '#FF0000';
+            ctx.beginPath();
+            ctx.moveTo(-12 * scale, 5 * scale);
+            ctx.lineTo(-20 * scale, 10 * scale);
+            ctx.lineTo(-12 * scale, 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(12 * scale, 5 * scale);
+            ctx.lineTo(20 * scale, 10 * scale);
+            ctx.lineTo(12 * scale, 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Thrust effect
+            if (game.isTouching && s.fuel > 0) {
+                const thrustSize = 3 + Math.random() * 3;
+                ctx.fillStyle = '#FFA500';
+                ctx.beginPath();
+                ctx.arc(-8 * scale, 15 * scale, thrustSize * scale, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(8 * scale, 15 * scale, thrustSize * scale, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Cargo indicator
+            if (s.hasCargo) {
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(-8, 18, 16, 12);
+                ctx.strokeStyle = '#FF8800';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(-8, 18, 16, 12);
+            }
+            
+            ctx.restore();
+        }
+        
+        // Draw cargo boxes
+        function drawCargo() {
+            game.cargoBoxes.forEach(box => {
+                if (!box.collected) {
+                    // Pulsing effect
+                    const pulse = Math.sin(Date.now() / 200) * 2;
+                    ctx.fillStyle = '#FFD700';
+                    ctx.fillRect(box.x - box.size/2, box.y - box.size/2, box.size, box.size);
+                    ctx.strokeStyle = '#FF8800';
+                    ctx.lineWidth = 2 + pulse;
+                    ctx.strokeRect(box.x - box.size/2, box.y - box.size/2, box.size, box.size);
+                }
+            });
+        }
+        
+        // Draw base
+        function drawBase() {
+            const b = game.base;
+            ctx.fillStyle = '#00FF00';
+            ctx.fillRect(b.x, b.y, b.width, b.height);
+            
+            // Flashing landing indicators
+            if (Math.floor(Date.now() / 500) % 2 === 0) {
+                ctx.fillStyle = '#FFFF00';
+                ctx.beginPath();
+                ctx.arc(b.x + 10, b.y + 10, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(b.x + b.width - 10, b.y + 10, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.fillStyle = '#00FF00';
+            ctx.font = '12px Courier New';
+            ctx.fillText('BASE', b.x + b.width/2 - 20, b.y - 5);
+        }
+        
+        // Draw walls
+        function drawWalls() {
+            ctx.fillStyle = '#666666';
+            game.walls.forEach(wall => {
+                ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+                ctx.strokeStyle = '#999999';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
+            });
+        }
+        
+        // Collision detection
+        function checkCollision(x, y, size) {
+            for (let wall of game.walls) {
+                if (x + size/2 > wall.x && 
+                    x - size/2 < wall.x + wall.width &&
+                    y + size/2 > wall.y && 
+                    y - size/2 < wall.y + wall.height) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Check cargo pickup
+        function checkCargoPickup() {
+            if (game.ship.hasCargo) return;
+            
+            game.cargoBoxes.forEach(box => {
+                if (!box.collected) {
+                    const dist = Math.sqrt(
+                        Math.pow(game.ship.x - box.x, 2) + 
+                        Math.pow(game.ship.y - box.y, 2)
+                    );
+                    
+                    if (dist < game.ship.size) {
+                        box.collected = true;
+                        game.ship.hasCargo = true;
+                    }
+                }
+            });
+        }
+        
+        // Check base landing
+        function checkBaseLanding() {
+            if (!game.ship.hasCargo) return;
+            
+            const b = game.base;
+            const s = game.ship;
+            
+            if (s.x > b.x && s.x < b.x + b.width &&
+                s.y > b.y - 10 && s.y < b.y + b.height + 10) {
+                
+                const speed = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+                
+                if (speed < 3) {
+                    game.ship.hasCargo = false;
+                    game.collectedCargo++;
+                    
+                    if (game.collectedCargo >= game.totalCargo) {
+                        game.levelComplete = true;
+                        document.getElementById('levelComplete').style.display = 'block';
+                    }
+                } else {
+                    game.gameOver = true;
+                    document.getElementById('gameOver').style.display = 'block';
+                }
+            }
+        }
+        
+        // Touch controls
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            game.isTouching = true;
+            const touch = e.touches[0];
+            game.touchX = touch.clientX;
+            game.touchY = touch.clientY;
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (game.isTouching) {
+                const touch = e.touches[0];
+                game.touchX = touch.clientX;
+                game.touchY = touch.clientY;
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            game.isTouching = false;
+        });
+        
+        // Mouse controls
+        canvas.addEventListener('mousedown', (e) => {
+            game.isTouching = true;
+            game.touchX = e.clientX;
+            game.touchY = e.clientY;
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (game.isTouching) {
+                game.touchX = e.clientX;
+                game.touchY = e.clientY;
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            game.isTouching = false;
+        });
+        
+        // Update HUD
+        function updateHUD() {
+            document.getElementById('fuel').textContent = Math.max(0, Math.floor(game.ship.fuel));
+            document.getElementById('cargo').textContent = game.ship.hasCargo ? '1' : '0';
+            const speed = Math.sqrt(game.ship.vx ** 2 + game.ship.vy ** 2);
+            document.getElementById('speed').textContent = speed.toFixed(1);
+            document.getElementById('remaining').textContent = 
+                `Remaining: ${game.totalCargo - game.collectedCargo}`;
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (game.gameOver || game.levelComplete) {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+            
+            ctx.fillStyle = '#000033';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw stars
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 137.5) % canvas.width;
+                const y = (i * 217.3) % canvas.height;
+                ctx.fillStyle = 'white';
+                ctx.fillRect(x, y, 1, 1);
+            }
+            
+            // Apply gravity
+            game.ship.vy += game.gravity;
+            
+            // Handle thrust input
+            if (game.isTouching && game.ship.fuel > 0) {
+                const dx = game.touchX - game.ship.x;
+                const dy = game.touchY - game.ship.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > 20) {
+                    game.ship.vx += (dx / dist) * game.thrust;
+                    game.ship.vy += (dy / dist) * game.thrust;
+                    game.ship.fuel -= 0.1;
+                }
+            }
+            
+            // Apply friction
+            game.ship.vx *= game.friction;
+            game.ship.vy *= game.friction;
+            
+            // Limit speed
+            const speed = Math.sqrt(game.ship.vx ** 2 + game.ship.vy ** 2);
+            if (speed > game.maxSpeed) {
+                game.ship.vx = (game.ship.vx / speed) * game.maxSpeed;
+                game.ship.vy = (game.ship.vy / speed) * game.maxSpeed;
+            }
+            
+            // Update position
+            const newX = game.ship.x + game.ship.vx;
+            const newY = game.ship.y + game.ship.vy;
+            
+            // Check collision
+            if (checkCollision(newX, newY, game.ship.size)) {
+                if (speed > 4) {
+                    game.gameOver = true;
+                    document.getElementById('gameOver').style.display = 'block';
+                } else {
+                    game.ship.vx *= -0.3;
+                    game.ship.vy *= -0.3;
+                }
+            } else {
+                game.ship.x = newX;
+                game.ship.y = newY;
+            }
+            
+            // Check pickups and landings
+            checkCargoPickup();
+            checkBaseLanding();
+            
+            // Draw everything
+            drawWalls();
+            drawBase();
+            drawCargo();
+            drawShip();
+            
+            // Update HUD
+            updateHUD();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Restart game
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            loadLevel(game.level);
+        }
+        
+        // Next level
+        function nextLevel() {
+            document.getElementById('levelComplete').style.display = 'none';
+            loadLevel(game.level + 1);
+        }
+        
+        // Start game
+        loadLevel(1);
+        gameLoop();
+    </script>
+</body>
+</html>
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="hud">
+        <div>FUEL: <span id="fuel">100</span>%</div>
+        <div>CARGO: <span id="cargo">0</span></div>
+        <div>SPEED: <span id="speed">0</span></div>
+    </div>
+    
+    <div class="mission">
+        <div>MISSION: COLLECT CARGO</div>
+        <div>DELIVER TO BASE</div>
+        <div id="remaining">Remaining: 0</div>
+    </div>
+    
+    <div class="game-over" id="gameOver">
+        <div>MISSION FAILED</div>
+        <div style="font-size: 16px; margin-top: 10px;">Ship Destroyed</div>
+        <button onclick="restartGame()">TRY AGAIN</button>
+    </div>
+    
+    <div class="level-complete" id="levelComplete">
+        <div>MISSION COMPLETE!</div>
+        <div style="font-size: 16px; margin-top: 10px;">All cargo delivered</div>
+        <button onclick="nextLevel()">NEXT LEVEL</button>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game state
+        const game = {
+            ship: {
+                x: 100,
+                y: 100,
+                vx: 0,
+                vy: 0,
+                angle: 0,
+                size: 30,
+                fuel: 1000,
+                hasCargo: false
+            },
+            gravity: 0.15,
+            thrust: 0.3,
+            maxSpeed: 12,
+            friction: 0.98,
+            cargoBoxes: [],
+            walls: [],
+            base: null,
+            level: 1,
+            gameOver: false,
+            levelComplete: false,
+            totalCargo: 0,
+            collectedCargo: 0,
+            isTouching: false,
+            touchX: 0,
+            touchY: 0
+        };
+        
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Level designs
+        function loadLevel(levelNum) {
+            game.level = levelNum;
+            game.gameOver = false;
+            game.levelComplete = false;
+            game.ship.fuel = 1000;
+            game.ship.hasCargo = false;
+            game.collectedCargo = 0;
+            
+            if (levelNum === 1) {
+                // Simple first level
+                game.ship.x = 100;
+                game.ship.y = 100;
+                game.ship.vx = 0;
+                game.ship.vy = 0;
+                
+                // Base (landing pad)
+                game.base = {
+                    x: 100,
+                    y: canvas.height - 80,
+                    width: 150,
+                    height: 20
+                };
+                
+                // Cargo boxes
+                game.cargoBoxes = [
+                    { x: canvas.width - 150, y: 100, size: 20, collected: false },
+                    { x: canvas.width / 2, y: 200, size: 20, collected: false },
+                    { x: canvas.width - 200, y: canvas.height - 200, size: 20, collected: false }
+                ];
+                
+                game.totalCargo = game.cargoBoxes.length;
+                
+                // Walls/obstacles
+                game.walls = [
+                    // Floor
+                    { x: 0, y: canvas.height - 50, width: canvas.width, height: 50 },
+                    // Ceiling
+                    { x: 0, y: 0, width: canvas.width, height: 30 },
+                    // Left wall
+                    { x: 0, y: 0, width: 30, height: canvas.height },
+                    // Right wall
+                    { x: canvas.width - 30, y: 0, width: 30, height: canvas.height },
+                    // Platform obstacle
+                    { x: canvas.width / 2 - 100, y: canvas.height / 2, width: 200, height: 20 }
+                ];
+            } else if (levelNum === 2) {
+                // Level 2 - More challenging
+                game.ship.x = 100;
+                game.ship.y = 100;
+                game.ship.vx = 0;
+                game.ship.vy = 0;
+                game.gravity = 0.2;
+                
+                game.base = {
+                    x: canvas.width - 150,
+                    y: canvas.height - 80,
+                    width: 100,
+                    height: 20
+                };
+                
+                game.cargoBoxes = [
+                    { x: 100, y: canvas.height - 200, size: 20, collected: false },
+                    { x: canvas.width / 2, y: 100, size: 20, collected: false },
+                    { x: canvas.width / 2 + 150, y: canvas.height / 2, size: 20, collected: false },
+                    { x: 200, y: canvas.height / 2 + 100, size: 20, collected: false }
+                ];
+                
+                game.totalCargo = game.cargoBoxes.length;
+                
+                game.walls = [
+                    { x: 0, y: canvas.height - 50, width: canvas.width, height: 50 },
+                    { x: 0, y: 0, width: canvas.width, height: 30 },
+                    { x: 0, y: 0, width: 30, height: canvas.height },
+                    { x: canvas.width - 30, y: 0, width: 30, height: canvas.height },
+                    // More obstacles
+                    { x: 200, y: 200, width: 150, height: 20 },
+                    { x: canvas.width / 2, y: canvas.height / 2 - 50, width: 150, height: 20 },
+                    { x: canvas.width / 2 + 100, y: canvas.height - 200, width: 20, height: 150 }
+                ];
+            }
+        }
+        
+        // Draw spaceship
+        function drawShip() {
+            const s = game.ship;
+            const scale = s.size / 40;
+            
+            ctx.save();
+            ctx.translate(s.x, s.y);
+            
+            // Main body
+            ctx.fillStyle = '#00FFFF';
+            ctx.beginPath();
+            ctx.moveTo(0, -15 * scale);
+            ctx.lineTo(-12 * scale, 15 * scale);
+            ctx.lineTo(12 * scale, 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Cockpit
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(0, -5 * scale, 4 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Wings
+            ctx.fillStyle = '#FF0000';
+            ctx.beginPath();
+            ctx.moveTo(-12 * scale, 5 * scale);
+            ctx.lineTo(-20 * scale, 10 * scale);
+            ctx.lineTo(-12 * scale, 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(12 * scale, 5 * scale);
+            ctx.lineTo(20 * scale, 10 * scale);
+            ctx.lineTo(12 * scale, 15 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Thrust effect
+            if (game.isTouching && s.fuel > 0) {
+                const thrustSize = 3 + Math.random() * 3;
+                ctx.fillStyle = '#FFA500';
+                ctx.beginPath();
+                ctx.arc(-8 * scale, 15 * scale, thrustSize * scale, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(8 * scale, 15 * scale, thrustSize * scale, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Cargo indicator
+            if (s.hasCargo) {
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(-8, 18, 16, 12);
+                ctx.strokeStyle = '#FF8800';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(-8, 18, 16, 12);
+            }
+            
+            ctx.restore();
+        }
+        
+        // Draw cargo boxes
+        function drawCargo() {
+            game.cargoBoxes.forEach(box => {
+                if (!box.collected) {
+                    // Pulsing effect
+                    const pulse = Math.sin(Date.now() / 200) * 2;
+                    ctx.fillStyle = '#FFD700';
+                    ctx.fillRect(box.x - box.size/2, box.y - box.size/2, box.size, box.size);
+                    ctx.strokeStyle = '#FF8800';
+                    ctx.lineWidth = 2 + pulse;
+                    ctx.strokeRect(box.x - box.size/2, box.y - box.size/2, box.size, box.size);
+                }
+            });
+        }
+        
+        // Draw base
+        function drawBase() {
+            const b = game.base;
+            ctx.fillStyle = '#00FF00';
+            ctx.fillRect(b.x, b.y, b.width, b.height);
+            
+            // Flashing landing indicators
+            if (Math.floor(Date.now() / 500) % 2 === 0) {
+                ctx.fillStyle = '#FFFF00';
+                ctx.beginPath();
+                ctx.arc(b.x + 10, b.y + 10, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(b.x + b.width - 10, b.y + 10, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.fillStyle = '#00FF00';
+            ctx.font = '12px Courier New';
+            ctx.fillText('BASE', b.x + b.width/2 - 20, b.y - 5);
+        }
+        
+        // Draw walls
+        function drawWalls() {
+            ctx.fillStyle = '#666666';
+            game.walls.forEach(wall => {
+                ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+                ctx.strokeStyle = '#999999';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
+            });
+        }
+        
+        // Collision detection
+        function checkCollision(x, y, size) {
+            for (let wall of game.walls) {
+                if (x + size/2 > wall.x && 
+                    x - size/2 < wall.x + wall.width &&
+                    y + size/2 > wall.y && 
+                    y - size/2 < wall.y + wall.height) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Check cargo pickup
+        function checkCargoPickup() {
+            if (game.ship.hasCargo) return;
+            
+            game.cargoBoxes.forEach(box => {
+                if (!box.collected) {
+                    const dist = Math.sqrt(
+                        Math.pow(game.ship.x - box.x, 2) + 
+                        Math.pow(game.ship.y - box.y, 2)
+                    );
+                    
+                    if (dist < game.ship.size) {
+                        box.collected = true;
+                        game.ship.hasCargo = true;
+                    }
+                }
+            });
+        }
+        
+        // Check base landing
+        function checkBaseLanding() {
+            if (!game.ship.hasCargo) return;
+            
+            const b = game.base;
+            const s = game.ship;
+            
+            if (s.x > b.x && s.x < b.x + b.width &&
+                s.y > b.y - 10 && s.y < b.y + b.height + 10) {
+                
+                const speed = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+                
+                if (speed < 3) {
+                    game.ship.hasCargo = false;
+                    game.collectedCargo++;
+                    
+                    if (game.collectedCargo >= game.totalCargo) {
+                        game.levelComplete = true;
+                        document.getElementById('levelComplete').style.display = 'block';
+                    }
+                } else {
+                    game.gameOver = true;
+                    document.getElementById('gameOver').style.display = 'block';
+                }
+            }
+        }
+        
+        // Touch controls
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            game.isTouching = true;
+            const touch = e.touches[0];
+            game.touchX = touch.clientX;
+            game.touchY = touch.clientY;
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (game.isTouching) {
+                const touch = e.touches[0];
+                game.touchX = touch.clientX;
+                game.touchY = touch.clientY;
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            game.isTouching = false;
+        });
+        
+        // Mouse controls
+        canvas.addEventListener('mousedown', (e) => {
+            game.isTouching = true;
+            game.touchX = e.clientX;
+            game.touchY = e.clientY;
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (game.isTouching) {
+                game.touchX = e.clientX;
+                game.touchY = e.clientY;
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            game.isTouching = false;
+        });
+        
+        // Update HUD
+        function updateHUD() {
+            document.getElementById('fuel').textContent = Math.max(0, Math.floor(game.ship.fuel));
+            document.getElementById('cargo').textContent = game.ship.hasCargo ? '1' : '0';
+            const speed = Math.sqrt(game.ship.vx ** 2 + game.ship.vy ** 2);
+            document.getElementById('speed').textContent = speed.toFixed(1);
+            document.getElementById('remaining').textContent = 
+                `Remaining: ${game.totalCargo - game.collectedCargo}`;
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (game.gameOver || game.levelComplete) {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+            
+            ctx.fillStyle = '#000033';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw stars
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 137.5) % canvas.width;
+                const y = (i * 217.3) % canvas.height;
+                ctx.fillStyle = 'white';
+                ctx.fillRect(x, y, 1, 1);
+            }
+            
+            // Apply gravity
+            game.ship.vy += game.gravity;
+            
+            // Handle thrust input
+            if (game.isTouching && game.ship.fuel > 0) {
+                const dx = game.touchX - game.ship.x;
+                const dy = game.touchY - game.ship.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > 20) {
+                    game.ship.vx += (dx / dist) * game.thrust;
+                    game.ship.vy += (dy / dist) * game.thrust;
+                    game.ship.fuel -= 0.1;
+                }
+            }
+            
+            // Apply friction
+            game.ship.vx *= game.friction;
+            game.ship.vy *= game.friction;
+            
+            // Limit speed
+            const speed = Math.sqrt(game.ship.vx ** 2 + game.ship.vy ** 2);
+            if (speed > game.maxSpeed) {
+                game.ship.vx = (game.ship.vx / speed) * game.maxSpeed;
+                game.ship.vy = (game.ship.vy / speed) * game.maxSpeed;
+            }
+            
+            // Update position
+            const newX = game.ship.x + game.ship.vx;
+            const newY = game.ship.y + game.ship.vy;
+            
+            // Check collision
+            if (checkCollision(newX, newY, game.ship.size)) {
+                if (speed > 4) {
+                    game.gameOver = true;
+                    document.getElementById('gameOver').style.display = 'block';
+                } else {
+                    game.ship.vx *= -0.3;
+                    game.ship.vy *= -0.3;
+                }
+            } else {
+                game.ship.x = newX;
+                game.ship.y = newY;
+            }
+            
+            // Check pickups and landings
+            checkCargoPickup();
+            checkBaseLanding();
+            
+            // Draw everything
+            drawWalls();
+            drawBase();
+            drawCargo();
+            drawShip();
+            
+            // Update HUD
+            updateHUD();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Restart game
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            loadLevel(game.level);
+        }
+        
+        // Next level
+        function nextLevel() {
+            document.getElementById('levelComplete').style.display = 'none';
+            loadLevel(game.level + 1);
+        }
+        
+        // Start game
+        loadLevel(1);
+        gameLoop();
+    </script>
+</body>
+</html>

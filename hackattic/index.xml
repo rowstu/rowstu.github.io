@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hackattic Challenges on rowstu.net</title><link>https://rowstu.net/hackattic/</link><description>Recent content in Hackattic Challenges on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/hackattic/index.xml" rel="self" type="application/rss+xml"/><item><title>A Case Of Snakes</title><link>https://rowstu.net/hackattic/a-case-of-snakes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/a-case-of-snakes/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+import re
+
+def main():
+ 
+ input = (sys.stdin.read().split())
+ 
+ for i in input:
+ 
+ # remove the initial prefix
+ prefix_removed = re.sub(r&amp;#39;^(f|p|b|n|d|dw|i16|i64|i32|u64|u32|ch|w)+&amp;#39;, &amp;#39;&amp;#39;, i)
+
+ # do a lookback and insert the underscore
+ underscore_added = re.sub(r&amp;#39;(?&amp;lt;!^)([A-Z])&amp;#39;, r&amp;#39;_\1&amp;#39;, prefix_removed)
+
+ # convert all of that to lowercase
+ print(underscore_added.lower()) 
+ 
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://chatgpt.com/c/6745e36e-a18c-8005-a99b-f0a45a742423"&gt;https://chatgpt.com/c/6745e36e-a18c-8005-a99b-f0a45a742423&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;a lambda version&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;import re
+
+def clean_and_format(input_string):
+ return re.sub(
+ r&amp;#39;^(f|p|b|dw|i32|u64|ch|w)+|(?&amp;lt;!^)([A-Z])&amp;#39;,
+ lambda m: &amp;#39;_&amp;#39; + m.group(2) if m.group(2) else &amp;#39;&amp;#39;,
+ input_string
+ )
+
+# Test examples
+examples = [
+ &amp;#34;fAir2DangerLevel&amp;#34;,
+ &amp;#34;u32Air2Ratio&amp;#34;,
+ &amp;#34;fnMixtureParam&amp;#34;,
+ &amp;#34;szWindowContents&amp;#34;,
+ &amp;#34;WindowContents&amp;#34;,
+ &amp;#34;thrustMass&amp;#34;,
+ &amp;#34;dwPlane&amp;#34;,
+ &amp;#34;i32VectorSettings&amp;#34;,
+ &amp;#34;chBufferZone&amp;#34;,
+]
+
+cleaned_examples = [clean_and_format(example) for example in examples]
+print(cleaned_examples)
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Almost Binary</title><link>https://rowstu.net/hackattic/almost-binary/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/almost-binary/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+
+def main():
+ input = (sys.stdin.read().split())
+ 
+ 
+ 
+ for i in input:
+ 
+ binary = []
+ 
+ for t in i:
+ if t == &amp;#34;#&amp;#34;:
+ binary.append(&amp;#34;1&amp;#34;)
+ if t == &amp;#34;.&amp;#34;:
+ binary.append(&amp;#34;0&amp;#34;)
+ x = &amp;#39;&amp;#39;.join(binary)
+ decimal_number = int(x, 2)
+ print(decimal_number)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.javatpoint.com/how-to-convert-binary-to-decimal-numbers-in-python"&gt;https://www.javatpoint.com/how-to-convert-binary-to-decimal-numbers-in-python&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The second parameter of int() function indicates that the number is in base-2 (binary) format.&lt;/p&gt;</description></item><item><title>Debasing 64</title><link>https://rowstu.net/hackattic/debasing_64/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/debasing_64/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import base64
+import sys
+
+
+def main():
+ for encoded in sys.stdin:
+ decoded_bytes = base64.b64decode(encoded)
+ decoded_string = decoded_bytes.decode(&amp;#39;utf-8&amp;#39;)
+ print(decoded_string)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Sites used to solve this:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.digitalocean.com/community/tutorials/read-stdin-python"&gt;https://www.digitalocean.com/community/tutorials/read-stdin-python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.geeksforgeeks.org/encoding-and-decoding-base64-strings-in-python/"&gt;https://www.geeksforgeeks.org/encoding-and-decoding-base64-strings-in-python/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://docs.python.org/3/library/base64.html#base64.b64decode"&gt;https://docs.python.org/3/library/base64.html#base64.b64decode&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Its Almost Compression</title><link>https://rowstu.net/hackattic/its-almost-compression/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/its-almost-compression/</guid><description>&lt;p&gt;first broken attempt&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+
+def main():
+ input = (sys.stdin.read().split())
+
+ char = &amp;#39;&amp;#39;
+ word = &amp;#39;&amp;#39;
+ 
+ for i in input:
+ # print(i)
+ 
+ count = 0
+ 
+ # count the number of chars in the string
+ 
+ if i == char:
+ count += 1
+ elif count &amp;gt;= 1 and char != i:
+ word = count + i
+ else:
+ char = i
+ count = 0
+ 
+ print(word)
+ 
+ 
+ # if the count is 1+x substitute the count and x
+ # move on to next x
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Open Parens</title><link>https://rowstu.net/hackattic/open-parens/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/open-parens/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+
+def main():
+ 
+ input = (sys.stdin.read().split())
+ for t in input:
+ left = t.count(&amp;#34;(&amp;#34;)
+ right = t.count(&amp;#34;)&amp;#34;)
+ 
+ if left == right:
+ print(&amp;#34;yes&amp;#34;)
+ else:
+ print(&amp;#34;no&amp;#34;)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Every line you read in from STDIN will contain a bunch of parentheses.&lt;/p&gt;
+&lt;p&gt;Your task is to determine if they are properly nested – i.e. if every opening parenthesis has a closing one.&lt;/p&gt;
+&lt;p&gt;Sample input&lt;/p&gt;
+&lt;p&gt;(())&lt;/p&gt;
+&lt;p&gt;()))&lt;/p&gt;
+&lt;p&gt;(()((())))&lt;/p&gt;
+&lt;p&gt;(()(()(()))&lt;/p&gt;
+&lt;p&gt;Sample output&lt;/p&gt;
+&lt;p&gt;yes&lt;/p&gt;</description></item><item><title>The Sum Of Things</title><link>https://rowstu.net/hackattic/the-sum-of-things/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/the-sum-of-things/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+import re
+
+def main():
+
+ 
+ input = (sys.stdin.read().split(sep=&amp;#34;\n&amp;#34;, maxsplit=-1))
+ 
+ for i in input:
+ 
+ total = 0
+ 
+ for j in i.split():
+ 
+ # check if number and add to total
+ if j.isnumeric():
+ total += int(j)
+ 
+ 
+ # check if hex 0x, convert to integer and add to total
+ if re.fullmatch(r&amp;#34;^0x[0-9A-Fa-f]+$&amp;#34;, j):
+ # print(f&amp;#34;it looks like {j} is hex&amp;#34;)
+ total = total + int(j, 16)
+ 
+ # check if binary, convert to integer and add to total
+ if re.fullmatch(r&amp;#34;^0b[0-1]+$&amp;#34;, j):
+ # print(f&amp;#34;it looks like {j} is binary&amp;#34;)
+ total = total + int(j, 2)
+ 
+ # check if octal, convert to integer and add to total
+ if re.fullmatch(r&amp;#34;^0o[0-9]+$&amp;#34;, j):
+ # print(f&amp;#34;it looks like {j} is binary&amp;#34;)
+ total = total + int(j, 8)
+ 
+ # check if ascii, convert to integer and add to total
+ if len(j) == 1 and j.isascii() and not j.isdigit():
+ #print(f&amp;#34;it looks like {j} is ascii&amp;#34;)
+ total = total + ord(j)
+ 
+ print(total)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;experimenting to check for ASCII character:&lt;/p&gt;</description></item><item><title>What Day Was It</title><link>https://rowstu.net/hackattic/what_day_was_it/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/what_day_was_it/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;zimport datetime
+from datetime import date,timedelta
+import sys
+
+def main():
+ 
+ epoch = date(1970,1,1)
+ input = (sys.stdin.read().split())
+
+ for t in input:
+ d = epoch + timedelta(days=int(t))
+ # print(d)
+ print(d.strftime(&amp;#39;%A&amp;#39;))
+
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://stackoverflow.com/questions/9847213/how-do-i-get-the-day-of-week-given-a-date"&gt;https://stackoverflow.com/questions/9847213/how-do-i-get-the-day-of-week-given-a-date&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://docs.python.org/3/library/datetime.html#datetime.date.isoweekday"&gt;https://docs.python.org/3/library/datetime.html#datetime.date.isoweekday&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://stackoverflow.com/questions/6871016/adding-days-to-a-date-in-python"&gt;https://stackoverflow.com/questions/6871016/adding-days-to-a-date-in-python&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Yes It Fizz</title><link>https://rowstu.net/hackattic/yes-it-fizz/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/yes-it-fizz/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+
+def main():
+ 
+ low,high = (sys.stdin.read().split())
+ 
+ for i in range(int(low),int(high)+1):
+ if i % 3 == 0 and i % 5 == 0:
+ print(&amp;#34;FizzBuzz&amp;#34;)
+ elif i % 3 == 0:
+ print(&amp;#34;Fizz&amp;#34;)
+ elif i % 5 == 0:
+ print(&amp;#34;Buzz&amp;#34;)
+ else:
+ print(i)
+
+if __name__ == &amp;#34;__main__&amp;#34;:
+ main()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;resources used to solve this:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.digitalocean.com/community/tutorials/python-add-to-list"&gt;https://www.digitalocean.com/community/tutorials/python-add-to-list&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.geeksforgeeks.org/iterate-over-a-list-in-python/"&gt;https://www.geeksforgeeks.org/iterate-over-a-list-in-python/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://docs.python.org/3/library/io.html#"&gt;https://docs.python.org/3/library/io.html#&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
