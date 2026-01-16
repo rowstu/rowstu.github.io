@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>YAML / JSON Converter</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-alt: #8b5cf6;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 1400px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.toolbar {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		button {
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		button:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		button.primary {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #000;
+		}
+
+		button.primary:hover { opacity: 0.9; }
+
+		button.alt {
+			background: var(--accent-alt);
+			border-color: var(--accent-alt);
+			color: #fff;
+		}
+
+		.direction-indicator {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border-radius: 4px;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+		}
+
+		.arrow { color: var(--accent); font-weight: bold; }
+
+		.editor-container {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+			height: calc(100vh - 220px);
+			min-height: 400px;
+		}
+
+		@media (max-width: 900px) {
+			.editor-container {
+				grid-template-columns: 1fr;
+				height: auto;
+			}
+			.panel { height: 300px; }
+		}
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+		}
+
+		.panel.yaml { border-top: 3px solid var(--accent); }
+		.panel.json { border-top: 3px solid var(--accent-alt); }
+
+		.panel-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.panel-header .label {
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		.panel-header .label.yaml-label { color: var(--accent); }
+		.panel-header .label.json-label { color: var(--accent-alt); }
+
+		.status {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.status-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: var(--text-muted);
+		}
+
+		.status-dot.valid { background: var(--accent); }
+		.status-dot.invalid { background: var(--danger); }
+
+		textarea {
+			flex: 1;
+			width: 100%;
+			padding: 1rem;
+			background: transparent;
+			border: none;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			line-height: 1.6;
+			resize: none;
+			outline: none;
+		}
+
+		textarea::placeholder { color: var(--text-muted); }
+
+		.error-banner {
+			padding: 0.75rem 1rem;
+			background: rgba(239, 68, 68, 0.1);
+			border-top: 1px solid var(--danger);
+			color: var(--danger);
+			font-size: 0.8rem;
+		}
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>YAML / JSON Converter</h1>
+			<p class="subtitle">Convert between YAML and JSON formats</p>
+		</header>
+
+		<div class="toolbar">
+			<button class="primary" onclick="yamlToJson()">YAML &rarr; JSON</button>
+			<button class="alt" onclick="jsonToYaml()">JSON &rarr; YAML</button>
+			<button onclick="copyYaml()">Copy YAML</button>
+			<button onclick="copyJson()">Copy JSON</button>
+			<button onclick="clearAll()">Clear</button>
+			<button onclick="loadSample()">Load Sample</button>
+		</div>
+
+		<div class="editor-container">
+			<div class="panel yaml">
+				<div class="panel-header">
+					<span class="label yaml-label">YAML</span>
+					<div class="status">
+						<div class="status-dot" id="yamlStatus"></div>
+						<span id="yamlStatusText"></span>
+					</div>
+				</div>
+				<textarea id="yamlInput" placeholder="Enter YAML here..."></textarea>
+				<div class="error-banner" id="yamlError" style="display: none;"></div>
+			</div>
+
+			<div class="panel json">
+				<div class="panel-header">
+					<span class="label json-label">JSON</span>
+					<div class="status">
+						<div class="status-dot" id="jsonStatus"></div>
+						<span id="jsonStatusText"></span>
+					</div>
+				</div>
+				<textarea id="jsonInput" placeholder="Enter JSON here..."></textarea>
+				<div class="error-banner" id="jsonError" style="display: none;"></div>
+			</div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<script>
+		const yamlInput = document.getElementById('yamlInput');
+		const jsonInput = document.getElementById('jsonInput');
+		const yamlStatus = document.getElementById('yamlStatus');
+		const jsonStatus = document.getElementById('jsonStatus');
+		const yamlStatusText = document.getElementById('yamlStatusText');
+		const jsonStatusText = document.getElementById('jsonStatusText');
+		const yamlError = document.getElementById('yamlError');
+		const jsonError = document.getElementById('jsonError');
+
+		function yamlToJson() {
+			const yaml = yamlInput.value.trim();
+			yamlError.style.display = 'none';
+			jsonError.style.display = 'none';
+
+			if (!yaml) {
+				setStatus('yaml', null);
+				setStatus('json', null);
+				jsonInput.value = '';
+				return;
+			}
+
+			try {
+				const parsed = jsyaml.load(yaml);
+				const json = JSON.stringify(parsed, null, 2);
+				jsonInput.value = json;
+				setStatus('yaml', true);
+				setStatus('json', true);
+			} catch (e) {
+				setStatus('yaml', false);
+				yamlError.textContent = e.message;
+				yamlError.style.display = 'block';
+			}
+		}
+
+		function jsonToYaml() {
+			const json = jsonInput.value.trim();
+			yamlError.style.display = 'none';
+			jsonError.style.display = 'none';
+
+			if (!json) {
+				setStatus('yaml', null);
+				setStatus('json', null);
+				yamlInput.value = '';
+				return;
+			}
+
+			try {
+				const parsed = JSON.parse(json);
+				const yaml = jsyaml.dump(parsed, {
+					indent: 2,
+					lineWidth: -1,
+					noRefs: true,
+					sortKeys: false
+				});
+				yamlInput.value = yaml;
+				setStatus('json', true);
+				setStatus('yaml', true);
+			} catch (e) {
+				setStatus('json', false);
+				jsonError.textContent = e.message;
+				jsonError.style.display = 'block';
+			}
+		}
+
+		function setStatus(type, valid) {
+			const dot = type === 'yaml' ? yamlStatus : jsonStatus;
+			const text = type === 'yaml' ? yamlStatusText : jsonStatusText;
+
+			if (valid === null) {
+				dot.className = 'status-dot';
+				text.textContent = '';
+			} else if (valid) {
+				dot.className = 'status-dot valid';
+				text.textContent = 'Valid';
+			} else {
+				dot.className = 'status-dot invalid';
+				text.textContent = 'Invalid';
+			}
+		}
+
+		function copyYaml() {
+			navigator.clipboard.writeText(yamlInput.value).then(() => {
+				const btn = event.target;
+				const orig = btn.textContent;
+				btn.textContent = 'Copied!';
+				setTimeout(() => btn.textContent = orig, 1500);
+			});
+		}
+
+		function copyJson() {
+			navigator.clipboard.writeText(jsonInput.value).then(() => {
+				const btn = event.target;
+				const orig = btn.textContent;
+				btn.textContent = 'Copied!';
+				setTimeout(() => btn.textContent = orig, 1500);
+			});
+		}
+
+		function clearAll() {
+			yamlInput.value = '';
+			jsonInput.value = '';
+			yamlError.style.display = 'none';
+			jsonError.style.display = 'none';
+			setStatus('yaml', null);
+			setStatus('json', null);
+		}
+
+		function loadSample() {
+			const sampleYaml = `# Kubernetes Deployment Example
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.21
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+            requests:
+              cpu: "250m"
+              memory: "64Mi"
+          env:
+            - name: ENV
+              value: production
+            - name: DEBUG
+              value: "false"`;
+			yamlInput.value = sampleYaml;
+			yamlToJson();
+		}
+
+		// Auto-convert on paste
+		yamlInput.addEventListener('paste', () => setTimeout(yamlToJson, 0));
+		jsonInput.addEventListener('paste', () => setTimeout(jsonToYaml, 0));
+	</script>
+</body>
+</html>

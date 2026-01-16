@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>JSON Formatter & Validator</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--info: #3b82f6;
+			--string: #a5d6ff;
+			--number: #79c0ff;
+			--boolean: #ff7b72;
+			--null: #9ca3af;
+			--key: #7ee787;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 1400px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.toolbar {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+			flex-wrap: wrap;
+		}
+
+		button {
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		button:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		button.primary {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #000;
+		}
+
+		button.primary:hover { opacity: 0.9; }
+
+		.editor-container {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+			height: calc(100vh - 220px);
+			min-height: 400px;
+		}
+
+		@media (max-width: 900px) {
+			.editor-container {
+				grid-template-columns: 1fr;
+				height: auto;
+			}
+			.panel { height: 300px; }
+		}
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.panel-header .status {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.status-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: var(--text-muted);
+		}
+
+		.status-dot.valid { background: var(--accent); }
+		.status-dot.invalid { background: var(--danger); }
+
+		textarea {
+			flex: 1;
+			width: 100%;
+			padding: 1rem;
+			background: transparent;
+			border: none;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			line-height: 1.6;
+			resize: none;
+			outline: none;
+		}
+
+		textarea::placeholder { color: var(--text-muted); }
+
+		.output {
+			flex: 1;
+			padding: 1rem;
+			overflow: auto;
+			font-size: 0.85rem;
+			line-height: 1.6;
+			white-space: pre-wrap;
+			word-break: break-word;
+		}
+
+		.output .string { color: var(--string); }
+		.output .number { color: var(--number); }
+		.output .boolean { color: var(--boolean); }
+		.output .null { color: var(--null); }
+		.output .key { color: var(--key); }
+		.output .bracket { color: var(--text-muted); }
+
+		.error-message {
+			color: var(--danger);
+			padding: 1rem;
+			background: rgba(239, 68, 68, 0.1);
+			border-radius: 4px;
+			margin: 1rem;
+		}
+
+		.stats {
+			display: flex;
+			gap: 1.5rem;
+			padding: 0.75rem 1rem;
+			border-top: 1px solid var(--border);
+			font-size: 0.75rem;
+			color: var(--text-muted);
+		}
+
+		.stat-item span { color: var(--text); margin-left: 0.25rem; }
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+
+		.indent-select {
+			padding: 0.5rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>JSON Formatter & Validator</h1>
+			<p class="subtitle">Paste JSON to format, validate, and analyze</p>
+		</header>
+
+		<div class="toolbar">
+			<button class="primary" onclick="formatJSON()">Format</button>
+			<button onclick="minifyJSON()">Minify</button>
+			<button onclick="copyOutput()">Copy Output</button>
+			<button onclick="clearAll()">Clear</button>
+			<button onclick="loadSample()">Load Sample</button>
+			<select class="indent-select" id="indentSize" onchange="formatJSON()">
+				<option value="2">2 spaces</option>
+				<option value="4">4 spaces</option>
+				<option value="tab">Tab</option>
+			</select>
+		</div>
+
+		<div class="editor-container">
+			<div class="panel">
+				<div class="panel-header">
+					<span>Input</span>
+					<div class="status">
+						<div class="status-dot" id="statusDot"></div>
+						<span id="statusText">Waiting for input...</span>
+					</div>
+				</div>
+				<textarea id="input" placeholder="Paste your JSON here..." oninput="validateJSON()"></textarea>
+			</div>
+
+			<div class="panel">
+				<div class="panel-header">
+					<span>Output</span>
+				</div>
+				<div class="output" id="output">Formatted JSON will appear here...</div>
+				<div class="stats" id="stats"></div>
+			</div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<script>
+		const input = document.getElementById('input');
+		const output = document.getElementById('output');
+		const statusDot = document.getElementById('statusDot');
+		const statusText = document.getElementById('statusText');
+		const stats = document.getElementById('stats');
+
+		let parsedJSON = null;
+
+		function validateJSON() {
+			const value = input.value.trim();
+			if (!value) {
+				statusDot.className = 'status-dot';
+				statusText.textContent = 'Waiting for input...';
+				output.innerHTML = 'Formatted JSON will appear here...';
+				stats.innerHTML = '';
+				parsedJSON = null;
+				return false;
+			}
+
+			try {
+				parsedJSON = JSON.parse(value);
+				statusDot.className = 'status-dot valid';
+				statusText.textContent = 'Valid JSON';
+				return true;
+			} catch (e) {
+				parsedJSON = null;
+				statusDot.className = 'status-dot invalid';
+				statusText.textContent = 'Invalid JSON';
+				output.innerHTML = `<div class="error-message">Error: ${e.message}</div>`;
+				stats.innerHTML = '';
+				return false;
+			}
+		}
+
+		function getIndent() {
+			const val = document.getElementById('indentSize').value;
+			return val === 'tab' ? '\t' : ' '.repeat(parseInt(val));
+		}
+
+		function formatJSON() {
+			if (!validateJSON()) return;
+
+			const indent = getIndent();
+			const formatted = JSON.stringify(parsedJSON, null, indent);
+			output.innerHTML = syntaxHighlight(formatted);
+			updateStats(formatted);
+		}
+
+		function minifyJSON() {
+			if (!validateJSON()) return;
+
+			const minified = JSON.stringify(parsedJSON);
+			output.innerHTML = syntaxHighlight(minified);
+			updateStats(minified);
+		}
+
+		function syntaxHighlight(json) {
+			json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+			return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+				let cls = 'number';
+				if (/^"/.test(match)) {
+					if (/:$/.test(match)) {
+						cls = 'key';
+						match = match.slice(0, -1) + '<span class="bracket">:</span>';
+					} else {
+						cls = 'string';
+					}
+				} else if (/true|false/.test(match)) {
+					cls = 'boolean';
+				} else if (/null/.test(match)) {
+					cls = 'null';
+				}
+				return '<span class="' + cls + '">' + match + '</span>';
+			}).replace(/[\[\]{}]/g, '<span class="bracket">$&</span>');
+		}
+
+		function updateStats(json) {
+			const objCount = (json.match(/\{/g) || []).length;
+			const arrCount = (json.match(/\[/g) || []).length;
+			const keyCount = (json.match(/"[^"]+"\s*:/g) || []).length;
+			const bytes = new Blob([json]).size;
+
+			stats.innerHTML = `
+				<div class="stat-item">Size:<span>${formatBytes(bytes)}</span></div>
+				<div class="stat-item">Objects:<span>${objCount}</span></div>
+				<div class="stat-item">Arrays:<span>${arrCount}</span></div>
+				<div class="stat-item">Keys:<span>${keyCount}</span></div>
+			`;
+		}
+
+		function formatBytes(bytes) {
+			if (bytes === 0) return '0 B';
+			const k = 1024;
+			const sizes = ['B', 'KB', 'MB'];
+			const i = Math.floor(Math.log(bytes) / Math.log(k));
+			return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+		}
+
+		function copyOutput() {
+			if (!parsedJSON) return;
+			const text = output.textContent;
+			navigator.clipboard.writeText(text).then(() => {
+				const btn = event.target;
+				const orig = btn.textContent;
+				btn.textContent = 'Copied!';
+				setTimeout(() => btn.textContent = orig, 1500);
+			});
+		}
+
+		function clearAll() {
+			input.value = '';
+			output.innerHTML = 'Formatted JSON will appear here...';
+			stats.innerHTML = '';
+			statusDot.className = 'status-dot';
+			statusText.textContent = 'Waiting for input...';
+			parsedJSON = null;
+		}
+
+		function loadSample() {
+			const sample = {
+				"name": "John Doe",
+				"age": 30,
+				"isAdmin": false,
+				"email": null,
+				"roles": ["user", "editor"],
+				"address": {
+					"street": "123 Main St",
+					"city": "London",
+					"postcode": "SW1A 1AA"
+				},
+				"projects": [
+					{"id": 1, "name": "Website Redesign", "active": true},
+					{"id": 2, "name": "API Migration", "active": false}
+				]
+			};
+			input.value = JSON.stringify(sample);
+			formatJSON();
+		}
+
+		// Auto-format on paste
+		input.addEventListener('paste', () => {
+			setTimeout(formatJSON, 0);
+		});
+	</script>
+</body>
+</html>

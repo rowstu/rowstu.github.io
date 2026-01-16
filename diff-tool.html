@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Text Diff Tool</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--added-bg: rgba(16, 185, 129, 0.15);
+			--added-border: #10b981;
+			--removed-bg: rgba(239, 68, 68, 0.15);
+			--removed-border: #ef4444;
+			--changed-bg: rgba(251, 191, 36, 0.15);
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 1400px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.toolbar {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+			flex-wrap: wrap;
+		}
+
+		button {
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		button:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		button.primary {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #000;
+		}
+
+		button.primary:hover { opacity: 0.9; }
+
+		.input-container {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		@media (max-width: 900px) {
+			.input-container { grid-template-columns: 1fr; }
+		}
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.panel-header .label { font-weight: 500; color: var(--text); }
+		.panel-header .count { font-size: 0.75rem; }
+
+		textarea {
+			width: 100%;
+			height: 200px;
+			padding: 1rem;
+			background: transparent;
+			border: none;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			line-height: 1.6;
+			resize: vertical;
+			outline: none;
+		}
+
+		textarea::placeholder { color: var(--text-muted); }
+
+		.diff-output {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			overflow: hidden;
+		}
+
+		.diff-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.diff-title {
+			font-size: 0.8rem;
+			color: var(--text);
+			font-weight: 500;
+		}
+
+		.diff-stats {
+			display: flex;
+			gap: 1rem;
+			font-size: 0.75rem;
+		}
+
+		.stat-added { color: var(--added-border); }
+		.stat-removed { color: var(--removed-border); }
+
+		.diff-content {
+			padding: 0;
+			font-size: 0.85rem;
+			line-height: 1.6;
+			max-height: 400px;
+			overflow: auto;
+		}
+
+		.diff-line {
+			display: flex;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.diff-line:last-child { border-bottom: none; }
+
+		.line-num {
+			min-width: 40px;
+			padding: 0.25rem 0.5rem;
+			text-align: right;
+			color: var(--text-muted);
+			font-size: 0.75rem;
+			background: rgba(0,0,0,0.2);
+			user-select: none;
+			border-right: 1px solid var(--border);
+		}
+
+		.line-num-left { border-right: 1px solid var(--border); }
+
+		.line-content {
+			flex: 1;
+			padding: 0.25rem 0.75rem;
+			white-space: pre-wrap;
+			word-break: break-word;
+		}
+
+		.diff-line.added {
+			background: var(--added-bg);
+		}
+
+		.diff-line.added .line-content::before {
+			content: '+';
+			color: var(--added-border);
+			margin-right: 0.5rem;
+		}
+
+		.diff-line.removed {
+			background: var(--removed-bg);
+		}
+
+		.diff-line.removed .line-content::before {
+			content: '-';
+			color: var(--removed-border);
+			margin-right: 0.5rem;
+		}
+
+		.diff-line.unchanged .line-content::before {
+			content: ' ';
+			margin-right: 0.5rem;
+		}
+
+		.empty-state {
+			padding: 3rem;
+			text-align: center;
+			color: var(--text-muted);
+		}
+
+		.view-toggle {
+			display: flex;
+			gap: 0.25rem;
+			background: var(--bg);
+			padding: 0.25rem;
+			border-radius: 4px;
+		}
+
+		.view-btn {
+			padding: 0.35rem 0.75rem;
+			background: transparent;
+			border: none;
+			color: var(--text-muted);
+			font-size: 0.75rem;
+			cursor: pointer;
+			border-radius: 3px;
+		}
+
+		.view-btn.active {
+			background: var(--surface);
+			color: var(--text);
+		}
+
+		.side-by-side {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.side-panel {
+			border-right: 1px solid var(--border);
+		}
+
+		.side-panel:last-child { border-right: none; }
+
+		.side-header {
+			padding: 0.5rem 0.75rem;
+			background: rgba(0,0,0,0.2);
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+
+		.inline-diff .word-added {
+			background: var(--added-bg);
+			border-bottom: 1px solid var(--added-border);
+		}
+
+		.inline-diff .word-removed {
+			background: var(--removed-bg);
+			border-bottom: 1px solid var(--removed-border);
+			text-decoration: line-through;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Text Diff Tool</h1>
+			<p class="subtitle">Compare two text blocks and see the differences</p>
+		</header>
+
+		<div class="toolbar">
+			<button class="primary" onclick="compareDiff()">Compare</button>
+			<button onclick="swapTexts()">Swap</button>
+			<button onclick="clearAll()">Clear</button>
+			<button onclick="loadSample()">Load Sample</button>
+		</div>
+
+		<div class="input-container">
+			<div class="panel">
+				<div class="panel-header">
+					<span class="label">Original Text</span>
+					<span class="count" id="leftCount">0 lines</span>
+				</div>
+				<textarea id="leftInput" placeholder="Paste original text here..." oninput="updateCount('left')"></textarea>
+			</div>
+
+			<div class="panel">
+				<div class="panel-header">
+					<span class="label">Modified Text</span>
+					<span class="count" id="rightCount">0 lines</span>
+				</div>
+				<textarea id="rightInput" placeholder="Paste modified text here..." oninput="updateCount('right')"></textarea>
+			</div>
+		</div>
+
+		<div class="diff-output">
+			<div class="diff-header">
+				<span class="diff-title">Diff Output</span>
+				<div style="display: flex; gap: 1rem; align-items: center;">
+					<div class="diff-stats" id="diffStats"></div>
+					<div class="view-toggle">
+						<button class="view-btn active" onclick="setView('unified', this)">Unified</button>
+						<button class="view-btn" onclick="setView('split', this)">Split</button>
+					</div>
+				</div>
+			</div>
+			<div class="diff-content" id="diffOutput">
+				<div class="empty-state">Enter text in both panels and click Compare</div>
+			</div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<script>
+		const leftInput = document.getElementById('leftInput');
+		const rightInput = document.getElementById('rightInput');
+		const diffOutput = document.getElementById('diffOutput');
+		const diffStats = document.getElementById('diffStats');
+
+		let currentView = 'unified';
+		let lastDiff = null;
+
+		function updateCount(side) {
+			const input = side === 'left' ? leftInput : rightInput;
+			const count = document.getElementById(side + 'Count');
+			const lines = input.value ? input.value.split('\n').length : 0;
+			count.textContent = lines + ' line' + (lines !== 1 ? 's' : '');
+		}
+
+		function compareDiff() {
+			const left = leftInput.value;
+			const right = rightInput.value;
+
+			if (!left && !right) {
+				diffOutput.innerHTML = '<div class="empty-state">Enter text in both panels and click Compare</div>';
+				diffStats.innerHTML = '';
+				return;
+			}
+
+			lastDiff = computeDiff(left.split('\n'), right.split('\n'));
+			renderDiff();
+		}
+
+		function computeDiff(oldLines, newLines) {
+			// Simple line-by-line diff using LCS
+			const lcs = longestCommonSubsequence(oldLines, newLines);
+			const diff = [];
+
+			let oldIdx = 0, newIdx = 0, lcsIdx = 0;
+
+			while (oldIdx < oldLines.length || newIdx < newLines.length) {
+				if (lcsIdx < lcs.length && oldIdx < oldLines.length && oldLines[oldIdx] === lcs[lcsIdx] && newIdx < newLines.length && newLines[newIdx] === lcs[lcsIdx]) {
+					diff.push({ type: 'unchanged', oldLine: oldIdx + 1, newLine: newIdx + 1, content: oldLines[oldIdx] });
+					oldIdx++; newIdx++; lcsIdx++;
+				} else if (newIdx < newLines.length && (lcsIdx >= lcs.length || newLines[newIdx] !== lcs[lcsIdx])) {
+					diff.push({ type: 'added', newLine: newIdx + 1, content: newLines[newIdx] });
+					newIdx++;
+				} else if (oldIdx < oldLines.length && (lcsIdx >= lcs.length || oldLines[oldIdx] !== lcs[lcsIdx])) {
+					diff.push({ type: 'removed', oldLine: oldIdx + 1, content: oldLines[oldIdx] });
+					oldIdx++;
+				}
+			}
+
+			return diff;
+		}
+
+		function longestCommonSubsequence(a, b) {
+			const m = a.length, n = b.length;
+			const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+			for (let i = 1; i <= m; i++) {
+				for (let j = 1; j <= n; j++) {
+					if (a[i - 1] === b[j - 1]) {
+						dp[i][j] = dp[i - 1][j - 1] + 1;
+					} else {
+						dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+					}
+				}
+			}
+
+			const lcs = [];
+			let i = m, j = n;
+			while (i > 0 && j > 0) {
+				if (a[i - 1] === b[j - 1]) {
+					lcs.unshift(a[i - 1]);
+					i--; j--;
+				} else if (dp[i - 1][j] > dp[i][j - 1]) {
+					i--;
+				} else {
+					j--;
+				}
+			}
+
+			return lcs;
+		}
+
+		function renderDiff() {
+			if (!lastDiff) return;
+
+			const added = lastDiff.filter(d => d.type === 'added').length;
+			const removed = lastDiff.filter(d => d.type === 'removed').length;
+
+			diffStats.innerHTML = `
+				<span class="stat-added">+${added} added</span>
+				<span class="stat-removed">-${removed} removed</span>
+			`;
+
+			if (currentView === 'unified') {
+				renderUnified();
+			} else {
+				renderSplit();
+			}
+		}
+
+		function renderUnified() {
+			let html = '';
+			lastDiff.forEach(line => {
+				const oldNum = line.oldLine || '';
+				const newNum = line.newLine || '';
+				html += `<div class="diff-line ${line.type}">
+					<span class="line-num">${oldNum}</span>
+					<span class="line-num">${newNum}</span>
+					<span class="line-content">${escapeHtml(line.content)}</span>
+				</div>`;
+			});
+			diffOutput.innerHTML = html || '<div class="empty-state">No differences found</div>';
+		}
+
+		function renderSplit() {
+			let leftHtml = '', rightHtml = '';
+			let leftLineNum = 1, rightLineNum = 1;
+
+			lastDiff.forEach(line => {
+				if (line.type === 'unchanged') {
+					leftHtml += `<div class="diff-line unchanged"><span class="line-num">${leftLineNum++}</span><span class="line-content">${escapeHtml(line.content)}</span></div>`;
+					rightHtml += `<div class="diff-line unchanged"><span class="line-num">${rightLineNum++}</span><span class="line-content">${escapeHtml(line.content)}</span></div>`;
+				} else if (line.type === 'removed') {
+					leftHtml += `<div class="diff-line removed"><span class="line-num">${leftLineNum++}</span><span class="line-content">${escapeHtml(line.content)}</span></div>`;
+					rightHtml += `<div class="diff-line"><span class="line-num"></span><span class="line-content"></span></div>`;
+				} else if (line.type === 'added') {
+					leftHtml += `<div class="diff-line"><span class="line-num"></span><span class="line-content"></span></div>`;
+					rightHtml += `<div class="diff-line added"><span class="line-num">${rightLineNum++}</span><span class="line-content">${escapeHtml(line.content)}</span></div>`;
+				}
+			});
+
+			diffOutput.innerHTML = `
+				<div class="side-by-side">
+					<div class="side-panel">
+						<div class="side-header">Original</div>
+						${leftHtml}
+					</div>
+					<div class="side-panel">
+						<div class="side-header">Modified</div>
+						${rightHtml}
+					</div>
+				</div>
+			`;
+		}
+
+		function setView(view, btn) {
+			currentView = view;
+			document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			if (lastDiff) renderDiff();
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+
+		function swapTexts() {
+			const temp = leftInput.value;
+			leftInput.value = rightInput.value;
+			rightInput.value = temp;
+			updateCount('left');
+			updateCount('right');
+		}
+
+		function clearAll() {
+			leftInput.value = '';
+			rightInput.value = '';
+			diffOutput.innerHTML = '<div class="empty-state">Enter text in both panels and click Compare</div>';
+			diffStats.innerHTML = '';
+			lastDiff = null;
+			updateCount('left');
+			updateCount('right');
+		}
+
+		function loadSample() {
+			leftInput.value = `server {
+    listen 80;
+    server_name example.com;
+    root /var/www/html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    error_log /var/log/nginx/error.log;
+    access_log /var/log/nginx/access.log;
+}`;
+
+			rightInput.value = `server {
+    listen 443 ssl;
+    server_name example.com;
+    root /var/www/html;
+
+    ssl_certificate /etc/ssl/certs/example.crt;
+    ssl_certificate_key /etc/ssl/private/example.key;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /api {
+        proxy_pass http://localhost:3000;
+    }
+
+    error_log /var/log/nginx/error.log;
+    access_log /var/log/nginx/access.log;
+}`;
+
+			updateCount('left');
+			updateCount('right');
+			compareDiff();
+		}
+	</script>
+</body>
+</html>
