@@ -1,180 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VAT Calculator</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>VAT Calculator</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-alt: #8b5cf6;
+			--warning: #f59e0b;
+		}
 
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #f0f2f5;
-        }
+		* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .calculator {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
 
-        .input-group {
-            margin-bottom: 20px;
-        }
+		.container { max-width: 700px; margin: 0 auto; }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+		header { margin-bottom: 1.5rem; }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
 
-        .results {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
 
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
 
-        .math-box {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 14px;
-        }
+		.panel-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-muted);
+		}
 
-        .checkbox-group {
-            margin: 20px 0;
-        }
+		.panel-header .label { font-weight: 500; color: var(--text); }
 
-        .custom-vat {
-            margin-top: 10px;
-            display: none;
-        }
+		.panel-content { padding: 1rem; }
 
-        .custom-vat.show {
-            display: block;
-        }
+		.mode-toggle {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
 
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .calculator {
-                padding: 15px;
-            }
-        }
-    </style>
+		.mode-btn {
+			flex: 1;
+			padding: 0.75rem 1rem;
+			background: var(--surface-hover);
+			border: 2px solid var(--border);
+			border-radius: 6px;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.85rem;
+			cursor: pointer;
+			transition: all 0.2s;
+			text-align: center;
+		}
+
+		.mode-btn:hover { border-color: var(--accent); }
+
+		.mode-btn.active {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #000;
+		}
+
+		.input-row {
+			display: grid;
+			grid-template-columns: 2fr 1fr;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		@media (max-width: 500px) {
+			.input-row { grid-template-columns: 1fr; }
+		}
+
+		.input-group label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-size: 0.85rem;
+			color: var(--text-muted);
+		}
+
+		.input-wrapper {
+			display: flex;
+			align-items: center;
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			overflow: hidden;
+		}
+
+		.input-wrapper:focus-within { border-color: var(--accent); }
+
+		.input-prefix, .input-suffix {
+			padding: 0.75rem;
+			background: var(--bg);
+			color: var(--text-muted);
+			font-size: 1rem;
+		}
+
+		input[type="number"] {
+			flex: 1;
+			padding: 0.75rem;
+			background: transparent;
+			border: none;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 1rem;
+			outline: none;
+			min-width: 0;
+		}
+
+		input[type="number"]::-webkit-inner-spin-button { display: none; }
+		input[type="number"]::placeholder { color: var(--text-muted); }
+
+		.vat-presets {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.5rem;
+		}
+
+		.preset-btn {
+			padding: 0.35rem 0.75rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.preset-btn:hover { border-color: var(--accent); color: var(--text); }
+		.preset-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
+
+		.results {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1rem;
+			margin-top: 1rem;
+		}
+
+		@media (max-width: 500px) {
+			.results { grid-template-columns: 1fr; }
+		}
+
+		.result-card {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			text-align: center;
+		}
+
+		.result-card.highlight {
+			border-color: var(--accent);
+			background: rgba(16, 185, 129, 0.1);
+		}
+
+		.result-label {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.result-value {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		.result-card.highlight .result-value { color: var(--accent); }
+
+		.breakdown {
+			margin-top: 1rem;
+			padding: 1rem;
+			background: var(--bg);
+			border-radius: 6px;
+		}
+
+		.breakdown-row {
+			display: flex;
+			justify-content: space-between;
+			padding: 0.5rem 0;
+			font-size: 0.9rem;
+		}
+
+		.breakdown-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+		.breakdown-row .label { color: var(--text-muted); }
+		.breakdown-row .value { color: var(--text); font-weight: 500; }
+		.breakdown-row.total .value { color: var(--accent); font-size: 1.1rem; }
+
+		.formula-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+			gap: 1rem;
+		}
+
+		.formula-card {
+			background: var(--surface-hover);
+			border-radius: 6px;
+			padding: 1rem;
+		}
+
+		.formula-title {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+		}
+
+		.formula-code {
+			font-family: inherit;
+			font-size: 0.9rem;
+			color: var(--accent);
+			background: var(--bg);
+			padding: 0.5rem;
+			border-radius: 4px;
+			margin-bottom: 0.5rem;
+		}
+
+		.formula-example {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+		}
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+	</style>
 </head>
 <body>
-    <div class="calculator">
-        <h1 style="margin-bottom: 20px;">VAT Calculator</h1>
-        
-        <div class="input-group">
-            <label for="price">Enter Price (£)</label>
-            <input type="number" id="price" step="0.01" min="0" placeholder="0.00">
-        </div>
+	<div class="container">
+		<header>
+			<h1>VAT Calculator</h1>
+			<p class="subtitle">Calculate VAT for UK prices - add or remove VAT</p>
+		</header>
 
-        <div class="checkbox-group">
-            <input type="checkbox" id="customVatToggle">
-            <label for="customVatToggle">Use custom VAT rate</label>
-            
-            <div class="custom-vat" id="customVatInput">
-                <label for="vatRate">VAT Rate (%)</label>
-                <input type="number" id="vatRate" min="1" max="99" value="20" step="1">
-            </div>
-        </div>
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Calculator</span>
+			</div>
+			<div class="panel-content">
+				<div class="mode-toggle">
+					<button class="mode-btn active" id="addVatBtn" onclick="setMode('add')">Add VAT</button>
+					<button class="mode-btn" id="removeVatBtn" onclick="setMode('remove')">Remove VAT</button>
+				</div>
 
-        <div class="results">
-            <div class="result-item">
-                <span>Original Price:</span>
-                <span id="originalPrice">£0.00</span>
-            </div>
-            <div class="result-item">
-                <span>VAT Amount:</span>
-                <span id="vatAmount">£0.00</span>
-            </div>
-            <div class="result-item" style="font-weight: bold;">
-                <span>Total Price:</span>
-                <span id="totalPrice">£0.00</span>
-            </div>
-        </div>
+				<div class="input-row">
+					<div class="input-group">
+						<label id="priceLabel">Price (excl. VAT)</label>
+						<div class="input-wrapper">
+							<span class="input-prefix">£</span>
+							<input type="number" id="price" step="0.01" min="0" placeholder="0.00">
+						</div>
+					</div>
+					<div class="input-group">
+						<label>VAT Rate</label>
+						<div class="input-wrapper">
+							<input type="number" id="vatRate" min="0" max="100" value="20" step="0.5">
+							<span class="input-suffix">%</span>
+						</div>
+						<div class="vat-presets">
+							<button class="preset-btn active" onclick="setRate(20)">20%</button>
+							<button class="preset-btn" onclick="setRate(5)">5%</button>
+							<button class="preset-btn" onclick="setRate(12.5)">12.5%</button>
+							<button class="preset-btn" onclick="setRate(0)">0%</button>
+						</div>
+					</div>
+				</div>
 
-        <div class="math-box">
-            <h3 style="margin-bottom: 10px;">How to Calculate VAT</h3>
-            <p>To add VAT:</p>
-            <ul style="margin-left: 20px;">
-                <li>Multiply the original price by (1 + VAT%/100)</li>
-                <li>Example: £100 × (1 + 20/100) = £120</li>
-            </ul>
-            <p style="margin-top: 10px;">To remove VAT:</p>
-            <ul style="margin-left: 20px;">
-                <li>Divide the total price by (1 + VAT%/100)</li>
-                <li>Example: £120 ÷ (1 + 20/100) = £100</li>
-            </ul>
-        </div>
-    </div>
+				<div class="results">
+					<div class="result-card" id="netCard">
+						<div class="result-label">Net Price</div>
+						<div class="result-value" id="netPrice">£0.00</div>
+					</div>
+					<div class="result-card">
+						<div class="result-label">VAT Amount</div>
+						<div class="result-value" id="vatAmount">£0.00</div>
+					</div>
+					<div class="result-card highlight" id="grossCard">
+						<div class="result-label">Gross Price</div>
+						<div class="result-value" id="grossPrice">£0.00</div>
+					</div>
+				</div>
 
-    <script>
-        const priceInput = document.getElementById('price');
-        const vatRateInput = document.getElementById('vatRate');
-        const customVatToggle = document.getElementById('customVatToggle');
-        const customVatInput = document.getElementById('customVatInput');
-        const originalPriceDisplay = document.getElementById('originalPrice');
-        const vatAmountDisplay = document.getElementById('vatAmount');
-        const totalPriceDisplay = document.getElementById('totalPrice');
+				<div class="breakdown">
+					<div class="breakdown-row">
+						<span class="label">Net (excl. VAT)</span>
+						<span class="value" id="breakdownNet">£0.00</span>
+					</div>
+					<div class="breakdown-row">
+						<span class="label">VAT @ <span id="breakdownRate">20</span>%</span>
+						<span class="value" id="breakdownVat">£0.00</span>
+					</div>
+					<div class="breakdown-row total">
+						<span class="label">Total (incl. VAT)</span>
+						<span class="value" id="breakdownTotal">£0.00</span>
+					</div>
+				</div>
+			</div>
+		</div>
 
-        function formatPrice(price) {
-            return `£${price.toFixed(2)}`;
-        }
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">VAT Formulas</span>
+			</div>
+			<div class="panel-content">
+				<div class="formula-grid">
+					<div class="formula-card">
+						<div class="formula-title">Add VAT to Price</div>
+						<div class="formula-code">Gross = Net × (1 + VAT/100)</div>
+						<div class="formula-example">£100 × 1.20 = £120</div>
+					</div>
+					<div class="formula-card">
+						<div class="formula-title">Remove VAT from Price</div>
+						<div class="formula-code">Net = Gross ÷ (1 + VAT/100)</div>
+						<div class="formula-example">£120 ÷ 1.20 = £100</div>
+					</div>
+					<div class="formula-card">
+						<div class="formula-title">Calculate VAT Amount</div>
+						<div class="formula-code">VAT = Net × (VAT/100)</div>
+						<div class="formula-example">£100 × 0.20 = £20</div>
+					</div>
+					<div class="formula-card">
+						<div class="formula-title">Extract VAT from Gross</div>
+						<div class="formula-code">VAT = Gross - (Gross ÷ 1.VAT)</div>
+						<div class="formula-example">£120 - (£120 ÷ 1.20) = £20</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-        function calculateVAT() {
-            const price = parseFloat(priceInput.value) || 0;
-            const vatRate = customVatToggle.checked ? 
-                (parseFloat(vatRateInput.value) || 20) : 20;
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
 
-            const vatAmount = price * (vatRate / 100);
-            const totalPrice = price + vatAmount;
+	<script>
+		const priceInput = document.getElementById('price');
+		const vatRateInput = document.getElementById('vatRate');
+		const priceLabel = document.getElementById('priceLabel');
+		const addVatBtn = document.getElementById('addVatBtn');
+		const removeVatBtn = document.getElementById('removeVatBtn');
+		const netCard = document.getElementById('netCard');
+		const grossCard = document.getElementById('grossCard');
 
-            originalPriceDisplay.textContent = formatPrice(price);
-            vatAmountDisplay.textContent = formatPrice(vatAmount);
-            totalPriceDisplay.textContent = formatPrice(totalPrice);
-        }
+		let mode = 'add';
 
-        customVatToggle.addEventListener('change', function() {
-            customVatInput.classList.toggle('show');
-            calculateVAT();
-        });
+		function formatPrice(price) {
+			return '£' + price.toFixed(2);
+		}
 
-        priceInput.addEventListener('input', calculateVAT);
-        vatRateInput.addEventListener('input', calculateVAT);
+		function setMode(newMode) {
+			mode = newMode;
 
-        // Initial calculation
-        calculateVAT();
-    </script>
+			addVatBtn.classList.toggle('active', mode === 'add');
+			removeVatBtn.classList.toggle('active', mode === 'remove');
+
+			if (mode === 'add') {
+				priceLabel.textContent = 'Price (excl. VAT)';
+				netCard.classList.remove('highlight');
+				grossCard.classList.add('highlight');
+			} else {
+				priceLabel.textContent = 'Price (incl. VAT)';
+				netCard.classList.add('highlight');
+				grossCard.classList.remove('highlight');
+			}
+
+			calculate();
+		}
+
+		function setRate(rate) {
+			vatRateInput.value = rate;
+			document.querySelectorAll('.preset-btn').forEach(btn => {
+				btn.classList.toggle('active', parseFloat(btn.textContent) === rate);
+			});
+			calculate();
+		}
+
+		function calculate() {
+			const inputPrice = parseFloat(priceInput.value) || 0;
+			const vatRate = parseFloat(vatRateInput.value) || 0;
+			const multiplier = 1 + (vatRate / 100);
+
+			let net, vat, gross;
+
+			if (mode === 'add') {
+				net = inputPrice;
+				vat = net * (vatRate / 100);
+				gross = net + vat;
+			} else {
+				gross = inputPrice;
+				net = gross / multiplier;
+				vat = gross - net;
+			}
+
+			document.getElementById('netPrice').textContent = formatPrice(net);
+			document.getElementById('vatAmount').textContent = formatPrice(vat);
+			document.getElementById('grossPrice').textContent = formatPrice(gross);
+
+			document.getElementById('breakdownNet').textContent = formatPrice(net);
+			document.getElementById('breakdownVat').textContent = formatPrice(vat);
+			document.getElementById('breakdownTotal').textContent = formatPrice(gross);
+			document.getElementById('breakdownRate').textContent = vatRate;
+		}
+
+		priceInput.addEventListener('input', calculate);
+		vatRateInput.addEventListener('input', () => {
+			document.querySelectorAll('.preset-btn').forEach(btn => {
+				btn.classList.toggle('active', parseFloat(btn.textContent) === parseFloat(vatRateInput.value));
+			});
+			calculate();
+		});
+
+		calculate();
+	</script>
 </body>
 </html>

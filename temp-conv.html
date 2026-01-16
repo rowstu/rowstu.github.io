@@ -1,135 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temperature Converter</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 0 20px;
-            background-color: #f5f5f5;
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Temperature Converter</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--celsius: #ff7b72;
+			--fahrenheit: #79c0ff;
+			--kelvin: #d2a8ff;
+		}
 
-        .converter-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+		* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .input-group {
-            margin-bottom: 20px;
-        }
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
 
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
+		.container { max-width: 700px; margin: 0 auto; }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
+		header { margin-bottom: 1.5rem; }
 
-        .result {
-            font-size: 1.2em;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #f0f8ff;
-            border-radius: 5px;
-        }
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
 
-        .math-section {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 5px;
-            border-left: 4px solid #4CAF50;
-        }
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
 
-        .formula {
-            font-family: monospace;
-            background-color: #f8f9fa;
-            padding: 8px;
-            border-radius: 4px;
-            margin: 5px 0;
-        }
-    </style>
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-muted);
+		}
+
+		.panel-header .label { font-weight: 500; color: var(--text); }
+
+		.panel-content { padding: 1rem; }
+
+		.temp-input-group {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.temp-input {
+			flex: 1;
+			padding: 1rem;
+			background: var(--surface-hover);
+			border: 2px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 1.5rem;
+			text-align: center;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+
+		.temp-input:focus { border-color: var(--accent); }
+		.temp-input::placeholder { color: var(--text-muted); }
+		.temp-input::-webkit-inner-spin-button { display: none; }
+
+		.unit-label {
+			font-size: 1.5rem;
+			font-weight: 600;
+			min-width: 40px;
+		}
+
+		.unit-label.celsius { color: var(--celsius); }
+		.unit-label.fahrenheit { color: var(--fahrenheit); }
+		.unit-label.kelvin { color: var(--kelvin); }
+
+		.results-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1rem;
+			margin-top: 1rem;
+		}
+
+		@media (max-width: 500px) {
+			.results-grid { grid-template-columns: 1fr; }
+		}
+
+		.result-card {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			text-align: center;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.result-card:hover {
+			border-color: var(--accent);
+		}
+
+		.result-card.active {
+			border-width: 2px;
+		}
+
+		.result-card.celsius.active { border-color: var(--celsius); }
+		.result-card.fahrenheit.active { border-color: var(--fahrenheit); }
+		.result-card.kelvin.active { border-color: var(--kelvin); }
+
+		.result-label {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.result-value {
+			font-size: 1.5rem;
+			font-weight: 600;
+		}
+
+		.result-card.celsius .result-value { color: var(--celsius); }
+		.result-card.fahrenheit .result-value { color: var(--fahrenheit); }
+		.result-card.kelvin .result-value { color: var(--kelvin); }
+
+		.result-symbol {
+			font-size: 0.85rem;
+			color: var(--text-muted);
+		}
+
+		.presets {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		button {
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		button:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		.reference-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: 0.5rem;
+		}
+
+		.ref-item {
+			display: flex;
+			justify-content: space-between;
+			padding: 0.75rem;
+			background: var(--surface-hover);
+			border-radius: 4px;
+			font-size: 0.85rem;
+		}
+
+		.ref-name { color: var(--text-muted); }
+		.ref-temps { display: flex; gap: 1rem; }
+		.ref-temps span { font-weight: 500; }
+		.ref-temps .c { color: var(--celsius); }
+		.ref-temps .f { color: var(--fahrenheit); }
+
+		.formula-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+			gap: 1rem;
+		}
+
+		.formula-card {
+			background: var(--surface-hover);
+			border-radius: 6px;
+			padding: 1rem;
+		}
+
+		.formula-title {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+		}
+
+		.formula-code {
+			font-family: inherit;
+			font-size: 1rem;
+			color: var(--accent);
+			background: var(--bg);
+			padding: 0.5rem;
+			border-radius: 4px;
+			text-align: center;
+		}
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+	</style>
 </head>
 <body>
-    <div class="converter-card">
-        <h1>Temperature Converter</h1>
-        
-        <div class="input-group">
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="scale" value="celsius" checked> Celsius
-                </label>
-                <label>
-                    <input type="radio" name="scale" value="fahrenheit"> Fahrenheit
-                </label>
-            </div>
-            
-            <input type="number" id="temperature" placeholder="Enter temperature" step="0.1">
-            
-            <div class="result" id="result">
-                Converted temperature will appear here
-            </div>
-        </div>
+	<div class="container">
+		<header>
+			<h1>Temperature Converter</h1>
+			<p class="subtitle">Convert between Celsius, Fahrenheit, and Kelvin</p>
+		</header>
 
-        <div class="math-section">
-            <h2>Converting Between Scales</h2>
-            <p><strong>Celsius to Fahrenheit:</strong></p>
-            <div class="formula">°F = (°C × 9/5) + 32</div>
-            
-            <p><strong>Fahrenheit to Celsius:</strong></p>
-            <div class="formula">°C = (°F - 32) × 5/9</div>
-            
-            <p>These formulas are based on the fact that:</p>
-            <ul>
-                <li>Water freezes at 0°C = 32°F</li>
-                <li>Water boils at 100°C = 212°F</li>
-            </ul>
-        </div>
-    </div>
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Converter</span>
+			</div>
+			<div class="panel-content">
+				<div class="presets">
+					<button onclick="setTemp(0, 'c')">Freezing</button>
+					<button onclick="setTemp(100, 'c')">Boiling</button>
+					<button onclick="setTemp(37, 'c')">Body Temp</button>
+					<button onclick="setTemp(20, 'c')">Room Temp</button>
+					<button onclick="setTemp(-40, 'c')">-40 (same!)</button>
+					<button onclick="setTemp(0, 'k')">Absolute Zero</button>
+				</div>
 
-    <script>
-        const tempInput = document.getElementById('temperature');
-        const result = document.getElementById('result');
-        const radioButtons = document.getElementsByName('scale');
+				<div class="temp-input-group">
+					<input type="number" class="temp-input" id="tempInput" placeholder="0" step="0.1">
+				</div>
 
-        function convert() {
-            const temp = parseFloat(tempInput.value);
-            if (isNaN(temp)) {
-                result.textContent = 'Please enter a valid number';
-                return;
-            }
+				<div class="results-grid">
+					<div class="result-card celsius active" onclick="setUnit('c')">
+						<div class="result-label">Celsius</div>
+						<div class="result-value" id="celsius">0</div>
+						<div class="result-symbol">°C</div>
+					</div>
+					<div class="result-card fahrenheit" onclick="setUnit('f')">
+						<div class="result-label">Fahrenheit</div>
+						<div class="result-value" id="fahrenheit">32</div>
+						<div class="result-symbol">°F</div>
+					</div>
+					<div class="result-card kelvin" onclick="setUnit('k')">
+						<div class="result-label">Kelvin</div>
+						<div class="result-value" id="kelvin">273.15</div>
+						<div class="result-symbol">K</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-            const selectedScale = Array.from(radioButtons).find(radio => radio.checked).value;
-            let convertedTemp;
-            let resultText;
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Common Reference Points</span>
+			</div>
+			<div class="panel-content">
+				<div class="reference-grid">
+					<div class="ref-item">
+						<span class="ref-name">Absolute Zero</span>
+						<div class="ref-temps">
+							<span class="c">-273°C</span>
+							<span class="f">-460°F</span>
+						</div>
+					</div>
+					<div class="ref-item">
+						<span class="ref-name">Water Freezes</span>
+						<div class="ref-temps">
+							<span class="c">0°C</span>
+							<span class="f">32°F</span>
+						</div>
+					</div>
+					<div class="ref-item">
+						<span class="ref-name">Room Temp</span>
+						<div class="ref-temps">
+							<span class="c">20°C</span>
+							<span class="f">68°F</span>
+						</div>
+					</div>
+					<div class="ref-item">
+						<span class="ref-name">Body Temp</span>
+						<div class="ref-temps">
+							<span class="c">37°C</span>
+							<span class="f">98.6°F</span>
+						</div>
+					</div>
+					<div class="ref-item">
+						<span class="ref-name">Water Boils</span>
+						<div class="ref-temps">
+							<span class="c">100°C</span>
+							<span class="f">212°F</span>
+						</div>
+					</div>
+					<div class="ref-item">
+						<span class="ref-name">Oven (Hot)</span>
+						<div class="ref-temps">
+							<span class="c">200°C</span>
+							<span class="f">392°F</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-            if (selectedScale === 'celsius') {
-                convertedTemp = (temp * 9/5) + 32;
-                resultText = `${temp}°C = ${convertedTemp.toFixed(1)}°F`;
-            } else {
-                convertedTemp = (temp - 32) * 5/9;
-                resultText = `${temp}°F = ${convertedTemp.toFixed(1)}°C`;
-            }
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Conversion Formulas</span>
+			</div>
+			<div class="panel-content">
+				<div class="formula-grid">
+					<div class="formula-card">
+						<div class="formula-title">Celsius to Fahrenheit</div>
+						<div class="formula-code">°F = (°C × 9/5) + 32</div>
+					</div>
+					<div class="formula-card">
+						<div class="formula-title">Fahrenheit to Celsius</div>
+						<div class="formula-code">°C = (°F - 32) × 5/9</div>
+					</div>
+					<div class="formula-card">
+						<div class="formula-title">Celsius to Kelvin</div>
+						<div class="formula-code">K = °C + 273.15</div>
+					</div>
+					<div class="formula-card">
+						<div class="formula-title">Kelvin to Celsius</div>
+						<div class="formula-code">°C = K - 273.15</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-            result.textContent = resultText;
-        }
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
 
-        tempInput.addEventListener('input', convert);
-        radioButtons.forEach(radio => radio.addEventListener('change', convert));
-    </script>
+	<script>
+		const tempInput = document.getElementById('tempInput');
+		const celsiusEl = document.getElementById('celsius');
+		const fahrenheitEl = document.getElementById('fahrenheit');
+		const kelvinEl = document.getElementById('kelvin');
+		const cards = document.querySelectorAll('.result-card');
+
+		let currentUnit = 'c';
+
+		function convert() {
+			const value = parseFloat(tempInput.value) || 0;
+			let c, f, k;
+
+			switch (currentUnit) {
+				case 'c':
+					c = value;
+					f = (c * 9/5) + 32;
+					k = c + 273.15;
+					break;
+				case 'f':
+					f = value;
+					c = (f - 32) * 5/9;
+					k = c + 273.15;
+					break;
+				case 'k':
+					k = value;
+					c = k - 273.15;
+					f = (c * 9/5) + 32;
+					break;
+			}
+
+			celsiusEl.textContent = formatTemp(c);
+			fahrenheitEl.textContent = formatTemp(f);
+			kelvinEl.textContent = formatTemp(k);
+		}
+
+		function formatTemp(temp) {
+			if (Number.isInteger(temp)) return temp.toString();
+			return temp.toFixed(2).replace(/\.?0+$/, '');
+		}
+
+		function setUnit(unit) {
+			currentUnit = unit;
+			cards.forEach(card => {
+				card.classList.remove('active');
+				if (card.classList.contains(
+					unit === 'c' ? 'celsius' : unit === 'f' ? 'fahrenheit' : 'kelvin'
+				)) {
+					card.classList.add('active');
+				}
+			});
+
+			// Update input to match selected unit's current value
+			switch (unit) {
+				case 'c':
+					tempInput.value = celsiusEl.textContent;
+					break;
+				case 'f':
+					tempInput.value = fahrenheitEl.textContent;
+					break;
+				case 'k':
+					tempInput.value = kelvinEl.textContent;
+					break;
+			}
+		}
+
+		function setTemp(value, unit) {
+			setUnit(unit);
+			tempInput.value = value;
+			convert();
+		}
+
+		tempInput.addEventListener('input', convert);
+
+		// Initialize
+		convert();
+	</script>
 </body>
 </html>

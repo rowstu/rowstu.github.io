@@ -1,95 +1,481 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Caesar Cipher Decoder</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 100px;
-            margin: 10px 0;
-            padding: 10px;
-        }
-        
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        button:hover {
-            background-color: #45a049;
-        }
-        
-        .result {
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-        
-        .shift-result {
-            margin: 5px 0;
-            padding: 5px;
-            background-color: #f9f9f9;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Caesar Cipher</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-alt: #8b5cf6;
+			--warning: #f59e0b;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.panel-header .label { font-weight: 500; color: var(--text); }
+
+		.panel-content { padding: 1rem; }
+
+		.mode-toggle {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.mode-btn {
+			flex: 1;
+			padding: 0.75rem 1rem;
+			background: var(--surface-hover);
+			border: 2px solid var(--border);
+			border-radius: 6px;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.85rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.mode-btn:hover { border-color: var(--accent); }
+
+		.mode-btn.active {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #000;
+		}
+
+		.shift-control {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			margin-bottom: 1rem;
+			padding: 1rem;
+			background: var(--surface-hover);
+			border-radius: 6px;
+		}
+
+		.shift-label {
+			color: var(--text-muted);
+			font-size: 0.85rem;
+			min-width: 60px;
+		}
+
+		.shift-slider {
+			flex: 1;
+			-webkit-appearance: none;
+			height: 8px;
+			background: var(--border);
+			border-radius: 4px;
+			outline: none;
+		}
+
+		.shift-slider::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			width: 20px;
+			height: 20px;
+			background: var(--accent);
+			border-radius: 50%;
+			cursor: pointer;
+		}
+
+		.shift-value {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			min-width: 50px;
+			text-align: center;
+		}
+
+		.quick-shifts {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.quick-shift {
+			padding: 0.35rem 0.6rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.quick-shift:hover { border-color: var(--accent); color: var(--text); }
+		.quick-shift.active { background: var(--accent); border-color: var(--accent); color: #000; }
+
+		textarea {
+			width: 100%;
+			height: 120px;
+			padding: 1rem;
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.9rem;
+			line-height: 1.6;
+			resize: vertical;
+			outline: none;
+			margin-bottom: 1rem;
+		}
+
+		textarea:focus { border-color: var(--accent); }
+		textarea::placeholder { color: var(--text-muted); }
+
+		.output-area {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			min-height: 120px;
+			font-size: 0.9rem;
+			line-height: 1.6;
+			white-space: pre-wrap;
+			word-break: break-word;
+		}
+
+		.toolbar {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		button {
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		button:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		.brute-force-results {
+			max-height: 400px;
+			overflow-y: auto;
+		}
+
+		.brute-result {
+			display: flex;
+			gap: 1rem;
+			padding: 0.75rem;
+			background: var(--surface-hover);
+			border-radius: 4px;
+			margin-bottom: 0.5rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.brute-result:hover {
+			border-left: 3px solid var(--accent);
+			padding-left: calc(0.75rem - 3px);
+		}
+
+		.brute-shift {
+			min-width: 60px;
+			color: var(--accent);
+			font-weight: 600;
+		}
+
+		.brute-text {
+			color: var(--text);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.alphabet-display {
+			display: flex;
+			gap: 2px;
+			overflow-x: auto;
+			padding: 1rem 0;
+		}
+
+		.alpha-char {
+			width: 28px;
+			height: 50px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			background: var(--surface-hover);
+			border-radius: 4px;
+			font-size: 0.75rem;
+		}
+
+		.alpha-original { color: var(--text-muted); }
+		.alpha-shifted { color: var(--accent); font-weight: 600; }
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+	</style>
 </head>
 <body>
-    <h1>Caesar Cipher Decoder</h1>
-    <p>Enter your encrypted text below to see all possible shifts:</p>
-    
-    <textarea id="input" placeholder="Enter encrypted text here..."></textarea>
-    <button onclick="decrypt()">Decrypt</button>
-    
-    <div id="results" class="result"></div>
+	<div class="container">
+		<header>
+			<h1>Caesar Cipher</h1>
+			<p class="subtitle">Classic shift cipher - encrypt and decrypt messages</p>
+		</header>
 
-    <script>
-        function decrypt() {
-            const input = document.getElementById('input').value;
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '';
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Cipher Tool</span>
+			</div>
+			<div class="panel-content">
+				<div class="mode-toggle">
+					<button class="mode-btn active" id="encryptBtn" onclick="setMode('encrypt')">Encrypt</button>
+					<button class="mode-btn" id="decryptBtn" onclick="setMode('decrypt')">Decrypt</button>
+					<button class="mode-btn" id="bruteBtn" onclick="setMode('brute')">Brute Force</button>
+				</div>
 
-            // Try all 26 possible shifts
-            for (let shift = 0; shift < 26; shift++) {
-                const decrypted = caesarDecrypt(input, shift);
-                const resultElement = document.createElement('div');
-                resultElement.className = 'shift-result';
-                resultElement.innerHTML = `<strong>Shift ${shift}:</strong> ${decrypted}`;
-                resultsDiv.appendChild(resultElement);
-            }
-        }
+				<div class="shift-control" id="shiftControl">
+					<span class="shift-label">Shift:</span>
+					<input type="range" class="shift-slider" id="shiftSlider" min="0" max="25" value="3">
+					<span class="shift-value" id="shiftValue">3</span>
+				</div>
 
-        function caesarDecrypt(text, shift) {
-            return text
-                .split('')
-                .map(char => {
-                    // Handle uppercase letters
-                    if (char >= 'A' && char <= 'Z') {
-                        return String.fromCharCode(
-                            (char.charCodeAt(0) - 65 - shift + 26) % 26 + 65
-                        );
-                    }
-                    // Handle lowercase letters
-                    if (char >= 'a' && char <= 'z') {
-                        return String.fromCharCode(
-                            (char.charCodeAt(0) - 97 - shift + 26) % 26 + 97
-                        );
-                    }
-                    // Return non-alphabetic characters unchanged
-                    return char;
-                })
-                .join('');
-        }
-    </script>
+				<div class="quick-shifts" id="quickShifts">
+					<button class="quick-shift" onclick="setShift(1)">1</button>
+					<button class="quick-shift" onclick="setShift(3)">3</button>
+					<button class="quick-shift" onclick="setShift(5)">5</button>
+					<button class="quick-shift" onclick="setShift(7)">7</button>
+					<button class="quick-shift" onclick="setShift(10)">10</button>
+					<button class="quick-shift active" onclick="setShift(13)">13 (ROT13)</button>
+					<button class="quick-shift" onclick="setShift(19)">19</button>
+					<button class="quick-shift" onclick="setShift(23)">23</button>
+				</div>
+
+				<textarea id="input" placeholder="Enter text to encrypt or decrypt..."></textarea>
+
+				<div class="toolbar">
+					<button onclick="copyOutput()">Copy Result</button>
+					<button onclick="swapIO()">Swap Input/Output</button>
+					<button onclick="clearAll()">Clear</button>
+				</div>
+
+				<div class="output-area" id="output"></div>
+
+				<div class="brute-force-results" id="bruteResults" style="display: none;"></div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Alphabet Mapping</span>
+			</div>
+			<div class="panel-content">
+				<div class="alphabet-display" id="alphabetDisplay"></div>
+			</div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<script>
+		const input = document.getElementById('input');
+		const output = document.getElementById('output');
+		const shiftSlider = document.getElementById('shiftSlider');
+		const shiftValue = document.getElementById('shiftValue');
+		const shiftControl = document.getElementById('shiftControl');
+		const quickShifts = document.getElementById('quickShifts');
+		const bruteResults = document.getElementById('bruteResults');
+		const alphabetDisplay = document.getElementById('alphabetDisplay');
+
+		let mode = 'encrypt';
+		let shift = 3;
+
+		function setMode(newMode) {
+			mode = newMode;
+			document.getElementById('encryptBtn').classList.toggle('active', mode === 'encrypt');
+			document.getElementById('decryptBtn').classList.toggle('active', mode === 'decrypt');
+			document.getElementById('bruteBtn').classList.toggle('active', mode === 'brute');
+
+			const showShiftControls = mode !== 'brute';
+			shiftControl.style.display = showShiftControls ? 'flex' : 'none';
+			quickShifts.style.display = showShiftControls ? 'flex' : 'none';
+			output.style.display = mode === 'brute' ? 'none' : 'block';
+			bruteResults.style.display = mode === 'brute' ? 'block' : 'none';
+
+			process();
+		}
+
+		function setShift(newShift) {
+			shift = newShift;
+			shiftSlider.value = shift;
+			shiftValue.textContent = shift;
+			updateQuickShiftButtons();
+			updateAlphabetDisplay();
+			process();
+		}
+
+		function updateQuickShiftButtons() {
+			document.querySelectorAll('.quick-shift').forEach(btn => {
+				const btnShift = parseInt(btn.textContent) || 13;
+				btn.classList.toggle('active', btnShift === shift);
+			});
+		}
+
+		function caesar(text, shiftAmount, encrypt = true) {
+			const actualShift = encrypt ? shiftAmount : (26 - shiftAmount) % 26;
+			return text.split('').map(char => {
+				if (char >= 'A' && char <= 'Z') {
+					return String.fromCharCode((char.charCodeAt(0) - 65 + actualShift) % 26 + 65);
+				}
+				if (char >= 'a' && char <= 'z') {
+					return String.fromCharCode((char.charCodeAt(0) - 97 + actualShift) % 26 + 97);
+				}
+				return char;
+			}).join('');
+		}
+
+		function process() {
+			const text = input.value;
+
+			if (mode === 'brute') {
+				bruteForce(text);
+			} else {
+				const result = caesar(text, shift, mode === 'encrypt');
+				output.textContent = result || 'Result will appear here...';
+			}
+		}
+
+		function bruteForce(text) {
+			bruteResults.innerHTML = '';
+
+			for (let s = 0; s < 26; s++) {
+				const decrypted = caesar(text, s, false);
+				const div = document.createElement('div');
+				div.className = 'brute-result';
+				div.innerHTML = `<span class="brute-shift">Shift ${s}</span><span class="brute-text">${escapeHtml(decrypted)}</span>`;
+				div.onclick = () => {
+					setShift(s);
+					setMode('decrypt');
+				};
+				bruteResults.appendChild(div);
+			}
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+
+		function updateAlphabetDisplay() {
+			alphabetDisplay.innerHTML = '';
+			const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+			for (let i = 0; i < 26; i++) {
+				const original = alphabet[i];
+				const shifted = alphabet[(i + shift) % 26];
+				const div = document.createElement('div');
+				div.className = 'alpha-char';
+				div.innerHTML = `<span class="alpha-original">${original}</span><span class="alpha-shifted">${shifted}</span>`;
+				alphabetDisplay.appendChild(div);
+			}
+		}
+
+		function copyOutput() {
+			const text = mode === 'brute' ? '' : output.textContent;
+			navigator.clipboard.writeText(text).then(() => {
+				const btn = event.target;
+				const orig = btn.textContent;
+				btn.textContent = 'Copied!';
+				setTimeout(() => btn.textContent = orig, 1500);
+			});
+		}
+
+		function swapIO() {
+			const temp = input.value;
+			input.value = output.textContent;
+			process();
+		}
+
+		function clearAll() {
+			input.value = '';
+			output.textContent = '';
+			bruteResults.innerHTML = '';
+		}
+
+		// Event listeners
+		input.addEventListener('input', process);
+		shiftSlider.addEventListener('input', () => {
+			shift = parseInt(shiftSlider.value);
+			shiftValue.textContent = shift;
+			updateQuickShiftButtons();
+			updateAlphabetDisplay();
+			process();
+		});
+
+		// Initialize
+		setShift(3);
+		updateAlphabetDisplay();
+	</script>
 </body>
 </html>

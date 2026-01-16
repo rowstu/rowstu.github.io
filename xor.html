@@ -1,173 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XOR Encryption/Decryption</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>XOR Cipher</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-alt: #8b5cf6;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-muted);
+		}
+
+		.panel-header .label { font-weight: 500; color: var(--text); }
+
+		.panel-content { padding: 1rem; }
+
+		.input-group {
+			margin-bottom: 1rem;
+		}
+
+		.input-group label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-size: 0.85rem;
+			color: var(--text-muted);
+		}
+
+		input[type="text"], textarea {
+			width: 100%;
+			padding: 0.75rem 1rem;
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.9rem;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+
+		input[type="text"]:focus, textarea:focus { border-color: var(--accent); }
+		input[type="text"]::placeholder, textarea::placeholder { color: var(--text-muted); }
+
+		textarea {
+			height: 100px;
+			resize: vertical;
+			line-height: 1.6;
+		}
+
+		.key-input input {
+			color: var(--accent-alt);
+			font-weight: 600;
+			letter-spacing: 0.05em;
+		}
+
+		.output-format {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.format-btn {
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.format-btn:hover { border-color: var(--accent); }
+		.format-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
+
+		.output-area {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			min-height: 80px;
+			font-size: 0.9rem;
+			line-height: 1.6;
+			white-space: pre-wrap;
+			word-break: break-all;
+		}
+
+		.toolbar {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		button {
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		button:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		.byte-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+			gap: 0.5rem;
+			margin-top: 1rem;
+			max-height: 300px;
+			overflow-y: auto;
+		}
+
+		.byte-item {
+			background: var(--surface-hover);
+			border-radius: 4px;
+			padding: 0.5rem;
+			font-size: 0.7rem;
+			text-align: center;
+		}
+
+		.byte-item .index { color: var(--text-muted); margin-bottom: 0.25rem; }
+		.byte-item .values { display: flex; gap: 0.25rem; justify-content: center; }
+		.byte-item .plain { color: var(--text); }
+		.byte-item .xor-op { color: var(--warning); }
+		.byte-item .key { color: var(--accent-alt); }
+		.byte-item .equals { color: var(--text-muted); }
+		.byte-item .result { color: var(--accent); font-weight: 600; }
+
+		.truth-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.8rem;
+		}
+
+		.truth-table th, .truth-table td {
+			padding: 0.5rem;
+			text-align: center;
+			border: 1px solid var(--border);
+		}
+
+		.truth-table th {
+			background: var(--surface-hover);
+			color: var(--accent);
+		}
+
+		.truth-table td { color: var(--text-muted); }
+
+		.info-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+			gap: 1rem;
+		}
+
+		.info-card {
+			background: var(--surface-hover);
+			border-radius: 6px;
+			padding: 1rem;
+		}
+
+		.info-card h4 {
+			color: var(--text);
+			font-size: 0.85rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.info-card p {
+			color: var(--text-muted);
+			font-size: 0.8rem;
+			line-height: 1.6;
+		}
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+	</style>
 </head>
-<body class="bg-gray-100 p-4">
-    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-4 text-center">XOR Encryption/Decryption</h1>
-        
-        <div class="mb-4">
-            <label class="block text-gray-700 mb-2">Plain Text</label>
-            <input 
-                type="text" 
-                id="plainText" 
-                class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter plain text"
-            >
-        </div>
-        
-        <div class="mb-4">
-            <label class="block text-gray-700 mb-2">Encryption Key</label>
-            <input 
-                type="text" 
-                id="key" 
-                class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter encryption key"
-            >
-        </div>
-        
-        <div id="encryptionResults" class="mt-6 bg-gray-50 p-4 rounded-md">
-            <h2 class="font-semibold mb-2">Encryption Details</h2>
-            <div id="outputDetails" class="text-sm text-gray-700">
-                Provide plain text and key to see encryption details
-            </div>
-        </div>
+<body>
+	<div class="container">
+		<header>
+			<h1>XOR Cipher</h1>
+			<p class="subtitle">Symmetric XOR encryption/decryption with key</p>
+		</header>
 
-        <div class="mt-4">
-            <h2 class="text-xl font-bold mb-4 text-center">Decryption</h2>
-            
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Encrypted Text (Base64)</label>
-                <input 
-                    type="text" 
-                    id="encryptedText" 
-                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter encrypted text"
-                >
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Decryption Key</label>
-                <input 
-                    type="text" 
-                    id="decryptionKey" 
-                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter decryption key"
-                >
-            </div>
-            
-            <div id="decryptionResults" class="mt-6 bg-gray-50 p-4 rounded-md">
-                <h2 class="font-semibold mb-2">Decryption Details</h2>
-                <div id="decryptedOutputDetails" class="text-sm text-gray-700">
-                    Provide encrypted text and key to see decryption details
-                </div>
-            </div>
-        </div>
-    </div>
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">XOR Tool</span>
+			</div>
+			<div class="panel-content">
+				<div class="input-group">
+					<label>Input Text</label>
+					<textarea id="input" placeholder="Enter text to encrypt or decrypt..."></textarea>
+				</div>
 
-    <script>
-        function xorStrings(input, key, isEncryption = true) {
-            // Ensure key is at least as long as input
-            const extendedKey = key.repeat(Math.ceil(input.length / key.length)).slice(0, input.length);
-            
-            let inputBytes;
-            if (isEncryption) {
-                // For encryption, convert input text to bytes
-                inputBytes = new TextEncoder().encode(input);
-            } else {
-                // For decryption, convert Base64 to bytes
-                inputBytes = new Uint8Array(atob(input).split('').map(char => char.charCodeAt(0)));
-            }
-            
-            const keyBytes = new TextEncoder().encode(extendedKey);
-            
-            // XOR the bytes
-            const xoredBytes = new Uint8Array(inputBytes.length);
-            for (let i = 0; i < inputBytes.length; i++) {
-                xoredBytes[i] = inputBytes[i] ^ keyBytes[i];
-            }
-            
-            // Convert XORed bytes to output
-            let output, explanation;
-            if (isEncryption) {
-                // For encryption, convert to Base64
-                output = btoa(String.fromCharCode.apply(null, xoredBytes));
-                
-                // Prepare explanation
-                explanation = 'XOR Encryption Details:\n\n';
-                inputBytes.forEach((inputByte, i) => {
-                    const keyByte = keyBytes[i];
-                    const xoredByte = xoredBytes[i];
-                    
-                    explanation += `Byte ${i + 1}:\n`;
-                    explanation += `Plain: Dec ${inputByte}, Hex ${inputByte.toString(16).padStart(2, '0')}\n`;
-                    explanation += `Key:   Dec ${keyByte}, Hex ${keyByte.toString(16).padStart(2, '0')}\n`;
-                    explanation += `XOR:   Dec ${xoredByte}, Hex ${xoredByte.toString(16).padStart(2, '0')}\n\n`;
-                });
-            } else {
-                // For decryption, convert to text
-                output = new TextDecoder().decode(xoredBytes);
-                
-                // Prepare explanation
-                explanation = 'XOR Decryption Details:\n\n';
-                inputBytes.forEach((inputByte, i) => {
-                    const keyByte = keyBytes[i];
-                    const xoredByte = xoredBytes[i];
-                    
-                    explanation += `Byte ${i + 1}:\n`;
-                    explanation += `Encrypted: Dec ${inputByte}, Hex ${inputByte.toString(16).padStart(2, '0')}\n`;
-                    explanation += `Key:       Dec ${keyByte}, Hex ${keyByte.toString(16).padStart(2, '0')}\n`;
-                    explanation += `Decrypted: Dec ${xoredByte}, Hex ${xoredByte.toString(16).padStart(2, '0')}\n\n`;
-                });
-            }
-            
-            return { output, explanation };
-        }
+				<div class="input-group key-input">
+					<label>Key</label>
+					<input type="text" id="key" placeholder="Enter encryption key">
+				</div>
 
-        function updateEncryption() {
-            const plainText = document.getElementById('plainText').value;
-            const key = document.getElementById('key').value;
-            const outputDetails = document.getElementById('outputDetails');
+				<div class="output-format">
+					<span style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem 0;">Output:</span>
+					<button class="format-btn active" onclick="setFormat('base64')">Base64</button>
+					<button class="format-btn" onclick="setFormat('hex')">Hex</button>
+					<button class="format-btn" onclick="setFormat('text')">Text</button>
+				</div>
 
-            if (plainText && key) {
-                const { output, explanation } = xorStrings(plainText, key, true);
-                
-                outputDetails.innerHTML = `
-                    <p><strong>Encrypted Text (Base64):</strong> ${output}</p>
-                    <p class="mt-2"><strong>Decryption Note:</strong> Use the same key to decrypt</p>
-                    <pre class="mt-2 text-xs overflow-x-auto">${explanation}</pre>
-                `;
-            } else {
-                outputDetails.innerHTML = 'Provide plain text and key to see encryption details';
-            }
-        }
+				<div class="toolbar">
+					<button onclick="copyOutput()">Copy Result</button>
+					<button onclick="swapIO()">Swap Input/Output</button>
+					<button onclick="clearAll()">Clear</button>
+				</div>
 
-        function updateDecryption() {
-            const encryptedText = document.getElementById('encryptedText').value;
-            const decryptionKey = document.getElementById('decryptionKey').value;
-            const decryptedOutputDetails = document.getElementById('decryptedOutputDetails');
+				<div class="output-area" id="output">Result will appear here...</div>
 
-            if (encryptedText && decryptionKey) {
-                const { output, explanation } = xorStrings(encryptedText, decryptionKey, false);
-                
-                decryptedOutputDetails.innerHTML = `
-                    <p><strong>Decrypted Text:</strong> ${output}</p>
-                    <pre class="mt-2 text-xs overflow-x-auto">${explanation}</pre>
-                `;
-            } else {
-                decryptedOutputDetails.innerHTML = 'Provide encrypted text and key to see decryption details';
-            }
-        }
+				<div class="byte-grid" id="byteGrid"></div>
+			</div>
+		</div>
 
-        // Add event listeners
-        document.getElementById('plainText').addEventListener('input', updateEncryption);
-        document.getElementById('key').addEventListener('input', updateEncryption);
-        document.getElementById('encryptedText').addEventListener('input', updateDecryption);
-        document.getElementById('decryptionKey').addEventListener('input', updateDecryption);
-    </script>
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">XOR Truth Table</span>
+			</div>
+			<div class="panel-content">
+				<table class="truth-table">
+					<tr>
+						<th>A</th>
+						<th>B</th>
+						<th>A XOR B</th>
+					</tr>
+					<tr><td>0</td><td>0</td><td>0</td></tr>
+					<tr><td>0</td><td>1</td><td>1</td></tr>
+					<tr><td>1</td><td>0</td><td>1</td></tr>
+					<tr><td>1</td><td>1</td><td>0</td></tr>
+				</table>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">About XOR Cipher</span>
+			</div>
+			<div class="panel-content">
+				<div class="info-grid">
+					<div class="info-card">
+						<h4>Symmetric Operation</h4>
+						<p>XOR is its own inverse. Applying XOR twice with the same key returns the original data: (A XOR K) XOR K = A</p>
+					</div>
+					<div class="info-card">
+						<h4>Key Cycling</h4>
+						<p>The key is repeated to match the input length. Longer keys provide better security.</p>
+					</div>
+					<div class="info-card">
+						<h4>Perfect Secrecy</h4>
+						<p>XOR with a truly random key as long as the message (one-time pad) provides theoretically unbreakable encryption.</p>
+					</div>
+					<div class="info-card">
+						<h4>Vulnerability</h4>
+						<p>Short, repeating keys are vulnerable to frequency analysis and known-plaintext attacks.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<script>
+		const inputEl = document.getElementById('input');
+		const keyEl = document.getElementById('key');
+		const outputEl = document.getElementById('output');
+		const byteGrid = document.getElementById('byteGrid');
+
+		let outputFormat = 'base64';
+
+		function setFormat(format) {
+			outputFormat = format;
+			document.querySelectorAll('.format-btn').forEach(btn => {
+				btn.classList.toggle('active', btn.textContent.toLowerCase() === format);
+			});
+			process();
+		}
+
+		function xorBytes(inputBytes, keyBytes) {
+			const result = new Uint8Array(inputBytes.length);
+			for (let i = 0; i < inputBytes.length; i++) {
+				result[i] = inputBytes[i] ^ keyBytes[i % keyBytes.length];
+			}
+			return result;
+		}
+
+		function process() {
+			const input = inputEl.value;
+			const key = keyEl.value;
+
+			if (!input || !key) {
+				outputEl.textContent = 'Result will appear here...';
+				byteGrid.innerHTML = '';
+				return;
+			}
+
+			// Try to detect if input is base64 or hex
+			let inputBytes;
+			try {
+				if (/^[A-Za-z0-9+/=]+$/.test(input) && input.length > 2) {
+					// Might be base64
+					inputBytes = new Uint8Array(atob(input).split('').map(c => c.charCodeAt(0)));
+				} else if (/^[0-9a-fA-F]+$/.test(input) && input.length % 2 === 0) {
+					// Might be hex
+					inputBytes = new Uint8Array(input.match(/.{2}/g).map(h => parseInt(h, 16)));
+				} else {
+					// Plain text
+					inputBytes = new TextEncoder().encode(input);
+				}
+			} catch {
+				inputBytes = new TextEncoder().encode(input);
+			}
+
+			const keyBytes = new TextEncoder().encode(key);
+			const xorResult = xorBytes(inputBytes, keyBytes);
+
+			// Format output
+			let outputStr;
+			switch (outputFormat) {
+				case 'base64':
+					outputStr = btoa(String.fromCharCode(...xorResult));
+					break;
+				case 'hex':
+					outputStr = Array.from(xorResult).map(b => b.toString(16).padStart(2, '0')).join('');
+					break;
+				case 'text':
+					outputStr = new TextDecoder().decode(xorResult);
+					break;
+			}
+
+			outputEl.textContent = outputStr;
+
+			// Build byte grid
+			buildByteGrid(inputBytes, keyBytes, xorResult);
+		}
+
+		function buildByteGrid(inputBytes, keyBytes, resultBytes) {
+			byteGrid.innerHTML = '';
+
+			const maxShow = Math.min(inputBytes.length, 50);
+			for (let i = 0; i < maxShow; i++) {
+				const inputByte = inputBytes[i];
+				const keyByte = keyBytes[i % keyBytes.length];
+				const resultByte = resultBytes[i];
+
+				const div = document.createElement('div');
+				div.className = 'byte-item';
+				div.innerHTML = `
+					<div class="index">Byte ${i}</div>
+					<div class="values">
+						<span class="plain">${inputByte.toString(16).padStart(2, '0')}</span>
+						<span class="xor-op">^</span>
+						<span class="key">${keyByte.toString(16).padStart(2, '0')}</span>
+						<span class="equals">=</span>
+						<span class="result">${resultByte.toString(16).padStart(2, '0')}</span>
+					</div>
+				`;
+				byteGrid.appendChild(div);
+			}
+
+			if (inputBytes.length > maxShow) {
+				const more = document.createElement('div');
+				more.className = 'byte-item';
+				more.innerHTML = `<div style="color: var(--text-muted)">... ${inputBytes.length - maxShow} more bytes</div>`;
+				byteGrid.appendChild(more);
+			}
+		}
+
+		function copyOutput() {
+			navigator.clipboard.writeText(outputEl.textContent).then(() => {
+				const btn = event.target;
+				const orig = btn.textContent;
+				btn.textContent = 'Copied!';
+				setTimeout(() => btn.textContent = orig, 1500);
+			});
+		}
+
+		function swapIO() {
+			inputEl.value = outputEl.textContent;
+			process();
+		}
+
+		function clearAll() {
+			inputEl.value = '';
+			keyEl.value = '';
+			outputEl.textContent = 'Result will appear here...';
+			byteGrid.innerHTML = '';
+		}
+
+		// Event listeners
+		inputEl.addEventListener('input', process);
+		keyEl.addEventListener('input', process);
+	</script>
 </body>
 </html>
