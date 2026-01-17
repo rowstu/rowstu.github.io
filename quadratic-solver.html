@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Quadratic Solver // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--info: #3b82f6;
+			--purple: #a78bfa;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 700px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.equation-display {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			text-align: center;
+			margin-bottom: 1rem;
+		}
+
+		.equation {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.equation .coef {
+			color: var(--warning);
+		}
+
+		.equation .var {
+			color: var(--info);
+		}
+
+		.input-row {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+			margin-bottom: 1rem;
+		}
+
+		.coef-input {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+		}
+
+		input[type="number"] {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.6rem 0.75rem;
+			color: var(--warning);
+			font-family: inherit;
+			font-size: 1.1rem;
+			font-weight: 600;
+			width: 70px;
+			text-align: center;
+			outline: none;
+		}
+
+		input[type="number"]:focus {
+			border-color: var(--accent);
+		}
+
+		.var-label {
+			font-size: 1.1rem;
+			color: var(--info);
+		}
+
+		.results {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+		}
+
+		.result-section {
+			margin-bottom: 1rem;
+			padding-bottom: 1rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.result-section:last-child {
+			margin-bottom: 0;
+			padding-bottom: 0;
+			border-bottom: none;
+		}
+
+		.result-label {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin-bottom: 0.5rem;
+		}
+
+		.result-value {
+			font-size: 1.2rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.result-value.complex {
+			color: var(--purple);
+		}
+
+		.result-value.no-solution {
+			color: var(--danger);
+		}
+
+		.roots {
+			display: flex;
+			gap: 1rem;
+			flex-wrap: wrap;
+		}
+
+		.root-box {
+			background: var(--surface);
+			padding: 0.75rem 1.25rem;
+			border-radius: 4px;
+			text-align: center;
+		}
+
+		.root-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-bottom: 0.25rem;
+		}
+
+		.root-value {
+			font-size: 1.1rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.working {
+			background: var(--surface);
+			border-radius: 4px;
+			padding: 0.75rem;
+			font-size: 0.85rem;
+			line-height: 1.8;
+		}
+
+		.step {
+			padding: 0.25rem 0;
+		}
+
+		.step-label {
+			color: var(--text-muted);
+		}
+
+		.step-value {
+			color: var(--text);
+		}
+
+		.highlight {
+			color: var(--accent);
+			font-weight: 500;
+		}
+
+		.discriminant-positive { color: var(--accent); }
+		.discriminant-zero { color: var(--warning); }
+		.discriminant-negative { color: var(--purple); }
+
+		.formula-box {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			text-align: center;
+		}
+
+		.formula-title {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+		}
+
+		.formula {
+			font-size: 1.1rem;
+			color: var(--text);
+		}
+
+		.examples {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 1rem;
+		}
+
+		.example-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.4rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.example-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.vertex-info {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+			gap: 0.5rem;
+			margin-top: 0.5rem;
+		}
+
+		.vertex-item {
+			background: var(--surface);
+			padding: 0.5rem;
+			border-radius: 4px;
+			text-align: center;
+		}
+
+		.vertex-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		.vertex-value {
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: var(--info);
+		}
+
+		@media (max-width: 500px) {
+			.equation {
+				font-size: 1.2rem;
+			}
+
+			input[type="number"] {
+				width: 60px;
+				font-size: 1rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Quadratic Solver</h1>
+			<p class="subtitle">Solve ax² + bx + c = 0 with step-by-step working</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Equation</span>
+			</div>
+			<div class="equation-display">
+				<span class="equation" id="equationDisplay">
+					<span class="coef">1</span><span class="var">x²</span> +
+					<span class="coef">-5</span><span class="var">x</span> +
+					<span class="coef">6</span> = 0
+				</span>
+			</div>
+			<div class="input-row">
+				<div class="coef-input">
+					<input type="number" id="coefA" value="1" step="any">
+					<span class="var-label">x²</span>
+				</div>
+				<span style="color: var(--text-muted);">+</span>
+				<div class="coef-input">
+					<input type="number" id="coefB" value="-5" step="any">
+					<span class="var-label">x</span>
+				</div>
+				<span style="color: var(--text-muted);">+</span>
+				<div class="coef-input">
+					<input type="number" id="coefC" value="6" step="any">
+				</div>
+				<span style="color: var(--text-muted);">= 0</span>
+			</div>
+			<div class="examples">
+				<span style="color: var(--text-muted); font-size: 0.75rem;">Try:</span>
+				<button class="example-btn" onclick="setExample(1, -5, 6)">x² - 5x + 6</button>
+				<button class="example-btn" onclick="setExample(1, 0, -9)">x² - 9</button>
+				<button class="example-btn" onclick="setExample(1, -6, 9)">x² - 6x + 9</button>
+				<button class="example-btn" onclick="setExample(1, 2, 5)">x² + 2x + 5</button>
+				<button class="example-btn" onclick="setExample(2, -4, -6)">2x² - 4x - 6</button>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Solutions</span>
+			</div>
+			<div class="results" id="results">
+				<!-- Filled by JS -->
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Working</span>
+			</div>
+			<div class="working" id="working">
+				<!-- Filled by JS -->
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Quadratic Formula</span>
+			</div>
+			<div class="formula-box">
+				<div class="formula-title">For ax² + bx + c = 0</div>
+				<div class="formula">x = (-b ± √(b² - 4ac)) / 2a</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const coefA = document.getElementById('coefA');
+		const coefB = document.getElementById('coefB');
+		const coefC = document.getElementById('coefC');
+
+		function fmt(n, decimals = 4) {
+			if (Number.isInteger(n)) return n.toString();
+			return n.toFixed(decimals).replace(/\.?0+$/, '');
+		}
+
+		function formatCoef(n, showPlus = false) {
+			const prefix = showPlus && n >= 0 ? '+' : '';
+			return prefix + fmt(n);
+		}
+
+		function updateEquationDisplay() {
+			const a = parseFloat(coefA.value) || 0;
+			const b = parseFloat(coefB.value) || 0;
+			const c = parseFloat(coefC.value) || 0;
+
+			let eq = '';
+			if (a !== 0) {
+				eq += `<span class="coef">${a === 1 ? '' : a === -1 ? '-' : fmt(a)}</span><span class="var">x²</span>`;
+			}
+			if (b !== 0) {
+				const bStr = a === 0 ? (b === 1 ? '' : b === -1 ? '-' : fmt(b)) : (b === 1 ? '+' : b === -1 ? '-' : formatCoef(b, true));
+				eq += ` <span class="coef">${bStr}</span><span class="var">x</span>`;
+			}
+			if (c !== 0 || (a === 0 && b === 0)) {
+				eq += ` <span class="coef">${formatCoef(c, a !== 0 || b !== 0)}</span>`;
+			}
+			eq += ' = 0';
+
+			document.getElementById('equationDisplay').innerHTML = eq;
+		}
+
+		function solve() {
+			const a = parseFloat(coefA.value) || 0;
+			const b = parseFloat(coefB.value) || 0;
+			const c = parseFloat(coefC.value) || 0;
+
+			updateEquationDisplay();
+
+			const resultsDiv = document.getElementById('results');
+			const workingDiv = document.getElementById('working');
+
+			if (a === 0) {
+				if (b === 0) {
+					resultsDiv.innerHTML = `<div class="result-section"><div class="result-label">Result</div><div class="result-value no-solution">${c === 0 ? 'Infinite solutions (0 = 0)' : 'No solution'}</div></div>`;
+					workingDiv.innerHTML = '<div class="step">Not a quadratic equation (a = 0)</div>';
+					return;
+				}
+				// Linear equation
+				const x = -c / b;
+				resultsDiv.innerHTML = `
+					<div class="result-section">
+						<div class="result-label">Solution (Linear)</div>
+						<div class="roots">
+							<div class="root-box"><div class="root-label">x</div><div class="root-value">${fmt(x)}</div></div>
+						</div>
+					</div>`;
+				workingDiv.innerHTML = `
+					<div class="step"><span class="step-label">Linear equation:</span> <span class="step-value">${fmt(b)}x + ${fmt(c)} = 0</span></div>
+					<div class="step"><span class="step-label">Solve:</span> <span class="step-value">x = ${fmt(-c)} / ${fmt(b)} = <span class="highlight">${fmt(x)}</span></span></div>`;
+				return;
+			}
+
+			// Quadratic
+			const discriminant = b * b - 4 * a * c;
+			const vertex_x = -b / (2 * a);
+			const vertex_y = a * vertex_x * vertex_x + b * vertex_x + c;
+
+			let rootsHtml = '';
+			let solutionType = '';
+			let discClass = '';
+
+			if (discriminant > 0) {
+				// Two real roots
+				const sqrtD = Math.sqrt(discriminant);
+				const x1 = (-b + sqrtD) / (2 * a);
+				const x2 = (-b - sqrtD) / (2 * a);
+				solutionType = 'Two Real Roots';
+				discClass = 'discriminant-positive';
+				rootsHtml = `
+					<div class="root-box"><div class="root-label">x₁</div><div class="root-value">${fmt(x1)}</div></div>
+					<div class="root-box"><div class="root-label">x₂</div><div class="root-value">${fmt(x2)}</div></div>`;
+			} else if (discriminant === 0) {
+				// One repeated root
+				const x = -b / (2 * a);
+				solutionType = 'One Repeated Root';
+				discClass = 'discriminant-zero';
+				rootsHtml = `<div class="root-box"><div class="root-label">x</div><div class="root-value">${fmt(x)}</div></div>`;
+			} else {
+				// Complex roots
+				const realPart = -b / (2 * a);
+				const imagPart = Math.sqrt(-discriminant) / (2 * a);
+				solutionType = 'Complex Roots';
+				discClass = 'discriminant-negative';
+				rootsHtml = `
+					<div class="root-box"><div class="root-label">x₁</div><div class="root-value complex">${fmt(realPart)} + ${fmt(imagPart)}i</div></div>
+					<div class="root-box"><div class="root-label">x₂</div><div class="root-value complex">${fmt(realPart)} - ${fmt(imagPart)}i</div></div>`;
+			}
+
+			resultsDiv.innerHTML = `
+				<div class="result-section">
+					<div class="result-label">${solutionType}</div>
+					<div class="roots">${rootsHtml}</div>
+				</div>
+				<div class="result-section">
+					<div class="result-label">Discriminant (b² - 4ac)</div>
+					<div class="result-value ${discClass}">${fmt(discriminant)}</div>
+				</div>
+				<div class="result-section">
+					<div class="result-label">Vertex & Properties</div>
+					<div class="vertex-info">
+						<div class="vertex-item"><div class="vertex-label">Vertex X</div><div class="vertex-value">${fmt(vertex_x)}</div></div>
+						<div class="vertex-item"><div class="vertex-label">Vertex Y</div><div class="vertex-value">${fmt(vertex_y)}</div></div>
+						<div class="vertex-item"><div class="vertex-label">Opens</div><div class="vertex-value">${a > 0 ? 'Upward ∪' : 'Downward ∩'}</div></div>
+						<div class="vertex-item"><div class="vertex-label">Y-intercept</div><div class="vertex-value">${fmt(c)}</div></div>
+					</div>
+				</div>`;
+
+			// Working
+			let working = `
+				<div class="step"><span class="step-label">Given:</span> <span class="step-value">a = ${fmt(a)}, b = ${fmt(b)}, c = ${fmt(c)}</span></div>
+				<div class="step"><span class="step-label">Discriminant:</span> <span class="step-value">Δ = b² - 4ac = (${fmt(b)})² - 4(${fmt(a)})(${fmt(c)}) = ${fmt(b*b)} - ${fmt(4*a*c)} = <span class="highlight ${discClass}">${fmt(discriminant)}</span></span></div>`;
+
+			if (discriminant >= 0) {
+				const sqrtD = Math.sqrt(discriminant);
+				working += `<div class="step"><span class="step-label">√Δ:</span> <span class="step-value">√${fmt(discriminant)} = ${fmt(sqrtD)}</span></div>`;
+				working += `<div class="step"><span class="step-label">x₁:</span> <span class="step-value">(-${fmt(b)} + ${fmt(sqrtD)}) / (2 × ${fmt(a)}) = ${fmt(-b + sqrtD)} / ${fmt(2*a)} = <span class="highlight">${fmt((-b + sqrtD) / (2*a))}</span></span></div>`;
+				if (discriminant > 0) {
+					working += `<div class="step"><span class="step-label">x₂:</span> <span class="step-value">(-${fmt(b)} - ${fmt(sqrtD)}) / (2 × ${fmt(a)}) = ${fmt(-b - sqrtD)} / ${fmt(2*a)} = <span class="highlight">${fmt((-b - sqrtD) / (2*a))}</span></span></div>`;
+				}
+			} else {
+				const sqrtNegD = Math.sqrt(-discriminant);
+				working += `<div class="step"><span class="step-label">√Δ:</span> <span class="step-value">√(${fmt(discriminant)}) = ${fmt(sqrtNegD)}i (imaginary)</span></div>`;
+				working += `<div class="step"><span class="step-label">Real part:</span> <span class="step-value">-b / 2a = ${fmt(-b)} / ${fmt(2*a)} = <span class="highlight">${fmt(-b / (2*a))}</span></span></div>`;
+				working += `<div class="step"><span class="step-label">Imaginary part:</span> <span class="step-value">√|Δ| / 2a = ${fmt(sqrtNegD)} / ${fmt(2*a)} = <span class="highlight">±${fmt(sqrtNegD / (2*a))}i</span></span></div>`;
+			}
+
+			workingDiv.innerHTML = working;
+		}
+
+		function setExample(a, b, c) {
+			coefA.value = a;
+			coefB.value = b;
+			coefC.value = c;
+			solve();
+		}
+
+		// Event listeners
+		[coefA, coefB, coefC].forEach(input => {
+			input.addEventListener('input', solve);
+		});
+
+		// Initial solve
+		solve();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

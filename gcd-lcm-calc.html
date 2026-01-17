@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GCD & LCM Calculator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--info: #3b82f6;
+			--purple: #a78bfa;
+			--pink: #f472b6;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 700px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.input-section {
+			margin-bottom: 1rem;
+		}
+
+		.input-label {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+			display: block;
+		}
+
+		.numbers-input {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.6rem 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 1rem;
+			width: 100%;
+			outline: none;
+		}
+
+		.numbers-input:focus {
+			border-color: var(--accent);
+		}
+
+		.input-hint {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.35rem;
+		}
+
+		.examples {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.example-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.example-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.result-section {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.result-section:last-child {
+			margin-bottom: 0;
+		}
+
+		.result-label {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin-bottom: 0.5rem;
+		}
+
+		.result-value {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.result-row {
+			display: flex;
+			gap: 1rem;
+			flex-wrap: wrap;
+		}
+
+		.result-box {
+			flex: 1;
+			min-width: 150px;
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			text-align: center;
+		}
+
+		.result-box .result-label {
+			margin-bottom: 0.25rem;
+		}
+
+		.gcd-value { color: var(--warning); }
+		.lcm-value { color: var(--info); }
+
+		.step-container {
+			background: var(--surface);
+			border-radius: 4px;
+			padding: 1rem;
+			margin-top: 0.5rem;
+		}
+
+		.step {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.35rem 0;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.9rem;
+		}
+
+		.step:last-child {
+			border-bottom: none;
+		}
+
+		.step-num {
+			color: var(--text-muted);
+			min-width: 25px;
+		}
+
+		.step-calc {
+			color: var(--text);
+		}
+
+		.step-result {
+			color: var(--accent);
+			margin-left: auto;
+		}
+
+		.divisor {
+			color: var(--warning);
+			font-weight: 600;
+		}
+
+		.factors-display {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.5rem;
+		}
+
+		.factor-item {
+			background: var(--surface);
+			padding: 0.5rem 0.75rem;
+			border-radius: 4px;
+		}
+
+		.factor-number {
+			color: var(--purple);
+			font-weight: 600;
+		}
+
+		.factor-equals {
+			color: var(--text-muted);
+			margin: 0 0.25rem;
+		}
+
+		.factor-primes {
+			color: var(--warning);
+		}
+
+		.common-factors {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.5rem;
+		}
+
+		.common-factor {
+			background: rgba(245, 158, 11, 0.2);
+			color: var(--warning);
+			padding: 0.3rem 0.6rem;
+			border-radius: 4px;
+			font-weight: 500;
+		}
+
+		.formula-box {
+			background: var(--surface);
+			padding: 0.75rem;
+			border-radius: 4px;
+			margin-top: 0.5rem;
+			font-size: 0.9rem;
+		}
+
+		.formula-label {
+			color: var(--text-muted);
+			font-size: 0.75rem;
+			margin-bottom: 0.25rem;
+		}
+
+		.formula {
+			color: var(--text);
+		}
+
+		.formula .highlight {
+			color: var(--accent);
+			font-weight: 600;
+		}
+
+		.info-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+			gap: 0.5rem;
+			margin-top: 0.5rem;
+		}
+
+		.info-item {
+			background: var(--surface);
+			padding: 0.5rem;
+			border-radius: 4px;
+			text-align: center;
+		}
+
+		.info-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		.info-value {
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--purple);
+		}
+
+		.coprime-badge {
+			display: inline-block;
+			background: rgba(16, 185, 129, 0.2);
+			color: var(--accent);
+			padding: 0.25rem 0.75rem;
+			border-radius: 4px;
+			font-size: 0.85rem;
+			font-weight: 600;
+			margin-top: 0.5rem;
+		}
+
+		.ref-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.85rem;
+		}
+
+		.ref-table th,
+		.ref-table td {
+			padding: 0.5rem;
+			text-align: left;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.ref-table th {
+			color: var(--text-muted);
+			font-weight: 500;
+			text-transform: uppercase;
+			font-size: 0.75rem;
+		}
+
+		.ref-table td:first-child {
+			color: var(--purple);
+			font-weight: 500;
+		}
+
+		.ref-table tr:last-child td {
+			border-bottom: none;
+		}
+
+		@media (max-width: 500px) {
+			.result-row {
+				flex-direction: column;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>GCD & LCM Calculator</h1>
+			<p class="subtitle">Find greatest common divisor and least common multiple</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Enter Numbers</span>
+			</div>
+			<div class="input-section">
+				<label class="input-label">Numbers (separated by commas or spaces)</label>
+				<input type="text" class="numbers-input" id="numbersInput" placeholder="e.g., 24, 36, 48" value="24, 36">
+				<p class="input-hint">Enter 2 or more positive integers</p>
+			</div>
+			<div class="examples">
+				<span style="color: var(--text-muted); font-size: 0.75rem;">Try:</span>
+				<button class="example-btn" onclick="setNumbers('12, 18')">12, 18</button>
+				<button class="example-btn" onclick="setNumbers('24, 36')">24, 36</button>
+				<button class="example-btn" onclick="setNumbers('15, 25')">15, 25</button>
+				<button class="example-btn" onclick="setNumbers('48, 60, 72')">48, 60, 72</button>
+				<button class="example-btn" onclick="setNumbers('17, 31')">17, 31</button>
+				<button class="example-btn" onclick="setNumbers('100, 150, 200')">100, 150, 200</button>
+			</div>
+		</div>
+
+		<div class="panel" id="resultsPanel" style="display: none;">
+			<div class="panel-header">
+				<span class="panel-title">Results</span>
+			</div>
+			<div id="results"></div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Quick Reference</span>
+			</div>
+			<table class="ref-table">
+				<thead>
+					<tr>
+						<th>Term</th>
+						<th>Definition</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>GCD</td>
+						<td>Greatest Common Divisor - largest number that divides all given numbers</td>
+					</tr>
+					<tr>
+						<td>LCM</td>
+						<td>Least Common Multiple - smallest number divisible by all given numbers</td>
+					</tr>
+					<tr>
+						<td>Coprime</td>
+						<td>Numbers with GCD = 1 (no common factors except 1)</td>
+					</tr>
+					<tr>
+						<td>Formula</td>
+						<td>GCD(a,b) × LCM(a,b) = a × b</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<script>
+		const numbersInput = document.getElementById('numbersInput');
+		const resultsPanel = document.getElementById('resultsPanel');
+		const resultsDiv = document.getElementById('results');
+
+		numbersInput.addEventListener('input', calculate);
+
+		function setNumbers(nums) {
+			numbersInput.value = nums;
+			calculate();
+		}
+
+		function parseNumbers(input) {
+			return input
+				.split(/[,\s]+/)
+				.map(s => parseInt(s.trim()))
+				.filter(n => !isNaN(n) && n > 0);
+		}
+
+		// GCD using Euclidean algorithm
+		function gcd(a, b) {
+			while (b !== 0) {
+				[a, b] = [b, a % b];
+			}
+			return a;
+		}
+
+		// GCD of multiple numbers
+		function gcdMultiple(numbers) {
+			return numbers.reduce((acc, n) => gcd(acc, n));
+		}
+
+		// LCM of two numbers
+		function lcm(a, b) {
+			return (a * b) / gcd(a, b);
+		}
+
+		// LCM of multiple numbers
+		function lcmMultiple(numbers) {
+			return numbers.reduce((acc, n) => lcm(acc, n));
+		}
+
+		// Get Euclidean steps for GCD
+		function getGcdSteps(a, b) {
+			const steps = [];
+			if (a < b) [a, b] = [b, a];
+
+			while (b !== 0) {
+				const quotient = Math.floor(a / b);
+				const remainder = a % b;
+				steps.push({ a, b, quotient, remainder });
+				[a, b] = [b, remainder];
+			}
+			return { gcd: a, steps };
+		}
+
+		// Prime factorisation
+		function getPrimeFactors(n) {
+			const factors = {};
+			let current = n;
+
+			while (current % 2 === 0) {
+				factors[2] = (factors[2] || 0) + 1;
+				current = current / 2;
+			}
+
+			for (let i = 3; i <= Math.sqrt(current); i += 2) {
+				while (current % i === 0) {
+					factors[i] = (factors[i] || 0) + 1;
+					current = current / i;
+				}
+			}
+
+			if (current > 2) {
+				factors[current] = (factors[current] || 0) + 1;
+			}
+
+			return factors;
+		}
+
+		// Format prime factors
+		function formatFactors(factors) {
+			return Object.entries(factors)
+				.map(([p, e]) => e === 1 ? p : `${p}<sup>${e}</sup>`)
+				.join(' × ');
+		}
+
+		// Get all divisors
+		function getDivisors(n) {
+			const divisors = [];
+			for (let i = 1; i <= Math.sqrt(n); i++) {
+				if (n % i === 0) {
+					divisors.push(i);
+					if (i !== n / i) divisors.push(n / i);
+				}
+			}
+			return divisors.sort((a, b) => a - b);
+		}
+
+		function calculate() {
+			const numbers = parseNumbers(numbersInput.value);
+
+			if (numbers.length < 2) {
+				resultsPanel.style.display = 'none';
+				return;
+			}
+
+			const gcdResult = gcdMultiple(numbers);
+			const lcmResult = lcmMultiple(numbers);
+			const product = numbers.reduce((a, b) => a * b, 1);
+			const isCoprime = gcdResult === 1;
+
+			// Get prime factorisations for all numbers
+			const allFactors = numbers.map(n => ({
+				number: n,
+				factors: getPrimeFactors(n)
+			}));
+
+			// Find common prime factors
+			const allPrimes = new Set();
+			allFactors.forEach(f => Object.keys(f.factors).forEach(p => allPrimes.add(parseInt(p))));
+
+			const commonPrimes = [...allPrimes].filter(p =>
+				allFactors.every(f => f.factors[p])
+			);
+
+			// Build factors display
+			const factorsHtml = allFactors.map(f => `
+				<div class="factor-item">
+					<span class="factor-number">${f.number.toLocaleString()}</span>
+					<span class="factor-equals">=</span>
+					<span class="factor-primes">${formatFactors(f.factors) || '1'}</span>
+				</div>
+			`).join('');
+
+			// For two numbers, show Euclidean algorithm steps
+			let euclideanHtml = '';
+			if (numbers.length === 2) {
+				const { steps } = getGcdSteps(numbers[0], numbers[1]);
+				const stepsHtml = steps.map((s, i) => `
+					<div class="step">
+						<span class="step-num">${i + 1}.</span>
+						<span class="step-calc">${s.a.toLocaleString()} = ${s.b.toLocaleString()} × <span class="divisor">${s.quotient}</span> + ${s.remainder}</span>
+					</div>
+				`).join('');
+
+				euclideanHtml = `
+					<div class="result-section">
+						<div class="result-label">Euclidean Algorithm Steps</div>
+						<div class="step-container">${stepsHtml}</div>
+					</div>
+				`;
+			}
+
+			// Common factors display
+			const commonFactorsHtml = commonPrimes.length > 0
+				? commonPrimes.map(p => `<span class="common-factor">${p}</span>`).join('')
+				: '<span style="color: var(--text-muted);">None (numbers are coprime)</span>';
+
+			// Coprime badge
+			const coprimeBadge = isCoprime
+				? '<div class="coprime-badge">These numbers are COPRIME</div>'
+				: '';
+
+			resultsDiv.innerHTML = `
+				<div class="result-row">
+					<div class="result-box">
+						<div class="result-label">GCD</div>
+						<div class="result-value gcd-value">${gcdResult.toLocaleString()}</div>
+					</div>
+					<div class="result-box">
+						<div class="result-label">LCM</div>
+						<div class="result-value lcm-value">${lcmResult.toLocaleString()}</div>
+					</div>
+				</div>
+				${coprimeBadge}
+
+				<div class="result-section">
+					<div class="result-label">Prime Factorisations</div>
+					<div class="factors-display">${factorsHtml}</div>
+				</div>
+
+				<div class="result-section">
+					<div class="result-label">Common Prime Factors</div>
+					<div class="common-factors">${commonFactorsHtml}</div>
+				</div>
+
+				${euclideanHtml}
+
+				<div class="result-section">
+					<div class="result-label">Verification</div>
+					<div class="formula-box">
+						<div class="formula-label">GCD × LCM = Product (for 2 numbers)</div>
+						<div class="formula">
+							<span class="highlight">${gcdResult.toLocaleString()}</span> ×
+							<span class="highlight">${lcmResult.toLocaleString()}</span> =
+							<span class="highlight">${(gcdResult * lcmResult).toLocaleString()}</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="result-section">
+					<div class="result-label">Properties</div>
+					<div class="info-grid">
+						<div class="info-item">
+							<div class="info-label">Numbers Count</div>
+							<div class="info-value">${numbers.length}</div>
+						</div>
+						<div class="info-item">
+							<div class="info-label">Product</div>
+							<div class="info-value">${product.toLocaleString()}</div>
+						</div>
+						<div class="info-item">
+							<div class="info-label">GCD Divisors</div>
+							<div class="info-value">${getDivisors(gcdResult).length}</div>
+						</div>
+						<div class="info-item">
+							<div class="info-label">Coprime</div>
+							<div class="info-value">${isCoprime ? 'Yes' : 'No'}</div>
+						</div>
+					</div>
+				</div>
+			`;
+
+			resultsPanel.style.display = 'block';
+		}
+
+		// Initial calculation
+		calculate();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

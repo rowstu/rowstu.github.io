@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Ratio Calculator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--info: #3b82f6;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 700px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.calc-section {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.calc-section:last-child {
+			margin-bottom: 0;
+		}
+
+		.calc-title {
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: var(--accent);
+			margin-bottom: 0.75rem;
+		}
+
+		.calc-row {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+			margin-bottom: 0.75rem;
+		}
+
+		input[type="number"] {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.5rem 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.9rem;
+			width: 80px;
+			outline: none;
+			text-align: center;
+		}
+
+		input[type="number"]:focus {
+			border-color: var(--accent);
+		}
+
+		.colon {
+			font-size: 1.2rem;
+			color: var(--text-muted);
+			font-weight: bold;
+		}
+
+		.equals {
+			font-size: 1.2rem;
+			color: var(--accent);
+		}
+
+		.arrow {
+			font-size: 1.2rem;
+			color: var(--warning);
+		}
+
+		.result {
+			background: var(--surface);
+			padding: 0.5rem 0.75rem;
+			border-radius: 4px;
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--accent);
+			min-width: 60px;
+			text-align: center;
+		}
+
+		.result.unknown {
+			color: var(--warning);
+			border: 1px dashed var(--warning);
+		}
+
+		.hint {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.5rem;
+		}
+
+		.scale-controls {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 0.5rem 1rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.8rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.btn-secondary {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: var(--surface-hover);
+		}
+
+		.parts-display {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+			margin-top: 0.75rem;
+		}
+
+		.part-box {
+			background: var(--surface);
+			padding: 0.5rem 0.75rem;
+			border-radius: 4px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			min-width: 70px;
+		}
+
+		.part-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+		}
+
+		.part-value {
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.examples {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.example-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.3rem 0.5rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.7rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.example-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.info-box {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			line-height: 1.6;
+		}
+
+		.ratio-examples {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+			gap: 0.5rem;
+		}
+
+		.ratio-ex {
+			display: flex;
+			justify-content: space-between;
+			padding: 0.35rem 0.5rem;
+			background: var(--surface);
+			border-radius: 4px;
+		}
+
+		.ratio-ex span:first-child {
+			color: var(--text-muted);
+		}
+
+		.ratio-ex span:last-child {
+			color: var(--accent);
+			font-weight: 500;
+		}
+
+		@media (max-width: 500px) {
+			input[type="number"] {
+				width: 65px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Ratio Calculator</h1>
+			<p class="subtitle">Scale ratios, find missing values, and simplify</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Simplify Ratio</span>
+			</div>
+			<div class="calc-section">
+				<div class="calc-row">
+					<input type="number" id="simpA" placeholder="12" value="12">
+					<span class="colon">:</span>
+					<input type="number" id="simpB" placeholder="18" value="18">
+					<span class="arrow">→</span>
+					<span class="result" id="simpResA">2</span>
+					<span class="colon">:</span>
+					<span class="result" id="simpResB">3</span>
+				</div>
+				<div class="hint">GCD: <span id="simpGcd">6</span></div>
+				<div class="examples">
+					<button class="example-btn" onclick="setSimplify(4, 6)">4:6</button>
+					<button class="example-btn" onclick="setSimplify(15, 25)">15:25</button>
+					<button class="example-btn" onclick="setSimplify(24, 36)">24:36</button>
+					<button class="example-btn" onclick="setSimplify(100, 75)">100:75</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Solve Proportion (A:B = C:D)</span>
+			</div>
+			<div class="calc-section">
+				<div class="calc-title">Find the missing value (leave one field empty)</div>
+				<div class="calc-row">
+					<input type="number" id="propA" placeholder="3" value="3">
+					<span class="colon">:</span>
+					<input type="number" id="propB" placeholder="4" value="4">
+					<span class="equals">=</span>
+					<input type="number" id="propC" placeholder="9" value="9">
+					<span class="colon">:</span>
+					<input type="number" id="propD" placeholder="?" value="">
+				</div>
+				<div class="hint">Result: <span id="propResult">D = 12</span></div>
+				<div class="examples">
+					<button class="example-btn" onclick="setProp(2, 3, 10, null)">2:3 = 10:?</button>
+					<button class="example-btn" onclick="setProp(5, null, 15, 12)">5:? = 15:12</button>
+					<button class="example-btn" onclick="setProp(null, 4, 6, 8)">?:4 = 6:8</button>
+					<button class="example-btn" onclick="setProp(7, 3, null, 9)">7:3 = ?:9</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Scale Ratio</span>
+			</div>
+			<div class="calc-section">
+				<div class="calc-title">Scale a ratio by a factor or to a target sum</div>
+				<div class="calc-row">
+					<input type="number" id="scaleA" placeholder="2" value="2">
+					<span class="colon">:</span>
+					<input type="number" id="scaleB" placeholder="3" value="3">
+				</div>
+				<div class="scale-controls">
+					<span style="color: var(--text-muted); font-size: 0.85rem;">Scale by</span>
+					<input type="number" id="scaleFactor" placeholder="5" value="5" style="width: 60px;">
+					<span class="arrow">→</span>
+					<span class="result" id="scaleResA">10</span>
+					<span class="colon">:</span>
+					<span class="result" id="scaleResB">15</span>
+				</div>
+				<div class="scale-controls" style="margin-top: 0.75rem;">
+					<span style="color: var(--text-muted); font-size: 0.85rem;">Total sum</span>
+					<input type="number" id="scaleSum" placeholder="100" value="100" style="width: 70px;">
+					<span class="arrow">→</span>
+					<span class="result" id="scaleSumA">40</span>
+					<span class="colon">:</span>
+					<span class="result" id="scaleSumB">60</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Divide Amount by Ratio</span>
+			</div>
+			<div class="calc-section">
+				<div class="calc-title">Divide a total amount into parts by ratio</div>
+				<div class="calc-row">
+					<span style="color: var(--text-muted); font-size: 0.85rem;">Divide</span>
+					<input type="number" id="divideTotal" placeholder="100" value="100" style="width: 80px;">
+					<span style="color: var(--text-muted); font-size: 0.85rem;">in ratio</span>
+					<input type="number" id="divideA" placeholder="2" value="2" style="width: 50px;">
+					<span class="colon">:</span>
+					<input type="number" id="divideB" placeholder="3" value="3" style="width: 50px;">
+					<span class="colon">:</span>
+					<input type="number" id="divideC" placeholder="5" value="5" style="width: 50px;">
+				</div>
+				<div class="parts-display" id="divideParts">
+					<div class="part-box"><span class="part-label">Part 1</span><span class="part-value">20</span></div>
+					<div class="part-box"><span class="part-label">Part 2</span><span class="part-value">30</span></div>
+					<div class="part-box"><span class="part-label">Part 3</span><span class="part-value">50</span></div>
+				</div>
+				<div class="hint">Each part = <span id="divideUnit">10</span> (total ÷ sum of ratio parts)</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Common Ratios</span>
+			</div>
+			<div class="info-box">
+				<div class="ratio-examples">
+					<div class="ratio-ex"><span>Golden</span><span>1:1.618</span></div>
+					<div class="ratio-ex"><span>Photo 4:3</span><span>4:3</span></div>
+					<div class="ratio-ex"><span>Photo 3:2</span><span>3:2</span></div>
+					<div class="ratio-ex"><span>Widescreen</span><span>16:9</span></div>
+					<div class="ratio-ex"><span>Ultra-wide</span><span>21:9</span></div>
+					<div class="ratio-ex"><span>Square</span><span>1:1</span></div>
+					<div class="ratio-ex"><span>A-paper</span><span>1:√2</span></div>
+					<div class="ratio-ex"><span>Rule of 3rds</span><span>1:2</span></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		function gcd(a, b) {
+			a = Math.abs(a);
+			b = Math.abs(b);
+			while (b) {
+				[a, b] = [b, a % b];
+			}
+			return a;
+		}
+
+		function formatNum(n) {
+			if (Number.isInteger(n)) return n.toString();
+			return n.toFixed(4).replace(/\.?0+$/, '');
+		}
+
+		// Simplify ratio
+		function calcSimplify() {
+			const a = parseFloat(document.getElementById('simpA').value) || 0;
+			const b = parseFloat(document.getElementById('simpB').value) || 0;
+
+			if (a === 0 && b === 0) {
+				document.getElementById('simpResA').textContent = '0';
+				document.getElementById('simpResB').textContent = '0';
+				document.getElementById('simpGcd').textContent = '0';
+				return;
+			}
+
+			const g = gcd(a, b);
+			document.getElementById('simpResA').textContent = formatNum(a / g);
+			document.getElementById('simpResB').textContent = formatNum(b / g);
+			document.getElementById('simpGcd').textContent = formatNum(g);
+		}
+
+		function setSimplify(a, b) {
+			document.getElementById('simpA').value = a;
+			document.getElementById('simpB').value = b;
+			calcSimplify();
+		}
+
+		// Proportion solver
+		function calcProportion() {
+			const aVal = document.getElementById('propA').value;
+			const bVal = document.getElementById('propB').value;
+			const cVal = document.getElementById('propC').value;
+			const dVal = document.getElementById('propD').value;
+
+			const a = aVal !== '' ? parseFloat(aVal) : null;
+			const b = bVal !== '' ? parseFloat(bVal) : null;
+			const c = cVal !== '' ? parseFloat(cVal) : null;
+			const d = dVal !== '' ? parseFloat(dVal) : null;
+
+			let result = '';
+
+			// A:B = C:D means A*D = B*C
+			if (a === null && b !== null && c !== null && d !== null && c !== 0) {
+				const answer = (b * c) / d;
+				result = `A = ${formatNum(answer)}`;
+			} else if (b === null && a !== null && c !== null && d !== null && d !== 0) {
+				const answer = (a * d) / c;
+				result = `B = ${formatNum(answer)}`;
+			} else if (c === null && a !== null && b !== null && d !== null && a !== 0) {
+				const answer = (b * d) / a;
+				result = `C = ${formatNum(answer)}`;
+			} else if (d === null && a !== null && b !== null && c !== null && b !== 0) {
+				const answer = (a * c) / b;
+				result = `D = ${formatNum(answer)}`;
+			} else {
+				result = 'Leave exactly one field empty';
+			}
+
+			document.getElementById('propResult').textContent = result;
+		}
+
+		function setProp(a, b, c, d) {
+			document.getElementById('propA').value = a !== null ? a : '';
+			document.getElementById('propB').value = b !== null ? b : '';
+			document.getElementById('propC').value = c !== null ? c : '';
+			document.getElementById('propD').value = d !== null ? d : '';
+			calcProportion();
+		}
+
+		// Scale ratio
+		function calcScale() {
+			const a = parseFloat(document.getElementById('scaleA').value) || 0;
+			const b = parseFloat(document.getElementById('scaleB').value) || 0;
+			const factor = parseFloat(document.getElementById('scaleFactor').value) || 1;
+			const sum = parseFloat(document.getElementById('scaleSum').value) || 0;
+
+			// Scale by factor
+			document.getElementById('scaleResA').textContent = formatNum(a * factor);
+			document.getElementById('scaleResB').textContent = formatNum(b * factor);
+
+			// Scale to sum
+			const total = a + b;
+			if (total !== 0) {
+				document.getElementById('scaleSumA').textContent = formatNum((a / total) * sum);
+				document.getElementById('scaleSumB').textContent = formatNum((b / total) * sum);
+			}
+		}
+
+		// Divide by ratio
+		function calcDivide() {
+			const total = parseFloat(document.getElementById('divideTotal').value) || 0;
+			const a = parseFloat(document.getElementById('divideA').value) || 0;
+			const b = parseFloat(document.getElementById('divideB').value) || 0;
+			const c = parseFloat(document.getElementById('divideC').value) || 0;
+
+			const parts = [a, b];
+			if (c) parts.push(c);
+
+			const sum = parts.reduce((acc, p) => acc + p, 0);
+			const unit = sum !== 0 ? total / sum : 0;
+
+			const container = document.getElementById('divideParts');
+			container.innerHTML = parts.map((p, i) => `
+				<div class="part-box">
+					<span class="part-label">Part ${i + 1}</span>
+					<span class="part-value">${formatNum(p * unit)}</span>
+				</div>
+			`).join('');
+
+			document.getElementById('divideUnit').textContent = formatNum(unit);
+		}
+
+		// Event listeners
+		['simpA', 'simpB'].forEach(id => {
+			document.getElementById(id).addEventListener('input', calcSimplify);
+		});
+
+		['propA', 'propB', 'propC', 'propD'].forEach(id => {
+			document.getElementById(id).addEventListener('input', calcProportion);
+		});
+
+		['scaleA', 'scaleB', 'scaleFactor', 'scaleSum'].forEach(id => {
+			document.getElementById(id).addEventListener('input', calcScale);
+		});
+
+		['divideTotal', 'divideA', 'divideB', 'divideC'].forEach(id => {
+			document.getElementById(id).addEventListener('input', calcDivide);
+		});
+
+		// Initial calculations
+		calcSimplify();
+		calcProportion();
+		calcScale();
+		calcDivide();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

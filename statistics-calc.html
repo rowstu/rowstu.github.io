@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Statistics Calculator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--info: #3b82f6;
+			--purple: #a78bfa;
+			--pink: #f472b6;
+			--red: #ef4444;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 800px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.input-section {
+			margin-bottom: 1rem;
+		}
+
+		.input-label {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+			display: block;
+		}
+
+		.data-input {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.6rem 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 1rem;
+			width: 100%;
+			outline: none;
+			min-height: 80px;
+			resize: vertical;
+		}
+
+		.data-input:focus {
+			border-color: var(--accent);
+		}
+
+		.input-hint {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.35rem;
+		}
+
+		.examples {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.example-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.example-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+			gap: 0.75rem;
+		}
+
+		.stat-card {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 0.75rem;
+			text-align: center;
+		}
+
+		.stat-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin-bottom: 0.25rem;
+		}
+
+		.stat-value {
+			font-size: 1.1rem;
+			font-weight: 600;
+		}
+
+		.stat-value.primary { color: var(--accent); }
+		.stat-value.secondary { color: var(--info); }
+		.stat-value.tertiary { color: var(--warning); }
+		.stat-value.purple { color: var(--purple); }
+		.stat-value.pink { color: var(--pink); }
+
+		.section-title {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin: 1.25rem 0 0.75rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.section-title:first-child {
+			margin-top: 0;
+		}
+
+		.data-display {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-top: 0.5rem;
+		}
+
+		.sorted-data {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.35rem;
+		}
+
+		.data-item {
+			background: var(--surface);
+			padding: 0.25rem 0.5rem;
+			border-radius: 4px;
+			font-size: 0.85rem;
+		}
+
+		.data-item.highlight-min {
+			background: rgba(239, 68, 68, 0.2);
+			color: var(--red);
+		}
+
+		.data-item.highlight-max {
+			background: rgba(16, 185, 129, 0.2);
+			color: var(--accent);
+		}
+
+		.data-item.highlight-median {
+			background: rgba(59, 130, 246, 0.2);
+			color: var(--info);
+		}
+
+		.data-item.highlight-mode {
+			background: rgba(244, 114, 182, 0.2);
+			color: var(--pink);
+		}
+
+		.quartiles-visual {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-top: 0.5rem;
+		}
+
+		.box-plot {
+			display: flex;
+			align-items: center;
+			height: 40px;
+			margin: 1rem 0;
+			position: relative;
+		}
+
+		.box-plot-line {
+			position: absolute;
+			height: 2px;
+			background: var(--border);
+			left: 0;
+			right: 0;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
+		.box-plot-box {
+			position: absolute;
+			height: 30px;
+			background: rgba(59, 130, 246, 0.3);
+			border: 2px solid var(--info);
+			border-radius: 4px;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
+		.box-plot-median {
+			position: absolute;
+			width: 3px;
+			height: 30px;
+			background: var(--accent);
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
+		.box-plot-whisker {
+			position: absolute;
+			width: 2px;
+			height: 16px;
+			background: var(--border);
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
+		.box-plot-labels {
+			display: flex;
+			justify-content: space-between;
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-top: 0.5rem;
+		}
+
+		.quartile-values {
+			display: grid;
+			grid-template-columns: repeat(5, 1fr);
+			gap: 0.5rem;
+			text-align: center;
+		}
+
+		.quartile-item {
+			padding: 0.5rem;
+		}
+
+		.quartile-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		.quartile-value {
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: var(--purple);
+		}
+
+		.frequency-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.85rem;
+			margin-top: 0.5rem;
+		}
+
+		.frequency-table th,
+		.frequency-table td {
+			padding: 0.5rem;
+			text-align: left;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.frequency-table th {
+			color: var(--text-muted);
+			font-weight: 500;
+			text-transform: uppercase;
+			font-size: 0.7rem;
+		}
+
+		.frequency-table td:first-child {
+			color: var(--warning);
+			font-weight: 500;
+		}
+
+		.frequency-table tr:last-child td {
+			border-bottom: none;
+		}
+
+		.freq-bar {
+			background: var(--surface-hover);
+			height: 8px;
+			border-radius: 4px;
+			overflow: hidden;
+		}
+
+		.freq-bar-fill {
+			height: 100%;
+			background: var(--info);
+			border-radius: 4px;
+		}
+
+		.ref-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.85rem;
+		}
+
+		.ref-table th,
+		.ref-table td {
+			padding: 0.5rem;
+			text-align: left;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.ref-table th {
+			color: var(--text-muted);
+			font-weight: 500;
+			text-transform: uppercase;
+			font-size: 0.7rem;
+		}
+
+		.ref-table td:first-child {
+			color: var(--purple);
+			font-weight: 500;
+			white-space: nowrap;
+		}
+
+		.ref-table tr:last-child td {
+			border-bottom: none;
+		}
+
+		@media (max-width: 600px) {
+			.stats-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			.quartile-values {
+				grid-template-columns: repeat(3, 1fr);
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Statistics Calculator</h1>
+			<p class="subtitle">Calculate mean, median, mode, standard deviation and more</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Enter Data</span>
+			</div>
+			<div class="input-section">
+				<label class="input-label">Numbers (separated by commas, spaces, or newlines)</label>
+				<textarea class="data-input" id="dataInput" placeholder="e.g., 12, 15, 18, 22, 25, 28, 30">12, 15, 18, 22, 25, 28, 30, 15, 22</textarea>
+				<p class="input-hint">Enter numerical data points to analyse</p>
+			</div>
+			<div class="examples">
+				<span style="color: var(--text-muted); font-size: 0.75rem;">Try:</span>
+				<button class="example-btn" onclick="setData('1, 2, 3, 4, 5')">Simple</button>
+				<button class="example-btn" onclick="setData('10, 20, 30, 40, 50, 60, 70, 80, 90, 100')">Range</button>
+				<button class="example-btn" onclick="setData('72, 85, 68, 92, 78, 88, 76, 95, 82, 90')">Test Scores</button>
+				<button class="example-btn" onclick="setData('5, 5, 5, 10, 10, 15, 20, 20, 20, 20')">With Mode</button>
+				<button class="example-btn" onclick="setData('2.5, 3.7, 4.2, 5.1, 6.8, 7.3')">Decimals</button>
+			</div>
+		</div>
+
+		<div class="panel" id="resultsPanel" style="display: none;">
+			<div class="panel-header">
+				<span class="panel-title">Results</span>
+			</div>
+			<div id="results"></div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Quick Reference</span>
+			</div>
+			<table class="ref-table">
+				<thead>
+					<tr>
+						<th>Measure</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Mean</td>
+						<td>Sum of all values divided by count (average)</td>
+					</tr>
+					<tr>
+						<td>Median</td>
+						<td>Middle value when data is sorted</td>
+					</tr>
+					<tr>
+						<td>Mode</td>
+						<td>Most frequently occurring value(s)</td>
+					</tr>
+					<tr>
+						<td>Std Dev</td>
+						<td>Measure of spread from the mean</td>
+					</tr>
+					<tr>
+						<td>Variance</td>
+						<td>Square of standard deviation</td>
+					</tr>
+					<tr>
+						<td>IQR</td>
+						<td>Interquartile range (Q3 - Q1)</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<script>
+		const dataInput = document.getElementById('dataInput');
+		const resultsPanel = document.getElementById('resultsPanel');
+		const resultsDiv = document.getElementById('results');
+
+		dataInput.addEventListener('input', calculate);
+
+		function setData(data) {
+			dataInput.value = data;
+			calculate();
+		}
+
+		function parseData(input) {
+			return input
+				.split(/[,\s\n]+/)
+				.map(s => parseFloat(s.trim()))
+				.filter(n => !isNaN(n));
+		}
+
+		function sum(arr) {
+			return arr.reduce((a, b) => a + b, 0);
+		}
+
+		function mean(arr) {
+			return sum(arr) / arr.length;
+		}
+
+		function median(arr) {
+			const sorted = [...arr].sort((a, b) => a - b);
+			const mid = Math.floor(sorted.length / 2);
+			return sorted.length % 2 !== 0
+				? sorted[mid]
+				: (sorted[mid - 1] + sorted[mid]) / 2;
+		}
+
+		function mode(arr) {
+			const freq = {};
+			arr.forEach(n => freq[n] = (freq[n] || 0) + 1);
+			const maxFreq = Math.max(...Object.values(freq));
+			if (maxFreq === 1) return { modes: [], frequency: 1 };
+			const modes = Object.keys(freq)
+				.filter(k => freq[k] === maxFreq)
+				.map(Number);
+			return { modes, frequency: maxFreq };
+		}
+
+		function variance(arr, isSample = true) {
+			const m = mean(arr);
+			const squaredDiffs = arr.map(n => Math.pow(n - m, 2));
+			const divisor = isSample ? arr.length - 1 : arr.length;
+			return sum(squaredDiffs) / divisor;
+		}
+
+		function stdDev(arr, isSample = true) {
+			return Math.sqrt(variance(arr, isSample));
+		}
+
+		function quartiles(arr) {
+			const sorted = [...arr].sort((a, b) => a - b);
+			const n = sorted.length;
+
+			const q2 = median(sorted);
+
+			const lowerHalf = sorted.slice(0, Math.floor(n / 2));
+			const upperHalf = sorted.slice(Math.ceil(n / 2));
+
+			const q1 = median(lowerHalf);
+			const q3 = median(upperHalf);
+
+			return { q1, q2, q3, min: sorted[0], max: sorted[n - 1] };
+		}
+
+		function formatNumber(n, decimals = 4) {
+			if (Number.isInteger(n)) return n.toLocaleString();
+			const rounded = parseFloat(n.toFixed(decimals));
+			return rounded.toLocaleString();
+		}
+
+		function getFrequencyTable(arr) {
+			const freq = {};
+			arr.forEach(n => freq[n] = (freq[n] || 0) + 1);
+			return Object.entries(freq)
+				.map(([value, count]) => ({ value: parseFloat(value), count }))
+				.sort((a, b) => a.value - b.value);
+		}
+
+		function calculate() {
+			const data = parseData(dataInput.value);
+
+			if (data.length < 2) {
+				resultsPanel.style.display = 'none';
+				return;
+			}
+
+			const sorted = [...data].sort((a, b) => a - b);
+			const n = data.length;
+			const dataSum = sum(data);
+			const dataMean = mean(data);
+			const dataMedian = median(data);
+			const dataMode = mode(data);
+			const dataVariance = variance(data);
+			const dataStdDev = stdDev(data);
+			const popVariance = variance(data, false);
+			const popStdDev = stdDev(data, false);
+			const q = quartiles(data);
+			const iqr = q.q3 - q.q1;
+			const range = q.max - q.min;
+			const freqTable = getFrequencyTable(data);
+
+			// Build sorted data display with highlights
+			const sortedHtml = sorted.map(n => {
+				let classes = ['data-item'];
+				if (n === q.min) classes.push('highlight-min');
+				if (n === q.max) classes.push('highlight-max');
+				if (n === dataMedian) classes.push('highlight-median');
+				if (dataMode.modes.includes(n)) classes.push('highlight-mode');
+				return `<span class="${classes.join(' ')}">${formatNumber(n)}</span>`;
+			}).join('');
+
+			// Mode display
+			const modeDisplay = dataMode.modes.length === 0
+				? 'No mode'
+				: dataMode.modes.map(m => formatNumber(m)).join(', ');
+
+			// Box plot calculations (percentage positions)
+			const dataRange = q.max - q.min;
+			const q1Pos = ((q.q1 - q.min) / dataRange) * 100;
+			const medianPos = ((q.q2 - q.min) / dataRange) * 100;
+			const q3Pos = ((q.q3 - q.min) / dataRange) * 100;
+			const boxWidth = q3Pos - q1Pos;
+
+			// Frequency table HTML
+			const maxFreq = Math.max(...freqTable.map(f => f.count));
+			const freqHtml = freqTable.slice(0, 15).map(f => `
+				<tr>
+					<td>${formatNumber(f.value)}</td>
+					<td>${f.count}</td>
+					<td>${formatNumber((f.count / n) * 100, 1)}%</td>
+					<td style="width: 100px;">
+						<div class="freq-bar">
+							<div class="freq-bar-fill" style="width: ${(f.count / maxFreq) * 100}%;"></div>
+						</div>
+					</td>
+				</tr>
+			`).join('');
+
+			const truncatedNote = freqTable.length > 15
+				? `<p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">Showing first 15 of ${freqTable.length} unique values</p>`
+				: '';
+
+			resultsDiv.innerHTML = `
+				<div class="section-title">Central Tendency</div>
+				<div class="stats-grid">
+					<div class="stat-card">
+						<div class="stat-label">Mean</div>
+						<div class="stat-value primary">${formatNumber(dataMean)}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Median</div>
+						<div class="stat-value secondary">${formatNumber(dataMedian)}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Mode</div>
+						<div class="stat-value pink">${modeDisplay}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Sum</div>
+						<div class="stat-value purple">${formatNumber(dataSum)}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Count</div>
+						<div class="stat-value tertiary">${n}</div>
+					</div>
+				</div>
+
+				<div class="section-title">Dispersion</div>
+				<div class="stats-grid">
+					<div class="stat-card">
+						<div class="stat-label">Std Dev (Sample)</div>
+						<div class="stat-value primary">${formatNumber(dataStdDev)}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Variance (Sample)</div>
+						<div class="stat-value secondary">${formatNumber(dataVariance)}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Std Dev (Pop)</div>
+						<div class="stat-value tertiary">${formatNumber(popStdDev)}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Variance (Pop)</div>
+						<div class="stat-value purple">${formatNumber(popVariance)}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">Range</div>
+						<div class="stat-value pink">${formatNumber(range)}</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-label">IQR</div>
+						<div class="stat-value primary">${formatNumber(iqr)}</div>
+					</div>
+				</div>
+
+				<div class="section-title">Quartiles & Box Plot</div>
+				<div class="quartiles-visual">
+					<div class="quartile-values">
+						<div class="quartile-item">
+							<div class="quartile-label">Min</div>
+							<div class="quartile-value">${formatNumber(q.min)}</div>
+						</div>
+						<div class="quartile-item">
+							<div class="quartile-label">Q1 (25%)</div>
+							<div class="quartile-value">${formatNumber(q.q1)}</div>
+						</div>
+						<div class="quartile-item">
+							<div class="quartile-label">Q2 (50%)</div>
+							<div class="quartile-value">${formatNumber(q.q2)}</div>
+						</div>
+						<div class="quartile-item">
+							<div class="quartile-label">Q3 (75%)</div>
+							<div class="quartile-value">${formatNumber(q.q3)}</div>
+						</div>
+						<div class="quartile-item">
+							<div class="quartile-label">Max</div>
+							<div class="quartile-value">${formatNumber(q.max)}</div>
+						</div>
+					</div>
+					<div class="box-plot">
+						<div class="box-plot-line"></div>
+						<div class="box-plot-whisker" style="left: 0;"></div>
+						<div class="box-plot-whisker" style="right: 0;"></div>
+						<div class="box-plot-box" style="left: ${q1Pos}%; width: ${boxWidth}%;"></div>
+						<div class="box-plot-median" style="left: ${medianPos}%;"></div>
+					</div>
+					<div class="box-plot-labels">
+						<span>${formatNumber(q.min)}</span>
+						<span>${formatNumber(q.max)}</span>
+					</div>
+				</div>
+
+				<div class="section-title">Sorted Data</div>
+				<div class="data-display">
+					<div class="sorted-data">${sortedHtml}</div>
+					<p style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.75rem;">
+						<span style="color: var(--red);">Min</span> |
+						<span style="color: var(--accent);">Max</span> |
+						<span style="color: var(--info);">Median</span> |
+						<span style="color: var(--pink);">Mode</span>
+					</p>
+				</div>
+
+				<div class="section-title">Frequency Distribution</div>
+				<table class="frequency-table">
+					<thead>
+						<tr>
+							<th>Value</th>
+							<th>Count</th>
+							<th>Percent</th>
+							<th>Distribution</th>
+						</tr>
+					</thead>
+					<tbody>
+						${freqHtml}
+					</tbody>
+				</table>
+				${truncatedNote}
+			`;
+
+			resultsPanel.style.display = 'block';
+		}
+
+		// Initial calculation
+		calculate();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

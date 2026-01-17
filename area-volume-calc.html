@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Area & Volume Calculator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--info: #3b82f6;
+			--purple: #a78bfa;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 800px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.tabs {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+			flex-wrap: wrap;
+		}
+
+		.tab {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.5rem 1rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.85rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.tab:hover, .tab.active {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.tab.active {
+			background: rgba(16, 185, 129, 0.1);
+		}
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+			display: none;
+		}
+
+		.panel.active {
+			display: block;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.shape-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: 1rem;
+		}
+
+		.shape-card {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+		}
+
+		.shape-name {
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: var(--accent);
+			margin-bottom: 0.75rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.shape-icon {
+			font-size: 1.2rem;
+		}
+
+		.input-group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.input-row {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.input-label {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			min-width: 60px;
+		}
+
+		input[type="number"] {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.4rem 0.6rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			width: 80px;
+			outline: none;
+		}
+
+		input[type="number"]:focus {
+			border-color: var(--accent);
+		}
+
+		.result-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.5rem;
+			background: var(--surface);
+			border-radius: 4px;
+			margin-top: 0.5rem;
+		}
+
+		.result-label {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+		}
+
+		.result-value {
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.formula {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-top: 0.5rem;
+			font-style: italic;
+		}
+
+		.pi-note {
+			font-size: 0.75rem;
+			color: var(--info);
+			margin-top: 0.5rem;
+		}
+
+		@media (max-width: 500px) {
+			.shape-grid {
+				grid-template-columns: 1fr;
+			}
+
+			input[type="number"] {
+				width: 70px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Area & Volume Calculator</h1>
+			<p class="subtitle">Calculate area, perimeter, volume, and surface area</p>
+		</header>
+
+		<div class="tabs">
+			<button class="tab active" onclick="showTab('2d')">2D Shapes</button>
+			<button class="tab" onclick="showTab('3d')">3D Shapes</button>
+		</div>
+
+		<div class="panel active" id="panel-2d">
+			<div class="panel-header">
+				<span class="panel-title">2D Shapes - Area & Perimeter</span>
+			</div>
+			<div class="shape-grid">
+				<!-- Square -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">◻</span> Square</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Side</span>
+							<input type="number" id="sq-side" value="5" step="any" oninput="calcSquare()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Area</span>
+						<span class="result-value" id="sq-area">25</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Perimeter</span>
+						<span class="result-value" id="sq-perim">20</span>
+					</div>
+					<div class="formula">A = s² | P = 4s</div>
+				</div>
+
+				<!-- Rectangle -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">▭</span> Rectangle</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Length</span>
+							<input type="number" id="rect-l" value="6" step="any" oninput="calcRect()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Width</span>
+							<input type="number" id="rect-w" value="4" step="any" oninput="calcRect()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Area</span>
+						<span class="result-value" id="rect-area">24</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Perimeter</span>
+						<span class="result-value" id="rect-perim">20</span>
+					</div>
+					<div class="formula">A = l×w | P = 2(l+w)</div>
+				</div>
+
+				<!-- Circle -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">●</span> Circle</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Radius</span>
+							<input type="number" id="circ-r" value="5" step="any" oninput="calcCircle()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Area</span>
+						<span class="result-value" id="circ-area">78.54</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Circumference</span>
+						<span class="result-value" id="circ-circum">31.42</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Diameter</span>
+						<span class="result-value" id="circ-diam">10</span>
+					</div>
+					<div class="formula">A = πr² | C = 2πr</div>
+				</div>
+
+				<!-- Triangle -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">△</span> Triangle</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Base</span>
+							<input type="number" id="tri-base" value="6" step="any" oninput="calcTriangle()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Height</span>
+							<input type="number" id="tri-height" value="4" step="any" oninput="calcTriangle()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Area</span>
+						<span class="result-value" id="tri-area">12</span>
+					</div>
+					<div class="formula">A = ½ × base × height</div>
+				</div>
+
+				<!-- Trapezoid -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">⏢</span> Trapezoid</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Base 1</span>
+							<input type="number" id="trap-a" value="8" step="any" oninput="calcTrapezoid()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Base 2</span>
+							<input type="number" id="trap-b" value="5" step="any" oninput="calcTrapezoid()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Height</span>
+							<input type="number" id="trap-h" value="4" step="any" oninput="calcTrapezoid()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Area</span>
+						<span class="result-value" id="trap-area">26</span>
+					</div>
+					<div class="formula">A = ½(a+b) × h</div>
+				</div>
+
+				<!-- Parallelogram -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">▱</span> Parallelogram</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Base</span>
+							<input type="number" id="para-base" value="6" step="any" oninput="calcParallelogram()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Height</span>
+							<input type="number" id="para-h" value="4" step="any" oninput="calcParallelogram()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Area</span>
+						<span class="result-value" id="para-area">24</span>
+					</div>
+					<div class="formula">A = base × height</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel" id="panel-3d">
+			<div class="panel-header">
+				<span class="panel-title">3D Shapes - Volume & Surface Area</span>
+			</div>
+			<div class="shape-grid">
+				<!-- Cube -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">⬜</span> Cube</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Side</span>
+							<input type="number" id="cube-s" value="5" step="any" oninput="calcCube()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Volume</span>
+						<span class="result-value" id="cube-vol">125</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Surface</span>
+						<span class="result-value" id="cube-surf">150</span>
+					</div>
+					<div class="formula">V = s³ | SA = 6s²</div>
+				</div>
+
+				<!-- Cuboid/Box -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">📦</span> Cuboid</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Length</span>
+							<input type="number" id="box-l" value="6" step="any" oninput="calcBox()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Width</span>
+							<input type="number" id="box-w" value="4" step="any" oninput="calcBox()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Height</span>
+							<input type="number" id="box-h" value="3" step="any" oninput="calcBox()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Volume</span>
+						<span class="result-value" id="box-vol">72</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Surface</span>
+						<span class="result-value" id="box-surf">108</span>
+					</div>
+					<div class="formula">V = lwh | SA = 2(lw+lh+wh)</div>
+				</div>
+
+				<!-- Sphere -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">🔴</span> Sphere</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Radius</span>
+							<input type="number" id="sphere-r" value="5" step="any" oninput="calcSphere()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Volume</span>
+						<span class="result-value" id="sphere-vol">523.6</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Surface</span>
+						<span class="result-value" id="sphere-surf">314.16</span>
+					</div>
+					<div class="formula">V = 4/3πr³ | SA = 4πr²</div>
+				</div>
+
+				<!-- Cylinder -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">🛢</span> Cylinder</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Radius</span>
+							<input type="number" id="cyl-r" value="3" step="any" oninput="calcCylinder()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Height</span>
+							<input type="number" id="cyl-h" value="7" step="any" oninput="calcCylinder()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Volume</span>
+						<span class="result-value" id="cyl-vol">197.92</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Surface</span>
+						<span class="result-value" id="cyl-surf">188.5</span>
+					</div>
+					<div class="formula">V = πr²h | SA = 2πr(r+h)</div>
+				</div>
+
+				<!-- Cone -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">🔺</span> Cone</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Radius</span>
+							<input type="number" id="cone-r" value="3" step="any" oninput="calcCone()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Height</span>
+							<input type="number" id="cone-h" value="5" step="any" oninput="calcCone()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Volume</span>
+						<span class="result-value" id="cone-vol">47.12</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Surface</span>
+						<span class="result-value" id="cone-surf">83.23</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Slant</span>
+						<span class="result-value" id="cone-slant">5.83</span>
+					</div>
+					<div class="formula">V = 1/3πr²h | l = √(r²+h²)</div>
+				</div>
+
+				<!-- Pyramid -->
+				<div class="shape-card">
+					<div class="shape-name"><span class="shape-icon">🔺</span> Square Pyramid</div>
+					<div class="input-group">
+						<div class="input-row">
+							<span class="input-label">Base</span>
+							<input type="number" id="pyr-b" value="4" step="any" oninput="calcPyramid()">
+						</div>
+						<div class="input-row">
+							<span class="input-label">Height</span>
+							<input type="number" id="pyr-h" value="6" step="any" oninput="calcPyramid()">
+						</div>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Volume</span>
+						<span class="result-value" id="pyr-vol">32</span>
+					</div>
+					<div class="result-row">
+						<span class="result-label">Surface</span>
+						<span class="result-value" id="pyr-surf">65.05</span>
+					</div>
+					<div class="formula">V = 1/3 × b² × h</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const PI = Math.PI;
+
+		function fmt(n) {
+			if (isNaN(n) || !isFinite(n)) return '—';
+			return n.toFixed(4).replace(/\.?0+$/, '');
+		}
+
+		function showTab(id) {
+			document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+			document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+			document.querySelector(`.tab[onclick="showTab('${id}')"]`).classList.add('active');
+			document.getElementById(`panel-${id}`).classList.add('active');
+		}
+
+		// 2D Shapes
+		function calcSquare() {
+			const s = parseFloat(document.getElementById('sq-side').value) || 0;
+			document.getElementById('sq-area').textContent = fmt(s * s);
+			document.getElementById('sq-perim').textContent = fmt(4 * s);
+		}
+
+		function calcRect() {
+			const l = parseFloat(document.getElementById('rect-l').value) || 0;
+			const w = parseFloat(document.getElementById('rect-w').value) || 0;
+			document.getElementById('rect-area').textContent = fmt(l * w);
+			document.getElementById('rect-perim').textContent = fmt(2 * (l + w));
+		}
+
+		function calcCircle() {
+			const r = parseFloat(document.getElementById('circ-r').value) || 0;
+			document.getElementById('circ-area').textContent = fmt(PI * r * r);
+			document.getElementById('circ-circum').textContent = fmt(2 * PI * r);
+			document.getElementById('circ-diam').textContent = fmt(2 * r);
+		}
+
+		function calcTriangle() {
+			const b = parseFloat(document.getElementById('tri-base').value) || 0;
+			const h = parseFloat(document.getElementById('tri-height').value) || 0;
+			document.getElementById('tri-area').textContent = fmt(0.5 * b * h);
+		}
+
+		function calcTrapezoid() {
+			const a = parseFloat(document.getElementById('trap-a').value) || 0;
+			const b = parseFloat(document.getElementById('trap-b').value) || 0;
+			const h = parseFloat(document.getElementById('trap-h').value) || 0;
+			document.getElementById('trap-area').textContent = fmt(0.5 * (a + b) * h);
+		}
+
+		function calcParallelogram() {
+			const b = parseFloat(document.getElementById('para-base').value) || 0;
+			const h = parseFloat(document.getElementById('para-h').value) || 0;
+			document.getElementById('para-area').textContent = fmt(b * h);
+		}
+
+		// 3D Shapes
+		function calcCube() {
+			const s = parseFloat(document.getElementById('cube-s').value) || 0;
+			document.getElementById('cube-vol').textContent = fmt(s * s * s);
+			document.getElementById('cube-surf').textContent = fmt(6 * s * s);
+		}
+
+		function calcBox() {
+			const l = parseFloat(document.getElementById('box-l').value) || 0;
+			const w = parseFloat(document.getElementById('box-w').value) || 0;
+			const h = parseFloat(document.getElementById('box-h').value) || 0;
+			document.getElementById('box-vol').textContent = fmt(l * w * h);
+			document.getElementById('box-surf').textContent = fmt(2 * (l*w + l*h + w*h));
+		}
+
+		function calcSphere() {
+			const r = parseFloat(document.getElementById('sphere-r').value) || 0;
+			document.getElementById('sphere-vol').textContent = fmt((4/3) * PI * r * r * r);
+			document.getElementById('sphere-surf').textContent = fmt(4 * PI * r * r);
+		}
+
+		function calcCylinder() {
+			const r = parseFloat(document.getElementById('cyl-r').value) || 0;
+			const h = parseFloat(document.getElementById('cyl-h').value) || 0;
+			document.getElementById('cyl-vol').textContent = fmt(PI * r * r * h);
+			document.getElementById('cyl-surf').textContent = fmt(2 * PI * r * (r + h));
+		}
+
+		function calcCone() {
+			const r = parseFloat(document.getElementById('cone-r').value) || 0;
+			const h = parseFloat(document.getElementById('cone-h').value) || 0;
+			const slant = Math.sqrt(r*r + h*h);
+			document.getElementById('cone-vol').textContent = fmt((1/3) * PI * r * r * h);
+			document.getElementById('cone-surf').textContent = fmt(PI * r * (r + slant));
+			document.getElementById('cone-slant').textContent = fmt(slant);
+		}
+
+		function calcPyramid() {
+			const b = parseFloat(document.getElementById('pyr-b').value) || 0;
+			const h = parseFloat(document.getElementById('pyr-h').value) || 0;
+			const slantH = Math.sqrt((b/2)*(b/2) + h*h);
+			document.getElementById('pyr-vol').textContent = fmt((1/3) * b * b * h);
+			document.getElementById('pyr-surf').textContent = fmt(b*b + 2*b*slantH);
+		}
+
+		// Initial calculations
+		calcSquare(); calcRect(); calcCircle(); calcTriangle(); calcTrapezoid(); calcParallelogram();
+		calcCube(); calcBox(); calcSphere(); calcCylinder(); calcCone(); calcPyramid();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

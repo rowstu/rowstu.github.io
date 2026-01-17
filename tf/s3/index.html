@@ -1,0 +1,300 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>S3 Buckets // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>S3 Buckets</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/tfs3/>Tfs3</a></div><div class="card markdown-content"><h1 id=s3-buckets>S3 Buckets</h1><p>Creating and configuring S3 buckets with Terraform.</p><h2 id=basic-bucket>Basic Bucket</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;my-unique-bucket-name-12345&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  tags <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>    Name        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;my-bucket&#34;</span>
+</span></span><span style=display:flex><span>    Environment <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;production&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=with-versioning>With Versioning</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;my-versioned-bucket&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_versioning&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>versioning_configuration</span> {
+</span></span><span style=display:flex><span>    status <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Enabled&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=server-side-encryption>Server-Side Encryption</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;my-encrypted-bucket&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_server_side_encryption_configuration&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>apply_server_side_encryption_by_default</span> {
+</span></span><span style=display:flex><span>      sse_algorithm <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;AES256&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    bucket_key_enabled <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=with-kms-key>With KMS Key</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_kms_key&#34; &#34;s3&#34;</span> {
+</span></span><span style=display:flex><span>  description             <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;KMS key for S3 bucket encryption&#34;</span>
+</span></span><span style=display:flex><span>  deletion_window_in_days <span style=color:#f92672>=</span> <span style=color:#ae81ff>7</span>
+</span></span><span style=display:flex><span>  enable_key_rotation     <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_server_side_encryption_configuration&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>apply_server_side_encryption_by_default</span> {
+</span></span><span style=display:flex><span>      kms_master_key_id <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_kms_key</span>.<span style=color:#66d9ef>s3</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>      sse_algorithm     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;aws:kms&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    bucket_key_enabled <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=block-public-access>Block Public Access</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_public_access_block&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  block_public_acls       <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  block_public_policy     <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  ignore_public_acls      <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  restrict_public_buckets <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=lifecycle-rules>Lifecycle Rules</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_lifecycle_configuration&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    id     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;transition-to-glacier&#34;</span>
+</span></span><span style=display:flex><span>    status <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Enabled&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>filter</span> {
+</span></span><span style=display:flex><span>      prefix <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;logs/&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>transition</span> {
+</span></span><span style=display:flex><span>      days          <span style=color:#f92672>=</span> <span style=color:#ae81ff>30</span>
+</span></span><span style=display:flex><span>      storage_class <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;STANDARD_IA&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>transition</span> {
+</span></span><span style=display:flex><span>      days          <span style=color:#f92672>=</span> <span style=color:#ae81ff>90</span>
+</span></span><span style=display:flex><span>      storage_class <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GLACIER&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>expiration</span> {
+</span></span><span style=display:flex><span>      days <span style=color:#f92672>=</span> <span style=color:#ae81ff>365</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>noncurrent_version_transition</span> {
+</span></span><span style=display:flex><span>      noncurrent_days <span style=color:#f92672>=</span> <span style=color:#ae81ff>30</span>
+</span></span><span style=display:flex><span>      storage_class   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GLACIER&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>noncurrent_version_expiration</span> {
+</span></span><span style=display:flex><span>      noncurrent_days <span style=color:#f92672>=</span> <span style=color:#ae81ff>90</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    id     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;abort-incomplete-uploads&#34;</span>
+</span></span><span style=display:flex><span>    status <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Enabled&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>abort_incomplete_multipart_upload</span> {
+</span></span><span style=display:flex><span>      days_after_initiation <span style=color:#f92672>=</span> <span style=color:#ae81ff>7</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=bucket-policy>Bucket Policy</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_policy&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    Version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;2012-10-17&#34;</span>
+</span></span><span style=display:flex><span>    Statement <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Sid       <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;EnforceHTTPS&#34;</span>
+</span></span><span style=display:flex><span>        Effect    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Deny&#34;</span>
+</span></span><span style=display:flex><span>        Principal <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>        Action    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;s3:*&#34;</span>
+</span></span><span style=display:flex><span>        Resource <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>          <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>arn</span>,
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;${aws_s3_bucket.main.arn}/*&#34;</span>
+</span></span><span style=display:flex><span>        ]
+</span></span><span style=display:flex><span>        Condition <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>          Bool <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>            &#34;aws:SecureTransport&#34; <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;false&#34;</span>
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=cors-configuration>CORS Configuration</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_cors_configuration&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>cors_rule</span> {
+</span></span><span style=display:flex><span>    allowed_headers <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;*&#34;</span>]
+</span></span><span style=display:flex><span>    allowed_methods <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;GET&#34;, &#34;HEAD&#34;</span>]
+</span></span><span style=display:flex><span>    allowed_origins <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;https://example.com&#34;</span>]
+</span></span><span style=display:flex><span>    expose_headers  <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;ETag&#34;</span>]
+</span></span><span style=display:flex><span>    max_age_seconds <span style=color:#f92672>=</span> <span style=color:#ae81ff>3000</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=static-website-hosting>Static Website Hosting</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket&#34; &#34;website&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;my-static-website&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_website_configuration&#34; &#34;website&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>website</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>index_document</span> {
+</span></span><span style=display:flex><span>    suffix <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;index.html&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>error_document</span> {
+</span></span><span style=display:flex><span>    key <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;error.html&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_public_access_block&#34; &#34;website&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>website</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  block_public_acls       <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>  block_public_policy     <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>  ignore_public_acls      <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>  restrict_public_buckets <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_policy&#34; &#34;website&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>website</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    Version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;2012-10-17&#34;</span>
+</span></span><span style=display:flex><span>    Statement <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Sid       <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PublicReadGetObject&#34;</span>
+</span></span><span style=display:flex><span>        Effect    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>        Principal <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>        Action    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;s3:GetObject&#34;</span>
+</span></span><span style=display:flex><span>        Resource  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;${aws_s3_bucket.website.arn}/*&#34;</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  depends_on <span style=color:#f92672>=</span> [<span style=color:#66d9ef>aws_s3_bucket_public_access_block</span>.<span style=color:#66d9ef>website</span>]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=cross-region-replication>Cross-Region Replication</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket&#34; &#34;source&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;source-bucket-12345&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket&#34; &#34;destination&#34;</span> {
+</span></span><span style=display:flex><span>  provider <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws</span>.<span style=color:#66d9ef>ireland</span>
+</span></span><span style=display:flex><span>  bucket   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;destination-bucket-12345&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_versioning&#34; &#34;source&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>source</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>versioning_configuration</span> {
+</span></span><span style=display:flex><span>    status <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Enabled&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_versioning&#34; &#34;destination&#34;</span> {
+</span></span><span style=display:flex><span>  provider <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws</span>.<span style=color:#66d9ef>ireland</span>
+</span></span><span style=display:flex><span>  bucket   <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>destination</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>versioning_configuration</span> {
+</span></span><span style=display:flex><span>    status <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Enabled&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role&#34; &#34;replication&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;s3-replication-role&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  assume_role_policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    Version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;2012-10-17&#34;</span>
+</span></span><span style=display:flex><span>    Statement <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Action <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;sts:AssumeRole&#34;</span>
+</span></span><span style=display:flex><span>        Effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>        Principal <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>          Service <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;s3.amazonaws.com&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role_policy&#34; &#34;replication&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;s3-replication-policy&#34;</span>
+</span></span><span style=display:flex><span>  role <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_iam_role</span>.<span style=color:#66d9ef>replication</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    Version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;2012-10-17&#34;</span>
+</span></span><span style=display:flex><span>    Statement <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Action <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;s3:GetReplicationConfiguration&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;s3:ListBucket&#34;</span>
+</span></span><span style=display:flex><span>        ]
+</span></span><span style=display:flex><span>        Effect   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>        Resource <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>source</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Action <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;s3:GetObjectVersionForReplication&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;s3:GetObjectVersionAcl&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;s3:GetObjectVersionTagging&#34;</span>
+</span></span><span style=display:flex><span>        ]
+</span></span><span style=display:flex><span>        Effect   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>        Resource <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;${aws_s3_bucket.source.arn}/*&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Action <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;s3:ReplicateObject&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;s3:ReplicateDelete&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;s3:ReplicateTags&#34;</span>
+</span></span><span style=display:flex><span>        ]
+</span></span><span style=display:flex><span>        Effect   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>        Resource <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;${aws_s3_bucket.destination.arn}/*&#34;</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_replication_configuration&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>source</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>  role   <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_iam_role</span>.<span style=color:#66d9ef>replication</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    id     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;replicate-all&#34;</span>
+</span></span><span style=display:flex><span>    status <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Enabled&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>destination</span> {
+</span></span><span style=display:flex><span>      bucket        <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>destination</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>      storage_class <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;STANDARD&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  depends_on <span style=color:#f92672>=</span> [<span style=color:#66d9ef>aws_s3_bucket_versioning</span>.<span style=color:#66d9ef>source</span>]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=logging>Logging</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket&#34; &#34;logs&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;my-access-logs-bucket&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_logging&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  target_bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>logs</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>  target_prefix <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;s3-logs/&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=outputs>Outputs</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>output</span> <span style=color:#e6db74>&#34;bucket_id&#34;</span> {
+</span></span><span style=display:flex><span>  value <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>output</span> <span style=color:#e6db74>&#34;bucket_arn&#34;</span> {
+</span></span><span style=display:flex><span>  value <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>output</span> <span style=color:#e6db74>&#34;bucket_domain_name&#34;</span> {
+</span></span><span style=display:flex><span>  value <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>bucket_domain_name</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>output</span> <span style=color:#e6db74>&#34;website_endpoint&#34;</span> {
+</span></span><span style=display:flex><span>  value <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket_website_configuration</span>.<span style=color:#66d9ef>website</span>.<span style=color:#66d9ef>website_endpoint</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>

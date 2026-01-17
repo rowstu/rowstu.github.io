@@ -1,0 +1,372 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Cost Explorer & Budgets // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Cost Explorer & Budgets</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/tfcost-explorer/>Tfcost Explorer</a></div><div class="card markdown-content"><h1 id=cost-explorer--budgets>Cost Explorer & Budgets</h1><p>Managing AWS costs with Terraform using Cost Explorer, Budgets, and Cost Allocation Tags.</p><h2 id=aws-budgets>AWS Budgets</h2><h3 id=monthly-cost-budget>Monthly Cost Budget</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_budgets_budget&#34; &#34;monthly&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;monthly-cost-budget&#34;</span>
+</span></span><span style=display:flex><span>  budget_type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;COST&#34;</span>
+</span></span><span style=display:flex><span>  limit_amount <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;1000&#34;</span>
+</span></span><span style=display:flex><span>  limit_unit   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;USD&#34;</span>
+</span></span><span style=display:flex><span>  time_unit    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;MONTHLY&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>notification</span> {
+</span></span><span style=display:flex><span>    comparison_operator        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GREATER_THAN&#34;</span>
+</span></span><span style=display:flex><span>    threshold                  <span style=color:#f92672>=</span> <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    threshold_type             <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>    notification_type          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ACTUAL&#34;</span>
+</span></span><span style=display:flex><span>    subscriber_email_addresses <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;alerts@example.com&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>notification</span> {
+</span></span><span style=display:flex><span>    comparison_operator        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GREATER_THAN&#34;</span>
+</span></span><span style=display:flex><span>    threshold                  <span style=color:#f92672>=</span> <span style=color:#ae81ff>100</span>
+</span></span><span style=display:flex><span>    threshold_type             <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>    notification_type          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ACTUAL&#34;</span>
+</span></span><span style=display:flex><span>    subscriber_email_addresses <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;alerts@example.com&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>notification</span> {
+</span></span><span style=display:flex><span>    comparison_operator        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GREATER_THAN&#34;</span>
+</span></span><span style=display:flex><span>    threshold                  <span style=color:#f92672>=</span> <span style=color:#ae81ff>100</span>
+</span></span><span style=display:flex><span>    threshold_type             <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>    notification_type          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;FORECASTED&#34;</span>
+</span></span><span style=display:flex><span>    subscriber_email_addresses <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;alerts@example.com&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=budget-with-cost-filters>Budget with Cost Filters</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_budgets_budget&#34; &#34;ec2&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ec2-monthly-budget&#34;</span>
+</span></span><span style=display:flex><span>  budget_type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;COST&#34;</span>
+</span></span><span style=display:flex><span>  limit_amount <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;500&#34;</span>
+</span></span><span style=display:flex><span>  limit_unit   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;USD&#34;</span>
+</span></span><span style=display:flex><span>  time_unit    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;MONTHLY&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>cost_filter</span> {
+</span></span><span style=display:flex><span>    name   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Service&#34;</span>
+</span></span><span style=display:flex><span>    values <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;Amazon Elastic Compute Cloud - Compute&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>notification</span> {
+</span></span><span style=display:flex><span>    comparison_operator        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GREATER_THAN&#34;</span>
+</span></span><span style=display:flex><span>    threshold                  <span style=color:#f92672>=</span> <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    threshold_type             <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>    notification_type          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ACTUAL&#34;</span>
+</span></span><span style=display:flex><span>    subscriber_email_addresses <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;alerts@example.com&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=budget-per-tag>Budget per Tag</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_budgets_budget&#34; &#34;project&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;project-alpha-budget&#34;</span>
+</span></span><span style=display:flex><span>  budget_type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;COST&#34;</span>
+</span></span><span style=display:flex><span>  limit_amount <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;2000&#34;</span>
+</span></span><span style=display:flex><span>  limit_unit   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;USD&#34;</span>
+</span></span><span style=display:flex><span>  time_unit    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;MONTHLY&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>cost_filter</span> {
+</span></span><span style=display:flex><span>    name   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;TagKeyValue&#34;</span>
+</span></span><span style=display:flex><span>    values <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;user:Project$Alpha&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>notification</span> {
+</span></span><span style=display:flex><span>    comparison_operator        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GREATER_THAN&#34;</span>
+</span></span><span style=display:flex><span>    threshold                  <span style=color:#f92672>=</span> <span style=color:#ae81ff>75</span>
+</span></span><span style=display:flex><span>    threshold_type             <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>    notification_type          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ACTUAL&#34;</span>
+</span></span><span style=display:flex><span>    subscriber_email_addresses <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;project-alpha@example.com&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=usage-budget-risavings-plans>Usage Budget (RI/Savings Plans)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_budgets_budget&#34; &#34;ri_utilization&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ri-utilization&#34;</span>
+</span></span><span style=display:flex><span>  budget_type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;RI_UTILIZATION&#34;</span>
+</span></span><span style=display:flex><span>  limit_amount <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;80&#34;</span>
+</span></span><span style=display:flex><span>  limit_unit   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>  time_unit    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;MONTHLY&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>cost_filter</span> {
+</span></span><span style=display:flex><span>    name   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Service&#34;</span>
+</span></span><span style=display:flex><span>    values <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;Amazon Elastic Compute Cloud - Compute&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>notification</span> {
+</span></span><span style=display:flex><span>    comparison_operator        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;LESS_THAN&#34;</span>
+</span></span><span style=display:flex><span>    threshold                  <span style=color:#f92672>=</span> <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    threshold_type             <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>    notification_type          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ACTUAL&#34;</span>
+</span></span><span style=display:flex><span>    subscriber_email_addresses <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;finops@example.com&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=budget-actions>Budget Actions</h2><p>Automatically respond to budget thresholds.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_budgets_budget&#34; &#34;with_action&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;budget-with-action&#34;</span>
+</span></span><span style=display:flex><span>  budget_type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;COST&#34;</span>
+</span></span><span style=display:flex><span>  limit_amount <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;100&#34;</span>
+</span></span><span style=display:flex><span>  limit_unit   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;USD&#34;</span>
+</span></span><span style=display:flex><span>  time_unit    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;MONTHLY&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_budgets_budget_action&#34; &#34;stop_ec2&#34;</span> {
+</span></span><span style=display:flex><span>  budget_name        <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_budgets_budget</span>.<span style=color:#66d9ef>with_action</span>.<span style=color:#66d9ef>name</span>
+</span></span><span style=display:flex><span>  action_type        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;RUN_SSM_DOCUMENTS&#34;</span>
+</span></span><span style=display:flex><span>  approval_model     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;AUTOMATIC&#34;</span>
+</span></span><span style=display:flex><span>  notification_type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ACTUAL&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>action_threshold</span> {
+</span></span><span style=display:flex><span>    action_threshold_type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>    action_threshold_value <span style=color:#f92672>=</span> <span style=color:#ae81ff>100</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>definition</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>ssm_action_definition</span> {
+</span></span><span style=display:flex><span>      action_sub_type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;STOP_EC2_INSTANCES&#34;</span>
+</span></span><span style=display:flex><span>      instance_ids    <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;i-1234567890abcdef0&#34;</span>]
+</span></span><span style=display:flex><span>      region          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;eu-west-2&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  execution_role_arn <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_iam_role</span>.<span style=color:#66d9ef>budget_action</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>subscriber</span> {
+</span></span><span style=display:flex><span>    address           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;alerts@example.com&#34;</span>
+</span></span><span style=display:flex><span>    subscription_type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;EMAIL&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role&#34; &#34;budget_action&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;budget-action-role&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  assume_role_policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    Version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;2012-10-17&#34;</span>
+</span></span><span style=display:flex><span>    Statement <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Action <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;sts:AssumeRole&#34;</span>
+</span></span><span style=display:flex><span>        Effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>        Principal <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>          Service <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;budgets.amazonaws.com&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role_policy&#34; &#34;budget_action&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;budget-action-policy&#34;</span>
+</span></span><span style=display:flex><span>  role <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_iam_role</span>.<span style=color:#66d9ef>budget_action</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    Version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;2012-10-17&#34;</span>
+</span></span><span style=display:flex><span>    Statement <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>        Action <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>          <span style=color:#e6db74>&#34;ec2:StopInstances&#34;</span>
+</span></span><span style=display:flex><span>        ]
+</span></span><span style=display:flex><span>        Resource <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=cost-allocation-tags>Cost Allocation Tags</h2><p>Enable cost allocation tags at the organization level.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_cost_allocation_tag&#34; &#34;environment&#34;</span> {
+</span></span><span style=display:flex><span>  tag_key <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Environment&#34;</span>
+</span></span><span style=display:flex><span>  status  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Active&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_cost_allocation_tag&#34; &#34;project&#34;</span> {
+</span></span><span style=display:flex><span>  tag_key <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Project&#34;</span>
+</span></span><span style=display:flex><span>  status  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Active&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_cost_allocation_tag&#34; &#34;owner&#34;</span> {
+</span></span><span style=display:flex><span>  tag_key <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Owner&#34;</span>
+</span></span><span style=display:flex><span>  status  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Active&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_cost_allocation_tag&#34; &#34;cost_center&#34;</span> {
+</span></span><span style=display:flex><span>  tag_key <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CostCenter&#34;</span>
+</span></span><span style=display:flex><span>  status  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Active&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=cost-categories>Cost Categories</h2><p>Group and categorise costs.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_cost_category&#34; &#34;environment&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Environment&#34;</span>
+</span></span><span style=display:flex><span>  rule_version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CostCategoryExpression.v1&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    value <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Production&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>tags</span> {
+</span></span><span style=display:flex><span>        key           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Environment&#34;</span>
+</span></span><span style=display:flex><span>        values        <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;production&#34;, &#34;prod&#34;</span>]
+</span></span><span style=display:flex><span>        match_options <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;EQUALS&#34;</span>]
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    value <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Development&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>tags</span> {
+</span></span><span style=display:flex><span>        key           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Environment&#34;</span>
+</span></span><span style=display:flex><span>        values        <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;development&#34;, &#34;dev&#34;</span>]
+</span></span><span style=display:flex><span>        match_options <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;EQUALS&#34;</span>]
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    value <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Staging&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>tags</span> {
+</span></span><span style=display:flex><span>        key           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Environment&#34;</span>
+</span></span><span style=display:flex><span>        values        <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;staging&#34;, &#34;stage&#34;</span>]
+</span></span><span style=display:flex><span>        match_options <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;EQUALS&#34;</span>]
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  default_value <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Untagged&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=cost-category-by-service>Cost Category by Service</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_cost_category&#34; &#34;workload&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Workload&#34;</span>
+</span></span><span style=display:flex><span>  rule_version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CostCategoryExpression.v1&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    value <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Compute&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>dimension</span> {
+</span></span><span style=display:flex><span>        key           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;SERVICE&#34;</span>
+</span></span><span style=display:flex><span>        values        <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;Amazon Elastic Compute Cloud - Compute&#34;, &#34;AWS Lambda&#34;</span>]
+</span></span><span style=display:flex><span>        match_options <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;EQUALS&#34;</span>]
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    value <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Storage&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>dimension</span> {
+</span></span><span style=display:flex><span>        key           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;SERVICE&#34;</span>
+</span></span><span style=display:flex><span>        values        <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;Amazon Simple Storage Service&#34;, &#34;Amazon Elastic Block Store&#34;</span>]
+</span></span><span style=display:flex><span>        match_options <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;EQUALS&#34;</span>]
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    value <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Database&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>dimension</span> {
+</span></span><span style=display:flex><span>        key           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;SERVICE&#34;</span>
+</span></span><span style=display:flex><span>        values        <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;Amazon Relational Database Service&#34;, &#34;Amazon DynamoDB&#34;</span>]
+</span></span><span style=display:flex><span>        match_options <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;EQUALS&#34;</span>]
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  default_value <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Other&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=anomaly-detection>Anomaly Detection</h2><p>Set up cost anomaly detection.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_anomaly_monitor&#34; &#34;service&#34;</span> {
+</span></span><span style=display:flex><span>  name              <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;service-anomaly-monitor&#34;</span>
+</span></span><span style=display:flex><span>  monitor_type      <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;DIMENSIONAL&#34;</span>
+</span></span><span style=display:flex><span>  monitor_dimension <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;SERVICE&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_anomaly_monitor&#34; &#34;custom&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;production-anomaly-monitor&#34;</span>
+</span></span><span style=display:flex><span>  monitor_type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CUSTOM&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  monitor_specification <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    Tags <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>      Key          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Environment&#34;</span>
+</span></span><span style=display:flex><span>      Values       <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;production&#34;</span>]
+</span></span><span style=display:flex><span>      MatchOptions <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;EQUALS&#34;</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_ce_anomaly_subscription&#34; &#34;main&#34;</span> {
+</span></span><span style=display:flex><span>  name      <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;anomaly-alerts&#34;</span>
+</span></span><span style=display:flex><span>  frequency <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;DAILY&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  monitor_arn_list <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>aws_ce_anomaly_monitor</span>.<span style=color:#66d9ef>service</span>.<span style=color:#66d9ef>arn</span>,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>aws_ce_anomaly_monitor</span>.<span style=color:#66d9ef>custom</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>subscriber</span> {
+</span></span><span style=display:flex><span>    type    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;EMAIL&#34;</span>
+</span></span><span style=display:flex><span>    address <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;finops@example.com&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>threshold_expression</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>dimension</span> {
+</span></span><span style=display:flex><span>      key           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ANOMALY_TOTAL_IMPACT_ABSOLUTE&#34;</span>
+</span></span><span style=display:flex><span>      values        <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;100&#34;</span>]
+</span></span><span style=display:flex><span>      match_options <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;GREATER_THAN_OR_EQUAL&#34;</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=sns-notifications-for-budgets>SNS Notifications for Budgets</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_sns_topic&#34; &#34;budget_alerts&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;budget-alerts&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_sns_topic_policy&#34; &#34;budget_alerts&#34;</span> {
+</span></span><span style=display:flex><span>  arn <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_sns_topic</span>.<span style=color:#66d9ef>budget_alerts</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    Version <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;2012-10-17&#34;</span>
+</span></span><span style=display:flex><span>    Statement <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        Sid    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;AllowBudgets&#34;</span>
+</span></span><span style=display:flex><span>        Effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>        Principal <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>          Service <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;budgets.amazonaws.com&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        Action   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;sns:Publish&#34;</span>
+</span></span><span style=display:flex><span>        Resource <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_sns_topic</span>.<span style=color:#66d9ef>budget_alerts</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_budgets_budget&#34; &#34;with_sns&#34;</span> {
+</span></span><span style=display:flex><span>  name         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;budget-with-sns&#34;</span>
+</span></span><span style=display:flex><span>  budget_type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;COST&#34;</span>
+</span></span><span style=display:flex><span>  limit_amount <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;500&#34;</span>
+</span></span><span style=display:flex><span>  limit_unit   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;USD&#34;</span>
+</span></span><span style=display:flex><span>  time_unit    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;MONTHLY&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>notification</span> {
+</span></span><span style=display:flex><span>    comparison_operator       <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GREATER_THAN&#34;</span>
+</span></span><span style=display:flex><span>    threshold                 <span style=color:#f92672>=</span> <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    threshold_type            <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PERCENTAGE&#34;</span>
+</span></span><span style=display:flex><span>    notification_type         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ACTUAL&#34;</span>
+</span></span><span style=display:flex><span>    subscriber_sns_topic_arns <span style=color:#f92672>=</span> [<span style=color:#66d9ef>aws_sns_topic</span>.<span style=color:#66d9ef>budget_alerts</span>.<span style=color:#66d9ef>arn</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=tagging-standards-with-aws-config>Tagging Standards with AWS Config</h2><p>Enforce tagging for cost allocation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_config_config_rule&#34; &#34;required_tags&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;required-tags&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>source</span> {
+</span></span><span style=display:flex><span>    owner             <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;AWS&#34;</span>
+</span></span><span style=display:flex><span>    source_identifier <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;REQUIRED_TAGS&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  input_parameters <span style=color:#f92672>=</span> <span style=color:#66d9ef>jsonencode</span>({
+</span></span><span style=display:flex><span>    tag1Key   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Environment&#34;</span>
+</span></span><span style=display:flex><span>    tag2Key   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Project&#34;</span>
+</span></span><span style=display:flex><span>    tag3Key   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Owner&#34;</span>
+</span></span><span style=display:flex><span>    tag4Key   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CostCenter&#34;</span>
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>scope</span> {
+</span></span><span style=display:flex><span>    compliance_resource_types <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;AWS::EC2::Instance&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;AWS::S3::Bucket&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;AWS::RDS::DBInstance&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;AWS::Lambda::Function&#34;</span>
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=outputs>Outputs</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>output</span> <span style=color:#e6db74>&#34;monthly_budget_id&#34;</span> {
+</span></span><span style=display:flex><span>  value <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_budgets_budget</span>.<span style=color:#66d9ef>monthly</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>output</span> <span style=color:#e6db74>&#34;anomaly_monitor_arn&#34;</span> {
+</span></span><span style=display:flex><span>  value <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_ce_anomaly_monitor</span>.<span style=color:#66d9ef>service</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>output</span> <span style=color:#e6db74>&#34;budget_alerts_topic_arn&#34;</span> {
+</span></span><span style=display:flex><span>  value <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_sns_topic</span>.<span style=color:#66d9ef>budget_alerts</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>

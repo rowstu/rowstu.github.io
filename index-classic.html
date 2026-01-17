@@ -172,6 +172,7 @@
 
 		.notes .section-title::before { background: var(--accent-teal); }
 		.tools .section-title::before { background: var(--accent-orange); }
+		.maths .section-title::before { background: var(--accent-yellow); }
 		.challenges .section-title::before { background: var(--accent-purple); }
 
 		.grid {
@@ -224,6 +225,12 @@
 		.challenges .card:hover {
 			border-color: var(--accent-purple);
 			box-shadow: 0 8px 24px rgba(183, 148, 246, 0.2);
+		}
+
+		.maths .card::before { background: var(--accent-yellow); }
+		.maths .card:hover {
+			border-color: var(--accent-yellow);
+			box-shadow: 0 8px 24px rgba(255, 210, 63, 0.2);
 		}
 
 		.card-title {
@@ -701,6 +708,60 @@
 					<a href="uri-decoder.html">
 						<div class="card-title">URI Decoder</div>
 						<div class="card-desc">Analyze URLs and find tracking params</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="section maths" style="--accent-section: #ffd23f;">
+			<h2 class="section-title">Mathematics</h2>
+			<div class="grid">
+				<div class="card">
+					<a href="percentage-calc.html">
+						<div class="card-title">Percentage Calculator</div>
+						<div class="card-desc">Calculate percentages, changes, and VAT</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="fraction-calc.html">
+						<div class="card-title">Fraction Calculator</div>
+						<div class="card-desc">Add, subtract, multiply, divide fractions</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="ratio-calc.html">
+						<div class="card-title">Ratio Calculator</div>
+						<div class="card-desc">Simplify ratios, solve proportions, scale</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="area-volume-calc.html">
+						<div class="card-title">Area & Volume</div>
+						<div class="card-desc">Calculate 2D and 3D shape measurements</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="quadratic-solver.html">
+						<div class="card-title">Quadratic Solver</div>
+						<div class="card-desc">Solve ax² + bx + c = 0 with steps</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="prime-factors.html">
+						<div class="card-title">Prime Factorisation</div>
+						<div class="card-desc">Find prime factors and divisors</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="gcd-lcm-calc.html">
+						<div class="card-title">GCD & LCM</div>
+						<div class="card-desc">Greatest common divisor and least common multiple</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="statistics-calc.html">
+						<div class="card-title">Statistics</div>
+						<div class="card-desc">Mean, median, mode, standard deviation</div>
 					</a>
 				</div>
 			</div>
