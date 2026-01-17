@@ -272,22 +272,140 @@
 			box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2);
 		}
 
-		@media (max-width: 768px) {
+		/* Tablet - 2 columns, smaller cards */
+		@media (max-width: 900px) {
+			.grid {
+				grid-template-columns: repeat(2, 1fr);
+				gap: 0.75rem;
+			}
+
+			.card {
+				padding: 0.875rem;
+			}
+
+			.card-title {
+				font-size: 1rem;
+				margin-bottom: 0.25rem;
+			}
+
+			.card-desc {
+				font-size: 0.8rem;
+				line-height: 1.3;
+			}
+
+			.section {
+				margin-bottom: 2rem;
+			}
+
+			.section-title {
+				font-size: 1.4rem;
+				margin-bottom: 1rem;
+			}
+
+			.container {
+				padding: 1.5rem 1rem;
+			}
+		}
+
+		/* Mobile - compact list-style cards */
+		@media (max-width: 600px) {
+			header {
+				padding: 1rem;
+			}
+
 			h1 {
-				font-size: 2rem;
+				font-size: 1.75rem;
+			}
+
+			.subtitle {
+				font-size: 0.9rem;
+			}
+
+			.terminal-switch {
+				position: static;
+				display: inline-block;
+				margin-bottom: 0.75rem;
+				padding: 0.4rem 0.75rem;
+				font-size: 0.8rem;
+			}
+
+			.container {
+				padding: 1rem 0.75rem;
+			}
+
+			.section {
+				margin-bottom: 1.5rem;
+			}
+
+			.section-title {
+				font-size: 1.2rem;
+				margin-bottom: 0.75rem;
+				padding-bottom: 0.35rem;
+			}
+
+			.grid {
+				grid-template-columns: 1fr 1fr;
+				gap: 0.5rem;
+			}
+
+			.card {
+				padding: 0.6rem 0.75rem;
+				border-radius: 6px;
+			}
+
+			.card:hover {
+				transform: none;
+				box-shadow: none;
+			}
+
+			.card-title {
+				font-size: 0.85rem;
+				margin-bottom: 0.15rem;
+			}
+
+			.card-desc {
+				font-size: 0.7rem;
+				line-height: 1.25;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+
+			.social-links {
+				margin-top: 1.5rem;
+				padding-top: 1rem;
+				gap: 0.75rem;
+			}
+
+			.social-link {
+				padding: 0.5rem 1rem;
+				font-size: 0.85rem;
+			}
+		}
+
+		/* Very small mobile - single column */
+		@media (max-width: 400px) {
+			h1 {
+				font-size: 1.5rem;
 			}
 
 			.grid {
 				grid-template-columns: 1fr;
+				gap: 0.4rem;
 			}
 
-			.container {
-				padding: 2rem 1rem;
+			.card {
+				padding: 0.5rem 0.65rem;
 			}
 
-			.social-links {
-				flex-direction: column;
-				align-items: center;
+			.card-title {
+				font-size: 0.8rem;
+			}
+
+			.card-desc {
+				font-size: 0.65rem;
+				-webkit-line-clamp: 1;
 			}
 		}
 	</style>
@@ -376,27 +494,15 @@
 			<h2 class="section-title">Interactive Tools</h2>
 			<div class="grid">
 				<div class="card">
-					<a href="wordle.html">
-						<div class="card-title">Wordle</div>
-						<div class="card-desc">Classic Wordle game clone</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="wordle2.html">
-						<div class="card-title">Wordle Variation</div>
-						<div class="card-desc">Alternative Wordle implementation</div>
+					<a href="craple.html">
+						<div class="card-title">Craple</div>
+						<div class="card-desc">Wordle clone with 14k+ word dictionary</div>
 					</a>
 				</div>
 				<div class="card">
 					<a href="math1.html">
 						<div class="card-title">Math Practice</div>
 						<div class="card-desc">Interactive math exercises</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="wm3.html">
-						<div class="card-title">Wordmaster</div>
-						<div class="card-desc">Advanced word puzzle game</div>
 					</a>
 				</div>
 				<div class="card">
@@ -511,6 +617,90 @@
 					<a href="diff-tool.html">
 						<div class="card-title">Diff Tool</div>
 						<div class="card-desc">Compare text side-by-side</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="hash-generator.html">
+						<div class="card-title">Hash Generator</div>
+						<div class="card-desc">MD5, SHA-1, SHA-256, SHA-512 hashes</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="uuid-generator.html">
+						<div class="card-title">UUID Generator</div>
+						<div class="card-desc">Generate v1 and v4 UUIDs</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="markdown-preview.html">
+						<div class="card-title">Markdown Preview</div>
+						<div class="card-desc">Live markdown to HTML preview</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="csv-json.html">
+						<div class="card-title">CSV to JSON</div>
+						<div class="card-desc">Convert CSV data to JSON</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="subnet-calc.html">
+						<div class="card-title">Subnet Calculator</div>
+						<div class="card-desc">IP subnet and CIDR calculator</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="dns-lookup.html">
+						<div class="card-title">DNS Lookup</div>
+						<div class="card-desc">Query DNS records for domains</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="http-headers.html">
+						<div class="card-title">HTTP Headers</div>
+						<div class="card-desc">Parse and explain HTTP headers</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="cron-builder.html">
+						<div class="card-title">Cron Builder</div>
+						<div class="card-desc">Build cron schedule expressions</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="url-encoder.html">
+						<div class="card-title">URL Encoder</div>
+						<div class="card-desc">Encode and decode URL strings</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="html-entities.html">
+						<div class="card-title">HTML Entities</div>
+						<div class="card-desc">Convert to/from HTML entities</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="jwt-decoder.html">
+						<div class="card-title">JWT Decoder</div>
+						<div class="card-desc">Decode and inspect JWT tokens</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="unix-timestamp.html">
+						<div class="card-title">Unix Timestamp</div>
+						<div class="card-desc">Convert timestamps and dates</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="password-generator.html">
+						<div class="card-title">Password Generator</div>
+						<div class="card-desc">Generate secure random passwords</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="uri-decoder.html">
+						<div class="card-title">URI Decoder</div>
+						<div class="card-desc">Analyze URLs and find tracking params</div>
 					</a>
 				</div>
 			</div>

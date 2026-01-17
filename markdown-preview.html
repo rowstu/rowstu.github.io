@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Markdown Preview // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--code-bg: #1e2228;
+			--link-color: #60a5fa;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.toolbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.75rem 1.5rem;
+			background: var(--surface);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.title {
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.toolbar-actions {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.4rem 0.75rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.btn.active {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #fff;
+		}
+
+		.main {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			flex: 1;
+			overflow: hidden;
+		}
+
+		.main.preview-only {
+			grid-template-columns: 1fr;
+		}
+
+		.main.preview-only .editor-pane {
+			display: none;
+		}
+
+		.pane {
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+		}
+
+		.pane-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border-bottom: 1px solid var(--border);
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.editor-pane {
+			border-right: 1px solid var(--border);
+		}
+
+		textarea {
+			flex: 1;
+			width: 100%;
+			background: var(--bg);
+			border: none;
+			padding: 1rem;
+			color: var(--text);
+			font-family: 'IBM Plex Mono', monospace;
+			font-size: 0.9rem;
+			line-height: 1.6;
+			resize: none;
+			outline: none;
+		}
+
+		textarea::placeholder {
+			color: var(--text-muted);
+		}
+
+		.preview {
+			flex: 1;
+			overflow-y: auto;
+			padding: 1.5rem;
+			background: var(--bg);
+		}
+
+		/* Markdown preview styles */
+		.preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 {
+			font-family: 'IBM Plex Sans', sans-serif;
+			color: var(--text);
+			margin-top: 1.5em;
+			margin-bottom: 0.5em;
+			line-height: 1.3;
+		}
+
+		.preview h1 { font-size: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+		.preview h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+		.preview h3 { font-size: 1.25rem; }
+		.preview h4 { font-size: 1rem; }
+		.preview h5 { font-size: 0.875rem; }
+		.preview h6 { font-size: 0.85rem; color: var(--text-muted); }
+
+		.preview h1:first-child, .preview h2:first-child, .preview h3:first-child {
+			margin-top: 0;
+		}
+
+		.preview p {
+			font-family: 'IBM Plex Sans', sans-serif;
+			margin-bottom: 1em;
+			line-height: 1.7;
+		}
+
+		.preview a {
+			color: var(--link-color);
+			text-decoration: none;
+		}
+
+		.preview a:hover {
+			text-decoration: underline;
+		}
+
+		.preview code {
+			background: var(--code-bg);
+			padding: 0.2em 0.4em;
+			border-radius: 3px;
+			font-family: 'IBM Plex Mono', monospace;
+			font-size: 0.9em;
+		}
+
+		.preview pre {
+			background: var(--code-bg);
+			padding: 1rem;
+			border-radius: 6px;
+			overflow-x: auto;
+			margin-bottom: 1em;
+		}
+
+		.preview pre code {
+			background: none;
+			padding: 0;
+			font-size: 0.85rem;
+			line-height: 1.5;
+		}
+
+		.preview blockquote {
+			border-left: 4px solid var(--accent);
+			margin: 1em 0;
+			padding: 0.5em 1em;
+			background: var(--surface);
+			border-radius: 0 4px 4px 0;
+		}
+
+		.preview blockquote p {
+			margin-bottom: 0;
+		}
+
+		.preview ul, .preview ol {
+			font-family: 'IBM Plex Sans', sans-serif;
+			margin-bottom: 1em;
+			padding-left: 2em;
+			line-height: 1.7;
+		}
+
+		.preview li {
+			margin-bottom: 0.25em;
+		}
+
+		.preview hr {
+			border: none;
+			border-top: 1px solid var(--border);
+			margin: 2em 0;
+		}
+
+		.preview table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 1em;
+			font-family: 'IBM Plex Sans', sans-serif;
+		}
+
+		.preview th, .preview td {
+			border: 1px solid var(--border);
+			padding: 0.5em 1em;
+			text-align: left;
+		}
+
+		.preview th {
+			background: var(--surface);
+			font-weight: 600;
+		}
+
+		.preview img {
+			max-width: 100%;
+			border-radius: 4px;
+		}
+
+		.preview strong {
+			font-weight: 600;
+		}
+
+		.preview em {
+			font-style: italic;
+		}
+
+		.preview del {
+			text-decoration: line-through;
+			color: var(--text-muted);
+		}
+
+		.preview .task-list-item {
+			list-style: none;
+			margin-left: -1.5em;
+		}
+
+		.preview .task-list-item input {
+			margin-right: 0.5em;
+		}
+
+		.word-count {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		.empty-preview {
+			color: var(--text-muted);
+			font-style: italic;
+		}
+
+		@media (max-width: 768px) {
+			.main {
+				grid-template-columns: 1fr;
+				grid-template-rows: 1fr 1fr;
+			}
+
+			.editor-pane {
+				border-right: none;
+				border-bottom: 1px solid var(--border);
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="toolbar">
+		<span class="title">Markdown Preview</span>
+		<div class="toolbar-actions">
+			<button class="btn" id="toggleView">Preview Only</button>
+			<button class="btn" id="copyHtml">Copy HTML</button>
+			<button class="btn" id="clearBtn">Clear</button>
+		</div>
+	</div>
+
+	<div class="main" id="main">
+		<div class="pane editor-pane">
+			<div class="pane-header">
+				<span>Markdown</span>
+				<span class="word-count" id="wordCount">0 words</span>
+			</div>
+			<textarea id="editor" placeholder="Type your markdown here..."></textarea>
+		</div>
+		<div class="pane">
+			<div class="pane-header">
+				<span>Preview</span>
+			</div>
+			<div class="preview" id="preview">
+				<p class="empty-preview">Start typing to see the preview...</p>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const editor = document.getElementById('editor');
+		const preview = document.getElementById('preview');
+		const wordCount = document.getElementById('wordCount');
+		const toggleView = document.getElementById('toggleView');
+		const copyHtml = document.getElementById('copyHtml');
+		const clearBtn = document.getElementById('clearBtn');
+		const main = document.getElementById('main');
+
+		// Simple markdown parser
+		function parseMarkdown(md) {
+			if (!md.trim()) {
+				return '<p class="empty-preview">Start typing to see the preview...</p>';
+			}
+
+			let html = md;
+
+			// Escape HTML (but preserve code blocks first)
+			const codeBlocks = [];
+			html = html.replace(/```([\s\S]*?)```/g, (match, code) => {
+				codeBlocks.push(`<pre><code>${escapeHtml(code.trim())}</code></pre>`);
+				return `\x00CODE${codeBlocks.length - 1}\x00`;
+			});
+
+			const inlineCode = [];
+			html = html.replace(/`([^`]+)`/g, (match, code) => {
+				inlineCode.push(`<code>${escapeHtml(code)}</code>`);
+				return `\x00INLINE${inlineCode.length - 1}\x00`;
+			});
+
+			// Escape remaining HTML
+			html = escapeHtml(html);
+
+			// Restore code blocks
+			html = html.replace(/\x00CODE(\d+)\x00/g, (match, i) => codeBlocks[i]);
+			html = html.replace(/\x00INLINE(\d+)\x00/g, (match, i) => inlineCode[i]);
+
+			// Headers
+			html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
+			html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
+			html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+			html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+			html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+			html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+			// Horizontal rules
+			html = html.replace(/^[-*_]{3,}$/gm, '<hr>');
+
+			// Bold and italic
+			html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+			html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+			html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+			html = html.replace(/___(.+?)___/g, '<strong><em>$1</em></strong>');
+			html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+			html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+			// Strikethrough
+			html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+			// Links and images
+			html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+			html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+			// Blockquotes
+			html = html.replace(/^&gt; (.+)$/gm, '<blockquote><p>$1</p></blockquote>');
+			// Merge consecutive blockquotes
+			html = html.replace(/<\/blockquote>\n<blockquote>/g, '\n');
+
+			// Task lists
+			html = html.replace(/^- \[x\] (.+)$/gm, '<li class="task-list-item"><input type="checkbox" checked disabled> $1</li>');
+			html = html.replace(/^- \[ \] (.+)$/gm, '<li class="task-list-item"><input type="checkbox" disabled> $1</li>');
+
+			// Unordered lists
+			html = html.replace(/^[*-] (.+)$/gm, '<li>$1</li>');
+
+			// Ordered lists
+			html = html.replace(/^\d+\. (.+)$/gm, '<oli>$1</oli>');
+
+			// Wrap list items
+			html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (match) => {
+				if (!match.includes('<oli>')) {
+					return `<ul>${match}</ul>`;
+				}
+				return match;
+			});
+			html = html.replace(/(<oli>[\s\S]*?<\/oli>)/g, (match) => {
+				return `<ol>${match.replace(/<\/?oli>/g, (m) => m.replace('oli', 'li'))}</ol>`;
+			});
+
+			// Merge consecutive lists
+			html = html.replace(/<\/ul>\n<ul>/g, '\n');
+			html = html.replace(/<\/ol>\n<ol>/g, '\n');
+
+			// Tables
+			html = html.replace(/^\|(.+)\|$/gm, (match, content) => {
+				const cells = content.split('|').map(c => c.trim());
+				if (cells.every(c => /^[-:]+$/.test(c))) {
+					return '<table-sep>';
+				}
+				return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+			});
+
+			// Convert table headers
+			html = html.replace(/<tr>([\s\S]*?)<\/tr>\n<table-sep>/g, (match, content) => {
+				return '<thead><tr>' + content.replace(/<td>/g, '<th>').replace(/<\/td>/g, '</th>') + '</tr></thead><tbody>';
+			});
+			html = html.replace(/<table-sep>\n/g, '');
+
+			// Wrap tables
+			html = html.replace(/(<thead>[\s\S]*?)(<tr>[\s\S]*?<\/tr>\n?)(?=<[^t]|$)/g, '<table>$1$2</tbody></table>');
+
+			// Paragraphs - wrap remaining text
+			const lines = html.split('\n');
+			const result = [];
+			let inParagraph = false;
+
+			for (let i = 0; i < lines.length; i++) {
+				const line = lines[i];
+				const isBlock = /^<(h[1-6]|ul|ol|li|blockquote|pre|hr|table|thead|tbody|tr|th|td|div|p)/.test(line) ||
+							   /<\/(h[1-6]|ul|ol|blockquote|pre|table|div|p)>$/.test(line) ||
+							   line.trim() === '';
+
+				if (isBlock) {
+					if (inParagraph) {
+						result.push('</p>');
+						inParagraph = false;
+					}
+					result.push(line);
+				} else {
+					if (!inParagraph) {
+						result.push('<p>');
+						inParagraph = true;
+					}
+					result.push(line);
+				}
+			}
+
+			if (inParagraph) {
+				result.push('</p>');
+			}
+
+			html = result.join('\n');
+
+			// Clean up empty paragraphs
+			html = html.replace(/<p>\s*<\/p>/g, '');
+
+			// Line breaks within paragraphs
+			html = html.replace(/([^>\n])\n([^<\n])/g, '$1<br>\n$2');
+
+			return html;
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+
+		function updatePreview() {
+			const md = editor.value;
+			preview.innerHTML = parseMarkdown(md);
+
+			// Word count
+			const words = md.trim().split(/\s+/).filter(w => w.length > 0);
+			wordCount.textContent = `${words.length} word${words.length !== 1 ? 's' : ''}`;
+		}
+
+		// Event listeners
+		editor.addEventListener('input', updatePreview);
+
+		toggleView.addEventListener('click', () => {
+			main.classList.toggle('preview-only');
+			toggleView.textContent = main.classList.contains('preview-only') ? 'Show Editor' : 'Preview Only';
+			toggleView.classList.toggle('active');
+		});
+
+		copyHtml.addEventListener('click', () => {
+			const html = parseMarkdown(editor.value);
+			navigator.clipboard.writeText(html).then(() => {
+				copyHtml.textContent = 'Copied!';
+				setTimeout(() => {
+					copyHtml.textContent = 'Copy HTML';
+				}, 1500);
+			});
+		});
+
+		clearBtn.addEventListener('click', () => {
+			editor.value = '';
+			updatePreview();
+		});
+
+		// Load sample content
+		editor.value = `# Markdown Preview
+
+This is a **live preview** of your markdown content.
+
+## Features
+
+- Real-time preview
+- GitHub-flavored markdown
+- Code highlighting
+- Tables support
+
+### Code Example
+
+\`\`\`javascript
+function hello() {
+    console.log("Hello, World!");
+}
+\`\`\`
+
+Or inline \`code\` like this.
+
+### Blockquote
+
+> This is a blockquote.
+> It can span multiple lines.
+
+### Table
+
+| Feature | Status |
+|---------|--------|
+| Headers | ✓ |
+| Lists   | ✓ |
+| Code    | ✓ |
+| Tables  | ✓ |
+
+### Task List
+
+- [x] Completed task
+- [ ] Pending task
+
+---
+
+*Italic*, **bold**, and ***both***!
+
+[Link to Google](https://google.com)
+`;
+
+		updatePreview();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

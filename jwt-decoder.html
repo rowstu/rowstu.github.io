@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>JWT Decoder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--info: #3b82f6;
+			--purple: #a78bfa;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 1000px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		textarea {
+			width: 100%;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			resize: vertical;
+			outline: none;
+			line-height: 1.5;
+		}
+
+		textarea:focus {
+			border-color: var(--accent);
+		}
+
+		textarea::placeholder {
+			color: var(--text-muted);
+		}
+
+		#jwtInput {
+			min-height: 100px;
+		}
+
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 0.5rem 1rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.8rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.btn-secondary {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: var(--surface-hover);
+		}
+
+		.actions {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+			margin-top: 0.75rem;
+		}
+
+		.jwt-visual {
+			font-size: 0.85rem;
+			word-break: break-all;
+			line-height: 1.6;
+			padding: 1rem;
+			background: var(--bg);
+			border-radius: 6px;
+			margin-bottom: 1rem;
+		}
+
+		.jwt-header { color: #f472b6; }
+		.jwt-payload { color: var(--purple); }
+		.jwt-signature { color: #2dd4bf; }
+		.jwt-dot { color: var(--text-muted); }
+
+		.decoded-sections {
+			display: grid;
+			gap: 1rem;
+		}
+
+		@media (min-width: 768px) {
+			.decoded-sections {
+				grid-template-columns: 1fr 1fr;
+			}
+		}
+
+		.decoded-section {
+			background: var(--bg);
+			border-radius: 6px;
+			overflow: hidden;
+		}
+
+		.section-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.section-title {
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.section-title.header { color: #f472b6; }
+		.section-title.payload { color: var(--purple); }
+		.section-title.signature { color: #2dd4bf; }
+
+		.section-content {
+			padding: 1rem;
+			font-size: 0.8rem;
+			line-height: 1.6;
+		}
+
+		.json-key { color: #f472b6; }
+		.json-string { color: var(--accent); }
+		.json-number { color: var(--warning); }
+		.json-boolean { color: var(--info); }
+		.json-null { color: var(--text-muted); }
+
+		.claim-row {
+			display: flex;
+			justify-content: space-between;
+			padding: 0.5rem 0;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.claim-row:last-child {
+			border-bottom: none;
+		}
+
+		.claim-name {
+			color: var(--text-muted);
+			font-size: 0.75rem;
+		}
+
+		.claim-value {
+			color: var(--text);
+			font-size: 0.8rem;
+			text-align: right;
+		}
+
+		.claim-value.expired { color: var(--danger); }
+		.claim-value.valid { color: var(--accent); }
+
+		.signature-section {
+			grid-column: 1 / -1;
+		}
+
+		.signature-info {
+			display: flex;
+			gap: 2rem;
+			flex-wrap: wrap;
+		}
+
+		.sig-item {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+		}
+
+		.sig-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+		}
+
+		.sig-value {
+			font-size: 0.85rem;
+			color: #2dd4bf;
+		}
+
+		.warning-box {
+			background: rgba(245, 158, 11, 0.1);
+			border: 1px solid var(--warning);
+			border-radius: 6px;
+			padding: 0.75rem 1rem;
+			font-size: 0.8rem;
+			color: var(--warning);
+			margin-top: 1rem;
+		}
+
+		.error {
+			background: rgba(239, 68, 68, 0.1);
+			border: 1px solid var(--danger);
+			color: var(--danger);
+			padding: 1rem;
+			border-radius: 6px;
+			font-size: 0.875rem;
+		}
+
+		.empty {
+			text-align: center;
+			padding: 2rem;
+			color: var(--text-muted);
+		}
+
+		.sample-tokens {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.sample-token {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.sample-token:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.info-box {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			line-height: 1.6;
+		}
+
+		.claims-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.75rem;
+		}
+
+		.claims-table th {
+			text-align: left;
+			padding: 0.5rem;
+			border-bottom: 1px solid var(--border);
+			color: var(--text-muted);
+			font-weight: 500;
+		}
+
+		.claims-table td {
+			padding: 0.5rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.claims-table tr:last-child td {
+			border-bottom: none;
+		}
+
+		.claims-table code {
+			background: var(--surface);
+			padding: 0.15rem 0.3rem;
+			border-radius: 3px;
+			color: var(--accent);
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>JWT Decoder</h1>
+			<p class="subtitle">Decode and inspect JSON Web Tokens</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Token Input</span>
+			</div>
+			<textarea id="jwtInput" placeholder="Paste your JWT here (e.g., eyJhbGciOiJIUzI1NiIs...)"></textarea>
+			<div class="actions">
+				<button class="btn" onclick="decode()">Decode</button>
+				<button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+			</div>
+			<div class="sample-tokens">
+				<span style="color: var(--text-muted); font-size: 0.75rem; margin-right: 0.5rem;">Try:</span>
+				<button class="sample-token" onclick="loadSample('hs256')">HS256 Sample</button>
+				<button class="sample-token" onclick="loadSample('rs256')">RS256 Sample</button>
+				<button class="sample-token" onclick="loadSample('expired')">Expired Token</button>
+			</div>
+		</div>
+
+		<div class="panel" id="resultsPanel">
+			<div class="panel-header">
+				<span class="panel-title">Decoded Token</span>
+			</div>
+			<div id="results">
+				<div class="empty">Paste a JWT above and click Decode</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Common JWT Claims</span>
+			</div>
+			<div class="info-box">
+				<table class="claims-table">
+					<tr><th>Claim</th><th>Name</th><th>Description</th></tr>
+					<tr><td><code>iss</code></td><td>Issuer</td><td>Who issued the token</td></tr>
+					<tr><td><code>sub</code></td><td>Subject</td><td>Who the token is about (user ID)</td></tr>
+					<tr><td><code>aud</code></td><td>Audience</td><td>Intended recipient of the token</td></tr>
+					<tr><td><code>exp</code></td><td>Expiration</td><td>When the token expires (Unix timestamp)</td></tr>
+					<tr><td><code>nbf</code></td><td>Not Before</td><td>Token not valid before this time</td></tr>
+					<tr><td><code>iat</code></td><td>Issued At</td><td>When the token was issued</td></tr>
+					<tr><td><code>jti</code></td><td>JWT ID</td><td>Unique identifier for the token</td></tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const jwtInput = document.getElementById('jwtInput');
+		const resultsDiv = document.getElementById('results');
+
+		// Sample tokens for demonstration
+		const sampleTokens = {
+			hs256: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.POstGetfAytaZS82wHcjoTyoqhMyxXiWdR7Nn7A29XU',
+			rs256: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkphbmUgRG9lIiwiYWRtaW4iOmZhbHNlLCJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTg5MzQ1NjAwMH0.invalid_signature_for_demo',
+			expired: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwibmFtZSI6IkV4cGlyZWQgVXNlciIsImV4cCI6MTYwMDAwMDAwMCwiaWF0IjoxNTk5OTk5MDAwfQ.demo_signature'
+		};
+
+		jwtInput.addEventListener('input', () => {
+			if (jwtInput.value.trim()) {
+				decode();
+			}
+		});
+
+		function loadSample(type) {
+			jwtInput.value = sampleTokens[type];
+			decode();
+		}
+
+		function clearAll() {
+			jwtInput.value = '';
+			resultsDiv.innerHTML = '<div class="empty">Paste a JWT above and click Decode</div>';
+		}
+
+		function decode() {
+			const token = jwtInput.value.trim();
+			if (!token) {
+				resultsDiv.innerHTML = '<div class="error">Please enter a JWT</div>';
+				return;
+			}
+
+			try {
+				const parts = token.split('.');
+				if (parts.length !== 3) {
+					throw new Error('Invalid JWT format. Expected 3 parts separated by dots.');
+				}
+
+				const header = decodeBase64Url(parts[0]);
+				const payload = decodeBase64Url(parts[1]);
+				const signature = parts[2];
+
+				let headerObj, payloadObj;
+				try {
+					headerObj = JSON.parse(header);
+				} catch (e) {
+					throw new Error('Invalid header: not valid JSON');
+				}
+
+				try {
+					payloadObj = JSON.parse(payload);
+				} catch (e) {
+					throw new Error('Invalid payload: not valid JSON');
+				}
+
+				displayResults(parts, headerObj, payloadObj, signature);
+			} catch (error) {
+				resultsDiv.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
+			}
+		}
+
+		function decodeBase64Url(str) {
+			// Replace URL-safe characters
+			let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+			// Pad with = if needed
+			while (base64.length % 4) {
+				base64 += '=';
+			}
+			try {
+				return decodeURIComponent(atob(base64).split('').map(c => {
+					return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+				}).join(''));
+			} catch (e) {
+				throw new Error('Failed to decode base64url');
+			}
+		}
+
+		function displayResults(parts, header, payload, signature) {
+			const now = Math.floor(Date.now() / 1000);
+			const isExpired = payload.exp && payload.exp < now;
+			const notYetValid = payload.nbf && payload.nbf > now;
+
+			let html = `
+				<div class="jwt-visual">
+					<span class="jwt-header">${escapeHtml(parts[0])}</span><span class="jwt-dot">.</span><span class="jwt-payload">${escapeHtml(parts[1])}</span><span class="jwt-dot">.</span><span class="jwt-signature">${escapeHtml(parts[2])}</span>
+				</div>
+				<div class="decoded-sections">
+					<div class="decoded-section">
+						<div class="section-header">
+							<span class="section-title header">Header</span>
+							<button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;" onclick="copyJson(${escapeHtml(JSON.stringify(JSON.stringify(header, null, 2)))})">Copy</button>
+						</div>
+						<div class="section-content">
+							<pre style="margin: 0; white-space: pre-wrap;">${syntaxHighlight(header)}</pre>
+						</div>
+					</div>
+					<div class="decoded-section">
+						<div class="section-header">
+							<span class="section-title payload">Payload</span>
+							<button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;" onclick="copyJson(${escapeHtml(JSON.stringify(JSON.stringify(payload, null, 2)))})">Copy</button>
+						</div>
+						<div class="section-content">
+							<pre style="margin: 0; white-space: pre-wrap;">${syntaxHighlight(payload)}</pre>
+						</div>
+					</div>
+					<div class="decoded-section signature-section">
+						<div class="section-header">
+							<span class="section-title signature">Signature</span>
+						</div>
+						<div class="section-content">
+							<div class="signature-info">
+								<div class="sig-item">
+									<span class="sig-label">Algorithm</span>
+									<span class="sig-value">${escapeHtml(header.alg || 'Unknown')}</span>
+								</div>
+								<div class="sig-item">
+									<span class="sig-label">Type</span>
+									<span class="sig-value">${escapeHtml(header.typ || 'JWT')}</span>
+								</div>
+								${header.kid ? `
+								<div class="sig-item">
+									<span class="sig-label">Key ID</span>
+									<span class="sig-value">${escapeHtml(header.kid)}</span>
+								</div>
+								` : ''}
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+
+			// Add time-based claim analysis
+			const timeClaims = [];
+			if (payload.iat) {
+				timeClaims.push({
+					name: 'Issued At (iat)',
+					value: payload.iat,
+					formatted: formatTimestamp(payload.iat),
+					status: 'neutral'
+				});
+			}
+			if (payload.nbf) {
+				timeClaims.push({
+					name: 'Not Before (nbf)',
+					value: payload.nbf,
+					formatted: formatTimestamp(payload.nbf),
+					status: notYetValid ? 'warning' : 'valid'
+				});
+			}
+			if (payload.exp) {
+				timeClaims.push({
+					name: 'Expires (exp)',
+					value: payload.exp,
+					formatted: formatTimestamp(payload.exp),
+					status: isExpired ? 'expired' : 'valid'
+				});
+			}
+
+			if (timeClaims.length > 0) {
+				html += `
+					<div style="margin-top: 1rem;">
+						<div class="decoded-section" style="grid-column: 1 / -1;">
+							<div class="section-header">
+								<span class="section-title" style="color: var(--warning);">Time Claims</span>
+							</div>
+							<div class="section-content">
+								${timeClaims.map(claim => `
+									<div class="claim-row">
+										<span class="claim-name">${claim.name}</span>
+										<span class="claim-value ${claim.status}">${claim.formatted}</span>
+									</div>
+								`).join('')}
+							</div>
+						</div>
+					</div>
+				`;
+			}
+
+			// Add warnings
+			let warnings = [];
+			if (isExpired) {
+				warnings.push('This token has expired.');
+			}
+			if (notYetValid) {
+				warnings.push('This token is not yet valid (nbf claim is in the future).');
+			}
+			if (header.alg === 'none') {
+				warnings.push('This token uses the "none" algorithm - signature is not verified!');
+			}
+
+			if (warnings.length > 0) {
+				html += `<div class="warning-box">${warnings.join(' ')}</div>`;
+			}
+
+			html += `<div class="warning-box" style="margin-top: 1rem; background: rgba(59, 130, 246, 0.1); border-color: var(--info); color: var(--info);">
+				Note: This decoder does not verify signatures. Never trust a JWT without proper server-side verification.
+			</div>`;
+
+			resultsDiv.innerHTML = html;
+		}
+
+		function syntaxHighlight(obj) {
+			const json = JSON.stringify(obj, null, 2);
+			return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+				let cls = 'json-number';
+				if (/^"/.test(match)) {
+					if (/:$/.test(match)) {
+						cls = 'json-key';
+						match = match.slice(0, -1); // remove colon
+						return `<span class="${cls}">${escapeHtml(match)}</span>:`;
+					} else {
+						cls = 'json-string';
+					}
+				} else if (/true|false/.test(match)) {
+					cls = 'json-boolean';
+				} else if (/null/.test(match)) {
+					cls = 'json-null';
+				}
+				return `<span class="${cls}">${escapeHtml(match)}</span>`;
+			});
+		}
+
+		function formatTimestamp(ts) {
+			const date = new Date(ts * 1000);
+			const now = new Date();
+			const diff = ts * 1000 - now.getTime();
+
+			let relative = '';
+			if (Math.abs(diff) < 60000) {
+				relative = diff < 0 ? 'just now' : 'in a moment';
+			} else if (Math.abs(diff) < 3600000) {
+				const mins = Math.round(Math.abs(diff) / 60000);
+				relative = diff < 0 ? `${mins}m ago` : `in ${mins}m`;
+			} else if (Math.abs(diff) < 86400000) {
+				const hours = Math.round(Math.abs(diff) / 3600000);
+				relative = diff < 0 ? `${hours}h ago` : `in ${hours}h`;
+			} else {
+				const days = Math.round(Math.abs(diff) / 86400000);
+				relative = diff < 0 ? `${days}d ago` : `in ${days}d`;
+			}
+
+			return `${date.toISOString().replace('T', ' ').replace('Z', '')} UTC (${relative})`;
+		}
+
+		function copyJson(json) {
+			navigator.clipboard.writeText(json).then(() => {
+				// Brief visual feedback could be added here
+			});
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = String(text);
+			return div.innerHTML;
+		}
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

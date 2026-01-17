@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Unix Timestamp Converter // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--info: #3b82f6;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.current-time {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			padding: 1rem;
+			background: var(--bg);
+			border-radius: 6px;
+			margin-bottom: 1rem;
+		}
+
+		.time-display {
+			font-size: 2rem;
+			font-weight: 600;
+			color: var(--accent);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.time-label {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+		}
+
+		.time-human {
+			font-size: 0.85rem;
+			color: var(--text-muted);
+			margin-top: 0.25rem;
+		}
+
+		input, select {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.6rem 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.9rem;
+			outline: none;
+		}
+
+		input:focus, select:focus {
+			border-color: var(--accent);
+		}
+
+		input::placeholder {
+			color: var(--text-muted);
+		}
+
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 0.6rem 1rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.8rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.btn-secondary {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: var(--surface-hover);
+		}
+
+		.converter-section {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.converter-section:last-child {
+			margin-bottom: 0;
+		}
+
+		.section-title {
+			font-size: 0.8rem;
+			font-weight: 500;
+			color: var(--accent);
+			margin-bottom: 0.75rem;
+		}
+
+		.input-row {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+			align-items: flex-end;
+		}
+
+		.input-group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+		}
+
+		.input-group label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+		}
+
+		.input-group input {
+			width: 100%;
+		}
+
+		.input-group.timestamp input {
+			width: 200px;
+		}
+
+		.date-inputs {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+			gap: 0.5rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.date-inputs input {
+			width: 100%;
+		}
+
+		.result-box {
+			background: var(--surface);
+			border-radius: 4px;
+			padding: 0.75rem 1rem;
+			margin-top: 0.75rem;
+		}
+
+		.result-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin-bottom: 0.25rem;
+		}
+
+		.result-value {
+			font-size: 1rem;
+			color: var(--text);
+			word-break: break-all;
+		}
+
+		.result-value.large {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.formats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 0.75rem;
+			margin-top: 0.75rem;
+		}
+
+		.format-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.5rem 0.75rem;
+			background: var(--surface);
+			border-radius: 4px;
+		}
+
+		.format-name {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+		}
+
+		.format-value {
+			font-size: 0.85rem;
+			color: var(--text);
+			cursor: pointer;
+			padding: 0.2rem 0.4rem;
+			border-radius: 3px;
+			transition: background 0.15s ease;
+		}
+
+		.format-value:hover {
+			background: var(--surface-hover);
+		}
+
+		.quick-times {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.quick-time {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.quick-time:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.info-box {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			line-height: 1.6;
+		}
+
+		.epoch-info {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+		}
+
+		.epoch-item strong {
+			color: var(--accent);
+			display: block;
+			margin-bottom: 0.25rem;
+		}
+
+		.copied {
+			animation: flash 0.3s ease;
+		}
+
+		@keyframes flash {
+			0% { background: var(--accent); color: var(--bg); }
+			100% { background: var(--surface-hover); color: var(--text); }
+		}
+
+		.timezone-note {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-top: 0.5rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Unix Timestamp Converter</h1>
+			<p class="subtitle">Convert between Unix timestamps and human-readable dates</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Current Time</span>
+			</div>
+			<div class="current-time">
+				<div>
+					<div class="time-label">Unix Timestamp</div>
+					<div class="time-display" id="currentTimestamp">-</div>
+				</div>
+				<div style="flex: 1;">
+					<div class="time-label">Human Readable (UTC)</div>
+					<div class="time-human" id="currentHuman">-</div>
+					<div class="time-label" style="margin-top: 0.5rem;">Local Time</div>
+					<div class="time-human" id="currentLocal">-</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Timestamp to Date</span>
+			</div>
+			<div class="converter-section">
+				<div class="input-row">
+					<div class="input-group timestamp">
+						<label>Unix Timestamp</label>
+						<input type="text" id="timestampInput" placeholder="e.g., 1704067200">
+					</div>
+					<div class="input-group">
+						<label>Unit</label>
+						<select id="timestampUnit">
+							<option value="s">Seconds</option>
+							<option value="ms">Milliseconds</option>
+						</select>
+					</div>
+					<button class="btn" onclick="convertTimestamp()">Convert</button>
+					<button class="btn btn-secondary" onclick="useCurrentTimestamp()">Now</button>
+				</div>
+				<div class="quick-times">
+					<span style="color: var(--text-muted); font-size: 0.75rem; margin-right: 0.5rem;">Quick:</span>
+					<button class="quick-time" onclick="setTimestamp(0)">Epoch (0)</button>
+					<button class="quick-time" onclick="setTimestamp(1000000000)">1 Billion</button>
+					<button class="quick-time" onclick="setTimestamp(2000000000)">2 Billion</button>
+					<button class="quick-time" onclick="setTimestamp(2147483647)">Y2K38</button>
+				</div>
+				<div id="timestampResult"></div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Date to Timestamp</span>
+			</div>
+			<div class="converter-section">
+				<div class="date-inputs">
+					<div class="input-group">
+						<label>Year</label>
+						<input type="number" id="year" placeholder="2024" min="1970" max="2100">
+					</div>
+					<div class="input-group">
+						<label>Month</label>
+						<input type="number" id="month" placeholder="1" min="1" max="12">
+					</div>
+					<div class="input-group">
+						<label>Day</label>
+						<input type="number" id="day" placeholder="1" min="1" max="31">
+					</div>
+					<div class="input-group">
+						<label>Hour</label>
+						<input type="number" id="hour" placeholder="0" min="0" max="23">
+					</div>
+					<div class="input-group">
+						<label>Minute</label>
+						<input type="number" id="minute" placeholder="0" min="0" max="59">
+					</div>
+					<div class="input-group">
+						<label>Second</label>
+						<input type="number" id="second" placeholder="0" min="0" max="59">
+					</div>
+				</div>
+				<div class="input-row">
+					<div class="input-group">
+						<label>Timezone</label>
+						<select id="timezone">
+							<option value="utc">UTC</option>
+							<option value="local">Local</option>
+						</select>
+					</div>
+					<button class="btn" onclick="convertDate()">Convert</button>
+					<button class="btn btn-secondary" onclick="useCurrentDate()">Now</button>
+				</div>
+				<div id="dateResult"></div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Reference</span>
+			</div>
+			<div class="info-box">
+				<div class="epoch-info">
+					<div class="epoch-item">
+						<strong>Unix Epoch</strong>
+						January 1, 1970, 00:00:00 UTC
+					</div>
+					<div class="epoch-item">
+						<strong>Y2K38 Problem</strong>
+						January 19, 2038, 03:14:07 UTC (2,147,483,647)
+					</div>
+					<div class="epoch-item">
+						<strong>Seconds per Day</strong>
+						86,400
+					</div>
+					<div class="epoch-item">
+						<strong>Current Range</strong>
+						32-bit: 1901-2038, 64-bit: ±292 billion years
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const timestampInput = document.getElementById('timestampInput');
+		const timestampUnit = document.getElementById('timestampUnit');
+		const timestampResult = document.getElementById('timestampResult');
+		const dateResult = document.getElementById('dateResult');
+
+		// Update current time every second
+		function updateCurrentTime() {
+			const now = new Date();
+			const timestamp = Math.floor(now.getTime() / 1000);
+
+			document.getElementById('currentTimestamp').textContent = timestamp.toLocaleString();
+			document.getElementById('currentHuman').textContent = now.toISOString().replace('T', ' ').replace('Z', ' UTC');
+			document.getElementById('currentLocal').textContent = now.toLocaleString() + ' (' + Intl.DateTimeFormat().resolvedOptions().timeZone + ')';
+		}
+
+		updateCurrentTime();
+		setInterval(updateCurrentTime, 1000);
+
+		// Event listeners
+		timestampInput.addEventListener('keydown', e => {
+			if (e.key === 'Enter') convertTimestamp();
+		});
+
+		function setTimestamp(ts) {
+			timestampInput.value = ts;
+			timestampUnit.value = 's';
+			convertTimestamp();
+		}
+
+		function useCurrentTimestamp() {
+			const now = Math.floor(Date.now() / 1000);
+			timestampInput.value = now;
+			timestampUnit.value = 's';
+			convertTimestamp();
+		}
+
+		function useCurrentDate() {
+			const now = new Date();
+			document.getElementById('year').value = now.getFullYear();
+			document.getElementById('month').value = now.getMonth() + 1;
+			document.getElementById('day').value = now.getDate();
+			document.getElementById('hour').value = now.getHours();
+			document.getElementById('minute').value = now.getMinutes();
+			document.getElementById('second').value = now.getSeconds();
+			document.getElementById('timezone').value = 'local';
+			convertDate();
+		}
+
+		function convertTimestamp() {
+			const input = timestampInput.value.trim();
+			if (!input) {
+				timestampResult.innerHTML = '';
+				return;
+			}
+
+			let timestamp = parseInt(input, 10);
+			if (isNaN(timestamp)) {
+				timestampResult.innerHTML = '<div class="result-box"><div class="result-label">Error</div><div class="result-value" style="color: var(--danger);">Invalid timestamp</div></div>';
+				return;
+			}
+
+			// Convert to milliseconds if needed
+			const unit = timestampUnit.value;
+			const ms = unit === 'ms' ? timestamp : timestamp * 1000;
+			const seconds = unit === 'ms' ? Math.floor(timestamp / 1000) : timestamp;
+
+			const date = new Date(ms);
+
+			if (isNaN(date.getTime())) {
+				timestampResult.innerHTML = '<div class="result-box"><div class="result-label">Error</div><div class="result-value" style="color: var(--danger);">Invalid date</div></div>';
+				return;
+			}
+
+			const formats = [
+				{ name: 'ISO 8601', value: date.toISOString() },
+				{ name: 'UTC String', value: date.toUTCString() },
+				{ name: 'Local String', value: date.toLocaleString() },
+				{ name: 'Date Only', value: date.toISOString().split('T')[0] },
+				{ name: 'Time Only (UTC)', value: date.toISOString().split('T')[1].replace('Z', '') },
+				{ name: 'Timestamp (s)', value: seconds.toString() },
+				{ name: 'Timestamp (ms)', value: ms.toString() }
+			];
+
+			timestampResult.innerHTML = `
+				<div class="formats-grid">
+					${formats.map(f => `
+						<div class="format-item">
+							<span class="format-name">${f.name}</span>
+							<span class="format-value" onclick="copyValue(this, '${escapeHtml(f.value)}')">${escapeHtml(f.value)}</span>
+						</div>
+					`).join('')}
+				</div>
+				<div class="timezone-note">Click any value to copy. Local timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}</div>
+			`;
+		}
+
+		function convertDate() {
+			const year = parseInt(document.getElementById('year').value) || new Date().getFullYear();
+			const month = parseInt(document.getElementById('month').value) || 1;
+			const day = parseInt(document.getElementById('day').value) || 1;
+			const hour = parseInt(document.getElementById('hour').value) || 0;
+			const minute = parseInt(document.getElementById('minute').value) || 0;
+			const second = parseInt(document.getElementById('second').value) || 0;
+			const tz = document.getElementById('timezone').value;
+
+			let date;
+			if (tz === 'utc') {
+				date = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+			} else {
+				date = new Date(year, month - 1, day, hour, minute, second);
+			}
+
+			if (isNaN(date.getTime())) {
+				dateResult.innerHTML = '<div class="result-box"><div class="result-label">Error</div><div class="result-value" style="color: var(--danger);">Invalid date</div></div>';
+				return;
+			}
+
+			const timestamp = Math.floor(date.getTime() / 1000);
+			const timestampMs = date.getTime();
+
+			dateResult.innerHTML = `
+				<div class="result-box">
+					<div class="result-label">Unix Timestamp (seconds)</div>
+					<div class="result-value large" onclick="copyValue(this, '${timestamp}')" style="cursor: pointer;">${timestamp.toLocaleString()}</div>
+				</div>
+				<div class="formats-grid">
+					<div class="format-item">
+						<span class="format-name">Milliseconds</span>
+						<span class="format-value" onclick="copyValue(this, '${timestampMs}')">${timestampMs}</span>
+					</div>
+					<div class="format-item">
+						<span class="format-name">ISO 8601</span>
+						<span class="format-value" onclick="copyValue(this, '${date.toISOString()}')">${date.toISOString()}</span>
+					</div>
+					<div class="format-item">
+						<span class="format-name">UTC String</span>
+						<span class="format-value" onclick="copyValue(this, '${date.toUTCString()}')">${date.toUTCString()}</span>
+					</div>
+					<div class="format-item">
+						<span class="format-name">Local String</span>
+						<span class="format-value" onclick="copyValue(this, '${escapeHtml(date.toLocaleString())}')">${escapeHtml(date.toLocaleString())}</span>
+					</div>
+				</div>
+				<div class="timezone-note">Click any value to copy. Input interpreted as ${tz === 'utc' ? 'UTC' : 'local time (' + Intl.DateTimeFormat().resolvedOptions().timeZone + ')'}</div>
+			`;
+		}
+
+		function copyValue(element, value) {
+			navigator.clipboard.writeText(value).then(() => {
+				element.classList.add('copied');
+				setTimeout(() => element.classList.remove('copied'), 300);
+			});
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = String(text);
+			return div.innerHTML;
+		}
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

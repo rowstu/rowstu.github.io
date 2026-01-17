@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cron Expression Builder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.cron-display {
+			background: var(--bg);
+			border-radius: 8px;
+			padding: 1.5rem;
+			text-align: center;
+			margin-bottom: 1rem;
+		}
+
+		.cron-expression {
+			font-size: 2rem;
+			font-weight: 600;
+			color: var(--accent);
+			letter-spacing: 0.1em;
+			margin-bottom: 0.5rem;
+		}
+
+		.cron-description {
+			color: var(--text);
+			font-size: 1rem;
+		}
+
+		.cron-parts {
+			display: flex;
+			justify-content: center;
+			gap: 0.25rem;
+			margin-top: 1rem;
+			flex-wrap: wrap;
+		}
+
+		.cron-part {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 0.5rem;
+			min-width: 60px;
+		}
+
+		.cron-part-value {
+			font-size: 1.25rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.cron-part-label {
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+		}
+
+		.field-group {
+			margin-bottom: 1.25rem;
+		}
+
+		.field-label {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 0.5rem;
+		}
+
+		.field-name {
+			font-size: 0.875rem;
+			font-weight: 500;
+		}
+
+		.field-hint {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		.field-options {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+
+		.field-row {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+		select, input {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.5rem 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			outline: none;
+		}
+
+		select:focus, input:focus {
+			border-color: var(--accent);
+		}
+
+		input[type="number"] {
+			width: 70px;
+		}
+
+		.radio-group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+
+		.radio-option {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			padding: 0.5rem;
+			background: var(--bg);
+			border-radius: 4px;
+			cursor: pointer;
+		}
+
+		.radio-option:hover {
+			background: var(--surface-hover);
+		}
+
+		.radio-option input[type="radio"] {
+			accent-color: var(--accent);
+			width: 16px;
+			height: 16px;
+			cursor: pointer;
+		}
+
+		.radio-option label {
+			flex: 1;
+			cursor: pointer;
+			font-size: 0.85rem;
+		}
+
+		.quick-presets {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+
+		.preset-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.4rem 0.75rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.preset-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.next-runs {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+		}
+
+		.next-run {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			font-size: 0.85rem;
+			padding: 0.35rem 0;
+		}
+
+		.next-run-num {
+			color: var(--text-muted);
+			font-size: 0.7rem;
+			min-width: 20px;
+		}
+
+		.next-run-date {
+			color: var(--accent);
+		}
+
+		.next-run-relative {
+			color: var(--text-muted);
+			font-size: 0.75rem;
+		}
+
+		.copy-btn {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 0.5rem 1rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.copy-btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.reference-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.8rem;
+		}
+
+		.reference-table th, .reference-table td {
+			border: 1px solid var(--border);
+			padding: 0.5rem;
+			text-align: left;
+		}
+
+		.reference-table th {
+			background: var(--surface);
+			font-weight: 500;
+			color: var(--text-muted);
+		}
+
+		.reference-table code {
+			background: var(--bg);
+			padding: 0.15rem 0.4rem;
+			border-radius: 3px;
+			color: var(--accent);
+		}
+
+		@media (max-width: 600px) {
+			.cron-expression {
+				font-size: 1.5rem;
+			}
+
+			.cron-part {
+				min-width: 50px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Cron Expression Builder</h1>
+			<p class="subtitle">Build and understand cron schedule expressions</p>
+		</header>
+
+		<div class="panel">
+			<div class="cron-display">
+				<div class="cron-expression" id="cronExpression">* * * * *</div>
+				<div class="cron-description" id="cronDescription">Every minute</div>
+				<div class="cron-parts">
+					<div class="cron-part">
+						<span class="cron-part-value" id="partMinute">*</span>
+						<span class="cron-part-label">Minute</span>
+					</div>
+					<div class="cron-part">
+						<span class="cron-part-value" id="partHour">*</span>
+						<span class="cron-part-label">Hour</span>
+					</div>
+					<div class="cron-part">
+						<span class="cron-part-value" id="partDay">*</span>
+						<span class="cron-part-label">Day</span>
+					</div>
+					<div class="cron-part">
+						<span class="cron-part-value" id="partMonth">*</span>
+						<span class="cron-part-label">Month</span>
+					</div>
+					<div class="cron-part">
+						<span class="cron-part-value" id="partWeekday">*</span>
+						<span class="cron-part-label">Weekday</span>
+					</div>
+				</div>
+			</div>
+			<div style="text-align: center;">
+				<button class="copy-btn" onclick="copyExpression()">Copy Expression</button>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Quick Presets</span>
+			</div>
+			<div class="quick-presets">
+				<button class="preset-btn" onclick="setPreset('* * * * *')">Every minute</button>
+				<button class="preset-btn" onclick="setPreset('*/5 * * * *')">Every 5 minutes</button>
+				<button class="preset-btn" onclick="setPreset('*/15 * * * *')">Every 15 minutes</button>
+				<button class="preset-btn" onclick="setPreset('0 * * * *')">Every hour</button>
+				<button class="preset-btn" onclick="setPreset('0 */6 * * *')">Every 6 hours</button>
+				<button class="preset-btn" onclick="setPreset('0 0 * * *')">Daily at midnight</button>
+				<button class="preset-btn" onclick="setPreset('0 9 * * *')">Daily at 9am</button>
+				<button class="preset-btn" onclick="setPreset('0 9 * * 1-5')">Weekdays at 9am</button>
+				<button class="preset-btn" onclick="setPreset('0 0 * * 0')">Weekly (Sunday)</button>
+				<button class="preset-btn" onclick="setPreset('0 0 1 * *')">Monthly (1st)</button>
+				<button class="preset-btn" onclick="setPreset('0 0 1 1 *')">Yearly (Jan 1st)</button>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Builder</span>
+			</div>
+
+			<div class="field-group">
+				<div class="field-label">
+					<span class="field-name">Minute</span>
+					<span class="field-hint">0-59</span>
+				</div>
+				<div class="radio-group" id="minuteOptions">
+					<div class="radio-option">
+						<input type="radio" name="minute" id="minuteEvery" value="*" checked>
+						<label for="minuteEvery">Every minute</label>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="minute" id="minuteInterval" value="interval">
+						<label for="minuteInterval">Every</label>
+						<input type="number" id="minuteIntervalValue" value="5" min="1" max="59">
+						<span>minutes</span>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="minute" id="minuteSpecific" value="specific">
+						<label for="minuteSpecific">At minute</label>
+						<input type="number" id="minuteSpecificValue" value="0" min="0" max="59">
+					</div>
+				</div>
+			</div>
+
+			<div class="field-group">
+				<div class="field-label">
+					<span class="field-name">Hour</span>
+					<span class="field-hint">0-23</span>
+				</div>
+				<div class="radio-group" id="hourOptions">
+					<div class="radio-option">
+						<input type="radio" name="hour" id="hourEvery" value="*" checked>
+						<label for="hourEvery">Every hour</label>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="hour" id="hourInterval" value="interval">
+						<label for="hourInterval">Every</label>
+						<input type="number" id="hourIntervalValue" value="2" min="1" max="23">
+						<span>hours</span>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="hour" id="hourSpecific" value="specific">
+						<label for="hourSpecific">At hour</label>
+						<input type="number" id="hourSpecificValue" value="9" min="0" max="23">
+					</div>
+				</div>
+			</div>
+
+			<div class="field-group">
+				<div class="field-label">
+					<span class="field-name">Day of Month</span>
+					<span class="field-hint">1-31</span>
+				</div>
+				<div class="radio-group" id="dayOptions">
+					<div class="radio-option">
+						<input type="radio" name="day" id="dayEvery" value="*" checked>
+						<label for="dayEvery">Every day</label>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="day" id="daySpecific" value="specific">
+						<label for="daySpecific">On day</label>
+						<input type="number" id="daySpecificValue" value="1" min="1" max="31">
+					</div>
+				</div>
+			</div>
+
+			<div class="field-group">
+				<div class="field-label">
+					<span class="field-name">Month</span>
+					<span class="field-hint">1-12</span>
+				</div>
+				<div class="radio-group" id="monthOptions">
+					<div class="radio-option">
+						<input type="radio" name="month" id="monthEvery" value="*" checked>
+						<label for="monthEvery">Every month</label>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="month" id="monthSpecific" value="specific">
+						<label for="monthSpecific">In month</label>
+						<select id="monthSpecificValue">
+							<option value="1">January</option>
+							<option value="2">February</option>
+							<option value="3">March</option>
+							<option value="4">April</option>
+							<option value="5">May</option>
+							<option value="6">June</option>
+							<option value="7">July</option>
+							<option value="8">August</option>
+							<option value="9">September</option>
+							<option value="10">October</option>
+							<option value="11">November</option>
+							<option value="12">December</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="field-group">
+				<div class="field-label">
+					<span class="field-name">Day of Week</span>
+					<span class="field-hint">0-6 (Sun-Sat)</span>
+				</div>
+				<div class="radio-group" id="weekdayOptions">
+					<div class="radio-option">
+						<input type="radio" name="weekday" id="weekdayEvery" value="*" checked>
+						<label for="weekdayEvery">Every day</label>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="weekday" id="weekdayWeekdays" value="1-5">
+						<label for="weekdayWeekdays">Weekdays (Mon-Fri)</label>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="weekday" id="weekdayWeekends" value="0,6">
+						<label for="weekdayWeekends">Weekends (Sat-Sun)</label>
+					</div>
+					<div class="radio-option">
+						<input type="radio" name="weekday" id="weekdaySpecific" value="specific">
+						<label for="weekdaySpecific">On</label>
+						<select id="weekdaySpecificValue">
+							<option value="0">Sunday</option>
+							<option value="1">Monday</option>
+							<option value="2">Tuesday</option>
+							<option value="3">Wednesday</option>
+							<option value="4">Thursday</option>
+							<option value="5">Friday</option>
+							<option value="6">Saturday</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Next 5 Runs</span>
+			</div>
+			<div class="next-runs" id="nextRuns"></div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Reference</span>
+			</div>
+			<table class="reference-table">
+				<thead>
+					<tr>
+						<th>Field</th>
+						<th>Values</th>
+						<th>Special Characters</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Minute</td>
+						<td>0-59</td>
+						<td><code>*</code> <code>,</code> <code>-</code> <code>/</code></td>
+					</tr>
+					<tr>
+						<td>Hour</td>
+						<td>0-23</td>
+						<td><code>*</code> <code>,</code> <code>-</code> <code>/</code></td>
+					</tr>
+					<tr>
+						<td>Day of Month</td>
+						<td>1-31</td>
+						<td><code>*</code> <code>,</code> <code>-</code> <code>/</code></td>
+					</tr>
+					<tr>
+						<td>Month</td>
+						<td>1-12</td>
+						<td><code>*</code> <code>,</code> <code>-</code> <code>/</code></td>
+					</tr>
+					<tr>
+						<td>Day of Week</td>
+						<td>0-6 (Sun=0)</td>
+						<td><code>*</code> <code>,</code> <code>-</code> <code>/</code></td>
+					</tr>
+				</tbody>
+			</table>
+			<div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+				<p><code>*</code> = any value &nbsp;&nbsp; <code>,</code> = list (1,3,5) &nbsp;&nbsp; <code>-</code> = range (1-5) &nbsp;&nbsp; <code>/</code> = step (*/5)</p>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const fields = ['minute', 'hour', 'day', 'month', 'weekday'];
+		const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+		const months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+		// Add event listeners
+		document.querySelectorAll('input[type="radio"], input[type="number"], select').forEach(el => {
+			el.addEventListener('change', updateCron);
+			el.addEventListener('input', updateCron);
+		});
+
+		function getFieldValue(field) {
+			const selected = document.querySelector(`input[name="${field}"]:checked`);
+			if (!selected) return '*';
+
+			const value = selected.value;
+
+			if (value === '*') return '*';
+			if (value === '1-5' || value === '0,6') return value;
+
+			if (value === 'interval') {
+				const interval = document.getElementById(`${field}IntervalValue`).value;
+				return `*/${interval}`;
+			}
+
+			if (value === 'specific') {
+				return document.getElementById(`${field}SpecificValue`).value;
+			}
+
+			return '*';
+		}
+
+		function updateCron() {
+			const minute = getFieldValue('minute');
+			const hour = getFieldValue('hour');
+			const day = getFieldValue('day');
+			const month = getFieldValue('month');
+			const weekday = getFieldValue('weekday');
+
+			const expression = `${minute} ${hour} ${day} ${month} ${weekday}`;
+
+			document.getElementById('cronExpression').textContent = expression;
+			document.getElementById('partMinute').textContent = minute;
+			document.getElementById('partHour').textContent = hour;
+			document.getElementById('partDay').textContent = day;
+			document.getElementById('partMonth').textContent = month;
+			document.getElementById('partWeekday').textContent = weekday;
+
+			document.getElementById('cronDescription').textContent = describeCron(minute, hour, day, month, weekday);
+			calculateNextRuns(minute, hour, day, month, weekday);
+		}
+
+		function describeCron(minute, hour, day, month, weekday) {
+			let parts = [];
+
+			// Time
+			if (minute === '*' && hour === '*') {
+				parts.push('Every minute');
+			} else if (minute.startsWith('*/')) {
+				parts.push(`Every ${minute.slice(2)} minutes`);
+			} else if (hour === '*') {
+				parts.push(`At minute ${minute} of every hour`);
+			} else if (hour.startsWith('*/')) {
+				parts.push(`At minute ${minute}, every ${hour.slice(2)} hours`);
+			} else {
+				const h = parseInt(hour);
+				const m = parseInt(minute);
+				const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+				parts.push(`At ${time}`);
+			}
+
+			// Day constraints
+			if (day !== '*') {
+				parts.push(`on day ${day}`);
+			}
+
+			if (month !== '*') {
+				parts.push(`in ${months[parseInt(month)]}`);
+			}
+
+			if (weekday !== '*') {
+				if (weekday === '1-5') {
+					parts.push('on weekdays');
+				} else if (weekday === '0,6') {
+					parts.push('on weekends');
+				} else {
+					parts.push(`on ${weekdays[parseInt(weekday)]}`);
+				}
+			}
+
+			return parts.join(' ');
+		}
+
+		function parseField(field, min, max) {
+			if (field === '*') {
+				return Array.from({ length: max - min + 1 }, (_, i) => min + i);
+			}
+
+			if (field.includes('/')) {
+				const [range, step] = field.split('/');
+				const stepNum = parseInt(step);
+				const values = [];
+				for (let i = min; i <= max; i += stepNum) {
+					values.push(i);
+				}
+				return values;
+			}
+
+			if (field.includes('-')) {
+				const [start, end] = field.split('-').map(Number);
+				return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+			}
+
+			if (field.includes(',')) {
+				return field.split(',').map(Number);
+			}
+
+			return [parseInt(field)];
+		}
+
+		function calculateNextRuns(minute, hour, day, month, weekday) {
+			const nextRunsDiv = document.getElementById('nextRuns');
+			const runs = [];
+			const now = new Date();
+			let current = new Date(now);
+
+			const minutes = parseField(minute, 0, 59);
+			const hours = parseField(hour, 0, 23);
+			const days = parseField(day, 1, 31);
+			const monthsList = parseField(month, 1, 12);
+			const weekdays = parseField(weekday, 0, 6);
+
+			// Simple brute force - check each minute for next 365 days
+			const maxIterations = 525600; // 1 year in minutes
+			let iterations = 0;
+
+			while (runs.length < 5 && iterations < maxIterations) {
+				current = new Date(current.getTime() + 60000); // Add 1 minute
+				iterations++;
+
+				const m = current.getMinutes();
+				const h = current.getHours();
+				const d = current.getDate();
+				const mo = current.getMonth() + 1;
+				const w = current.getDay();
+
+				if (minutes.includes(m) &&
+					hours.includes(h) &&
+					days.includes(d) &&
+					monthsList.includes(mo) &&
+					weekdays.includes(w)) {
+					runs.push(new Date(current));
+				}
+			}
+
+			nextRunsDiv.innerHTML = runs.map((date, i) => {
+				const relative = formatRelative(date, now);
+				return `
+					<div class="next-run">
+						<span class="next-run-num">${i + 1}.</span>
+						<span class="next-run-date">${formatDate(date)}</span>
+						<span class="next-run-relative">(${relative})</span>
+					</div>
+				`;
+			}).join('');
+
+			if (runs.length === 0) {
+				nextRunsDiv.innerHTML = '<div style="color: var(--text-muted);">No runs found in the next year</div>';
+			}
+		}
+
+		function formatDate(date) {
+			const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+			const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+			return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+		}
+
+		function formatRelative(date, now) {
+			const diff = date - now;
+			const minutes = Math.floor(diff / 60000);
+			const hours = Math.floor(minutes / 60);
+			const days = Math.floor(hours / 24);
+
+			if (days > 0) return `in ${days} day${days > 1 ? 's' : ''}`;
+			if (hours > 0) return `in ${hours} hour${hours > 1 ? 's' : ''}`;
+			return `in ${minutes} minute${minutes > 1 ? 's' : ''}`;
+		}
+
+		function setPreset(expression) {
+			const parts = expression.split(' ');
+
+			// Reset all to "every"
+			fields.forEach(field => {
+				document.querySelector(`input[name="${field}"][value="*"]`).checked = true;
+			});
+
+			// Parse minute
+			if (parts[0] !== '*') {
+				if (parts[0].startsWith('*/')) {
+					document.getElementById('minuteInterval').checked = true;
+					document.getElementById('minuteIntervalValue').value = parts[0].slice(2);
+				} else {
+					document.getElementById('minuteSpecific').checked = true;
+					document.getElementById('minuteSpecificValue').value = parts[0];
+				}
+			}
+
+			// Parse hour
+			if (parts[1] !== '*') {
+				if (parts[1].startsWith('*/')) {
+					document.getElementById('hourInterval').checked = true;
+					document.getElementById('hourIntervalValue').value = parts[1].slice(2);
+				} else {
+					document.getElementById('hourSpecific').checked = true;
+					document.getElementById('hourSpecificValue').value = parts[1];
+				}
+			}
+
+			// Parse day
+			if (parts[2] !== '*') {
+				document.getElementById('daySpecific').checked = true;
+				document.getElementById('daySpecificValue').value = parts[2];
+			}
+
+			// Parse month
+			if (parts[3] !== '*') {
+				document.getElementById('monthSpecific').checked = true;
+				document.getElementById('monthSpecificValue').value = parts[3];
+			}
+
+			// Parse weekday
+			if (parts[4] !== '*') {
+				if (parts[4] === '1-5') {
+					document.getElementById('weekdayWeekdays').checked = true;
+				} else if (parts[4] === '0,6') {
+					document.getElementById('weekdayWeekends').checked = true;
+				} else {
+					document.getElementById('weekdaySpecific').checked = true;
+					document.getElementById('weekdaySpecificValue').value = parts[4];
+				}
+			}
+
+			updateCron();
+		}
+
+		function copyExpression() {
+			const expression = document.getElementById('cronExpression').textContent;
+			navigator.clipboard.writeText(expression);
+		}
+
+		// Initial update
+		updateCron();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

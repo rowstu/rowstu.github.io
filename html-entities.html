@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HTML Entity Encoder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		textarea {
+			width: 100%;
+			min-height: 120px;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.9rem;
+			line-height: 1.5;
+			resize: vertical;
+			outline: none;
+		}
+
+		textarea:focus { border-color: var(--accent); }
+		textarea::placeholder { color: var(--text-muted); }
+
+		.btn-row {
+			display: flex;
+			justify-content: center;
+			gap: 1rem;
+			margin: 1.5rem 0;
+		}
+
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 0.75rem 1.5rem;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 0.9rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.btn:hover { background: var(--accent-hover); }
+
+		.arrow { font-size: 1.2rem; }
+
+		.options {
+			display: flex;
+			gap: 1.5rem;
+			flex-wrap: wrap;
+			margin-bottom: 1rem;
+		}
+
+		.option {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			cursor: pointer;
+			font-size: 0.875rem;
+		}
+
+		.option input[type="checkbox"],
+		.option input[type="radio"] {
+			accent-color: var(--accent);
+			width: 16px;
+			height: 16px;
+			cursor: pointer;
+		}
+
+		.actions {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.action-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.65rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.7rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.action-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.reference-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.8rem;
+		}
+
+		.reference-table th, .reference-table td {
+			border: 1px solid var(--border);
+			padding: 0.5rem;
+			text-align: left;
+		}
+
+		.reference-table th {
+			background: var(--surface);
+			font-weight: 500;
+			color: var(--text-muted);
+		}
+
+		.reference-table code {
+			background: var(--bg);
+			padding: 0.15rem 0.4rem;
+			border-radius: 3px;
+			color: var(--accent);
+		}
+
+		.char-display {
+			font-size: 1.2rem;
+			text-align: center;
+		}
+
+		.entity-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+			gap: 0.5rem;
+			margin-top: 1rem;
+		}
+
+		.entity-item {
+			background: var(--bg);
+			padding: 0.5rem;
+			border-radius: 4px;
+			text-align: center;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.entity-item:hover {
+			background: var(--surface-hover);
+		}
+
+		.entity-char {
+			font-size: 1.25rem;
+			margin-bottom: 0.25rem;
+		}
+
+		.entity-code {
+			font-size: 0.7rem;
+			color: var(--accent);
+		}
+
+		.tabs {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.tab {
+			background: transparent;
+			border: 1px solid var(--border);
+			color: var(--text-muted);
+			padding: 0.4rem 0.75rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.tab:hover {
+			border-color: var(--accent);
+			color: var(--text);
+		}
+
+		.tab.active {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #fff;
+		}
+
+		.tab-content { display: none; }
+		.tab-content.active { display: block; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>HTML Entity Encoder</h1>
+			<p class="subtitle">Convert special characters to HTML entities and back</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Plain Text</span>
+				<div class="actions">
+					<button class="action-btn" onclick="clearInput()">Clear</button>
+				</div>
+			</div>
+			<textarea id="plainText" placeholder="Enter text with special characters..."></textarea>
+		</div>
+
+		<div class="btn-row">
+			<button class="btn" onclick="encode()">
+				Encode <span class="arrow">↓</span>
+			</button>
+			<button class="btn" onclick="decode()">
+				<span class="arrow">↑</span> Decode
+			</button>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">HTML Entities</span>
+				<div class="actions">
+					<button class="action-btn" onclick="copyOutput()">Copy</button>
+				</div>
+			</div>
+			<textarea id="encoded" placeholder="Encoded HTML entities will appear here..."></textarea>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Encoding Options</span>
+			</div>
+			<div class="options">
+				<label class="option">
+					<input type="radio" name="format" id="formatNamed" checked>
+					<span>Named entities (&amp;amp;)</span>
+				</label>
+				<label class="option">
+					<input type="radio" name="format" id="formatNumeric">
+					<span>Numeric entities (&amp;#38;)</span>
+				</label>
+				<label class="option">
+					<input type="radio" name="format" id="formatHex">
+					<span>Hex entities (&amp;#x26;)</span>
+				</label>
+			</div>
+			<div class="options">
+				<label class="option">
+					<input type="checkbox" id="encodeAll">
+					<span>Encode all characters (not just special)</span>
+				</label>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Common Entities</span>
+			</div>
+			<div class="tabs">
+				<button class="tab active" data-tab="essential">Essential</button>
+				<button class="tab" data-tab="symbols">Symbols</button>
+				<button class="tab" data-tab="arrows">Arrows</button>
+				<button class="tab" data-tab="math">Math</button>
+				<button class="tab" data-tab="currency">Currency</button>
+			</div>
+			<div id="essential" class="tab-content active">
+				<div class="entity-grid" id="essentialGrid"></div>
+			</div>
+			<div id="symbols" class="tab-content">
+				<div class="entity-grid" id="symbolsGrid"></div>
+			</div>
+			<div id="arrows" class="tab-content">
+				<div class="entity-grid" id="arrowsGrid"></div>
+			</div>
+			<div id="math" class="tab-content">
+				<div class="entity-grid" id="mathGrid"></div>
+			</div>
+			<div id="currency" class="tab-content">
+				<div class="entity-grid" id="currencyGrid"></div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const plainText = document.getElementById('plainText');
+		const encodedText = document.getElementById('encoded');
+		const formatNamed = document.getElementById('formatNamed');
+		const formatNumeric = document.getElementById('formatNumeric');
+		const formatHex = document.getElementById('formatHex');
+		const encodeAll = document.getElementById('encodeAll');
+
+		// Named entity map
+		const namedEntities = {
+			'&': '&amp;',
+			'<': '&lt;',
+			'>': '&gt;',
+			'"': '&quot;',
+			"'": '&apos;',
+			' ': '&nbsp;',
+			'©': '&copy;',
+			'®': '&reg;',
+			'™': '&trade;',
+			'€': '&euro;',
+			'£': '&pound;',
+			'¥': '&yen;',
+			'¢': '&cent;',
+			'§': '&sect;',
+			'°': '&deg;',
+			'±': '&plusmn;',
+			'×': '&times;',
+			'÷': '&divide;',
+			'•': '&bull;',
+			'…': '&hellip;',
+			'–': '&ndash;',
+			'—': '&mdash;',
+			''': '&lsquo;',
+			''': '&rsquo;',
+			'"': '&ldquo;',
+			'"': '&rdquo;',
+			'«': '&laquo;',
+			'»': '&raquo;',
+			'←': '&larr;',
+			'→': '&rarr;',
+			'↑': '&uarr;',
+			'↓': '&darr;',
+			'↔': '&harr;',
+			'♠': '&spades;',
+			'♣': '&clubs;',
+			'♥': '&hearts;',
+			'♦': '&diams;'
+		};
+
+		// Reverse map for decoding
+		const reverseEntities = {};
+		for (const [char, entity] of Object.entries(namedEntities)) {
+			reverseEntities[entity] = char;
+		}
+
+		function encode() {
+			const input = plainText.value;
+			let output = '';
+
+			for (const char of input) {
+				if (encodeAll.checked || /[&<>"'\u00A0-\uFFFF]/.test(char)) {
+					if (formatNamed.checked && namedEntities[char]) {
+						output += namedEntities[char];
+					} else if (formatHex.checked) {
+						output += `&#x${char.charCodeAt(0).toString(16).toUpperCase()};`;
+					} else {
+						output += `&#${char.charCodeAt(0)};`;
+					}
+				} else {
+					output += char;
+				}
+			}
+
+			encodedText.value = output;
+		}
+
+		function decode() {
+			let input = encodedText.value;
+
+			// Decode named entities
+			for (const [entity, char] of Object.entries(reverseEntities)) {
+				input = input.split(entity).join(char);
+			}
+
+			// Decode numeric entities (decimal)
+			input = input.replace(/&#(\d+);/g, (match, dec) => {
+				return String.fromCharCode(parseInt(dec, 10));
+			});
+
+			// Decode hex entities
+			input = input.replace(/&#x([0-9A-Fa-f]+);/g, (match, hex) => {
+				return String.fromCharCode(parseInt(hex, 16));
+			});
+
+			plainText.value = input;
+		}
+
+		function clearInput() {
+			plainText.value = '';
+			encodedText.value = '';
+		}
+
+		function copyOutput() {
+			navigator.clipboard.writeText(encodedText.value);
+		}
+
+		// Entity reference grids
+		const entities = {
+			essential: [
+				{ char: '&', name: '&amp;' },
+				{ char: '<', name: '&lt;' },
+				{ char: '>', name: '&gt;' },
+				{ char: '"', name: '&quot;' },
+				{ char: "'", name: '&apos;' },
+				{ char: ' ', name: '&nbsp;', display: '␣' },
+				{ char: '©', name: '&copy;' },
+				{ char: '®', name: '&reg;' },
+				{ char: '™', name: '&trade;' },
+				{ char: '•', name: '&bull;' },
+				{ char: '…', name: '&hellip;' },
+				{ char: '–', name: '&ndash;' },
+				{ char: '—', name: '&mdash;' }
+			],
+			symbols: [
+				{ char: '§', name: '&sect;' },
+				{ char: '¶', name: '&para;' },
+				{ char: '†', name: '&dagger;' },
+				{ char: '‡', name: '&Dagger;' },
+				{ char: '♠', name: '&spades;' },
+				{ char: '♣', name: '&clubs;' },
+				{ char: '♥', name: '&hearts;' },
+				{ char: '♦', name: '&diams;' },
+				{ char: '★', name: '&#9733;' },
+				{ char: '☆', name: '&#9734;' },
+				{ char: '✓', name: '&#10003;' },
+				{ char: '✗', name: '&#10007;' }
+			],
+			arrows: [
+				{ char: '←', name: '&larr;' },
+				{ char: '→', name: '&rarr;' },
+				{ char: '↑', name: '&uarr;' },
+				{ char: '↓', name: '&darr;' },
+				{ char: '↔', name: '&harr;' },
+				{ char: '↕', name: '&#8597;' },
+				{ char: '⇐', name: '&lArr;' },
+				{ char: '⇒', name: '&rArr;' },
+				{ char: '⇑', name: '&uArr;' },
+				{ char: '⇓', name: '&dArr;' },
+				{ char: '⇔', name: '&hArr;' },
+				{ char: '↩', name: '&#8617;' }
+			],
+			math: [
+				{ char: '±', name: '&plusmn;' },
+				{ char: '×', name: '&times;' },
+				{ char: '÷', name: '&divide;' },
+				{ char: '≠', name: '&ne;' },
+				{ char: '≤', name: '&le;' },
+				{ char: '≥', name: '&ge;' },
+				{ char: '∞', name: '&infin;' },
+				{ char: '∑', name: '&sum;' },
+				{ char: '√', name: '&radic;' },
+				{ char: 'π', name: '&pi;' },
+				{ char: '°', name: '&deg;' },
+				{ char: '‰', name: '&permil;' }
+			],
+			currency: [
+				{ char: '€', name: '&euro;' },
+				{ char: '£', name: '&pound;' },
+				{ char: '¥', name: '&yen;' },
+				{ char: '¢', name: '&cent;' },
+				{ char: '$', name: '&#36;' },
+				{ char: '₹', name: '&#8377;' },
+				{ char: '₽', name: '&#8381;' },
+				{ char: '₿', name: '&#8383;' }
+			]
+		};
+
+		function renderEntityGrid(category, containerId) {
+			const container = document.getElementById(containerId);
+			container.innerHTML = entities[category].map(e => `
+				<div class="entity-item" onclick="insertEntity('${e.char.replace(/'/g, "\\'")}')">
+					<div class="entity-char">${e.display || e.char}</div>
+					<div class="entity-code">${e.name}</div>
+				</div>
+			`).join('');
+		}
+
+		function insertEntity(char) {
+			plainText.value += char;
+			plainText.focus();
+		}
+
+		// Tab switching
+		document.querySelectorAll('.tab').forEach(tab => {
+			tab.addEventListener('click', () => {
+				document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+				document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+				tab.classList.add('active');
+				document.getElementById(tab.dataset.tab).classList.add('active');
+			});
+		});
+
+		// Initialize grids
+		renderEntityGrid('essential', 'essentialGrid');
+		renderEntityGrid('symbols', 'symbolsGrid');
+		renderEntityGrid('arrows', 'arrowsGrid');
+		renderEntityGrid('math', 'mathGrid');
+		renderEntityGrid('currency', 'currencyGrid');
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

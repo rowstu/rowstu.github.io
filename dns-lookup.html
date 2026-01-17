@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>DNS Lookup // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--info: #3b82f6;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.input-row {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+		}
+
+		input, select {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.6rem 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.9rem;
+			outline: none;
+		}
+
+		input:focus, select:focus {
+			border-color: var(--accent);
+		}
+
+		input::placeholder {
+			color: var(--text-muted);
+		}
+
+		#domain {
+			flex: 1;
+			min-width: 200px;
+		}
+
+		#recordType {
+			width: 100px;
+		}
+
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 0.6rem 1.25rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.875rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.btn:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.quick-domains {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 1rem;
+		}
+
+		.quick-domain {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.quick-domain:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.results {
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+		}
+
+		.record {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+		}
+
+		.record-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 0.5rem;
+		}
+
+		.record-type {
+			font-size: 0.7rem;
+			font-weight: 600;
+			padding: 0.2rem 0.5rem;
+			border-radius: 3px;
+			text-transform: uppercase;
+		}
+
+		.record-type.A { background: rgba(16, 185, 129, 0.2); color: var(--accent); }
+		.record-type.AAAA { background: rgba(59, 130, 246, 0.2); color: var(--info); }
+		.record-type.CNAME { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+		.record-type.MX { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+		.record-type.TXT { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+		.record-type.NS { background: rgba(20, 184, 166, 0.2); color: #2dd4bf; }
+		.record-type.SOA { background: rgba(251, 146, 60, 0.2); color: #fb923c; }
+		.record-type.PTR { background: rgba(168, 162, 158, 0.2); color: #a8a29e; }
+
+		.record-ttl {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		.record-value {
+			font-size: 0.9rem;
+			word-break: break-all;
+		}
+
+		.record-extra {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.25rem;
+		}
+
+		.loading {
+			text-align: center;
+			padding: 2rem;
+			color: var(--text-muted);
+		}
+
+		.spinner {
+			display: inline-block;
+			width: 20px;
+			height: 20px;
+			border: 2px solid var(--border);
+			border-top-color: var(--accent);
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin-right: 0.5rem;
+			vertical-align: middle;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		.error {
+			background: rgba(239, 68, 68, 0.1);
+			border: 1px solid var(--danger);
+			color: var(--danger);
+			padding: 1rem;
+			border-radius: 6px;
+			font-size: 0.875rem;
+		}
+
+		.empty {
+			text-align: center;
+			padding: 2rem;
+			color: var(--text-muted);
+		}
+
+		.info-box {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			line-height: 1.6;
+		}
+
+		.record-types {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 0.75rem;
+		}
+
+		.record-type-info {
+			display: flex;
+			gap: 0.5rem;
+			align-items: flex-start;
+		}
+
+		.record-type-info strong {
+			color: var(--accent);
+			min-width: 50px;
+		}
+
+		.api-note {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-align: center;
+			margin-top: 1rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>DNS Lookup</h1>
+			<p class="subtitle">Query DNS records for any domain</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Query</span>
+			</div>
+			<div class="input-row">
+				<input type="text" id="domain" placeholder="example.com" autocomplete="off" spellcheck="false">
+				<select id="recordType">
+					<option value="A">A</option>
+					<option value="AAAA">AAAA</option>
+					<option value="CNAME">CNAME</option>
+					<option value="MX">MX</option>
+					<option value="TXT">TXT</option>
+					<option value="NS">NS</option>
+					<option value="SOA">SOA</option>
+					<option value="ANY" selected>ALL</option>
+				</select>
+				<button class="btn" id="lookupBtn" onclick="lookup()">Lookup</button>
+			</div>
+			<div class="quick-domains">
+				<span style="color: var(--text-muted); font-size: 0.75rem; margin-right: 0.5rem;">Try:</span>
+				<button class="quick-domain" onclick="setDomain('google.com')">google.com</button>
+				<button class="quick-domain" onclick="setDomain('github.com')">github.com</button>
+				<button class="quick-domain" onclick="setDomain('cloudflare.com')">cloudflare.com</button>
+				<button class="quick-domain" onclick="setDomain('amazon.com')">amazon.com</button>
+			</div>
+		</div>
+
+		<div class="panel" id="resultsPanel">
+			<div class="panel-header">
+				<span class="panel-title">Results</span>
+				<span class="panel-title" id="queryInfo" style="font-size: 0.7rem;"></span>
+			</div>
+			<div id="results">
+				<div class="empty">Enter a domain and click Lookup</div>
+			</div>
+			<p class="api-note">Powered by Google Public DNS (dns.google)</p>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Record Types</span>
+			</div>
+			<div class="record-types">
+				<div class="record-type-info"><strong>A</strong> IPv4 address</div>
+				<div class="record-type-info"><strong>AAAA</strong> IPv6 address</div>
+				<div class="record-type-info"><strong>CNAME</strong> Canonical name (alias)</div>
+				<div class="record-type-info"><strong>MX</strong> Mail exchange server</div>
+				<div class="record-type-info"><strong>TXT</strong> Text records (SPF, DKIM)</div>
+				<div class="record-type-info"><strong>NS</strong> Name servers</div>
+				<div class="record-type-info"><strong>SOA</strong> Start of authority</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const domainInput = document.getElementById('domain');
+		const recordTypeSelect = document.getElementById('recordType');
+		const resultsDiv = document.getElementById('results');
+		const queryInfo = document.getElementById('queryInfo');
+		const lookupBtn = document.getElementById('lookupBtn');
+
+		// Record type codes
+		const recordTypes = {
+			A: 1,
+			AAAA: 28,
+			CNAME: 5,
+			MX: 15,
+			TXT: 16,
+			NS: 2,
+			SOA: 6
+		};
+
+		const typeNames = {
+			1: 'A',
+			2: 'NS',
+			5: 'CNAME',
+			6: 'SOA',
+			15: 'MX',
+			16: 'TXT',
+			28: 'AAAA'
+		};
+
+		domainInput.addEventListener('keydown', e => {
+			if (e.key === 'Enter') lookup();
+		});
+
+		function setDomain(domain) {
+			domainInput.value = domain;
+			lookup();
+		}
+
+		async function lookup() {
+			const domain = domainInput.value.trim().toLowerCase();
+			if (!domain) {
+				resultsDiv.innerHTML = '<div class="error">Please enter a domain</div>';
+				return;
+			}
+
+			// Basic domain validation
+			if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i.test(domain)) {
+				resultsDiv.innerHTML = '<div class="error">Invalid domain format</div>';
+				return;
+			}
+
+			const recordType = recordTypeSelect.value;
+			lookupBtn.disabled = true;
+			resultsDiv.innerHTML = '<div class="loading"><span class="spinner"></span>Looking up...</div>';
+
+			try {
+				let records = [];
+
+				if (recordType === 'ANY') {
+					// Query all common record types
+					const types = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS'];
+					const promises = types.map(type => queryDNS(domain, type));
+					const results = await Promise.all(promises);
+					records = results.flat();
+				} else {
+					records = await queryDNS(domain, recordType);
+				}
+
+				displayResults(domain, records);
+			} catch (error) {
+				resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+			} finally {
+				lookupBtn.disabled = false;
+			}
+		}
+
+		async function queryDNS(domain, type) {
+			const typeCode = recordTypes[type] || 1;
+			const url = `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${typeCode}`;
+
+			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error(`DNS query failed: ${response.status}`);
+			}
+
+			const data = await response.json();
+
+			if (data.Status !== 0) {
+				// Non-zero status means error or no records
+				const errors = {
+					1: 'Format error',
+					2: 'Server failure',
+					3: 'Domain does not exist (NXDOMAIN)',
+					4: 'Not implemented',
+					5: 'Query refused'
+				};
+				if (data.Status === 3) {
+					return []; // NXDOMAIN - just no records
+				}
+				throw new Error(errors[data.Status] || `DNS error: ${data.Status}`);
+			}
+
+			if (!data.Answer) {
+				return [];
+			}
+
+			return data.Answer.map(record => ({
+				type: typeNames[record.type] || record.type,
+				typeCode: record.type,
+				name: record.name,
+				ttl: record.TTL,
+				data: record.data
+			}));
+		}
+
+		function displayResults(domain, records) {
+			queryInfo.textContent = `${domain} - ${records.length} record${records.length !== 1 ? 's' : ''}`;
+
+			if (records.length === 0) {
+				resultsDiv.innerHTML = '<div class="empty">No records found</div>';
+				return;
+			}
+
+			// Sort by type
+			const typeOrder = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SOA'];
+			records.sort((a, b) => {
+				const aIndex = typeOrder.indexOf(a.type);
+				const bIndex = typeOrder.indexOf(b.type);
+				return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+			});
+
+			resultsDiv.innerHTML = records.map(record => {
+				let extra = '';
+				let displayData = record.data;
+
+				// Parse MX priority
+				if (record.type === 'MX') {
+					const match = record.data.match(/^(\d+)\s+(.+)$/);
+					if (match) {
+						extra = `Priority: ${match[1]}`;
+						displayData = match[2];
+					}
+				}
+
+				// Format TTL
+				const ttlStr = formatTTL(record.ttl);
+
+				return `
+					<div class="record">
+						<div class="record-header">
+							<span class="record-type ${record.type}">${record.type}</span>
+							<span class="record-ttl">TTL: ${ttlStr}</span>
+						</div>
+						<div class="record-value">${escapeHtml(displayData)}</div>
+						${extra ? `<div class="record-extra">${extra}</div>` : ''}
+					</div>
+				`;
+			}).join('');
+		}
+
+		function formatTTL(seconds) {
+			if (seconds < 60) return `${seconds}s`;
+			if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+			if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
+			return `${Math.floor(seconds / 86400)}d`;
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

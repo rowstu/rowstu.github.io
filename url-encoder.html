@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>URL Encoder/Decoder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		textarea {
+			width: 100%;
+			min-height: 120px;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.9rem;
+			line-height: 1.5;
+			resize: vertical;
+			outline: none;
+		}
+
+		textarea:focus { border-color: var(--accent); }
+		textarea::placeholder { color: var(--text-muted); }
+
+		.btn-row {
+			display: flex;
+			justify-content: center;
+			gap: 1rem;
+			margin: 1.5rem 0;
+		}
+
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 0.75rem 1.5rem;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 0.9rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.btn-secondary {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: var(--surface-hover);
+		}
+
+		.arrow {
+			font-size: 1.2rem;
+		}
+
+		.options {
+			display: flex;
+			gap: 1.5rem;
+			flex-wrap: wrap;
+			margin-bottom: 1rem;
+		}
+
+		.option {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			cursor: pointer;
+			font-size: 0.875rem;
+		}
+
+		.option input[type="checkbox"],
+		.option input[type="radio"] {
+			accent-color: var(--accent);
+			width: 16px;
+			height: 16px;
+			cursor: pointer;
+		}
+
+		.actions {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.action-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.65rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.7rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.action-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.info-box {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			line-height: 1.6;
+		}
+
+		.info-box code {
+			background: var(--surface);
+			padding: 0.15rem 0.4rem;
+			border-radius: 3px;
+			color: var(--accent);
+		}
+
+		.examples {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 0.75rem;
+			margin-top: 1rem;
+		}
+
+		.example {
+			background: var(--bg);
+			padding: 0.75rem;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.example:hover {
+			background: var(--surface-hover);
+		}
+
+		.example-label {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin-bottom: 0.25rem;
+		}
+
+		.example-value {
+			font-size: 0.8rem;
+			word-break: break-all;
+		}
+
+		.char-count {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-align: right;
+			margin-top: 0.5rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>URL Encoder/Decoder</h1>
+			<p class="subtitle">Encode and decode URL strings (percent-encoding)</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Input (Decoded)</span>
+				<div class="actions">
+					<button class="action-btn" onclick="clearInput()">Clear</button>
+					<button class="action-btn" onclick="pasteInput()">Paste</button>
+				</div>
+			</div>
+			<textarea id="decoded" placeholder="Enter text to encode..."></textarea>
+			<div class="char-count"><span id="decodedCount">0</span> characters</div>
+		</div>
+
+		<div class="btn-row">
+			<button class="btn" onclick="encode()">
+				Encode <span class="arrow">↓</span>
+			</button>
+			<button class="btn" onclick="decode()">
+				<span class="arrow">↑</span> Decode
+			</button>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Output (Encoded)</span>
+				<div class="actions">
+					<button class="action-btn" onclick="copyOutput()">Copy</button>
+					<button class="action-btn" onclick="clearOutput()">Clear</button>
+				</div>
+			</div>
+			<textarea id="encoded" placeholder="Encoded output will appear here..."></textarea>
+			<div class="char-count"><span id="encodedCount">0</span> characters</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Options</span>
+			</div>
+			<div class="options">
+				<label class="option">
+					<input type="radio" name="mode" id="modeComponent" checked>
+					<span>encodeURIComponent (recommended)</span>
+				</label>
+				<label class="option">
+					<input type="radio" name="mode" id="modeURI">
+					<span>encodeURI (preserves URL structure)</span>
+				</label>
+			</div>
+			<div class="info-box">
+				<strong>encodeURIComponent</strong>: Encodes all special characters. Use for query parameters or path segments.<br>
+				<strong>encodeURI</strong>: Preserves <code>: / ? # [ ] @</code> and other URL-safe characters. Use for full URLs.
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Examples</span>
+			</div>
+			<div class="examples">
+				<div class="example" onclick="loadExample('Hello World!')">
+					<div class="example-label">Basic text</div>
+					<div class="example-value">Hello World! → Hello%20World!</div>
+				</div>
+				<div class="example" onclick="loadExample('name=John Doe&city=New York')">
+					<div class="example-label">Query string</div>
+					<div class="example-value">name=John Doe&city=New York</div>
+				</div>
+				<div class="example" onclick="loadExample('https://example.com/path?q=test&lang=en')">
+					<div class="example-label">Full URL</div>
+					<div class="example-value">https://example.com/path?q=test</div>
+				</div>
+				<div class="example" onclick="loadExample('Ñoño español 日本語 emoji 🎉')">
+					<div class="example-label">Unicode & emoji</div>
+					<div class="example-value">Ñoño español 日本語 🎉</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Common Encodings Reference</span>
+			</div>
+			<div class="info-box">
+				<code>space</code> → <code>%20</code> &nbsp;&nbsp;
+				<code>&</code> → <code>%26</code> &nbsp;&nbsp;
+				<code>=</code> → <code>%3D</code> &nbsp;&nbsp;
+				<code>?</code> → <code>%3F</code> &nbsp;&nbsp;
+				<code>#</code> → <code>%23</code> &nbsp;&nbsp;
+				<code>/</code> → <code>%2F</code> &nbsp;&nbsp;
+				<code>+</code> → <code>%2B</code> &nbsp;&nbsp;
+				<code>@</code> → <code>%40</code>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const decodedEl = document.getElementById('decoded');
+		const encodedEl = document.getElementById('encoded');
+		const decodedCount = document.getElementById('decodedCount');
+		const encodedCount = document.getElementById('encodedCount');
+		const modeComponent = document.getElementById('modeComponent');
+
+		// Update character counts
+		decodedEl.addEventListener('input', () => {
+			decodedCount.textContent = decodedEl.value.length;
+		});
+
+		encodedEl.addEventListener('input', () => {
+			encodedCount.textContent = encodedEl.value.length;
+		});
+
+		function encode() {
+			const input = decodedEl.value;
+			try {
+				const encoded = modeComponent.checked
+					? encodeURIComponent(input)
+					: encodeURI(input);
+				encodedEl.value = encoded;
+				encodedCount.textContent = encoded.length;
+			} catch (e) {
+				encodedEl.value = 'Error: ' + e.message;
+			}
+		}
+
+		function decode() {
+			const input = encodedEl.value;
+			try {
+				const decoded = modeComponent.checked
+					? decodeURIComponent(input)
+					: decodeURI(input);
+				decodedEl.value = decoded;
+				decodedCount.textContent = decoded.length;
+			} catch (e) {
+				decodedEl.value = 'Error: ' + e.message;
+			}
+		}
+
+		function clearInput() {
+			decodedEl.value = '';
+			decodedCount.textContent = '0';
+		}
+
+		function clearOutput() {
+			encodedEl.value = '';
+			encodedCount.textContent = '0';
+		}
+
+		async function pasteInput() {
+			try {
+				const text = await navigator.clipboard.readText();
+				decodedEl.value = text;
+				decodedCount.textContent = text.length;
+			} catch (e) {
+				// Clipboard access denied
+			}
+		}
+
+		function copyOutput() {
+			navigator.clipboard.writeText(encodedEl.value);
+		}
+
+		function loadExample(text) {
+			decodedEl.value = text;
+			decodedCount.textContent = text.length;
+			encode();
+		}
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

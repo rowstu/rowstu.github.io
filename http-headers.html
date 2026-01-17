@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HTTP Header Parser // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--info: #3b82f6;
+			--purple: #a78bfa;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 1000px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		textarea {
+			width: 100%;
+			min-height: 200px;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			line-height: 1.5;
+			resize: vertical;
+			outline: none;
+		}
+
+		textarea:focus { border-color: var(--accent); }
+		textarea::placeholder { color: var(--text-muted); }
+
+		.btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.4rem 0.75rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.btn-primary {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #fff;
+		}
+
+		.btn-primary:hover {
+			background: var(--accent-hover);
+			border-color: var(--accent-hover);
+			color: #fff;
+		}
+
+		.header-list {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+
+		.header-item {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 0.75rem 1rem;
+		}
+
+		.header-row {
+			display: flex;
+			gap: 0.5rem;
+			align-items: flex-start;
+			flex-wrap: wrap;
+		}
+
+		.header-name {
+			color: var(--accent);
+			font-weight: 500;
+			min-width: 180px;
+		}
+
+		.header-value {
+			flex: 1;
+			word-break: break-all;
+		}
+
+		.header-category {
+			font-size: 0.65rem;
+			font-weight: 600;
+			padding: 0.15rem 0.4rem;
+			border-radius: 3px;
+			text-transform: uppercase;
+			margin-left: auto;
+		}
+
+		.category-security { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+		.category-caching { background: rgba(59, 130, 246, 0.2); color: var(--info); }
+		.category-content { background: rgba(16, 185, 129, 0.2); color: var(--accent); }
+		.category-cors { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+		.category-auth { background: rgba(167, 139, 250, 0.2); color: var(--purple); }
+		.category-request { background: rgba(20, 184, 166, 0.2); color: #2dd4bf; }
+		.category-response { background: rgba(251, 146, 60, 0.2); color: #fb923c; }
+
+		.header-explanation {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.5rem;
+			padding-top: 0.5rem;
+			border-top: 1px solid var(--border);
+		}
+
+		.status-line {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 0.75rem 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.status-method {
+			color: var(--warning);
+			font-weight: 600;
+		}
+
+		.status-path {
+			color: var(--text);
+		}
+
+		.status-version {
+			color: var(--text-muted);
+		}
+
+		.status-code {
+			font-weight: 600;
+		}
+
+		.status-code.success { color: var(--accent); }
+		.status-code.redirect { color: var(--info); }
+		.status-code.client-error { color: var(--warning); }
+		.status-code.server-error { color: var(--danger); }
+
+		.empty {
+			text-align: center;
+			padding: 2rem;
+			color: var(--text-muted);
+		}
+
+		.actions {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.sample-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.7rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.sample-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.count-badge {
+			background: var(--accent);
+			color: #fff;
+			font-size: 0.7rem;
+			padding: 0.1rem 0.4rem;
+			border-radius: 10px;
+			margin-left: 0.5rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>HTTP Header Parser</h1>
+			<p class="subtitle">Parse and explain HTTP request/response headers</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Input Headers</span>
+				<div>
+					<button class="btn" onclick="clearInput()">Clear</button>
+				</div>
+			</div>
+			<textarea id="input" placeholder="Paste HTTP headers here...
+
+Example:
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: max-age=3600
+X-Frame-Options: DENY"></textarea>
+			<div class="actions">
+				<span style="color: var(--text-muted); font-size: 0.7rem; margin-right: 0.5rem;">Load sample:</span>
+				<button class="sample-btn" onclick="loadSample('request')">Request</button>
+				<button class="sample-btn" onclick="loadSample('response')">Response</button>
+				<button class="sample-btn" onclick="loadSample('security')">Security</button>
+				<button class="sample-btn" onclick="loadSample('cors')">CORS</button>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Parsed Headers <span class="count-badge" id="count">0</span></span>
+			</div>
+			<div id="results">
+				<div class="empty">Paste headers above to parse them</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const input = document.getElementById('input');
+		const results = document.getElementById('results');
+		const count = document.getElementById('count');
+
+		// Header explanations database
+		const headerInfo = {
+			// Security
+			'content-security-policy': { category: 'security', desc: 'Controls resources the browser is allowed to load. Helps prevent XSS attacks.' },
+			'x-content-type-options': { category: 'security', desc: 'Prevents MIME type sniffing. Set to "nosniff" to enforce declared Content-Type.' },
+			'x-frame-options': { category: 'security', desc: 'Controls whether the page can be embedded in frames. DENY or SAMEORIGIN.' },
+			'x-xss-protection': { category: 'security', desc: 'Legacy XSS filter. Modern browsers use CSP instead.' },
+			'strict-transport-security': { category: 'security', desc: 'Forces HTTPS connections. max-age specifies duration in seconds.' },
+			'referrer-policy': { category: 'security', desc: 'Controls how much referrer information is sent with requests.' },
+			'permissions-policy': { category: 'security', desc: 'Controls which browser features can be used (formerly Feature-Policy).' },
+			'x-permitted-cross-domain-policies': { category: 'security', desc: 'Controls Adobe Flash/PDF cross-domain policy files.' },
+
+			// Caching
+			'cache-control': { category: 'caching', desc: 'Directives for caching. Common: max-age, no-cache, no-store, private, public.' },
+			'expires': { category: 'caching', desc: 'Date/time after which the response is stale. Superseded by Cache-Control max-age.' },
+			'etag': { category: 'caching', desc: 'Unique identifier for a specific version. Used for conditional requests.' },
+			'last-modified': { category: 'caching', desc: 'Date the resource was last modified. Used with If-Modified-Since.' },
+			'if-none-match': { category: 'caching', desc: 'Conditional request using ETag. Returns 304 if unchanged.' },
+			'if-modified-since': { category: 'caching', desc: 'Conditional request using date. Returns 304 if unchanged.' },
+			'age': { category: 'caching', desc: 'Time in seconds the response has been in cache.' },
+			'vary': { category: 'caching', desc: 'Headers that affect cache key. Important for content negotiation.' },
+
+			// Content
+			'content-type': { category: 'content', desc: 'MIME type of the body. For requests, describes sent data; for responses, describes received data.' },
+			'content-length': { category: 'content', desc: 'Size of the body in bytes.' },
+			'content-encoding': { category: 'content', desc: 'Compression algorithm used (gzip, br, deflate).' },
+			'content-language': { category: 'content', desc: 'Natural language(s) of the content.' },
+			'content-disposition': { category: 'content', desc: 'How content should be displayed. "attachment" triggers download.' },
+			'transfer-encoding': { category: 'content', desc: 'Encoding used for transfer. "chunked" for streaming responses.' },
+			'accept': { category: 'content', desc: 'MIME types the client accepts.' },
+			'accept-encoding': { category: 'content', desc: 'Compression algorithms the client supports.' },
+			'accept-language': { category: 'content', desc: 'Preferred languages for the response.' },
+
+			// CORS
+			'access-control-allow-origin': { category: 'cors', desc: 'Origins allowed to access the resource. "*" allows any origin.' },
+			'access-control-allow-methods': { category: 'cors', desc: 'HTTP methods allowed for CORS requests.' },
+			'access-control-allow-headers': { category: 'cors', desc: 'Headers allowed in CORS requests.' },
+			'access-control-allow-credentials': { category: 'cors', desc: 'Whether credentials (cookies, auth) can be sent with CORS requests.' },
+			'access-control-max-age': { category: 'cors', desc: 'How long preflight results can be cached (seconds).' },
+			'access-control-expose-headers': { category: 'cors', desc: 'Headers the browser is allowed to access.' },
+			'origin': { category: 'cors', desc: 'Origin of the request. Sent with CORS and POST requests.' },
+
+			// Auth
+			'authorization': { category: 'auth', desc: 'Credentials for authenticating the client. Common: Bearer, Basic.' },
+			'www-authenticate': { category: 'auth', desc: 'Authentication method the server requires.' },
+			'proxy-authenticate': { category: 'auth', desc: 'Authentication method required by proxy.' },
+			'proxy-authorization': { category: 'auth', desc: 'Credentials for proxy authentication.' },
+
+			// Request
+			'host': { category: 'request', desc: 'Domain name of the server (required in HTTP/1.1).' },
+			'user-agent': { category: 'request', desc: 'Information about the client software.' },
+			'referer': { category: 'request', desc: 'URL of the page that linked to this request.' },
+			'cookie': { category: 'request', desc: 'Cookies previously sent by the server.' },
+			'x-requested-with': { category: 'request', desc: 'Indicates AJAX request. Often "XMLHttpRequest".' },
+			'x-forwarded-for': { category: 'request', desc: 'Original client IP when behind proxy/load balancer.' },
+			'x-forwarded-proto': { category: 'request', desc: 'Original protocol (http/https) when behind proxy.' },
+			'x-real-ip': { category: 'request', desc: 'Real client IP (alternative to X-Forwarded-For).' },
+
+			// Response
+			'set-cookie': { category: 'response', desc: 'Sets a cookie. Attributes: Expires, Max-Age, Domain, Path, Secure, HttpOnly, SameSite.' },
+			'location': { category: 'response', desc: 'URL for redirects (3xx) or created resource (201).' },
+			'server': { category: 'response', desc: 'Information about the server software.' },
+			'date': { category: 'response', desc: 'Date and time the response was generated.' },
+			'connection': { category: 'response', desc: 'Connection options. "keep-alive" or "close".' },
+			'x-powered-by': { category: 'response', desc: 'Technology stack information. Often hidden for security.' },
+			'x-request-id': { category: 'response', desc: 'Unique request identifier for debugging/tracing.' },
+			'retry-after': { category: 'response', desc: 'When to retry after 503 or 429 responses.' }
+		};
+
+		const samples = {
+			request: `GET /api/users HTTP/1.1
+Host: api.example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+Accept: application/json
+Accept-Language: en-GB,en;q=0.9
+Accept-Encoding: gzip, deflate, br
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Cookie: session=abc123; theme=dark
+X-Requested-With: XMLHttpRequest`,
+
+			response: `HTTP/1.1 200 OK
+Date: Fri, 17 Jan 2025 10:30:00 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 1234
+Content-Encoding: gzip
+Cache-Control: private, max-age=3600
+ETag: "abc123"
+Last-Modified: Thu, 16 Jan 2025 08:00:00 GMT
+Server: nginx/1.24.0
+Connection: keep-alive`,
+
+			security: `HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-XSS-Protection: 1; mode=block
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: geolocation=(), microphone=(), camera=()`,
+
+			cors: `HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://example.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 86400
+Access-Control-Expose-Headers: X-Request-Id, X-Response-Time`
+		};
+
+		input.addEventListener('input', parse);
+
+		function loadSample(type) {
+			input.value = samples[type];
+			parse();
+		}
+
+		function clearInput() {
+			input.value = '';
+			parse();
+		}
+
+		function parse() {
+			const text = input.value.trim();
+
+			if (!text) {
+				results.innerHTML = '<div class="empty">Paste headers above to parse them</div>';
+				count.textContent = '0';
+				return;
+			}
+
+			const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+			let html = '';
+			let headerCount = 0;
+
+			// Check for status line (request or response)
+			const firstLine = lines[0];
+			const requestMatch = firstLine.match(/^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\s+(\S+)\s+(HTTP\/[\d.]+)$/i);
+			const responseMatch = firstLine.match(/^(HTTP\/[\d.]+)\s+(\d{3})\s*(.*)$/i);
+
+			if (requestMatch) {
+				html += `<div class="status-line">
+					<span class="status-method">${requestMatch[1]}</span>
+					<span class="status-path">${escapeHtml(requestMatch[2])}</span>
+					<span class="status-version">${requestMatch[3]}</span>
+				</div>`;
+				lines.shift();
+			} else if (responseMatch) {
+				const statusCode = parseInt(responseMatch[2]);
+				let statusClass = '';
+				if (statusCode >= 200 && statusCode < 300) statusClass = 'success';
+				else if (statusCode >= 300 && statusCode < 400) statusClass = 'redirect';
+				else if (statusCode >= 400 && statusCode < 500) statusClass = 'client-error';
+				else if (statusCode >= 500) statusClass = 'server-error';
+
+				html += `<div class="status-line">
+					<span class="status-version">${responseMatch[1]}</span>
+					<span class="status-code ${statusClass}">${responseMatch[2]}</span>
+					<span>${escapeHtml(responseMatch[3])}</span>
+				</div>`;
+				lines.shift();
+			}
+
+			html += '<div class="header-list">';
+
+			for (const line of lines) {
+				const colonIndex = line.indexOf(':');
+				if (colonIndex === -1) continue;
+
+				const name = line.slice(0, colonIndex).trim();
+				const value = line.slice(colonIndex + 1).trim();
+				const nameLower = name.toLowerCase();
+
+				const info = headerInfo[nameLower] || { category: 'response', desc: null };
+				headerCount++;
+
+				html += `<div class="header-item">
+					<div class="header-row">
+						<span class="header-name">${escapeHtml(name)}</span>
+						<span class="header-value">${escapeHtml(value)}</span>
+						<span class="header-category category-${info.category}">${info.category}</span>
+					</div>
+					${info.desc ? `<div class="header-explanation">${info.desc}</div>` : ''}
+				</div>`;
+			}
+
+			html += '</div>';
+
+			if (headerCount === 0) {
+				html = '<div class="empty">No valid headers found</div>';
+			}
+
+			results.innerHTML = html;
+			count.textContent = headerCount;
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+
+		// Parse on load if there's content
+		parse();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

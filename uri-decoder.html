@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>URI Decoder & Analyzer // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--info: #3b82f6;
+			--purple: #a78bfa;
+			--pink: #f472b6;
+			--teal: #2dd4bf;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 1000px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		textarea {
+			width: 100%;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			resize: vertical;
+			outline: none;
+			line-height: 1.5;
+		}
+
+		textarea:focus {
+			border-color: var(--accent);
+		}
+
+		textarea::placeholder {
+			color: var(--text-muted);
+		}
+
+		#uriInput {
+			min-height: 80px;
+		}
+
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 0.6rem 1.25rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.875rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.btn-secondary {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: var(--surface-hover);
+		}
+
+		.actions {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+			flex-wrap: wrap;
+		}
+
+		.sample-urls {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.sample-url {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.sample-url:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.uri-breakdown {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.uri-visual {
+			font-size: 0.85rem;
+			word-break: break-all;
+			line-height: 1.8;
+			margin-bottom: 1rem;
+		}
+
+		.uri-protocol { color: var(--accent); }
+		.uri-host { color: var(--info); }
+		.uri-port { color: var(--warning); }
+		.uri-path { color: var(--purple); }
+		.uri-query { color: var(--pink); }
+		.uri-fragment { color: var(--teal); }
+
+		.uri-components {
+			display: grid;
+			gap: 0.5rem;
+		}
+
+		.component-row {
+			display: flex;
+			padding: 0.5rem 0.75rem;
+			background: var(--surface);
+			border-radius: 4px;
+			align-items: flex-start;
+			gap: 1rem;
+		}
+
+		.component-label {
+			min-width: 80px;
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			padding-top: 0.15rem;
+		}
+
+		.component-value {
+			flex: 1;
+			font-size: 0.85rem;
+			word-break: break-all;
+		}
+
+		.params-section {
+			margin-top: 1rem;
+		}
+
+		.params-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 0.75rem;
+		}
+
+		.params-title {
+			font-size: 0.8rem;
+			font-weight: 600;
+			color: var(--pink);
+		}
+
+		.params-count {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+		}
+
+		.param-row {
+			display: grid;
+			grid-template-columns: minmax(120px, 1fr) 2fr;
+			gap: 0.75rem;
+			padding: 0.75rem;
+			background: var(--surface);
+			border-radius: 4px;
+			margin-bottom: 0.5rem;
+			align-items: start;
+		}
+
+		.param-key {
+			font-size: 0.8rem;
+			font-weight: 500;
+			color: var(--warning);
+			word-break: break-all;
+		}
+
+		.param-value {
+			font-size: 0.8rem;
+			word-break: break-all;
+		}
+
+		.param-decoded {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.25rem;
+			font-style: italic;
+		}
+
+		.param-tag {
+			display: inline-block;
+			font-size: 0.65rem;
+			padding: 0.15rem 0.4rem;
+			border-radius: 3px;
+			margin-left: 0.5rem;
+			text-transform: uppercase;
+		}
+
+		.tag-tracking { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+		.tag-session { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+		.tag-utm { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+		.tag-search { background: rgba(59, 130, 246, 0.2); color: var(--info); }
+		.tag-affiliate { background: rgba(236, 72, 153, 0.2); color: var(--pink); }
+
+		.tracking-summary {
+			background: rgba(239, 68, 68, 0.1);
+			border: 1px solid var(--danger);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-top: 1rem;
+		}
+
+		.tracking-title {
+			font-size: 0.8rem;
+			font-weight: 600;
+			color: var(--danger);
+			margin-bottom: 0.75rem;
+		}
+
+		.tracking-list {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+
+		.tracking-item {
+			font-size: 0.75rem;
+			padding: 0.25rem 0.5rem;
+			background: rgba(239, 68, 68, 0.15);
+			border-radius: 3px;
+			color: var(--text);
+		}
+
+		.clean-url {
+			background: rgba(16, 185, 129, 0.1);
+			border: 1px solid var(--accent);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-top: 1rem;
+		}
+
+		.clean-title {
+			font-size: 0.8rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.clean-value {
+			font-size: 0.85rem;
+			word-break: break-all;
+			cursor: pointer;
+			padding: 0.5rem;
+			background: var(--bg);
+			border-radius: 4px;
+		}
+
+		.clean-value:hover {
+			background: var(--surface-hover);
+		}
+
+		.empty {
+			text-align: center;
+			padding: 2rem;
+			color: var(--text-muted);
+		}
+
+		.error {
+			background: rgba(239, 68, 68, 0.1);
+			border: 1px solid var(--danger);
+			color: var(--danger);
+			padding: 1rem;
+			border-radius: 6px;
+			font-size: 0.875rem;
+		}
+
+		.legend {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+			padding: 0.75rem;
+			background: var(--bg);
+			border-radius: 6px;
+			font-size: 0.75rem;
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 0.35rem;
+		}
+
+		.legend-color {
+			width: 12px;
+			height: 12px;
+			border-radius: 2px;
+		}
+
+		.copied-toast {
+			position: fixed;
+			bottom: 2rem;
+			left: 50%;
+			transform: translateX(-50%) translateY(100px);
+			background: var(--accent);
+			color: white;
+			padding: 0.75rem 1.5rem;
+			border-radius: 6px;
+			font-size: 0.875rem;
+			font-weight: 500;
+			opacity: 0;
+			transition: all 0.3s ease;
+			pointer-events: none;
+		}
+
+		.copied-toast.show {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0);
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>URI Decoder & Analyzer</h1>
+			<p class="subtitle">Break apart URLs to see tracking parameters and hidden data</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">URL Input</span>
+			</div>
+			<textarea id="uriInput" placeholder="Paste a URL here (e.g., from Amazon, Google, Facebook, etc.)"></textarea>
+			<div class="actions">
+				<button class="btn" onclick="analyze()">Analyze</button>
+				<button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+				<button class="btn btn-secondary" onclick="pasteFromClipboard()">Paste</button>
+			</div>
+			<div class="sample-urls">
+				<span style="color: var(--text-muted); font-size: 0.75rem; margin-right: 0.5rem;">Try:</span>
+				<button class="sample-url" onclick="loadSample('amazon')">Amazon Product</button>
+				<button class="sample-url" onclick="loadSample('google')">Google Search</button>
+				<button class="sample-url" onclick="loadSample('utm')">Marketing Link</button>
+				<button class="sample-url" onclick="loadSample('youtube')">YouTube Video</button>
+			</div>
+		</div>
+
+		<div class="panel" id="resultsPanel">
+			<div class="panel-header">
+				<span class="panel-title">Analysis</span>
+			</div>
+			<div id="results">
+				<div class="empty">Paste a URL above and click Analyze</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Color Legend</span>
+			</div>
+			<div class="legend">
+				<div class="legend-item"><div class="legend-color" style="background: var(--accent);"></div> Protocol</div>
+				<div class="legend-item"><div class="legend-color" style="background: var(--info);"></div> Host</div>
+				<div class="legend-item"><div class="legend-color" style="background: var(--warning);"></div> Port</div>
+				<div class="legend-item"><div class="legend-color" style="background: var(--purple);"></div> Path</div>
+				<div class="legend-item"><div class="legend-color" style="background: var(--pink);"></div> Query String</div>
+				<div class="legend-item"><div class="legend-color" style="background: var(--teal);"></div> Fragment</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="copied-toast" id="toast">Copied to clipboard!</div>
+
+	<script>
+		const uriInput = document.getElementById('uriInput');
+		const resultsDiv = document.getElementById('results');
+
+		// Known tracking parameters and their categories
+		const trackingParams = {
+			// General tracking
+			'utm_source': { cat: 'utm', desc: 'Traffic source (e.g., google, newsletter)' },
+			'utm_medium': { cat: 'utm', desc: 'Marketing medium (e.g., cpc, email)' },
+			'utm_campaign': { cat: 'utm', desc: 'Campaign name' },
+			'utm_term': { cat: 'utm', desc: 'Paid keywords' },
+			'utm_content': { cat: 'utm', desc: 'Content variant (A/B testing)' },
+			'utm_id': { cat: 'utm', desc: 'Campaign ID' },
+
+			// Facebook
+			'fbclid': { cat: 'tracking', desc: 'Facebook Click ID - tracks your click from Facebook' },
+			'fb_action_ids': { cat: 'tracking', desc: 'Facebook action tracking' },
+			'fb_action_types': { cat: 'tracking', desc: 'Facebook action type' },
+			'fb_source': { cat: 'tracking', desc: 'Facebook source' },
+
+			// Google
+			'gclid': { cat: 'tracking', desc: 'Google Click ID - tracks your click from Google Ads' },
+			'gclsrc': { cat: 'tracking', desc: 'Google Click source' },
+			'dclid': { cat: 'tracking', desc: 'DoubleClick ID' },
+
+			// Microsoft/Bing
+			'msclkid': { cat: 'tracking', desc: 'Microsoft Click ID' },
+
+			// Amazon
+			'ref': { cat: 'tracking', desc: 'Amazon referral tracking' },
+			'ref_': { cat: 'tracking', desc: 'Amazon referral tracking' },
+			'pf_rd_r': { cat: 'tracking', desc: 'Amazon personalization data' },
+			'pf_rd_p': { cat: 'tracking', desc: 'Amazon personalization data' },
+			'pf_rd_s': { cat: 'tracking', desc: 'Amazon session tracking' },
+			'pf_rd_t': { cat: 'tracking', desc: 'Amazon timestamp/type' },
+			'pf_rd_i': { cat: 'tracking', desc: 'Amazon item tracking' },
+			'pf_rd_m': { cat: 'tracking', desc: 'Amazon merchant ID' },
+			'pd_rd_r': { cat: 'tracking', desc: 'Amazon discovery tracking' },
+			'pd_rd_w': { cat: 'tracking', desc: 'Amazon widget tracking' },
+			'pd_rd_wg': { cat: 'tracking', desc: 'Amazon widget group' },
+			'psc': { cat: 'tracking', desc: 'Amazon product selection' },
+			'smid': { cat: 'tracking', desc: 'Amazon seller/merchant ID' },
+			'spIA': { cat: 'tracking', desc: 'Amazon sponsored product tracking' },
+			'sp_csd': { cat: 'tracking', desc: 'Amazon sponsored content data' },
+			'linkCode': { cat: 'affiliate', desc: 'Amazon affiliate link code' },
+			'tag': { cat: 'affiliate', desc: 'Amazon affiliate tag' },
+
+			// YouTube
+			'si': { cat: 'tracking', desc: 'YouTube share tracking ID' },
+			'feature': { cat: 'tracking', desc: 'YouTube feature source' },
+			'pp': { cat: 'tracking', desc: 'YouTube playlist position' },
+
+			// Twitter/X
+			'twclid': { cat: 'tracking', desc: 'Twitter Click ID' },
+			's': { cat: 'tracking', desc: 'Twitter share tracking' },
+
+			// General session/tracking
+			'_ga': { cat: 'session', desc: 'Google Analytics cookie' },
+			'_gl': { cat: 'session', desc: 'Google Linker parameter' },
+			'mc_cid': { cat: 'tracking', desc: 'Mailchimp campaign ID' },
+			'mc_eid': { cat: 'tracking', desc: 'Mailchimp email ID' },
+			'oly_enc_id': { cat: 'tracking', desc: 'Omeda tracking' },
+			'vero_id': { cat: 'tracking', desc: 'Vero tracking ID' },
+			'nr_email_referer': { cat: 'tracking', desc: 'Email referer tracking' },
+			'yclid': { cat: 'tracking', desc: 'Yandex Click ID' },
+
+			// Search
+			'q': { cat: 'search', desc: 'Search query' },
+			'query': { cat: 'search', desc: 'Search query' },
+			'search': { cat: 'search', desc: 'Search query' },
+			'keywords': { cat: 'search', desc: 'Search keywords' },
+			'k': { cat: 'search', desc: 'Search keywords (Amazon)' }
+		};
+
+		// Sample URLs for demonstration
+		const samples = {
+			amazon: 'https://www.amazon.co.uk/dp/B09V3KXJPB?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1&psc=1&pf_rd_r=ABC123&pf_rd_p=xyz789&pd_rd_r=test123&smid=A3P5ROKL5A1OLE&sp_csd=d2lkZ2V0TmFtZT1zcF9kZXRhaWw&tag=affiliate-20',
+			google: 'https://www.google.com/search?q=privacy+tools&sca_esv=abc123&source=hp&ei=xyz789&iflsig=test&ved=2ahUKEtest&uact=5&oq=privacy&gs_lp=Egdnd3Mtd2l6&sclient=gws-wiz',
+			utm: 'https://example.com/landing-page?utm_source=newsletter&utm_medium=email&utm_campaign=summer_sale_2024&utm_content=hero_button&utm_term=discount&fbclid=IwAR3xyz123&gclid=CjwKCAtest',
+			youtube: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLtest123&index=1&si=abc123xyz&feature=shared&pp=ygUJcmlja3JvbGw%3D'
+		};
+
+		uriInput.addEventListener('input', () => {
+			if (uriInput.value.trim()) {
+				analyze();
+			}
+		});
+
+		function loadSample(type) {
+			uriInput.value = samples[type];
+			analyze();
+		}
+
+		function clearAll() {
+			uriInput.value = '';
+			resultsDiv.innerHTML = '<div class="empty">Paste a URL above and click Analyze</div>';
+		}
+
+		async function pasteFromClipboard() {
+			try {
+				const text = await navigator.clipboard.readText();
+				uriInput.value = text;
+				analyze();
+			} catch (err) {
+				// Clipboard access denied
+			}
+		}
+
+		function analyze() {
+			const input = uriInput.value.trim();
+			if (!input) {
+				resultsDiv.innerHTML = '<div class="error">Please enter a URL</div>';
+				return;
+			}
+
+			let url;
+			try {
+				// Try to parse as URL, add protocol if missing
+				let urlStr = input;
+				if (!urlStr.match(/^https?:\/\//i)) {
+					urlStr = 'https://' + urlStr;
+				}
+				url = new URL(urlStr);
+			} catch (e) {
+				resultsDiv.innerHTML = '<div class="error">Invalid URL format</div>';
+				return;
+			}
+
+			displayAnalysis(url, input);
+		}
+
+		function displayAnalysis(url, originalInput) {
+			// Build visual representation
+			let visual = '';
+			visual += `<span class="uri-protocol">${escapeHtml(url.protocol)}</span>`;
+			visual += `<span class="uri-host">//${escapeHtml(url.host)}</span>`;
+			if (url.port) {
+				visual += `<span class="uri-port">:${escapeHtml(url.port)}</span>`;
+			}
+			if (url.pathname && url.pathname !== '/') {
+				visual += `<span class="uri-path">${escapeHtml(url.pathname)}</span>`;
+			}
+			if (url.search) {
+				visual += `<span class="uri-query">${escapeHtml(url.search)}</span>`;
+			}
+			if (url.hash) {
+				visual += `<span class="uri-fragment">${escapeHtml(url.hash)}</span>`;
+			}
+
+			// Parse query parameters
+			const params = [];
+			const trackingFound = [];
+			url.searchParams.forEach((value, key) => {
+				const decoded = decodeURIComponent(value);
+				const info = getParamInfo(key);
+				params.push({
+					key,
+					value,
+					decoded: decoded !== value ? decoded : null,
+					info
+				});
+				if (info && (info.cat === 'tracking' || info.cat === 'affiliate')) {
+					trackingFound.push(key);
+				}
+			});
+
+			// Build clean URL (without tracking params)
+			const cleanUrl = buildCleanUrl(url);
+
+			let html = `
+				<div class="uri-breakdown">
+					<div class="uri-visual">${visual}</div>
+					<div class="uri-components">
+						<div class="component-row">
+							<span class="component-label uri-protocol">Protocol</span>
+							<span class="component-value">${escapeHtml(url.protocol.replace(':', ''))}</span>
+						</div>
+						<div class="component-row">
+							<span class="component-label uri-host">Host</span>
+							<span class="component-value">${escapeHtml(url.hostname)}</span>
+						</div>
+						${url.port ? `
+						<div class="component-row">
+							<span class="component-label uri-port">Port</span>
+							<span class="component-value">${escapeHtml(url.port)}</span>
+						</div>
+						` : ''}
+						${url.pathname && url.pathname !== '/' ? `
+						<div class="component-row">
+							<span class="component-label uri-path">Path</span>
+							<span class="component-value">${escapeHtml(url.pathname)}</span>
+						</div>
+						` : ''}
+						${url.hash ? `
+						<div class="component-row">
+							<span class="component-label uri-fragment">Fragment</span>
+							<span class="component-value">${escapeHtml(url.hash.substring(1))}</span>
+						</div>
+						` : ''}
+					</div>
+				</div>
+			`;
+
+			// Parameters section
+			if (params.length > 0) {
+				html += `
+					<div class="params-section">
+						<div class="params-header">
+							<span class="params-title">Query Parameters</span>
+							<span class="params-count">${params.length} parameter${params.length !== 1 ? 's' : ''}</span>
+						</div>
+				`;
+
+				params.forEach(param => {
+					let tagHtml = '';
+					if (param.info) {
+						tagHtml = `<span class="param-tag tag-${param.info.cat}">${param.info.cat}</span>`;
+					}
+
+					html += `
+						<div class="param-row">
+							<div class="param-key">${escapeHtml(param.key)}${tagHtml}</div>
+							<div>
+								<div class="param-value">${escapeHtml(param.value)}</div>
+								${param.decoded ? `<div class="param-decoded">Decoded: ${escapeHtml(param.decoded)}</div>` : ''}
+								${param.info ? `<div class="param-decoded">${param.info.desc}</div>` : ''}
+							</div>
+						</div>
+					`;
+				});
+
+				html += '</div>';
+			}
+
+			// Tracking summary
+			if (trackingFound.length > 0) {
+				html += `
+					<div class="tracking-summary">
+						<div class="tracking-title">Tracking Parameters Detected (${trackingFound.length})</div>
+						<div class="tracking-list">
+							${trackingFound.map(p => `<span class="tracking-item">${escapeHtml(p)}</span>`).join('')}
+						</div>
+					</div>
+				`;
+			}
+
+			// Clean URL
+			if (cleanUrl !== url.href) {
+				html += `
+					<div class="clean-url">
+						<div class="clean-title">Clean URL (tracking removed)</div>
+						<div class="clean-value" onclick="copyCleanUrl('${escapeHtml(cleanUrl)}')">${escapeHtml(cleanUrl)}</div>
+					</div>
+				`;
+			}
+
+			resultsDiv.innerHTML = html;
+		}
+
+		function getParamInfo(key) {
+			// Check exact match first
+			if (trackingParams[key]) {
+				return trackingParams[key];
+			}
+			// Check prefixes for Amazon-style params
+			const lowerKey = key.toLowerCase();
+			if (lowerKey.startsWith('pf_rd_') || lowerKey.startsWith('pd_rd_')) {
+				return { cat: 'tracking', desc: 'Amazon personalization/discovery tracking' };
+			}
+			if (lowerKey.startsWith('utm_')) {
+				return { cat: 'utm', desc: 'Marketing tracking parameter' };
+			}
+			if (lowerKey.startsWith('ref') && lowerKey.length <= 5) {
+				return { cat: 'tracking', desc: 'Referral tracking' };
+			}
+			return null;
+		}
+
+		function buildCleanUrl(url) {
+			const clean = new URL(url.href);
+			const keysToRemove = [];
+
+			clean.searchParams.forEach((value, key) => {
+				const info = getParamInfo(key);
+				if (info && (info.cat === 'tracking' || info.cat === 'affiliate' || info.cat === 'session')) {
+					keysToRemove.push(key);
+				}
+			});
+
+			keysToRemove.forEach(key => clean.searchParams.delete(key));
+			return clean.href;
+		}
+
+		function copyCleanUrl(url) {
+			navigator.clipboard.writeText(url).then(() => {
+				showToast();
+			});
+		}
+
+		function showToast() {
+			const toast = document.getElementById('toast');
+			toast.classList.add('show');
+			setTimeout(() => toast.classList.remove('show'), 2000);
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = String(text);
+			return div.innerHTML;
+		}
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>
