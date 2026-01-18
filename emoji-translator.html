@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Emoji Translator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-hover: #059669;
+			--warning: #f59e0b;
+			--info: #3b82f6;
+			--purple: #a78bfa;
+			--pink: #f472b6;
+			--red: #ef4444;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 800px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1rem;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.panel-title {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.message-input {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 1rem;
+			width: 100%;
+			min-height: 100px;
+			resize: vertical;
+			outline: none;
+		}
+
+		.message-input:focus {
+			border-color: var(--accent);
+		}
+
+		.message-input::placeholder {
+			color: var(--text-muted);
+		}
+
+		.examples {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.example-btn {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.35rem 0.6rem;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.example-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.translation-section {
+			background: var(--bg);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.translation-label {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin-bottom: 0.5rem;
+		}
+
+		.original-message {
+			font-size: 1.1rem;
+			padding: 0.75rem;
+			background: var(--surface);
+			border-radius: 4px;
+			margin-bottom: 1rem;
+			word-break: break-word;
+		}
+
+		.translated-message {
+			font-size: 1.1rem;
+			padding: 0.75rem;
+			background: rgba(16, 185, 129, 0.1);
+			border: 1px solid var(--accent);
+			border-radius: 4px;
+			color: var(--accent);
+			word-break: break-word;
+		}
+
+		.emoji-breakdown {
+			margin-top: 1rem;
+		}
+
+		.emoji-item {
+			display: flex;
+			align-items: flex-start;
+			gap: 0.75rem;
+			padding: 0.75rem;
+			background: var(--surface);
+			border-radius: 4px;
+			margin-bottom: 0.5rem;
+		}
+
+		.emoji-char {
+			font-size: 1.5rem;
+			min-width: 40px;
+			text-align: center;
+		}
+
+		.emoji-info {
+			flex: 1;
+		}
+
+		.emoji-name {
+			font-size: 0.85rem;
+			color: var(--warning);
+			font-weight: 500;
+			margin-bottom: 0.25rem;
+		}
+
+		.emoji-meanings {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+		}
+
+		.emoji-meaning {
+			display: inline-block;
+			background: var(--bg);
+			padding: 0.2rem 0.5rem;
+			border-radius: 3px;
+			margin: 0.15rem 0.25rem 0.15rem 0;
+		}
+
+		.emoji-meaning.primary {
+			background: rgba(167, 139, 250, 0.2);
+			color: var(--purple);
+		}
+
+		.tone-indicator {
+			display: inline-block;
+			padding: 0.25rem 0.5rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: 500;
+			margin-left: 0.5rem;
+		}
+
+		.tone-passive { background: rgba(59, 130, 246, 0.2); color: var(--info); }
+		.tone-flirty { background: rgba(244, 114, 182, 0.2); color: var(--pink); }
+		.tone-sarcastic { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+		.tone-dismissive { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+		.tone-friendly { background: rgba(16, 185, 129, 0.2); color: var(--accent); }
+
+		.no-emojis {
+			color: var(--text-muted);
+			font-style: italic;
+			padding: 1rem;
+			text-align: center;
+		}
+
+		.stats-row {
+			display: flex;
+			gap: 1rem;
+			flex-wrap: wrap;
+			margin-top: 1rem;
+		}
+
+		.stat-box {
+			background: var(--surface);
+			padding: 0.5rem 0.75rem;
+			border-radius: 4px;
+			font-size: 0.8rem;
+		}
+
+		.stat-label {
+			color: var(--text-muted);
+		}
+
+		.stat-value {
+			color: var(--purple);
+			font-weight: 600;
+		}
+
+		.warning-box {
+			background: rgba(245, 158, 11, 0.1);
+			border: 1px solid var(--warning);
+			border-radius: 4px;
+			padding: 0.75rem;
+			margin-top: 1rem;
+			font-size: 0.85rem;
+			color: var(--warning);
+		}
+
+		.ref-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: 0.5rem;
+		}
+
+		.ref-item {
+			background: var(--bg);
+			padding: 0.5rem 0.75rem;
+			border-radius: 4px;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.ref-emoji {
+			font-size: 1.2rem;
+		}
+
+		.ref-meaning {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+		}
+
+		.category-title {
+			font-size: 0.75rem;
+			color: var(--warning);
+			text-transform: uppercase;
+			margin: 1rem 0 0.5rem;
+			padding-bottom: 0.25rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.category-title:first-child {
+			margin-top: 0;
+		}
+
+		@media (max-width: 600px) {
+			.stats-row {
+				flex-direction: column;
+			}
+
+			.ref-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Emoji Translator</h1>
+			<p class="subtitle">Decode the hidden meanings behind emoji messages</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Paste Message</span>
+			</div>
+			<textarea class="message-input" id="messageInput" placeholder="Paste a message with emojis here... e.g., 'Sure, I'd love to help 🙂'"></textarea>
+			<div class="examples">
+				<span style="color: var(--text-muted); font-size: 0.75rem;">Try:</span>
+				<button class="example-btn" data-msg="Sure, I'd love to help 🙂">Passive aggressive</button>
+				<button class="example-btn" data-msg="Wow that's so interesting 💀">Sarcastic</button>
+				<button class="example-btn" data-msg="Hey! 👀 Nice pics 🔥">Flirty</button>
+				<button class="example-btn" data-msg="k 👍">Dismissive</button>
+				<button class="example-btn" data-msg="OMG I can't even 😭😭😭">Dramatic</button>
+				<button class="example-btn" data-msg="That's one way to do it 🤡">Shade</button>
+			</div>
+		</div>
+
+		<div class="panel" id="resultsPanel" style="display: none;">
+			<div class="panel-header">
+				<span class="panel-title">Translation</span>
+			</div>
+			<div id="results"></div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Common Hidden Meanings</span>
+			</div>
+
+			<div class="category-title">Passive Aggressive</div>
+			<div class="ref-grid">
+				<div class="ref-item"><span class="ref-emoji">🙂</span><span class="ref-meaning">Annoyed / fake politeness</span></div>
+				<div class="ref-item"><span class="ref-emoji">👍</span><span class="ref-meaning">Whatever / don't care</span></div>
+				<div class="ref-item"><span class="ref-emoji">🙃</span><span class="ref-meaning">Internally screaming</span></div>
+				<div class="ref-item"><span class="ref-emoji">😊</span><span class="ref-meaning">Forced happiness</span></div>
+			</div>
+
+			<div class="category-title">Sarcasm / Shade</div>
+			<div class="ref-grid">
+				<div class="ref-item"><span class="ref-emoji">💀</span><span class="ref-meaning">I'm dead / that's hilarious</span></div>
+				<div class="ref-item"><span class="ref-emoji">🤡</span><span class="ref-meaning">You're a clown / foolish</span></div>
+				<div class="ref-item"><span class="ref-emoji">🤭</span><span class="ref-meaning">Tea / gossip incoming</span></div>
+				<div class="ref-item"><span class="ref-emoji">💅</span><span class="ref-meaning">Unbothered / sassy</span></div>
+			</div>
+
+			<div class="category-title">Flirty / Suggestive</div>
+			<div class="ref-grid">
+				<div class="ref-item"><span class="ref-emoji">👀</span><span class="ref-meaning">I see you / interested</span></div>
+				<div class="ref-item"><span class="ref-emoji">🔥</span><span class="ref-meaning">You're hot / attractive</span></div>
+				<div class="ref-item"><span class="ref-emoji">😏</span><span class="ref-meaning">Suggestive / flirting</span></div>
+				<div class="ref-item"><span class="ref-emoji">🍑</span><span class="ref-meaning">Butt / suggestive</span></div>
+				<div class="ref-item"><span class="ref-emoji">🍆</span><span class="ref-meaning">Suggestive / innuendo</span></div>
+				<div class="ref-item"><span class="ref-emoji">😈</span><span class="ref-meaning">Naughty / mischievous</span></div>
+			</div>
+
+			<div class="category-title">Emotional Amplifiers</div>
+			<div class="ref-grid">
+				<div class="ref-item"><span class="ref-emoji">😭</span><span class="ref-meaning">Crying laughing / overwhelmed</span></div>
+				<div class="ref-item"><span class="ref-emoji">✨</span><span class="ref-meaning">Aesthetic / emphasis</span></div>
+				<div class="ref-item"><span class="ref-emoji">💀</span><span class="ref-meaning">Dead from laughing</span></div>
+				<div class="ref-item"><span class="ref-emoji">🥺</span><span class="ref-meaning">Pleading / guilt trip</span></div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const messageInput = document.getElementById('messageInput');
+		const resultsPanel = document.getElementById('resultsPanel');
+		const resultsDiv = document.getElementById('results');
+
+		// Comprehensive emoji meanings database
+		const emojiMeanings = {
+			// Passive aggressive / fake nice
+			'🙂': {
+				name: 'Slightly Smiling Face',
+				meanings: ['Passive aggressive', 'Fake politeness', 'Annoyed but civil', 'Barely tolerating'],
+				primary: 'I\'m annoyed but being polite',
+				tone: 'passive'
+			},
+			'🙃': {
+				name: 'Upside-Down Face',
+				meanings: ['Internally screaming', 'Everything is fine (not)', 'Frustrated', 'Ironic'],
+				primary: 'Everything is NOT fine',
+				tone: 'passive'
+			},
+			'😊': {
+				name: 'Smiling Face with Smiling Eyes',
+				meanings: ['Genuine happiness', 'Forced politeness', 'Passive aggressive sweetness'],
+				primary: 'Could be genuine or forced niceness',
+				tone: 'passive'
+			},
+			'👍': {
+				name: 'Thumbs Up',
+				meanings: ['OK whatever', 'Dismissive agreement', 'Don\'t care', 'Passive aggressive OK'],
+				primary: 'Whatever, I don\'t care',
+				tone: 'dismissive'
+			},
+			'👌': {
+				name: 'OK Hand',
+				meanings: ['Sure', 'Whatever you say', 'Dismissive agreement'],
+				primary: 'Fine, whatever',
+				tone: 'dismissive'
+			},
+
+			// Sarcasm and shade
+			'💀': {
+				name: 'Skull',
+				meanings: ['I\'m dead', 'That\'s hilarious', 'I can\'t believe this', 'Dying of laughter'],
+				primary: 'I\'m dying (of laughter/cringe)',
+				tone: 'sarcastic'
+			},
+			'🤡': {
+				name: 'Clown Face',
+				meanings: ['You\'re a clown', 'Foolish behavior', 'Self-deprecating', 'Calling out stupidity'],
+				primary: 'Someone\'s being a fool',
+				tone: 'sarcastic'
+			},
+			'🤭': {
+				name: 'Face with Hand Over Mouth',
+				meanings: ['Oops', 'Gossip', 'Sneaky', 'Tea spilling'],
+				primary: 'I have tea to spill',
+				tone: 'sarcastic'
+			},
+			'💅': {
+				name: 'Nail Polish',
+				meanings: ['Unbothered', 'Sassy', 'Self-care', 'Confident'],
+				primary: 'I\'m unbothered and fabulous',
+				tone: 'sarcastic'
+			},
+			'🙄': {
+				name: 'Face with Rolling Eyes',
+				meanings: ['Eye roll', 'Annoyed', 'Exasperated', 'Can\'t believe this'],
+				primary: 'I\'m so done with this',
+				tone: 'dismissive'
+			},
+			'😒': {
+				name: 'Unamused Face',
+				meanings: ['Unimpressed', 'Skeptical', 'Side-eye', 'Not buying it'],
+				primary: 'I\'m not impressed',
+				tone: 'dismissive'
+			},
+			'🤨': {
+				name: 'Face with Raised Eyebrow',
+				meanings: ['Skeptical', 'Suspicious', 'Really?', 'Doubtful'],
+				primary: 'I\'m suspicious of this',
+				tone: 'sarcastic'
+			},
+
+			// Flirty / suggestive
+			'👀': {
+				name: 'Eyes',
+				meanings: ['Looking', 'Interested', 'Noticed something', 'Flirty attention'],
+				primary: 'I\'m watching / interested',
+				tone: 'flirty'
+			},
+			'🔥': {
+				name: 'Fire',
+				meanings: ['Hot', 'Attractive', 'Amazing', 'On fire'],
+				primary: 'That\'s hot / attractive',
+				tone: 'flirty'
+			},
+			'😏': {
+				name: 'Smirking Face',
+				meanings: ['Flirty', 'Suggestive', 'Smug', 'Knowing look'],
+				primary: 'Flirty / suggestive intent',
+				tone: 'flirty'
+			},
+			'😈': {
+				name: 'Smiling Face with Horns',
+				meanings: ['Naughty', 'Mischievous', 'Devil-ish intent', 'Playfully bad'],
+				primary: 'Feeling naughty',
+				tone: 'flirty'
+			},
+			'🍑': {
+				name: 'Peach',
+				meanings: ['Butt', 'Booty', 'Suggestive', 'Actual peach (rarely)'],
+				primary: 'Suggestive / booty reference',
+				tone: 'flirty'
+			},
+			'🍆': {
+				name: 'Eggplant',
+				meanings: ['Phallic reference', 'Suggestive', 'Innuendo'],
+				primary: 'Sexual innuendo',
+				tone: 'flirty'
+			},
+			'💦': {
+				name: 'Sweat Droplets',
+				meanings: ['Sweating', 'Working hard', 'Sexual reference', 'Thirsty'],
+				primary: 'Could be suggestive',
+				tone: 'flirty'
+			},
+			'😍': {
+				name: 'Heart Eyes',
+				meanings: ['Love it', 'Attracted', 'Obsessed', 'Adoring'],
+				primary: 'I\'m attracted / love this',
+				tone: 'flirty'
+			},
+			'🥵': {
+				name: 'Hot Face',
+				meanings: ['That\'s hot', 'Overwhelmed', 'Attracted', 'Too much'],
+				primary: 'Finding something/someone hot',
+				tone: 'flirty'
+			},
+
+			// Emotional / dramatic
+			'😭': {
+				name: 'Loudly Crying Face',
+				meanings: ['Crying laughing', 'So funny', 'Overwhelmed', 'Dramatic crying'],
+				primary: 'Overwhelmed (usually by humor)',
+				tone: 'friendly'
+			},
+			'💀': {
+				name: 'Skull',
+				meanings: ['Dead', 'Dying of laughter', 'Can\'t cope', 'That killed me'],
+				primary: 'I\'m dead (from laughing)',
+				tone: 'sarcastic'
+			},
+			'✨': {
+				name: 'Sparkles',
+				meanings: ['Aesthetic', 'Emphasis', 'Magic', 'Making it fancy'],
+				primary: 'Adding emphasis / aesthetic',
+				tone: 'friendly'
+			},
+			'🥺': {
+				name: 'Pleading Face',
+				meanings: ['Please', 'Sad', 'Guilt trip', 'Begging'],
+				primary: 'Pleading / guilt tripping',
+				tone: 'passive'
+			},
+			'😤': {
+				name: 'Face with Steam',
+				meanings: ['Frustrated', 'Determined', 'Huffing', 'Annoyed'],
+				primary: 'Frustrated or determined',
+				tone: 'passive'
+			},
+			'🤪': {
+				name: 'Zany Face',
+				meanings: ['Crazy', 'Wild', 'Goofy', 'Unhinged'],
+				primary: 'Feeling chaotic / wild',
+				tone: 'friendly'
+			},
+
+			// Agreement / reactions
+			'💯': {
+				name: 'Hundred Points',
+				meanings: ['Absolutely', '100%', 'Perfect', 'Facts'],
+				primary: 'Completely agree / facts',
+				tone: 'friendly'
+			},
+			'👏': {
+				name: 'Clapping Hands',
+				meanings: ['Applause', 'Emphasis', 'Sarcastic clap', 'Well done'],
+				primary: 'Could be genuine or sarcastic praise',
+				tone: 'sarcastic'
+			},
+			'🙏': {
+				name: 'Folded Hands',
+				meanings: ['Please', 'Thank you', 'Praying', 'Hoping'],
+				primary: 'Please / thank you',
+				tone: 'friendly'
+			},
+			'🤷': {
+				name: 'Shrug',
+				meanings: ['Don\'t know', 'Whatever', 'Not my problem', 'Who knows'],
+				primary: 'I don\'t know / care',
+				tone: 'dismissive'
+			},
+			'🤦': {
+				name: 'Facepalm',
+				meanings: ['Can\'t believe this', 'Embarrassed', 'Frustrated', 'Disappointed'],
+				primary: 'I can\'t believe this',
+				tone: 'dismissive'
+			},
+
+			// Hearts with meanings
+			'❤️': {
+				name: 'Red Heart',
+				meanings: ['Love', 'Strong affection', 'Classic love'],
+				primary: 'Love / strong feelings',
+				tone: 'friendly'
+			},
+			'🖤': {
+				name: 'Black Heart',
+				meanings: ['Dark love', 'Edgy', 'Grief', 'Alternative'],
+				primary: 'Edgy affection',
+				tone: 'friendly'
+			},
+			'💜': {
+				name: 'Purple Heart',
+				meanings: ['BTS fans', 'Appreciation', 'Support'],
+				primary: 'Support / K-pop love',
+				tone: 'friendly'
+			},
+			'🤍': {
+				name: 'White Heart',
+				meanings: ['Pure love', 'Support', 'Minimalist'],
+				primary: 'Pure / clean affection',
+				tone: 'friendly'
+			},
+
+			// Misc
+			'🐍': {
+				name: 'Snake',
+				meanings: ['Sneaky person', 'Backstabber', 'Untrustworthy'],
+				primary: 'Calling someone fake/sneaky',
+				tone: 'sarcastic'
+			},
+			'🐸': {
+				name: 'Frog',
+				meanings: ['That\'s none of my business', 'Kermit meme', 'Tea'],
+				primary: 'But that\'s none of my business...',
+				tone: 'sarcastic'
+			},
+			'☕': {
+				name: 'Hot Beverage',
+				meanings: ['Tea (gossip)', 'Coffee', 'Spill the tea'],
+				primary: 'Gossip / drama incoming',
+				tone: 'sarcastic'
+			},
+			'🚩': {
+				name: 'Red Flag',
+				meanings: ['Warning sign', 'Red flag behavior', 'Problematic'],
+				primary: 'That\'s a red flag / warning',
+				tone: 'sarcastic'
+			},
+			'💀☠️': {
+				name: 'Skull and Crossbones',
+				meanings: ['Dead', 'Dying', 'Can\'t cope'],
+				primary: 'I\'m absolutely dead',
+				tone: 'sarcastic'
+			},
+			'😬': {
+				name: 'Grimacing Face',
+				meanings: ['Awkward', 'Yikes', 'Uncomfortable', 'Cringe'],
+				primary: 'That\'s awkward / yikes',
+				tone: 'passive'
+			},
+			'🤮': {
+				name: 'Vomiting Face',
+				meanings: ['Disgusting', 'Gross', 'Makes me sick'],
+				primary: 'That\'s disgusting',
+				tone: 'dismissive'
+			},
+			'😴': {
+				name: 'Sleeping Face',
+				meanings: ['Boring', 'Tired', 'Uninterested', 'Sleepy'],
+				primary: 'This is boring',
+				tone: 'dismissive'
+			},
+			'🥱': {
+				name: 'Yawning Face',
+				meanings: ['Bored', 'Unimpressed', 'Tired of this'],
+				primary: 'I\'m bored / unimpressed',
+				tone: 'dismissive'
+			}
+		};
+
+		// Extract emojis from text
+		function extractEmojis(text) {
+			const emojiRegex = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2300}-\u{23FF}]|[\u{2B50}]|[\u{200D}]|[\u{FE0F}]|[\u{1FA00}-\u{1FAFF}]/gu;
+			const matches = text.match(emojiRegex) || [];
+			// Filter out variation selectors and ZWJ
+			return matches.filter(e => e !== '\u200D' && e !== '\uFE0F');
+		}
+
+		// Get unique emojis with counts
+		function getEmojiCounts(emojis) {
+			const counts = {};
+			emojis.forEach(emoji => {
+				counts[emoji] = (counts[emoji] || 0) + 1;
+			});
+			return counts;
+		}
+
+		// Detect overall tone
+		function detectTone(emojis) {
+			const tones = { passive: 0, sarcastic: 0, flirty: 0, dismissive: 0, friendly: 0 };
+
+			emojis.forEach(emoji => {
+				const info = emojiMeanings[emoji];
+				if (info && info.tone) {
+					tones[info.tone]++;
+				}
+			});
+
+			const maxTone = Object.entries(tones).reduce((a, b) => b[1] > a[1] ? b : a);
+			return maxTone[1] > 0 ? maxTone[0] : null;
+		}
+
+		// Translate message
+		function translateMessage(text, emojis) {
+			let translated = text;
+
+			emojis.forEach(emoji => {
+				const info = emojiMeanings[emoji];
+				if (info) {
+					translated = translated.replace(emoji, `[${info.primary}]`);
+				}
+			});
+
+			return translated;
+		}
+
+		// Get tone label HTML
+		function getToneLabel(tone) {
+			const labels = {
+				passive: 'Passive Aggressive',
+				sarcastic: 'Sarcastic / Shady',
+				flirty: 'Flirty / Suggestive',
+				dismissive: 'Dismissive',
+				friendly: 'Friendly / Genuine'
+			};
+			return tone ? `<span class="tone-indicator tone-${tone}">${labels[tone]}</span>` : '';
+		}
+
+		function setMessage(msg) {
+			messageInput.value = msg;
+			analyze();
+		}
+
+		function analyze() {
+			const text = messageInput.value.trim();
+
+			if (!text) {
+				resultsPanel.style.display = 'none';
+				return;
+			}
+
+			const emojis = extractEmojis(text);
+
+			if (emojis.length === 0) {
+				resultsDiv.innerHTML = '<div class="no-emojis">No emojis detected in this message. Try pasting a message with emojis!</div>';
+				resultsPanel.style.display = 'block';
+				return;
+			}
+
+			const emojiCounts = getEmojiCounts(emojis);
+			const tone = detectTone(emojis);
+			const translated = translateMessage(text, emojis);
+
+			// Build emoji breakdown
+			let breakdownHtml = '';
+			Object.keys(emojiCounts).forEach(emoji => {
+				const info = emojiMeanings[emoji];
+				const count = emojiCounts[emoji];
+
+				if (info) {
+					const meaningsHtml = info.meanings.map((m, i) =>
+						`<span class="emoji-meaning ${i === 0 ? 'primary' : ''}">${m}</span>`
+					).join('');
+
+					breakdownHtml += `
+						<div class="emoji-item">
+							<div class="emoji-char">${emoji}${count > 1 ? ` ×${count}` : ''}</div>
+							<div class="emoji-info">
+								<div class="emoji-name">${info.name}</div>
+								<div class="emoji-meanings">${meaningsHtml}</div>
+							</div>
+						</div>
+					`;
+				} else {
+					breakdownHtml += `
+						<div class="emoji-item">
+							<div class="emoji-char">${emoji}${count > 1 ? ` ×${count}` : ''}</div>
+							<div class="emoji-info">
+								<div class="emoji-name">Unknown Emoji</div>
+								<div class="emoji-meanings"><span class="emoji-meaning">No hidden meaning data available</span></div>
+							</div>
+						</div>
+					`;
+				}
+			});
+
+			// Warning for certain combinations
+			let warningHtml = '';
+			const hasFlirty = emojis.some(e => emojiMeanings[e]?.tone === 'flirty');
+			const hasPassive = emojis.some(e => emojiMeanings[e]?.tone === 'passive');
+
+			if (hasFlirty && emojis.includes('👀') && emojis.includes('🔥')) {
+				warningHtml = '<div class="warning-box">⚠️ This combination (👀 + 🔥) is commonly used for flirting or expressing attraction.</div>';
+			} else if (hasPassive && (emojis.includes('🙂') || emojis.includes('👍'))) {
+				warningHtml = '<div class="warning-box">⚠️ The 🙂 or 👍 in short responses often indicates passive aggression or dismissiveness.</div>';
+			}
+
+			resultsDiv.innerHTML = `
+				<div class="translation-section">
+					<div class="translation-label">Original Message</div>
+					<div class="original-message">${escapeHtml(text)}</div>
+
+					<div class="translation-label">Possible Interpretation ${getToneLabel(tone)}</div>
+					<div class="translated-message">${escapeHtml(translated)}</div>
+
+					<div class="stats-row">
+						<div class="stat-box">
+							<span class="stat-label">Emojis found:</span>
+							<span class="stat-value">${emojis.length}</span>
+						</div>
+						<div class="stat-box">
+							<span class="stat-label">Unique:</span>
+							<span class="stat-value">${Object.keys(emojiCounts).length}</span>
+						</div>
+					</div>
+					${warningHtml}
+				</div>
+
+				<div class="translation-section">
+					<div class="translation-label">Emoji Breakdown</div>
+					<div class="emoji-breakdown">${breakdownHtml}</div>
+				</div>
+			`;
+
+			resultsPanel.style.display = 'block';
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+
+		messageInput.addEventListener('input', analyze);
+
+		// Example button handlers
+		document.querySelectorAll('.example-btn[data-msg]').forEach(btn => {
+			btn.addEventListener('click', () => {
+				setMessage(btn.dataset.msg);
+			});
+		});
+
+		// Initial empty state
+		analyze();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

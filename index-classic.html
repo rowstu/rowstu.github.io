@@ -139,6 +139,7 @@
 		.section:nth-child(3) { animation-delay: 0.3s; }
 		.section:nth-child(4) { animation-delay: 0.4s; }
 		.section:nth-child(5) { animation-delay: 0.5s; }
+		.section:nth-child(6) { animation-delay: 0.6s; }
 
 		@keyframes fadeInUp {
 			from {
@@ -231,6 +232,13 @@
 		.maths .card:hover {
 			border-color: var(--accent-yellow);
 			box-shadow: 0 8px 24px rgba(255, 210, 63, 0.2);
+		}
+
+		.games .section-title::before { background: #f472b6; }
+		.games .card::before { background: #f472b6; }
+		.games .card:hover {
+			border-color: #f472b6;
+			box-shadow: 0 8px 24px rgba(244, 114, 182, 0.2);
 		}
 
 		.card-title {
@@ -501,30 +509,6 @@
 			<h2 class="section-title">Interactive Tools</h2>
 			<div class="grid">
 				<div class="card">
-					<a href="craple.html">
-						<div class="card-title">Craple</div>
-						<div class="card-desc">Wordle clone with 14k+ word dictionary</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="math1.html">
-						<div class="card-title">Math Practice</div>
-						<div class="card-desc">Interactive math exercises</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="t-rex-chrome/index.html">
-						<div class="card-title">T-Rex Runner</div>
-						<div class="card-desc">Chrome dinosaur game</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="ttquiz/index.html">
-						<div class="card-title">Times Tables Quiz</div>
-						<div class="card-desc">Practice multiplication</div>
-					</a>
-				</div>
-				<div class="card">
 					<a href="base64.html">
 						<div class="card-title">Base64</div>
 						<div class="card-desc">Encode and decode Base64</div>
@@ -543,12 +527,6 @@
 					</a>
 				</div>
 				<div class="card">
-					<a href="dadjoke.html">
-						<div class="card-title">Dad Jokes</div>
-						<div class="card-desc">Random dad joke generator</div>
-					</a>
-				</div>
-				<div class="card">
 					<a href="mock-exams.html">
 						<div class="card-title">Mock Exams</div>
 						<div class="card-desc">Practice exam questions</div>
@@ -558,12 +536,6 @@
 					<a href="roman-numerals.html">
 						<div class="card-title">Roman Numerals</div>
 						<div class="card-desc">Convert to/from Roman numerals</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="space.html">
-						<div class="card-title">Space Game</div>
-						<div class="card-desc">Space shooter game</div>
 					</a>
 				</div>
 				<div class="card">
@@ -588,12 +560,6 @@
 					<a href="xor.html">
 						<div class="card-title">XOR Tool</div>
 						<div class="card-desc">XOR encryption/decryption</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="games/asteroids/index.html">
-						<div class="card-title">Asteroids</div>
-						<div class="card-desc">Classic arcade space shooter</div>
 					</a>
 				</div>
 				<div class="card">
@@ -708,6 +674,60 @@
 					<a href="uri-decoder.html">
 						<div class="card-title">URI Decoder</div>
 						<div class="card-desc">Analyze URLs and find tracking params</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="emoji-translator.html">
+						<div class="card-title">Emoji Translator</div>
+						<div class="card-desc">Decode hidden meanings in emoji messages</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="section games">
+			<h2 class="section-title">Games</h2>
+			<div class="grid">
+				<div class="card">
+					<a href="craple.html">
+						<div class="card-title">Craple</div>
+						<div class="card-desc">Wordle clone with 14k+ word dictionary</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="math1.html">
+						<div class="card-title">Math Practice</div>
+						<div class="card-desc">Interactive math exercises</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="t-rex-chrome/index.html">
+						<div class="card-title">T-Rex Runner</div>
+						<div class="card-desc">Chrome dinosaur game</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="ttquiz/index.html">
+						<div class="card-title">Times Tables Quiz</div>
+						<div class="card-desc">Practice multiplication</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="dadjoke.html">
+						<div class="card-title">Dad Jokes</div>
+						<div class="card-desc">Random dad joke generator</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="space.html">
+						<div class="card-title">Space Game</div>
+						<div class="card-desc">Space shooter game</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="games/asteroids/index.html">
+						<div class="card-title">Asteroids</div>
+						<div class="card-desc">Classic arcade space shooter</div>
 					</a>
 				</div>
 			</div>

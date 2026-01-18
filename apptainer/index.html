@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioconda Apptainer Definition Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="grain-overlay"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <span class="title-bio">Bio</span><span class="title-conda">conda</span>
+                <span class="title-sub">Apptainer Definition Generator</span>
+            </h1>
+            <p class="subtitle">Create optimized container definitions for bioinformatics workflows</p>
+            <div id="status-badge" class="status-badge loading">
+                <span class="status-dot"></span>
+                <span id="status-text">Loading package index...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Column: Package Selection -->
+            <section class="panel package-panel">
+                <h2 class="panel-title">Package Selection</h2>
+
+                <div class="search-section">
+                    <label for="package-search" class="label">Search Bioconda Packages</label>
+                    <div class="search-wrapper">
+                        <input
+                            type="text"
+                            id="package-search"
+                            class="input search-input"
+                            placeholder="Type to search packages..."
+                            autocomplete="off"
+                        >
+                        <div class="search-icon">🔍</div>
+                    </div>
+                    <div id="search-results" class="search-results"></div>
+                </div>
+
+                <div class="selected-packages-section">
+                    <label class="label">Selected Packages</label>
+                    <div id="selected-packages" class="selected-packages">
+                        <div class="empty-state">No packages selected yet</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="additional-packages" class="label">Additional Packages</label>
+                    <input
+                        type="text"
+                        id="additional-packages"
+                        class="input"
+                        placeholder="e.g., curl wget git"
+                    >
+                    <span class="help-text">Space-separated system/conda packages</span>
+                </div>
+            </section>
+
+            <!-- Right Column: Configuration -->
+            <section class="panel config-panel">
+                <h2 class="panel-title">Configuration</h2>
+
+                <div class="input-group">
+                    <label for="base-image" class="label">Base Image</label>
+                    <select id="base-image" class="select">
+                        <option value="mambaforge">Mambaforge (recommended)</option>
+                        <option value="debian">Debian Bookworm + Micromamba</option>
+                    </select>
+                </div>
+
+                <div class="options-grid">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="multi-stage" class="checkbox" checked>
+                        <label for="multi-stage" class="checkbox-label">
+                            <span class="checkbox-text">Multi-stage build</span>
+                            <span class="checkbox-hint">~66% size reduction</span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="strip-binaries" class="checkbox">
+                        <label for="strip-binaries" class="checkbox-label">
+                            <span class="checkbox-text">Strip binaries</span>
+                            <span class="checkbox-hint">Single-stage only</span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remove-static" class="checkbox">
+                        <label for="remove-static" class="checkbox-label">
+                            <span class="checkbox-text">Remove static libraries</span>
+                            <span class="checkbox-hint">Single-stage only</span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remove-symlinks" class="checkbox">
+                        <label for="remove-symlinks" class="checkbox-label">
+                            <span class="checkbox-text">Remove dangling symlinks</span>
+                            <span class="checkbox-hint">Single-stage only</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="sbom-section">
+                    <label class="label">SBOM Options</label>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-group-inline">
+                            <input type="checkbox" id="include-cyclonedx" class="checkbox">
+                            <label for="include-cyclonedx" class="checkbox-label-inline">CycloneDX</label>
+                        </div>
+                        <div class="checkbox-group-inline">
+                            <input type="checkbox" id="include-spdx" class="checkbox">
+                            <label for="include-spdx" class="checkbox-label-inline">SPDX</label>
+                        </div>
+                    </div>
+                    <span class="help-text">Add SBOM generation instructions to definition</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="custom-commands" class="label">Custom Commands</label>
+                    <textarea
+                        id="custom-commands"
+                        class="textarea"
+                        placeholder="Optional bash commands to run during build..."
+                        rows="4"
+                    ></textarea>
+                    <span class="help-text">Executed in %post section</span>
+                </div>
+
+                <button id="generate-btn" class="btn btn-primary" disabled>
+                    <span class="btn-text">Generate Definition</span>
+                    <span class="btn-icon">→</span>
+                </button>
+            </section>
+        </div>
+
+        <!-- Output Section -->
+        <section class="panel output-panel" id="output-section" style="display: none;">
+            <div class="output-header">
+                <h2 class="panel-title">Generated Definition</h2>
+                <div class="output-actions">
+                    <button id="copy-btn" class="btn btn-secondary">
+                        <span class="btn-text">Copy to Clipboard</span>
+                    </button>
+                    <button id="download-btn" class="btn btn-secondary">
+                        <span class="btn-text">Download .def</span>
+                    </button>
+                </div>
+            </div>
+            <div class="definition-preview">
+                <pre id="definition-output" class="definition-code"></pre>
+            </div>
+            <div class="usage-instructions">
+                <h3 class="instructions-title">Build Instructions</h3>
+                <div class="command-block">
+                    <code>apptainer build container.sif container.def</code>
+                </div>
+                <p class="instructions-text">
+                    Save the definition to a <code>.def</code> file and build using the command above.
+                    Add <code>--fakeroot</code> flag if building without root privileges.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>Built for the bioinformatics community • Generates Apptainer/Singularity definition files</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

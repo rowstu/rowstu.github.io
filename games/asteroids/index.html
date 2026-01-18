@@ -2,34 +2,232 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asteroids Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Asteroids</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        html, body, #gameContainer, canvas {
+            touch-action: none;
+        }
+        body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #000;
+            min-height: 100vh;
+            background: #0a0a12;
             font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
         }
         canvas {
-            border: 2px solid #fff;
+            display: block;
+            width: 100%;
+            height: auto;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
         }
-        #score {
+        #hud {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
             color: #fff;
+            font-size: clamp(14px, 3vw, 20px);
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+            pointer-events: none;
+        }
+        #lives span {
+            color: #ef4444;
+        }
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            z-index: 100;
+        }
+        #overlay.hidden {
+            display: none;
+        }
+        #overlay h1 {
+            font-size: clamp(24px, 6vw, 48px);
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #overlay p {
+            font-size: clamp(12px, 3vw, 18px);
+            color: #94a3b8;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        #overlay .final-score {
+            font-size: clamp(18px, 4vw, 28px);
+            color: #fbbf24;
+            margin: 20px 0;
+        }
+        #startBtn {
+            margin-top: 20px;
+            padding: 12px 32px;
+            font-size: clamp(14px, 3vw, 18px);
+            font-family: inherit;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            pointer-events: auto;
+            position: relative;
+            z-index: 101;
+        }
+        #startBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        .controls-info {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .controls-info h3 {
+            color: #3b82f6;
+            margin-bottom: 10px;
+            font-size: clamp(12px, 2.5vw, 16px);
+        }
+        .controls-info p {
+            margin: 5px 0;
+            font-size: clamp(11px, 2vw, 14px);
+        }
+
+        /* Touch controls */
+        #touchControls {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 35%;
+            pointer-events: none;
+        }
+        .touch-zone {
+            position: absolute;
+            pointer-events: auto;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-size: 24px;
+            color: rgba(255, 255, 255, 0.4);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .touch-zone.active {
+            background: rgba(59, 130, 246, 0.3);
+        }
+        #joystickZone {
+            left: 10px;
+            bottom: 10px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        #joystickKnob {
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.6);
+            border-radius: 50%;
+            position: absolute;
+            pointer-events: none;
+        }
+        #fireZone {
+            right: 10px;
+            bottom: 10px;
+            width: 80px;
+            height: 80px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+        }
+        #thrustZone {
+            right: 100px;
+            bottom: 10px;
+            width: 80px;
+            height: 80px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 2px solid rgba(34, 197, 94, 0.4);
+        }
+
+        @media (max-width: 600px), (pointer: coarse) {
+            #touchControls {
+                display: block;
+            }
+            #hud {
+                top: 5px;
+                left: 5px;
+                right: 5px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="score">Score: 0</div>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="gameContainer">
+        <div id="hud">
+            <div id="score">Score: 0</div>
+            <div id="lives">Lives: <span>♥♥♥</span></div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div id="touchControls">
+            <div id="joystickZone" class="touch-zone">
+                <div id="joystickKnob"></div>
+            </div>
+            <div id="thrustZone" class="touch-zone">▲</div>
+            <div id="fireZone" class="touch-zone">●</div>
+        </div>
+
+        <div id="overlay">
+            <h1>ASTEROIDS</h1>
+            <p>Destroy asteroids and survive!</p>
+            <div class="controls-info">
+                <h3>Controls</h3>
+                <p><strong>Desktop:</strong> WASD to move, SPACE to shoot</p>
+                <p><strong>Mobile:</strong> Joystick to rotate, ▲ thrust, ● fire</p>
+            </div>
+            <button type="button" id="startBtn">START GAME</button>
+        </div>
+    </div>
+    <script>
+        // Inline minimal script to ensure button works
+        document.getElementById('startBtn').addEventListener('click', function() {
+            if (typeof window.startGame === 'function') {
+                window.startGame();
+            }
+        });
+    </script>
     <script src="game.js"></script>
 </body>
 </html>
