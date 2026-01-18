@@ -605,13 +605,32 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Event listeners
-if (startBtn) {
-    startBtn.addEventListener('click', startGame);
-    startBtn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        startGame();
-    });
+// Event listeners - use DOMContentLoaded to ensure button exists
+function setupStartButton() {
+    const btn = document.getElementById('startBtn');
+    console.log('Setting up start button:', btn);
+    if (btn) {
+        btn.addEventListener('click', function(e) {
+            console.log('Click detected');
+            e.preventDefault();
+            window.startGame();
+        });
+        btn.addEventListener('mousedown', function(e) {
+            console.log('Mousedown detected');
+            e.preventDefault();
+            window.startGame();
+        });
+        btn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            window.startGame();
+        });
+    }
+}
+
+// Run setup now and also on DOMContentLoaded just in case
+setupStartButton();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupStartButton);
 }
 
 // Prevent scrolling on touch

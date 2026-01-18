@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>TEA.BAG.DEMO</title>
+  <style>
+    @font-face {
+      font-family: 'Topaz';
+      src: local('Topaz'), local('Amiga Topaz');
+    }
+
+    :root {
+      --amiga-blue: #0055aa;
+      --amiga-orange: #ff8800;
+      --amiga-white: #ffffff;
+      --amiga-black: #000020;
+      --workbench-grey: #aaaaaa;
+      --workbench-blue: #0055aa;
+      --workbench-orange: #ff8800;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--amiga-black);
+      overflow: hidden;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      cursor: none;
+    }
+
+    #bootscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #222244;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.5s;
+    }
+
+    #bootscreen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .boot-hand {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 20px;
+      animation: insertDisk 1s ease-in-out infinite;
+    }
+
+    @keyframes insertDisk {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .boot-text {
+      color: #ff8800;
+      font-size: 16px;
+      text-align: center;
+      animation: blink 0.8s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Workbench 1.3 Loading Screen */
+    #loadscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #0055aa 0%, #0055aa 50%, #ff8800 50%, #ff8800 100%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .workbench-window {
+      background: #aaaaaa;
+      border: 2px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      padding: 0;
+      min-width: 320px;
+      max-width: 90vw;
+    }
+
+    .wb-titlebar {
+      background: linear-gradient(90deg, #0055aa, #0055aa);
+      color: white;
+      padding: 2px 8px;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #000;
+    }
+
+    .wb-titlebar-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .wb-btn {
+      width: 20px;
+      height: 16px;
+      background: #aaaaaa;
+      border: 1px solid #000;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wb-content {
+      padding: 16px;
+      background: #aaaaaa;
+    }
+
+    .load-title {
+      color: #000;
+      font-size: 14px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .progress-container {
+      background: #666;
+      border: 2px inset #888;
+      height: 20px;
+      width: 280px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: repeating-linear-gradient(
+        90deg,
+        #ff8800 0px,
+        #ff8800 8px,
+        #ffaa44 8px,
+        #ffaa44 16px
+      );
+      transition: width 0.1s;
+      animation: progressStripes 0.3s linear infinite;
+    }
+
+    @keyframes progressStripes {
+      0% { background-position: 0 0; }
+      100% { background-position: 16px 0; }
+    }
+
+    .load-status {
+      color: #000;
+      font-size: 12px;
+      margin-top: 8px;
+      text-align: center;
+      font-family: monospace;
+    }
+
+    .disk-activity {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+
+    .disk-led {
+      width: 12px;
+      height: 12px;
+      background: #440000;
+      border-radius: 50%;
+      border: 1px solid #222;
+      animation: diskBlink 0.15s step-end infinite;
+    }
+
+    @keyframes diskBlink {
+      50% { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
+    }
+
+    .disk-label {
+      font-size: 11px;
+      color: #000;
+    }
+
+    /* Main Demo Canvas */
+    #screen {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Copper bars overlay */
+    #copperOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      mix-blend-mode: screen;
+      opacity: 0.4;
+    }
+
+    /* Sine scroller at bottom */
+    #sinescroller {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      z-index: 3;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* Click to start overlay */
+    #clickStart {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 998;
+      cursor: pointer;
+    }
+
+    .start-text {
+      color: #ff8800;
+      font-size: clamp(16px, 4vw, 24px);
+      text-align: center;
+      animation: pulse 1.5s ease-in-out infinite;
+      text-shadow: 0 0 10px #ff8800;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    /* Scanlines effect */
+    #scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+    }
+
+    /* Mobile hint */
+    @media (max-width: 600px) {
+      .workbench-window {
+        min-width: 280px;
+      }
+      .progress-container {
+        width: 240px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Boot Screen (Insert Disk) -->
+<div id="bootscreen">
+  <svg class="boot-hand" viewBox="0 0 64 64" fill="none">
+    <!-- Floppy disk icon -->
+    <rect x="12" y="8" width="40" height="48" fill="#333" stroke="#666" stroke-width="2"/>
+    <rect x="20" y="8" width="24" height="16" fill="#aaa"/>
+    <rect x="24" y="12" width="16" height="8" fill="#666"/>
+    <rect x="18" y="36" width="28" height="16" fill="#222" rx="2"/>
+    <rect x="22" y="40" width="20" height="8" fill="#111"/>
+  </svg>
+  <div class="boot-text">INSERT DISK<br>CLICK TO START</div>
+</div>
+
+<!-- Workbench Loading Screen -->
+<div id="loadscreen">
+  <div class="workbench-window">
+    <div class="wb-titlebar">
+      <span>TEA.DEMO</span>
+      <div class="wb-titlebar-buttons">
+        <div class="wb-btn">▢</div>
+        <div class="wb-btn">▼</div>
+      </div>
+    </div>
+    <div class="wb-content">
+      <div class="load-title">Loading TEA.BAG.DEMO...</div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="load-status" id="loadStatus">Initializing...</div>
+      <div class="disk-activity">
+        <div class="disk-led"></div>
+        <span class="disk-label">DF0: TEA.BAG.ADF</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Demo -->
+<canvas id="screen"></canvas>
+<canvas id="copperOverlay"></canvas>
+<canvas id="sinescroller"></canvas>
+<div id="scanlines"></div>
+
+<!-- MicroMod - Pure JS MOD Player -->
+<script src="micromod.js"></script>
+
+<script>
+// ==================== CONFIGURATION ====================
+const CONFIG = {
+  PAL_FPS: 50,
+  MOD_FILE: 'DAXXChildren165bpm.mod',
+  SCROLLER_TEXT: '      *** TEABAG DEMO *** DEDICATED TO ALL AMIGA PIRATES AT CHELL CRICKET CLUB ***      PUT THE KETTLE ON DUCK! *** YORKSHIRE TEA, PG TIPS, TWININGS & TETLEY FOREVER ***      MILK FIRST? ARE YOU MENTAL!! ***      GREETINGS TO: FAIRLIGHT * SKID ROW * PARADOX * QUARTEX * RAZOR 1911 ***      KEEP THE AMIGA ALIVE! *** CODE BY WIL AND ROW OF TEA CREW 2026 ***   AUDIO MOD BY DAXX ***   REMEMBER THE DEMOSCENE *** A500 FOREVER ***      '
+};
+
+// ==================== GLOBALS ====================
+const canvas = document.getElementById('screen');
+const ctx = canvas.getContext('2d');
+const copperCanvas = document.getElementById('copperOverlay');
+const copperCtx = copperCanvas.getContext('2d');
+const scrollerCanvas = document.getElementById('sinescroller');
+const scrollerCtx = scrollerCanvas.getContext('2d');
+
+let width, height;
+let t = 0;
+let demoStarted = false;
+let audioStarted = false;
+
+// Audio
+let audioCtx = null;
+let modPlayer = null;
+let audioNode = null;
+
+// ==================== 8x8 BITMAP FONT ====================
+const FONT = {
+  'A':[0x18,0x3C,0x66,0x7E,0x66,0x66,0x66,0x00],
+  'B':[0x7C,0x66,0x66,0x7C,0x66,0x66,0x7C,0x00],
+  'C':[0x3C,0x66,0x60,0x60,0x60,0x66,0x3C,0x00],
+  'D':[0x78,0x6C,0x66,0x66,0x66,0x6C,0x78,0x00],
+  'E':[0x7E,0x60,0x60,0x7C,0x60,0x60,0x7E,0x00],
+  'F':[0x7E,0x60,0x60,0x7C,0x60,0x60,0x60,0x00],
+  'G':[0x3C,0x66,0x60,0x6E,0x66,0x66,0x3E,0x00],
+  'H':[0x66,0x66,0x66,0x7E,0x66,0x66,0x66,0x00],
+  'I':[0x3C,0x18,0x18,0x18,0x18,0x18,0x3C,0x00],
+  'J':[0x1E,0x0C,0x0C,0x0C,0x0C,0x6C,0x38,0x00],
+  'K':[0x66,0x6C,0x78,0x70,0x78,0x6C,0x66,0x00],
+  'L':[0x60,0x60,0x60,0x60,0x60,0x60,0x7E,0x00],
+  'M':[0x63,0x77,0x7F,0x6B,0x63,0x63,0x63,0x00],
+  'N':[0x66,0x76,0x7E,0x7E,0x6E,0x66,0x66,0x00],
+  'O':[0x3C,0x66,0x66,0x66,0x66,0x66,0x3C,0x00],
+  'P':[0x7C,0x66,0x66,0x7C,0x60,0x60,0x60,0x00],
+  'Q':[0x3C,0x66,0x66,0x66,0x6A,0x6C,0x36,0x00],
+  'R':[0x7C,0x66,0x66,0x7C,0x6C,0x66,0x66,0x00],
+  'S':[0x3C,0x66,0x60,0x3C,0x06,0x66,0x3C,0x00],
+  'T':[0x7E,0x18,0x18,0x18,0x18,0x18,0x18,0x00],
+  'U':[0x66,0x66,0x66,0x66,0x66,0x66,0x3C,0x00],
+  'V':[0x66,0x66,0x66,0x66,0x66,0x3C,0x18,0x00],
+  'W':[0x63,0x63,0x63,0x6B,0x7F,0x77,0x63,0x00],
+  'X':[0x66,0x66,0x3C,0x18,0x3C,0x66,0x66,0x00],
+  'Y':[0x66,0x66,0x66,0x3C,0x18,0x18,0x18,0x00],
+  'Z':[0x7E,0x06,0x0C,0x18,0x30,0x60,0x7E,0x00],
+  '0':[0x3C,0x66,0x6E,0x7E,0x76,0x66,0x3C,0x00],
+  '1':[0x18,0x38,0x18,0x18,0x18,0x18,0x7E,0x00],
+  '2':[0x3C,0x66,0x06,0x1C,0x30,0x60,0x7E,0x00],
+  '3':[0x3C,0x66,0x06,0x1C,0x06,0x66,0x3C,0x00],
+  '4':[0x0C,0x1C,0x3C,0x6C,0x7E,0x0C,0x0C,0x00],
+  '5':[0x7E,0x60,0x7C,0x06,0x06,0x66,0x3C,0x00],
+  '6':[0x1C,0x30,0x60,0x7C,0x66,0x66,0x3C,0x00],
+  '7':[0x7E,0x06,0x0C,0x18,0x30,0x30,0x30,0x00],
+  '8':[0x3C,0x66,0x66,0x3C,0x66,0x66,0x3C,0x00],
+  '9':[0x3C,0x66,0x66,0x3E,0x06,0x0C,0x38,0x00],
+  ' ':[0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00],
+  '*':[0x00,0x66,0x3C,0xFF,0x3C,0x66,0x00,0x00],
+  '.':[0x00,0x00,0x00,0x00,0x00,0x18,0x18,0x00],
+  ',':[0x00,0x00,0x00,0x00,0x00,0x18,0x18,0x30],
+  '!':[0x18,0x18,0x18,0x18,0x18,0x00,0x18,0x00],
+  '?':[0x3C,0x66,0x06,0x0C,0x18,0x00,0x18,0x00],
+  '-':[0x00,0x00,0x00,0x7E,0x00,0x00,0x00,0x00],
+  ':':[0x00,0x18,0x18,0x00,0x18,0x18,0x00,0x00],
+  "'":[0x18,0x18,0x30,0x00,0x00,0x00,0x00,0x00]
+};
+
+// ==================== RESIZE HANDLER ====================
+function resize() {
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+  copperCanvas.width = width;
+  copperCanvas.height = height;
+  scrollerCanvas.width = width;
+  scrollerCanvas.height = 80;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ==================== STARFIELD ====================
+const stars = [];
+for (let i = 0; i < 200; i++) {
+  stars.push({
+    x: Math.random() * 2 - 1,
+    y: Math.random() * 2 - 1,
+    z: Math.random() * 1.5 + 0.5,
+    speed: Math.random() * 0.02 + 0.01
+  });
+}
+
+function drawStarfield() {
+  for (let star of stars) {
+    star.z -= star.speed;
+    if (star.z <= 0.1) {
+      star.z = 1.5;
+      star.x = Math.random() * 2 - 1;
+      star.y = Math.random() * 2 - 1;
+    }
+
+    const sx = (star.x / star.z) * (width / 2) + width / 2;
+    const sy = (star.y / star.z) * (height / 2) + height / 2;
+
+    if (sx < 0 || sx > width || sy < 0 || sy > height) continue;
+
+    const size = (1 - star.z / 1.5) * 3 + 1;
+    const brightness = Math.floor((1 - star.z / 1.5) * 255);
+
+    ctx.fillStyle = `rgb(${brightness},${brightness},${brightness})`;
+    ctx.fillRect(sx, sy, size, size);
+  }
+}
+
+// ==================== COPPER BARS ====================
+function drawCopperBars() {
+  copperCtx.clearRect(0, 0, width, height);
+
+  const numBars = 8;
+  const barHeight = 12;
+
+  for (let i = 0; i < numBars; i++) {
+    const baseY = height / 2 + Math.sin(t * 0.05 + i * 0.8) * (height / 3);
+
+    // Gradient bar with classic Amiga copper colors
+    const gradient = copperCtx.createLinearGradient(0, baseY - barHeight, 0, baseY + barHeight);
+
+    const hue = (t * 2 + i * 45) % 360;
+    gradient.addColorStop(0, `hsla(${hue}, 100%, 20%, 0)`);
+    gradient.addColorStop(0.3, `hsla(${hue}, 100%, 50%, 0.8)`);
+    gradient.addColorStop(0.5, `hsla(${hue}, 100%, 70%, 1)`);
+    gradient.addColorStop(0.7, `hsla(${hue}, 100%, 50%, 0.8)`);
+    gradient.addColorStop(1, `hsla(${hue}, 100%, 20%, 0)`);
+
+    copperCtx.fillStyle = gradient;
+    copperCtx.fillRect(0, baseY - barHeight, width, barHeight * 2);
+  }
+}
+
+// ==================== PLASMA EFFECT ====================
+let plasmaBuffer = null;
+let plasmaData = null;
+
+function initPlasma() {
+  const pw = Math.floor(width / 4);
+  const ph = Math.floor(height / 4);
+  plasmaBuffer = ctx.createImageData(pw, ph);
+  plasmaData = plasmaBuffer.data;
+}
+
+function drawPlasma() {
+  if (!plasmaBuffer || plasmaBuffer.width !== Math.floor(width / 4)) {
+    initPlasma();
+  }
+
+  const pw = plasmaBuffer.width;
+  const ph = plasmaBuffer.height;
+
+  for (let y = 0; y < ph; y++) {
+    for (let x = 0; x < pw; x++) {
+      const v1 = Math.sin(x * 0.05 + t * 0.1);
+      const v2 = Math.sin((y * 0.05 + t * 0.08));
+      const v3 = Math.sin((x * 0.03 + y * 0.03 + t * 0.05));
+      const v4 = Math.sin(Math.sqrt((x - pw/2) * (x - pw/2) + (y - ph/2) * (y - ph/2)) * 0.05 - t * 0.1);
+
+      const v = (v1 + v2 + v3 + v4) / 4;
+
+      const idx = (y * pw + x) * 4;
+      plasmaData[idx] = Math.floor((Math.sin(v * Math.PI + t * 0.1) + 1) * 127);
+      plasmaData[idx + 1] = Math.floor((Math.sin(v * Math.PI + 2.094 + t * 0.12) + 1) * 127);
+      plasmaData[idx + 2] = Math.floor((Math.sin(v * Math.PI + 4.188 + t * 0.08) + 1) * 127);
+      plasmaData[idx + 3] = 255;
+    }
+  }
+
+  // Draw scaled up
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = pw;
+  tempCanvas.height = ph;
+  tempCanvas.getContext('2d').putImageData(plasmaBuffer, 0, 0);
+
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tempCanvas, 0, 0, width, height);
+}
+
+// ==================== ROTATING 3D CUBE ====================
+const cubeVertices = [
+  [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+  [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
+];
+
+const cubeEdges = [
+  [0, 1], [1, 2], [2, 3], [3, 0],
+  [4, 5], [5, 6], [6, 7], [7, 4],
+  [0, 4], [1, 5], [2, 6], [3, 7]
+];
+
+function drawCube(cx, cy, size, rotX, rotY, rotZ) {
+  const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+  const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+  const cosZ = Math.cos(rotZ), sinZ = Math.sin(rotZ);
+
+  const projected = cubeVertices.map(v => {
+    let [x, y, z] = v;
+
+    // Rotate Y
+    let temp = x;
+    x = x * cosY - z * sinY;
+    z = temp * sinY + z * cosY;
+
+    // Rotate X
+    temp = y;
+    y = y * cosX - z * sinX;
+    z = temp * sinX + z * cosX;
+
+    // Rotate Z
+    temp = x;
+    x = x * cosZ - y * sinZ;
+    y = temp * sinZ + y * cosZ;
+
+    // Perspective
+    const scale = size / (z + 4);
+    return [cx + x * scale, cy + y * scale];
+  });
+
+  ctx.strokeStyle = '#00ffcc';
+  ctx.lineWidth = 2;
+  ctx.shadowColor = '#00ffcc';
+  ctx.shadowBlur = 10;
+
+  for (let edge of cubeEdges) {
+    ctx.beginPath();
+    ctx.moveTo(projected[edge[0]][0], projected[edge[0]][1]);
+    ctx.lineTo(projected[edge[1]][0], projected[edge[1]][1]);
+    ctx.stroke();
+  }
+
+  ctx.shadowBlur = 0;
+}
+
+// ==================== ROTATING TORUS / DONUT ====================
+function drawTorus(cx, cy, R, r, rotX, rotY) {
+  const cosA = Math.cos(rotX), sinA = Math.sin(rotX);
+  const cosB = Math.cos(rotY), sinB = Math.sin(rotY);
+
+  ctx.fillStyle = '#ff8800';
+
+  for (let theta = 0; theta < Math.PI * 2; theta += 0.2) {
+    for (let phi = 0; phi < Math.PI * 2; phi += 0.15) {
+      const cosTheta = Math.cos(theta), sinTheta = Math.sin(theta);
+      const cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+
+      // Torus parametric
+      let x = (R + r * cosTheta) * cosPhi;
+      let y = (R + r * cosTheta) * sinPhi;
+      let z = r * sinTheta;
+
+      // Rotate
+      let temp = y;
+      y = y * cosA - z * sinA;
+      z = temp * sinA + z * cosA;
+
+      temp = x;
+      x = x * cosB - z * sinB;
+      z = temp * sinB + z * cosB;
+
+      // Perspective & plot
+      if (z > -3) {
+        const scale = 150 / (z + 4);
+        const sx = cx + x * scale;
+        const sy = cy + y * scale;
+        const brightness = Math.max(0, Math.min(255, (z + 2) * 60 + 100));
+        ctx.fillStyle = `rgb(${brightness}, ${Math.floor(brightness * 0.5)}, 0)`;
+        ctx.fillRect(sx, sy, 3, 3);
+      }
+    }
+  }
+}
+
+// ==================== DRAW BIG TEXT ====================
+function drawBigText(text, x, y, scale, color, shadow) {
+  text = text.toUpperCase();
+
+  if (shadow) {
+    ctx.fillStyle = '#000';
+    for (let i = 0; i < text.length; i++) {
+      const glyph = FONT[text[i]] || FONT[' '];
+      for (let row = 0; row < 8; row++) {
+        for (let bit = 0; bit < 8; bit++) {
+          if (glyph[row] & (1 << (7 - bit))) {
+            ctx.fillRect(x + (i * 9 + bit) * scale + 2, y + row * scale + 2, scale, scale);
+          }
+        }
+      }
+    }
+  }
+
+  ctx.fillStyle = color;
+  for (let i = 0; i < text.length; i++) {
+    const glyph = FONT[text[i]] || FONT[' '];
+    for (let row = 0; row < 8; row++) {
+      for (let bit = 0; bit < 8; bit++) {
+        if (glyph[row] & (1 << (7 - bit))) {
+          ctx.fillRect(x + (i * 9 + bit) * scale, y + row * scale, scale, scale);
+        }
+      }
+    }
+  }
+}
+
+// ==================== SINE WAVE SCROLLER ====================
+let scrollOffset = 0;
+
+function drawSineScroller() {
+  scrollerCtx.fillStyle = '#000020';
+  scrollerCtx.fillRect(0, 0, scrollerCanvas.width, 80);
+
+  const text = CONFIG.SCROLLER_TEXT;
+  const charWidth = 16;
+  const charHeight = 16;
+  const amplitude = 15;
+
+  scrollOffset += 3;
+  if (scrollOffset > text.length * charWidth) {
+    scrollOffset = 0;
+  }
+
+  const startChar = Math.floor(scrollOffset / charWidth);
+  const pixelOffset = scrollOffset % charWidth;
+
+  for (let i = 0; i < Math.ceil(scrollerCanvas.width / charWidth) + 2; i++) {
+    const charIndex = (startChar + i) % text.length;
+    const char = text[charIndex].toUpperCase();
+    const glyph = FONT[char] || FONT[' '];
+
+    const baseX = i * charWidth - pixelOffset;
+    const sineY = Math.sin((scrollOffset + i * 20) * 0.03) * amplitude + 30;
+
+    // Rainbow color based on position
+    const hue = (scrollOffset + i * 15) % 360;
+
+    // Shadow
+    scrollerCtx.fillStyle = '#000';
+    for (let row = 0; row < 8; row++) {
+      for (let bit = 0; bit < 8; bit++) {
+        if (glyph[row] & (1 << (7 - bit))) {
+          scrollerCtx.fillRect(baseX + bit * 2 + 2, sineY + row * 2 + 2, 2, 2);
+        }
+      }
+    }
+
+    // Main text
+    scrollerCtx.fillStyle = `hsl(${hue}, 100%, 60%)`;
+    for (let row = 0; row < 8; row++) {
+      for (let bit = 0; bit < 8; bit++) {
+        if (glyph[row] & (1 << (7 - bit))) {
+          scrollerCtx.fillRect(baseX + bit * 2, sineY + row * 2, 2, 2);
+        }
+      }
+    }
+  }
+}
+
+// ==================== BOUNCING LOGO / TEA BAG ====================
+function drawTeaBag(x, y, scale) {
+  // String
+  ctx.strokeStyle = '#888';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + scale * 2, y - scale * 4);
+  ctx.lineTo(x + scale * 2, y);
+  ctx.stroke();
+
+  // Tag
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(x + scale, y - scale * 6, scale * 3, scale * 2);
+  ctx.fillStyle = '#c00';
+  ctx.font = `${scale}px monospace`;
+  ctx.fillText('T', x + scale * 1.5, y - scale * 4.5);
+
+  // Bag body
+  ctx.fillStyle = '#c9a066';
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + scale * 4, y);
+  ctx.lineTo(x + scale * 3.5, y + scale * 5);
+  ctx.lineTo(x + scale * 0.5, y + scale * 5);
+  ctx.closePath();
+  ctx.fill();
+
+  // Tea stain texture
+  ctx.fillStyle = '#a08050';
+  ctx.fillRect(x + scale, y + scale, scale * 2, scale * 3);
+}
+
+// ==================== SCENE MANAGEMENT ====================
+let currentScene = 0;
+let sceneTimer = 0;
+const SCENE_DURATION = 400; // frames per scene
+
+function drawScene() {
+  ctx.fillStyle = '#000020';
+  ctx.fillRect(0, 0, width, height);
+
+  sceneTimer++;
+  if (sceneTimer > SCENE_DURATION) {
+    sceneTimer = 0;
+    currentScene = (currentScene + 1) % 4;
+  }
+
+  switch (currentScene) {
+    case 0: // Starfield + bouncing objects
+      drawStarfield();
+
+      // Bouncing cube
+      const cubeX = width / 2 + Math.sin(t * 0.03) * (width / 4);
+      const cubeY = height / 2 + Math.cos(t * 0.025) * (height / 6);
+      drawCube(cubeX, cubeY, 120, t * 0.02, t * 0.03, t * 0.01);
+
+      // Floating tea bags
+      for (let i = 0; i < 5; i++) {
+        const tx = (width * 0.1 + i * width * 0.2 + t * 2) % (width + 100) - 50;
+        const ty = height * 0.3 + Math.sin(t * 0.08 + i * 1.5) * 50;
+        drawTeaBag(tx, ty, 6);
+      }
+      break;
+
+    case 1: // Plasma
+      drawPlasma();
+      break;
+
+    case 2: // Torus + starfield
+      drawStarfield();
+      drawTorus(width / 2, height / 2, 1.5, 0.5, t * 0.03, t * 0.02);
+      break;
+
+    case 3: // Starfield with multiple cubes
+      drawStarfield();
+      for (let i = 0; i < 3; i++) {
+        const cx = width * (0.25 + i * 0.25);
+        const cy = height / 2 + Math.sin(t * 0.04 + i * 2) * 80;
+        drawCube(cx, cy, 80 + i * 20, t * 0.02 + i, t * 0.03 + i * 0.5, t * 0.015);
+      }
+      break;
+  }
+
+  // Always draw title
+  const titleScale = Math.min(4, width / 100);
+  const titleWidth = 'TEA.BAG.DEMO'.length * 9 * titleScale;
+  drawBigText('TEA.BAG.DEMO', width / 2 - titleWidth / 2, 60, titleScale, '#ffcc00', true);
+
+  const subScale = Math.min(2, width / 180);
+  const subText = 'CHELL CRICKET CLUB MONDAY NIGHT - YOU COMING??';
+  const subWidth = subText.length * 9 * subScale;
+  drawBigText(subText, width / 2 - subWidth / 2, 60 + titleScale * 10, subScale, '#00ffcc', true);
+
+  t += 1;
+}
+
+// ==================== MOD PLAYER ====================
+async function initAudio() {
+  if (audioStarted) return;
+
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    if (audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+
+    console.log('Initializing MicroMod player...');
+
+    // Use MicroMod - pure JavaScript MOD player
+    modPlayer = new MicroMod(audioCtx);
+    await modPlayer.load(CONFIG.MOD_FILE);
+    modPlayer.play();
+
+    audioStarted = true;
+    console.log('MOD playback started!');
+
+  } catch (err) {
+    console.error('Audio init error:', err);
+    audioStarted = true; // Continue without audio
+  }
+}
+
+// ==================== LOADING SEQUENCE ====================
+const bootscreen = document.getElementById('bootscreen');
+const loadscreen = document.getElementById('loadscreen');
+const progressBar = document.getElementById('progressBar');
+const loadStatus = document.getElementById('loadStatus');
+
+const loadSteps = [
+  { progress: 5, status: 'Checking DF0:...' },
+  { progress: 15, status: 'Loading Kickstart...' },
+  { progress: 25, status: 'Initializing Copper...' },
+  { progress: 35, status: 'Allocating Chip RAM...' },
+  { progress: 45, status: 'Loading TEA.MOD...' },
+  { progress: 55, status: 'Decrunching data...' },
+  { progress: 70, status: 'Setting up Blitter...' },
+  { progress: 80, status: 'Initializing Paula...' },
+  { progress: 90, status: 'Starting demo...' },
+  { progress: 100, status: 'Ready!' }
+];
+
+async function simulateLoading() {
+  loadscreen.style.display = 'flex';
+
+  for (let step of loadSteps) {
+    progressBar.style.width = step.progress + '%';
+    loadStatus.textContent = step.status;
+    await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
+  }
+
+  await new Promise(r => setTimeout(r, 500));
+  loadscreen.style.display = 'none';
+}
+
+// ==================== MAIN LOOP ====================
+let lastFrame = 0;
+const frameTime = 1000 / CONFIG.PAL_FPS;
+let accumulator = 0;
+
+function mainLoop(timestamp) {
+  if (!demoStarted) {
+    requestAnimationFrame(mainLoop);
+    return;
+  }
+
+  const delta = timestamp - lastFrame;
+  lastFrame = timestamp;
+  accumulator += delta;
+
+  while (accumulator >= frameTime) {
+    accumulator -= frameTime;
+
+    // Draw main scene
+    drawScene();
+
+    // Draw copper bars overlay
+    drawCopperBars();
+
+    // Draw sine scroller
+    drawSineScroller();
+  }
+
+  requestAnimationFrame(mainLoop);
+}
+
+// ==================== START ====================
+async function startDemo() {
+  bootscreen.classList.add('hidden');
+
+  await simulateLoading();
+
+  demoStarted = true;
+  initAudio();
+}
+
+// Click handler for boot screen
+bootscreen.addEventListener('click', startDemo);
+bootscreen.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  startDemo();
+});
+
+// Start the animation loop
+requestAnimationFrame(mainLoop);
+</script>
+
+</body>
+</html>
