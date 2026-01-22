@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Proxmoxes on rowstu.net</title><link>https://rowstu.net/proxmox/</link><description>Recent content in Proxmoxes on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/proxmox/index.xml" rel="self" type="application/rss+xml"/><item><title>Proxmox notes</title><link>https://rowstu.net/proxmox/notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/proxmox/notes/</guid><description>&lt;p&gt;&lt;strong&gt;Proxmox VE&lt;/strong&gt; is an open-source virtualization platform based on &lt;strong&gt;Debian Linux&lt;/strong&gt; that integrates:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;KVM&lt;/strong&gt; – full virtual machines (Windows, Linux, BSD)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LXC&lt;/strong&gt; – lightweight system containers&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Web-based management UI&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Software-defined storage&lt;/strong&gt; (ZFS, Ceph, LVM)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Built-in backup, clustering, and HA&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="key-strengths"&gt;Key Strengths&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Free and open-source (paid support optional)&lt;/li&gt;
+&lt;li&gt;Excellent web UI&lt;/li&gt;
+&lt;li&gt;ZFS and snapshot support&lt;/li&gt;
+&lt;li&gt;Native clustering without external tooling&lt;/li&gt;
+&lt;li&gt;Ideal for homelabs, SMEs, and edge environments&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="installation-and-configuration"&gt;Installation and Configuration&lt;/h2&gt;
+&lt;h3 id="hardware-requirements-realistic-minimums"&gt;Hardware Requirements (Realistic Minimums)&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Minimum&lt;/strong&gt;&lt;/p&gt;</description></item></channel></rss>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dockers on rowstu.net</title><link>https://rowstu.net/docker/</link><description>Recent content in Dockers on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>Docker Notes</title><link>https://rowstu.net/docker/notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/docker/notes/</guid><description>&lt;p&gt;Docker is a platform that automates the deployment of applications inside lightweight, portable containers. Containers package an application with everything it needs to run: code, runtime, libraries, and system tools.&lt;/p&gt;
+&lt;h3 id="key-benefits"&gt;&lt;strong&gt;Key Benefits&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Consistency:&lt;/strong&gt; Runs the same way everywhere (dev, test, prod).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Isolation:&lt;/strong&gt; Containers run independently and don’t interfere with each other.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Efficiency:&lt;/strong&gt; Uses fewer resources than VMs (no full OS per container).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Portability:&lt;/strong&gt; Works across different OSes and environments.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Speed:&lt;/strong&gt; Containers start in seconds.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="core-concepts"&gt;&lt;strong&gt;Core Concepts&lt;/strong&gt;&lt;/h2&gt;
+&lt;h3 id="containers"&gt;&lt;strong&gt;Containers&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Lightweight, standalone runtime environments.&lt;/li&gt;
+&lt;li&gt;Run processes in isolation.&lt;/li&gt;
+&lt;li&gt;Share the host kernel but have isolated user space.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="images"&gt;&lt;strong&gt;Images&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Read-only templates used to create containers.&lt;/li&gt;
+&lt;li&gt;Built from layers (each command in Dockerfile creates a new layer).&lt;/li&gt;
+&lt;li&gt;Can be versioned/tagged.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="dockerfile"&gt;&lt;strong&gt;Dockerfile&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Text file defining how to build an image.&lt;/li&gt;
+&lt;li&gt;Contains instructions like &lt;code&gt;FROM&lt;/code&gt;, &lt;code&gt;RUN&lt;/code&gt;, &lt;code&gt;COPY&lt;/code&gt;, &lt;code&gt;CMD&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="registry"&gt;&lt;strong&gt;Registry&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Storage for Docker images (e.g., Docker Hub, GitHub Container Registry).&lt;/li&gt;
+&lt;li&gt;Allows sharing and distributing images.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="docker-engine"&gt;&lt;strong&gt;Docker Engine&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Runtime that builds and runs containers.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="installation"&gt;&lt;strong&gt;Installation&lt;/strong&gt;&lt;/h2&gt;
+&lt;h3 id="linux-ubuntu"&gt;&lt;strong&gt;Linux (Ubuntu)&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install -y docker.io
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo systemctl enable --now docker
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo usermod -aG docker $USER
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="linux-centosrhel"&gt;&lt;strong&gt;Linux (CentOS/RHEL)&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo yum install -y yum-utils
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo yum install docker-ce docker-ce-cli containerd.io
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo systemctl enable --now docker
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo usermod -aG docker $USER
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Verify installation:&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker version
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker info
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Test run:&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker run hello-world
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id="3-basic-commands--usage"&gt;&lt;strong&gt;3. Basic Commands &amp;amp; Usage&lt;/strong&gt;&lt;/h1&gt;
+&lt;h2 id="common-commands"&gt;&lt;strong&gt;Common Commands&lt;/strong&gt;&lt;/h2&gt;
+&lt;h3 id="run-a-container"&gt;&lt;strong&gt;Run a container&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker run -it ubuntu bash
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="list-containers"&gt;&lt;strong&gt;List containers&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker ps
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker ps -a
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="stop--start--remove"&gt;&lt;strong&gt;Stop / Start / Remove&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker stop &amp;lt;container_id&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker start &amp;lt;container_id&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker rm &amp;lt;container_id&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="pull-an-image"&gt;&lt;strong&gt;Pull an image&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker pull nginx:latest
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="build-an-image"&gt;&lt;strong&gt;Build an image&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker build -t myapp:1.0 .
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="list-images"&gt;&lt;strong&gt;List images&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker images
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="basic-workflow-example"&gt;&lt;strong&gt;Basic Workflow Example&lt;/strong&gt;&lt;/h2&gt;
+&lt;h3 id="1-create-dockerfile"&gt;&lt;strong&gt;1. Create Dockerfile&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-dockerfile" data-lang="dockerfile"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;FROM&lt;/span&gt; &lt;span style="color:#e6db74"&gt;python:3.12-slim&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;WORKDIR&lt;/span&gt; &lt;span style="color:#e6db74"&gt;/app&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;COPY&lt;/span&gt; . /app&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;RUN&lt;/span&gt; pip install -r requirements.txt&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;CMD&lt;/span&gt; [&lt;span style="color:#e6db74"&gt;&amp;#34;python&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;app.py&amp;#34;&lt;/span&gt;]&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="2-build-image"&gt;&lt;strong&gt;2. Build image&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker build -t myapp:1.0 .
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="3-run-container"&gt;&lt;strong&gt;3. Run container&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker run -d -p 5000:5000 myapp:1.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="4-verify"&gt;&lt;strong&gt;4. Verify&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl http://localhost:5000
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id="4-docker-networking"&gt;&lt;strong&gt;4. Docker Networking&lt;/strong&gt;&lt;/h1&gt;
+&lt;h2 id="networking-principles"&gt;&lt;strong&gt;Networking Principles&lt;/strong&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Each container gets its own network namespace.&lt;/li&gt;
+&lt;li&gt;Containers can communicate via virtual network interfaces.&lt;/li&gt;
+&lt;li&gt;Docker creates a default bridge network (&lt;code&gt;docker0&lt;/code&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="network-types"&gt;&lt;strong&gt;Network Types&lt;/strong&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Bridge (default):&lt;/strong&gt; Containers on same host communicate via bridge.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Host:&lt;/strong&gt; Container uses host’s network stack.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Overlay:&lt;/strong&gt; Multi-host networking (Docker Swarm).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Macvlan:&lt;/strong&gt; Containers get IPs from LAN subnet.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="create--manage-networks"&gt;&lt;strong&gt;Create &amp;amp; Manage Networks&lt;/strong&gt;&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker network create mynet
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker network ls
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker network inspect mynet
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="run-containers-on-same-network"&gt;&lt;strong&gt;Run containers on same network&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker run -d --name app1 --network mynet nginx
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker run -d --name app2 --network mynet nginx
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="communication"&gt;&lt;strong&gt;Communication&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker exec -it app1 ping app2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id="managing-docker-images"&gt;&lt;strong&gt;Managing Docker Images&lt;/strong&gt;&lt;/h1&gt;
+&lt;h2 id="best-practices"&gt;&lt;strong&gt;Best Practices&lt;/strong&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Use official base images&lt;/strong&gt; (e.g., &lt;code&gt;python&lt;/code&gt;, &lt;code&gt;nginx&lt;/code&gt;, &lt;code&gt;alpine&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Keep images small&lt;/strong&gt; (avoid bloated base images)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pin versions&lt;/strong&gt; (&lt;code&gt;python:3.12-slim&lt;/code&gt;, not &lt;code&gt;python:latest&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Minimize layers&lt;/strong&gt; (combine commands)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Use &lt;code&gt;.dockerignore&lt;/code&gt;&lt;/strong&gt; to exclude unnecessary files&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="optimizing-image-size"&gt;&lt;strong&gt;Optimizing Image Size&lt;/strong&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Use &lt;strong&gt;multi-stage builds&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Remove build dependencies after install&lt;/li&gt;
+&lt;li&gt;Use &lt;strong&gt;slim&lt;/strong&gt; or &lt;strong&gt;alpine&lt;/strong&gt; base images&lt;/li&gt;
+&lt;li&gt;Clean package caches&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="example-multi-stage-build"&gt;&lt;strong&gt;Example (multi-stage build)&lt;/strong&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-dockerfile" data-lang="dockerfile"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;FROM&lt;/span&gt; &lt;span style="color:#e6db74"&gt;node:20&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;AS&lt;/span&gt; &lt;span style="color:#e6db74"&gt;builder&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;WORKDIR&lt;/span&gt; &lt;span style="color:#e6db74"&gt;/app&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;COPY&lt;/span&gt; package.json .&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;RUN&lt;/span&gt; npm install&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;COPY&lt;/span&gt; . .&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;RUN&lt;/span&gt; npm run build&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;FROM&lt;/span&gt; &lt;span style="color:#e6db74"&gt;nginx:alpine&lt;/span&gt;&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;COPY&lt;/span&gt; --from&lt;span style="color:#f92672"&gt;=&lt;/span&gt;builder /app/build /usr/share/nginx/html&lt;span style="color:#960050;background-color:#1e0010"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id="docker-compose"&gt;&lt;strong&gt;Docker Compose&lt;/strong&gt;&lt;/h1&gt;
+&lt;h2 id="what-is-docker-compose"&gt;&lt;strong&gt;What is Docker Compose?&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Docker Compose defines and runs multi-container applications using a YAML file (&lt;code&gt;docker-compose.yml&lt;/code&gt;).&lt;/p&gt;</description></item></channel></rss>

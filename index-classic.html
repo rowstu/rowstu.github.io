@@ -228,6 +228,13 @@
 			box-shadow: 0 8px 24px rgba(183, 148, 246, 0.2);
 		}
 
+		.personal .section-title::before { background: #10b981; }
+		.personal .card::before { background: #10b981; }
+		.personal .card:hover {
+			border-color: #10b981;
+			box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+		}
+
 		.maths .card::before { background: var(--accent-yellow); }
 		.maths .card:hover {
 			border-color: var(--accent-yellow);
@@ -434,7 +441,7 @@
 
 	<div class="container">
 		<section class="section notes">
-			<h2 class="section-title">Documentation & Notes</h2>
+			<h2 class="section-title">Technical Notes</h2>
 			<div class="grid">
 				<div class="card">
 					<a href="/amiga/">
@@ -504,8 +511,8 @@
 				</div>
 				<div class="card">
 					<a href="/maths/">
-						<div class="card-title">Mathematics</div>
-						<div class="card-desc">Math concepts and problems</div>
+						<div class="card-title">Maths</div>
+						<div class="card-desc">Maths concepts and problems</div>
 					</a>
 				</div>
 				<div class="card">
@@ -530,6 +537,108 @@
 					<a href="/incus/">
 						<div class="card-title">Incus</div>
 						<div class="card-desc">Incus notes.</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/kubernetes/">
+						<div class="card-title">Kubernetes</div>
+						<div class="card-desc">Kubernetes notes.</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/docker/">
+						<div class="card-title">Docker</div>
+						<div class="card-desc">Docker notes.</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/vmware/">
+						<div class="card-title">VMWare</div>
+						<div class="card-desc">VMWare notes.</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/proxmox/">
+						<div class="card-title">Proxmox</div>
+						<div class="card-desc">Proxmox notes.</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="section personal">
+			<h2 class="section-title">Personal Notes</h2>
+			<div class="grid">
+				<div class="card">
+					<a href="/personal/quotes/">
+						<div class="card-title">Quotes</div>
+						<div class="card-desc">Collected quotes and sayings</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/inspiration/">
+						<div class="card-title">Inspiration</div>
+						<div class="card-desc">Inspirational thoughts and ideas</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/dictionary/">
+						<div class="card-title">Dictionary</div>
+						<div class="card-desc">Personal word definitions</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/grammar/">
+						<div class="card-title">Grammar</div>
+						<div class="card-desc">Grammar notes and rules</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/phrases/">
+						<div class="card-title">Phrases</div>
+						<div class="card-desc">Useful phrases and expressions</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/collective-nouns/">
+						<div class="card-title">Collective Nouns</div>
+						<div class="card-desc">Groups and gatherings</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/prefixes-suffixes/">
+						<div class="card-title">Prefixes & Suffixes</div>
+						<div class="card-desc">Word building blocks</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/socratic-method/">
+						<div class="card-title">Socratic Method</div>
+						<div class="card-desc">The art of questioning</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/buddhist-noble-truths/">
+						<div class="card-title">Buddhist Noble Truths</div>
+						<div class="card-desc">The four noble truths</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/learning-ideas/">
+						<div class="card-title">Learning Ideas</div>
+						<div class="card-desc">Topics to explore</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/to-watch-list/">
+						<div class="card-title">Watch List</div>
+						<div class="card-desc">Films and shows to watch</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="/personal/links/">
+						<div class="card-title">Links</div>
+						<div class="card-desc">Useful links and resources</div>
 					</a>
 				</div>
 			</div>
@@ -728,7 +837,7 @@
 		</section>
 
 		<section class="section games">
-			<h2 class="section-title">Games</h2>
+			<h2 class="section-title">Games and Demos</h2>
 			<div class="grid">
 				<div class="card">
 					<a href="craple.html">
@@ -738,8 +847,14 @@
 				</div>
 				<div class="card">
 					<a href="math1.html">
-						<div class="card-title">Math Practice</div>
+						<div class="card-title">Math Practice 1</div>
 						<div class="card-desc">Interactive math exercises</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="math2.html">
+						<div class="card-title">Math Practice 2</div>
+						<div class="card-desc">More interactive math exercises</div>
 					</a>
 				</div>
 				<div class="card">
@@ -767,16 +882,34 @@
 					</a>
 				</div>
 				<div class="card">
+					<a href="space_mobile.html">
+						<div class="card-title">Space Game Mobile</div>
+						<div class="card-desc">Mobile space shooter</div>
+					</a>
+				</div>
+				<div class="card">
 					<a href="games/asteroids/index.html">
 						<div class="card-title">Asteroids</div>
 						<div class="card-desc">Classic arcade space shooter</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="gfdemo.html">
+						<div class="card-title">GF Demo</div>
+						<div class="card-desc">Graphics demo</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="teabag/index.html">
+						<div class="card-title">Tea Drinkers Demo</div>
+						<div class="card-desc">Amiga style demo disk in Javascript</div>
 					</a>
 				</div>
 			</div>
 		</section>
 
 		<section class="section maths" style="--accent-section: #ffd23f;">
-			<h2 class="section-title">Mathematics</h2>
+			<h2 class="section-title">Maths Tools</h2>
 			<div class="grid">
 				<div class="card">
 					<a href="percentage-calc.html">
