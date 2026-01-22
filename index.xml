@@ -46,8 +46,7 @@ examples = [
 
 cleaned_examples = [clean_and_format(example) for example in examples]
 print(cleaned_examples)
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>About</title><link>https://rowstu.net/docs/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/docs/about/</guid><description>&lt;h1 id="about"&gt;About&lt;/h1&gt;
-&lt;p&gt;This is the about page&lt;/p&gt;</description></item><item><title>Almost Binary</title><link>https://rowstu.net/hackattic/almost-binary/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/almost-binary/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Almost Binary</title><link>https://rowstu.net/hackattic/almost-binary/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/almost-binary/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
 
 def main():
  input = (sys.stdin.read().split())
@@ -406,7 +405,25 @@ From: nvidia/cuda:12.2.0-runtime-ubuntu22.04
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="backend-configuration"&gt;Backend Configuration&lt;/h2&gt;
-&lt;p&gt;Store state remotely in S3 with DynamoDB locking.&lt;/p&gt;</description></item><item><title>Book.Thinking</title><link>https://rowstu.net/books/book.thinking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/book.thinking/</guid><description>&lt;h1 id="key-lessons-from-dont-believe-everything-you-think"&gt;Key lessons from Don&amp;rsquo;t Believe Everything You Think&lt;/h1&gt;
+&lt;p&gt;Store state remotely in S3 with DynamoDB locking.&lt;/p&gt;</description></item><item><title>Azure VMware Solution (AVS)</title><link>https://rowstu.net/azure/avs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/azure/avs/</guid><description>&lt;p&gt;&lt;strong&gt;Azure VMware Solution&lt;/strong&gt; provides &lt;strong&gt;fully managed VMware SDDC private clouds&lt;/strong&gt; on Azure bare-metal infrastructure. It runs VMware’s core stack — &lt;strong&gt;vSphere, vSAN, NSX-T and vCenter&lt;/strong&gt; — allowing you to lift &amp;amp; shift VMware workloads into Azure without refactoring. Microsoft manages the infrastructure, VMware licenses and patches, giving you enterprise-grade cloud capacity with familiar tooling. (&lt;a href="https://learn.microsoft.com/en-us/azure/azure-vmware/introduction?utm_source=chatgpt.com" title="Introduction - Azure VMware Solution"&gt;Microsoft Learn&lt;/a&gt;)&lt;/p&gt;
+&lt;h3 id="key-features--benefits"&gt;&lt;strong&gt;Key Features &amp;amp; Benefits&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Seamless migration&lt;/strong&gt; of VMware workloads without replatforming. (&lt;a href="https://azure.microsoft.com/en-in/products/azure-vmware?utm_source=chatgpt.com" title="Azure VMware Solution | Microsoft Azure"&gt;Microsoft Azure&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Familiar VMware tooling&lt;/strong&gt; (vCenter, HCX, NSX Manager). (&lt;a href="https://azure-int.microsoft.com/en-us/products/azure-vmware/?utm_source=chatgpt.com" title="Azure VMware Solution | Microsoft Azure"&gt;azure-int.microsoft.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fully managed infrastructure&lt;/strong&gt; — Microsoft maintains the control plane and hardware. (&lt;a href="https://learn.microsoft.com/en-us/azure/azure-vmware/?utm_source=chatgpt.com" title="Azure VMware Solution documentation"&gt;Microsoft Learn&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Integration with 200+ Azure services&lt;/strong&gt; (backup, security, AI/ML). (&lt;a href="https://azure.microsoft.com/en-in/products/azure-vmware?utm_source=chatgpt.com" title="Azure VMware Solution | Microsoft Azure"&gt;Microsoft Azure&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Scalable private clouds&lt;/strong&gt; — host clusters from 3 up to 16 hosts. (&lt;a href="https://learn.microsoft.com/en-us/azure/azure-vmware/introduction?utm_source=chatgpt.com" title="Introduction - Azure VMware Solution"&gt;Microsoft Learn&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Cost benefits&lt;/strong&gt;: Reservations, Azure Hybrid Benefit and Extended Security Updates for Windows &amp;amp; SQL Server. (&lt;a href="https://azure.microsoft.com/en-gb/pricing/details/azure-vmware-cloudsimple/?utm_source=chatgpt.com" title="Pricing - Azure VMware Solution | Microsoft Azure"&gt;Microsoft Azure&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="integration-with-azure-services"&gt;&lt;strong&gt;Integration with Azure Services&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Azure ExpressRoute&lt;/strong&gt; connects on-premises to AVS for low-latency networking. (&lt;a href="https://learn.microsoft.com/en-us/azure/azure-vmware/deploy-azure-vmware-solution?utm_source=chatgpt.com" title="Deploy and configure Azure VMware Solution"&gt;Microsoft Learn&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Azure Monitor &amp;amp; Logs&lt;/strong&gt; for visibility across VM workloads and infrastructure. (&lt;a href="https://learn.microsoft.com/en-us/azure/azure-vmware/azure-vmware-solution-private-cloud-maintenance-best-practices?utm_source=chatgpt.com" title="Azure VMware Solution - private cloud maintenance best practices - Microsoft Learn"&gt;Microsoft Learn&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Azure Security Center / Defender for Cloud&lt;/strong&gt; can protect AVS tenant workloads. (&lt;a href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure-vmware/eslz-security-governance-and-compliance?utm_source=chatgpt.com" title="Security, governance, and compliance disciplines for Azure VMware Solution - Cloud Adoption Framework | Microsoft Learn"&gt;Microsoft Learn&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Azure Backup &amp;amp; Site Recovery&lt;/strong&gt; integration for disaster recovery strategies. (&lt;a href="https://azure.microsoft.com/en-us/blog/the-new-azure-vmware-solution-is-now-generally-available/?utm_source=chatgpt.com" title="The new Azure VMware Solution is now generally available | Microsoft Azure Blog"&gt;Microsoft Azure&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Further reading:&lt;/strong&gt;
+🔗 Azure VMware Solution docs — &lt;a href="https://learn.microsoft.com/en-us/azure/azure-vmware/?utm_source=chatgpt.com"&gt;Official AVS Microsoft Docs&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Book.Thinking</title><link>https://rowstu.net/books/book.thinking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/book.thinking/</guid><description>&lt;h1 id="key-lessons-from-dont-believe-everything-you-think"&gt;Key lessons from Don&amp;rsquo;t Believe Everything You Think&lt;/h1&gt;
 &lt;p&gt;Thinking is an active process.&lt;/p&gt;
 &lt;p&gt;Thoughts happen all by them selves.&lt;/p&gt;
 &lt;p&gt;The two are similar but not the same thing.&lt;/p&gt;
@@ -2425,7 +2442,33 @@ Shift Left:
  &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;h3 id="severity-criteria"&gt;Severity Criteria&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;SEV1 - Critical&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Infrastructure as Code</title><link>https://rowstu.net/devops/infrastructure-as-code/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/infrastructure-as-code/</guid><description>&lt;h1 id="infrastructure-as-code-best-practices"&gt;Infrastructure as Code Best Practices&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;SEV1 - Critical&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Incus – Notes, Procedures, and Best Practices</title><link>https://rowstu.net/incus/notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/incus/notes/</guid><description>&lt;p&gt;&lt;strong&gt;LXC (Linux Containers)&lt;/strong&gt; is a low-level container technology that provides:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;OS-level virtualization using &lt;strong&gt;kernel features&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;namespaces (pid, net, mount, user, ipc, uts)&lt;/li&gt;
+&lt;li&gt;cgroups (resource control)&lt;/li&gt;
+&lt;li&gt;seccomp, AppArmor/SELinux&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Containers that behave like &lt;strong&gt;lightweight virtual machines&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Full init system&lt;/li&gt;
+&lt;li&gt;Multiple services&lt;/li&gt;
+&lt;li&gt;Persistent state&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Key characteristics&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Near-native performance&lt;/li&gt;
+&lt;li&gt;Uses the host kernel&lt;/li&gt;
+&lt;li&gt;Designed for &lt;em&gt;system containers&lt;/em&gt;, not single-process workloads&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="what-is-incus"&gt;What is Incus?&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Incus&lt;/strong&gt; is a &lt;strong&gt;modern container and VM manager&lt;/strong&gt; built on top of:&lt;/p&gt;</description></item><item><title>Infrastructure as Code</title><link>https://rowstu.net/devops/infrastructure-as-code/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/infrastructure-as-code/</guid><description>&lt;h1 id="infrastructure-as-code-best-practices"&gt;Infrastructure as Code Best Practices&lt;/h1&gt;
 &lt;p&gt;Managing infrastructure through code for consistency, repeatability, and automation.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2 id="core-principles"&gt;Core Principles&lt;/h2&gt;
@@ -4762,58 +4805,7 @@ sudo sssctl user-checks username
 &lt;p&gt;&lt;a href="https://ifelse.io/2019/01/12/secure-ad-free-internet-anywhere-with-streisand-and-pi-hole/"&gt;https://ifelse.io/2019/01/12/secure-ad-free-internet-anywhere-with-streisand-and-pi-hole/&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id="bash"&gt;BASH&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://github.com/onceupon/Bash-Oneliner"&gt;https://github.com/onceupon/Bash-Oneliner&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://github.com/metal3d/bashsimplecurses"&gt;https://github.com/metal3d/bashsimplecurses&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Tape List</title><link>https://rowstu.net/retro/the-spectrum-tape-list/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/retro/the-spectrum-tape-list/</guid><description>&lt;h1 id="spectrum-games-list"&gt;Spectrum Games List&lt;/h1&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;Atic Atac
-Back To Skool
-Batman
-Bomb Jack
-Bruce Lee
-Bubble Bobble
-Chase H.Q.
-Chuckie Egg
-Commando
-Dan Dare 3
-Deathchase 3D
-Driller
-Elite
-Emlyn Hughes Soccer
-Fantasy World Dizzy
-Formula 1 Simulator
-Harrier Attack
-Head Over Heels
-Highway Encounter
-Horace Goes Skiing
-Jetpac
-Jet Set Willy
-Kikstart 2
-Knightlore
-Laser Squad
-Light Force
-Lords of Midnight
-Lunar Jetman
-Manic Miner
-Match Day 2
-Match Point
-Midnight Resistance
-Nether Earth
-Rebel Star
-Renegade
-Robocop
-R-Type
-Saboteur
-Sabre Wulf
-Skooldaze
-Spy Hunter
-Starion
-Star Quake
-Star Strike
-Star Wars
-Target Renegade
-The Hobbit
-The Way of the Exploding Fist
-T.L.L.
-Turbo Esprit
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Teach</title><link>https://rowstu.net/personal/teach/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/teach/</guid><description>&lt;h1 id="ideas-list-for-what-to-teach-my-kids"&gt;Ideas list for what to teach my kids&lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://github.com/metal3d/bashsimplecurses"&gt;https://github.com/metal3d/bashsimplecurses&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Teach</title><link>https://rowstu.net/personal/teach/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/teach/</guid><description>&lt;h1 id="ideas-list-for-what-to-teach-my-kids"&gt;Ideas list for what to teach my kids&lt;/h1&gt;
 &lt;ul&gt;
 &lt;li&gt;How to send a good email&lt;/li&gt;
 &lt;li&gt;Role models to pick&lt;/li&gt;

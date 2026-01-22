@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Incuses on rowstu.net</title><link>https://rowstu.net/incus/</link><description>Recent content in Incuses on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/incus/index.xml" rel="self" type="application/rss+xml"/><item><title>Incus – Notes, Procedures, and Best Practices</title><link>https://rowstu.net/incus/notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/incus/notes/</guid><description>&lt;p&gt;&lt;strong&gt;LXC (Linux Containers)&lt;/strong&gt; is a low-level container technology that provides:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;OS-level virtualization using &lt;strong&gt;kernel features&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;namespaces (pid, net, mount, user, ipc, uts)&lt;/li&gt;
+&lt;li&gt;cgroups (resource control)&lt;/li&gt;
+&lt;li&gt;seccomp, AppArmor/SELinux&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Containers that behave like &lt;strong&gt;lightweight virtual machines&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Full init system&lt;/li&gt;
+&lt;li&gt;Multiple services&lt;/li&gt;
+&lt;li&gt;Persistent state&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Key characteristics&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Near-native performance&lt;/li&gt;
+&lt;li&gt;Uses the host kernel&lt;/li&gt;
+&lt;li&gt;Designed for &lt;em&gt;system containers&lt;/em&gt;, not single-process workloads&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="what-is-incus"&gt;What is Incus?&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Incus&lt;/strong&gt; is a &lt;strong&gt;modern container and VM manager&lt;/strong&gt; built on top of:&lt;/p&gt;</description></item></channel></rss>
