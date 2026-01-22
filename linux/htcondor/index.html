@@ -1,0 +1,323 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>HTCondor // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>HTCondor</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/linuxhtcondor/>Linuxhtcondor</a></div><div class="card markdown-content"><h1 id=htcondor-high-throughput-computing>HTCondor: High Throughput Computing</h1><p>HTCondor is a workload management system for compute-intensive jobs. It manages job queuing, scheduling, resource management, and monitoring across distributed computing resources.</p><hr><h2 id=installation>Installation</h2><h3 id=debianubuntu>Debian/Ubuntu</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Add HTCondor repository</span>
+</span></span><span style=display:flex><span>curl -fsSL https://research.cs.wisc.edu/htcondor/repo/keys/HTCondor-current-Key | sudo gpg --dearmor -o /usr/share/keyrings/htcondor-archive-keyring.gpg
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;deb [signed-by=/usr/share/keyrings/htcondor-archive-keyring.gpg] https://research.cs.wisc.edu/htcondor/repo/ubuntu/current </span><span style=color:#66d9ef>$(</span>lsb_release -cs<span style=color:#66d9ef>)</span><span style=color:#e6db74> main&#34;</span> | sudo tee /etc/apt/sources.list.d/htcondor.list
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo apt update
+</span></span><span style=display:flex><span>sudo apt install htcondor
+</span></span></code></pre></div><h3 id=rhelcentosrocky>RHEL/CentOS/Rocky</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Add HTCondor repository</span>
+</span></span><span style=display:flex><span>sudo yum install https://research.cs.wisc.edu/htcondor/repo/current/htcondor-release-current.el<span style=color:#66d9ef>$(</span>rpm -E %rhel<span style=color:#66d9ef>)</span>.noarch.rpm
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo yum install condor
+</span></span></code></pre></div><h3 id=start-services>Start Services</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo systemctl enable condor
+</span></span><span style=display:flex><span>sudo systemctl start condor
+</span></span></code></pre></div><hr><h2 id=basic-concepts>Basic Concepts</h2><table><thead><tr><th>Term</th><th>Description</th></tr></thead><tbody><tr><td><strong>Job</strong></td><td>A unit of work to be executed</td></tr><tr><td><strong>Submit file</strong></td><td>Description of jobs to run</td></tr><tr><td><strong>Universe</strong></td><td>Execution environment (vanilla, docker, etc.)</td></tr><tr><td><strong>ClassAd</strong></td><td>Classified advertisement describing jobs/machines</td></tr><tr><td><strong>Pool</strong></td><td>Collection of HTCondor daemons working together</td></tr><tr><td><strong>Slot</strong></td><td>Execution slot on an execute machine</td></tr><tr><td><strong>Central Manager</strong></td><td>Machine running the collector and negotiator</td></tr><tr><td><strong>Execute Node</strong></td><td>Machine that runs jobs</td></tr><tr><td><strong>Submit Node</strong></td><td>Machine from which jobs are submitted</td></tr></tbody></table><hr><h2 id=submit-file-basics>Submit File Basics</h2><p>A submit file (<code>.sub</code>) describes jobs to HTCondor.</p><h3 id=minimal-example>Minimal Example</h3><pre tabindex=0><code># job.sub
+executable = my_script.sh
+output     = job.out
+error      = job.err
+log        = job.log
+queue
+</code></pre><h3 id=common-submit-file-directives>Common Submit File Directives</h3><pre tabindex=0><code># Executable and arguments
+executable = /path/to/program
+arguments  = arg1 arg2 arg3
+
+# Input/Output files
+input      = input.txt
+output     = output.$(Cluster).$(Process).out
+error      = error.$(Cluster).$(Process).err
+log        = condor.log
+
+# File transfer
+transfer_input_files  = data.csv, config.ini
+transfer_output_files = results.csv
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+# Resource requirements
+request_cpus   = 4
+request_memory = 8GB
+request_disk   = 10GB
+
+# Environment
+environment = &#34;PATH=/usr/bin VAR=value&#34;
+getenv      = True
+
+# Notifications
+notification = Complete
+notify_user  = user@example.com
+
+# Job requirements
+requirements = (OpSys == &#34;LINUX&#34;) &amp;&amp; (Arch == &#34;X86_64&#34;)
+rank         = Memory
+
+# Queue directive
+queue
+</code></pre><hr><h2 id=submitting-jobs>Submitting Jobs</h2><h3 id=submit-a-job>Submit a Job</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>condor_submit job.sub
+</span></span></code></pre></div><h3 id=submit-multiple-jobs>Submit Multiple Jobs</h3><pre tabindex=0><code># Run 100 instances
+executable = process.sh
+arguments  = $(Process)
+output     = out.$(Process).txt
+queue 100
+</code></pre><pre tabindex=0><code># Different arguments per job
+executable = analyse.sh
+arguments  = $(item)
+queue item from arguments.txt
+</code></pre><pre tabindex=0><code># Iterate over files
+executable = process.sh
+arguments  = $(file)
+transfer_input_files = $(file)
+queue file matching data/*.csv
+</code></pre><pre tabindex=0><code># Multiple variables
+executable = run.sh
+arguments  = $(a) $(b)
+queue a, b from (
+  1, alpha
+  2, beta
+  3, gamma
+)
+</code></pre><hr><h2 id=job-management-commands>Job Management Commands</h2><h3 id=check-job-status>Check Job Status</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># View your jobs</span>
+</span></span><span style=display:flex><span>condor_q
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># View all jobs in the pool</span>
+</span></span><span style=display:flex><span>condor_q -all
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Detailed job info</span>
+</span></span><span style=display:flex><span>condor_q -long &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Specific attributes</span>
+</span></span><span style=display:flex><span>condor_q -af ClusterId ProcId JobStatus RemoteHost
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Analyse why jobs aren&#39;t running</span>
+</span></span><span style=display:flex><span>condor_q -better-analyze &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Watch jobs (refreshes)</span>
+</span></span><span style=display:flex><span>condor_q -watch
+</span></span></code></pre></div><h3 id=job-status-codes>Job Status Codes</h3><table><thead><tr><th>Code</th><th>Status</th></tr></thead><tbody><tr><td>1</td><td>Idle</td></tr><tr><td>2</td><td>Running</td></tr><tr><td>3</td><td>Removed</td></tr><tr><td>4</td><td>Completed</td></tr><tr><td>5</td><td>Held</td></tr><tr><td>6</td><td>Transferring Output</td></tr><tr><td>7</td><td>Suspended</td></tr></tbody></table><h3 id=manage-jobs>Manage Jobs</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Remove a job</span>
+</span></span><span style=display:flex><span>condor_rm &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Remove all your jobs</span>
+</span></span><span style=display:flex><span>condor_rm -all
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Hold a job</span>
+</span></span><span style=display:flex><span>condor_hold &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Release a held job</span>
+</span></span><span style=display:flex><span>condor_release &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Change job priority</span>
+</span></span><span style=display:flex><span>condor_prio -p <span style=color:#ae81ff>10</span> &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Edit a job attribute</span>
+</span></span><span style=display:flex><span>condor_qedit &lt;job_id&gt; RequestMemory <span style=color:#ae81ff>16000</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Suspend a job</span>
+</span></span><span style=display:flex><span>condor_suspend &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Continue a suspended job</span>
+</span></span><span style=display:flex><span>condor_continue &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Vacate a job (evict, will restart)</span>
+</span></span><span style=display:flex><span>condor_vacate_job &lt;job_id&gt;
+</span></span></code></pre></div><hr><h2 id=pool-and-machine-status>Pool and Machine Status</h2><h3 id=view-pool-status>View Pool Status</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Summary of pool</span>
+</span></span><span style=display:flex><span>condor_status
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Detailed machine info</span>
+</span></span><span style=display:flex><span>condor_status -long &lt;machine&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Specific attributes</span>
+</span></span><span style=display:flex><span>condor_status -af Name Cpus Memory State Activity
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show only available slots</span>
+</span></span><span style=display:flex><span>condor_status -avail
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show claimed slots</span>
+</span></span><span style=display:flex><span>condor_status -claimed
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Collector status</span>
+</span></span><span style=display:flex><span>condor_status -collector
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Schedd status</span>
+</span></span><span style=display:flex><span>condor_status -schedd
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Negotiator status</span>
+</span></span><span style=display:flex><span>condor_status -negotiator
+</span></span></code></pre></div><h3 id=machine-states>Machine States</h3><table><thead><tr><th>State</th><th>Description</th></tr></thead><tbody><tr><td>Owner</td><td>Not available (owner activity)</td></tr><tr><td>Unclaimed</td><td>Available for jobs</td></tr><tr><td>Matched</td><td>Matched to job, waiting to start</td></tr><tr><td>Claimed</td><td>Running a job</td></tr><tr><td>Preempting</td><td>Job being evicted</td></tr><tr><td>Drained</td><td>Being drained of jobs</td></tr></tbody></table><hr><h2 id=universes>Universes</h2><h3 id=vanilla-universe-default>Vanilla Universe (Default)</h3><p>Standard jobs with file transfer.</p><pre tabindex=0><code>universe = vanilla
+executable = my_program
+queue
+</code></pre><h3 id=docker-universe>Docker Universe</h3><p>Run jobs in Docker containers.</p><pre tabindex=0><code>universe = docker
+docker_image = python:3.11
+executable = /usr/bin/python3
+arguments = script.py
+transfer_input_files = script.py
+queue
+</code></pre><h3 id=container-universe>Container Universe</h3><p>Run jobs in Apptainer/Singularity containers.</p><pre tabindex=0><code>universe = container
+container_image = /path/to/container.sif
+executable = /app/run.sh
+queue
+</code></pre><h3 id=java-universe>Java Universe</h3><p>Run Java applications.</p><pre tabindex=0><code>universe = java
+executable = MyClass.class
+jar_files = myapp.jar,lib.jar
+queue
+</code></pre><h3 id=scheduler-universe>Scheduler Universe</h3><p>Run on the submit machine (for DAG workflows).</p><pre tabindex=0><code>universe = scheduler
+executable = local_script.sh
+queue
+</code></pre><h3 id=local-universe>Local Universe</h3><p>Run on the submit machine as the user.</p><pre tabindex=0><code>universe = local
+executable = local_task.sh
+queue
+</code></pre><hr><h2 id=dagman-workflow-management>DAGMan: Workflow Management</h2><p>DAGMan manages job dependencies as Directed Acyclic Graphs.</p><h3 id=dag-file-example>DAG File Example</h3><pre tabindex=0><code># workflow.dag
+
+# Define jobs
+JOB A job_a.sub
+JOB B job_b.sub
+JOB C job_c.sub
+JOB D job_d.sub
+
+# Define dependencies (PARENT -&gt; CHILD)
+PARENT A CHILD B C
+PARENT B C CHILD D
+
+# Optional: Scripts
+SCRIPT PRE A pre_a.sh
+SCRIPT POST D post_d.sh
+
+# Optional: Retry failed jobs
+RETRY B 3
+
+# Optional: Variables
+VARS A input=&#34;data1.csv&#34;
+VARS B input=&#34;data2.csv&#34;
+</code></pre><h3 id=submit-a-dag>Submit a DAG</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>condor_submit_dag workflow.dag
+</span></span></code></pre></div><h3 id=dag-commands>DAG Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Check DAG status</span>
+</span></span><span style=display:flex><span>condor_q -dag
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Remove a DAG (and all jobs)</span>
+</span></span><span style=display:flex><span>condor_rm &lt;dag_job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Rescue a failed DAG (creates .rescue file)</span>
+</span></span><span style=display:flex><span>condor_submit_dag -force workflow.dag
+</span></span></code></pre></div><hr><h2 id=job-accounting-and-history>Job Accounting and History</h2><h3 id=view-completed-jobs>View Completed Jobs</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Job history</span>
+</span></span><span style=display:flex><span>condor_history
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Your job history</span>
+</span></span><span style=display:flex><span>condor_history $USER
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Specific job</span>
+</span></span><span style=display:flex><span>condor_history &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Custom format</span>
+</span></span><span style=display:flex><span>condor_history -af ClusterId Owner JobStatus ExitCode RemoteWallClockTime
+</span></span></code></pre></div><h3 id=accounting>Accounting</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># User accounting</span>
+</span></span><span style=display:flex><span>condor_userprio
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Detailed accounting</span>
+</span></span><span style=display:flex><span>condor_userprio -all
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Group accounting</span>
+</span></span><span style=display:flex><span>condor_userprio -grouporder
+</span></span></code></pre></div><hr><h2 id=configuration>Configuration</h2><h3 id=view-configuration>View Configuration</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># All config</span>
+</span></span><span style=display:flex><span>condor_config_val -dump
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Specific parameter</span>
+</span></span><span style=display:flex><span>condor_config_val COLLECTOR_HOST
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Configuration sources</span>
+</span></span><span style=display:flex><span>condor_config_val -config
+</span></span></code></pre></div><h3 id=common-configuration-parameters>Common Configuration Parameters</h3><pre tabindex=0><code># /etc/condor/condor_config.local
+
+# Pool settings
+CONDOR_HOST = central-manager.example.com
+COLLECTOR_HOST = $(CONDOR_HOST):9618
+
+# Allow specific users to submit
+ALLOW_WRITE = *.example.com
+
+# Resource limits
+NUM_CPUS = 8
+MEMORY = 32000
+DISK = 100000000
+
+# Slot configuration
+NUM_SLOTS = 1
+NUM_SLOTS_TYPE_1 = 1
+SLOT_TYPE_1 = cpus=100%, memory=100%, disk=100%
+SLOT_TYPE_1_PARTITIONABLE = TRUE
+
+# Job limits
+MAX_JOBS_RUNNING = 1000
+
+# Security
+SEC_DEFAULT_AUTHENTICATION = REQUIRED
+SEC_DEFAULT_AUTHENTICATION_METHODS = FS, PASSWORD, SSL
+</code></pre><h3 id=reconfigure-htcondor>Reconfigure HTCondor</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Reconfigure all daemons</span>
+</span></span><span style=display:flex><span>sudo condor_reconfig
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Reconfigure specific machine</span>
+</span></span><span style=display:flex><span>sudo condor_reconfig &lt;machine&gt;
+</span></span></code></pre></div><hr><h2 id=useful-submit-file-patterns>Useful Submit File Patterns</h2><h3 id=job-with-dependencies>Job with Dependencies</h3><pre tabindex=0><code>executable = step2.sh
+transfer_input_files = step1_output.dat
+queue
+</code></pre><h3 id=periodic-jobs>Periodic Jobs</h3><pre tabindex=0><code>executable = monitor.sh
+on_exit_remove = false
+periodic_release = (CurrentTime - EnteredCurrentStatus) &gt; 300
+queue
+</code></pre><h3 id=gpu-jobs>GPU Jobs</h3><pre tabindex=0><code>executable = gpu_task.sh
+request_gpus = 1
+requirements = (CUDAGlobalMemoryMb &gt;= 8000)
++CUDACapability = 7.0
+queue
+</code></pre><h3 id=memory-intensive-jobs>Memory-Intensive Jobs</h3><pre tabindex=0><code>executable = big_memory.sh
+request_memory = 64GB
+requirements = (Memory &gt;= 65536)
+queue
+</code></pre><h3 id=interactive-job>Interactive Job</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>condor_submit -interactive
+</span></span></code></pre></div><p>Or in submit file:</p><pre tabindex=0><code>executable = /bin/bash
+arguments = -i
+queue
+</code></pre><h3 id=job-wrapper-script>Job Wrapper Script</h3><pre tabindex=0><code>executable = wrapper.sh
+arguments = real_program.py $(args)
+transfer_input_files = real_program.py
+queue args from params.txt
+</code></pre><hr><h2 id=troubleshooting>Troubleshooting</h2><h3 id=common-issues>Common Issues</h3><p><strong>Job stuck in Idle:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>condor_q -better-analyze &lt;job_id&gt;
+</span></span></code></pre></div><p><strong>Check why job was held:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>condor_q -hold -af HoldReason
+</span></span></code></pre></div><p><strong>View job log:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>cat job.log
+</span></span></code></pre></div><p><strong>Check daemon logs:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>tail -f /var/log/condor/SchedLog
+</span></span><span style=display:flex><span>tail -f /var/log/condor/StartLog
+</span></span><span style=display:flex><span>tail -f /var/log/condor/CollectorLog
+</span></span></code></pre></div><p><strong>Test job requirements:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>condor_status -constraint <span style=color:#e6db74>&#39;Memory &gt; 8000 &amp;&amp; Cpus &gt;= 4&#39;</span>
+</span></span></code></pre></div><h3 id=useful-debugging>Useful Debugging</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Check pool resources</span>
+</span></span><span style=display:flex><span>condor_status -total
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Check negotiation cycle</span>
+</span></span><span style=display:flex><span>condor_userprio -negotiator
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Verify submit file</span>
+</span></span><span style=display:flex><span>condor_submit -dry-run job.sub
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># SSH to running job</span>
+</span></span><span style=display:flex><span>condor_ssh_to_job &lt;job_id&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Fetch output early</span>
+</span></span><span style=display:flex><span>condor_transfer_data &lt;job_id&gt;
+</span></span></code></pre></div><hr><h2 id=quick-reference>Quick Reference</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Submit</span>
+</span></span><span style=display:flex><span>condor_submit job.sub
+</span></span><span style=display:flex><span>condor_submit_dag workflow.dag
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Monitor</span>
+</span></span><span style=display:flex><span>condor_q                    <span style=color:#75715e># Your jobs</span>
+</span></span><span style=display:flex><span>condor_q -all               <span style=color:#75715e># All jobs</span>
+</span></span><span style=display:flex><span>condor_status               <span style=color:#75715e># Pool status</span>
+</span></span><span style=display:flex><span>condor_q -better-analyze    <span style=color:#75715e># Why not running?</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Manage</span>
+</span></span><span style=display:flex><span>condor_rm &lt;job_id&gt;          <span style=color:#75715e># Remove job</span>
+</span></span><span style=display:flex><span>condor_hold &lt;job_id&gt;        <span style=color:#75715e># Hold job</span>
+</span></span><span style=display:flex><span>condor_release &lt;job_id&gt;     <span style=color:#75715e># Release held job</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># History</span>
+</span></span><span style=display:flex><span>condor_history              <span style=color:#75715e># Completed jobs</span>
+</span></span><span style=display:flex><span>condor_userprio             <span style=color:#75715e># Accounting</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Admin</span>
+</span></span><span style=display:flex><span>condor_config_val           <span style=color:#75715e># View config</span>
+</span></span><span style=display:flex><span>condor_reconfig             <span style=color:#75715e># Reload config</span>
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>

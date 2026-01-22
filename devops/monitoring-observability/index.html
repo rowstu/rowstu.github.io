@@ -1,0 +1,194 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Monitoring and Observability // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Monitoring and Observability</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/devopsmonitoring-observability/>Devopsmonitoring Observability</a></div><div class="card markdown-content"><h1 id=monitoring-and-observability-best-practices>Monitoring and Observability Best Practices</h1><p>Understanding system behaviour through metrics, logs, and traces.</p><hr><h2 id=observability-vs-monitoring>Observability vs Monitoring</h2><table><thead><tr><th>Monitoring</th><th>Observability</th></tr></thead><tbody><tr><td>Known unknowns</td><td>Unknown unknowns</td></tr><tr><td>Predefined questions</td><td>Ad-hoc exploration</td></tr><tr><td>Dashboards and alerts</td><td>Investigation and debugging</td></tr><tr><td>&ldquo;Is it working?&rdquo;</td><td>&ldquo;Why isn&rsquo;t it working?&rdquo;</td></tr></tbody></table><hr><h2 id=three-pillars-of-observability>Three Pillars of Observability</h2><h3 id=1-metrics>1. Metrics</h3><p>Numerical measurements over time.</p><pre tabindex=0><code>http_requests_total{method=&#34;GET&#34;, path=&#34;/api/users&#34;, status=&#34;200&#34;} 1234
+http_request_duration_seconds{quantile=&#34;0.99&#34;} 0.245
+</code></pre><p><strong>Types:</strong></p><table><thead><tr><th>Type</th><th>Description</th><th>Example</th></tr></thead><tbody><tr><td>Counter</td><td>Only increases</td><td>Total requests</td></tr><tr><td>Gauge</td><td>Can increase or decrease</td><td>Current connections</td></tr><tr><td>Histogram</td><td>Distribution of values</td><td>Request latency buckets</td></tr><tr><td>Summary</td><td>Quantiles over time</td><td>p99 latency</td></tr></tbody></table><h3 id=2-logs>2. Logs</h3><p>Discrete events with context.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;timestamp&#34;</span>: <span style=color:#e6db74>&#34;2024-01-15T10:30:45.123Z&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;level&#34;</span>: <span style=color:#e6db74>&#34;error&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;service&#34;</span>: <span style=color:#e6db74>&#34;payment-api&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;trace_id&#34;</span>: <span style=color:#e6db74>&#34;abc123&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;user_id&#34;</span>: <span style=color:#e6db74>&#34;user-456&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;message&#34;</span>: <span style=color:#e6db74>&#34;Payment processing failed&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;error&#34;</span>: <span style=color:#e6db74>&#34;Card declined&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;duration_ms&#34;</span>: <span style=color:#ae81ff>234</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>Log Levels:</strong></p><table><thead><tr><th>Level</th><th>Use Case</th></tr></thead><tbody><tr><td>DEBUG</td><td>Detailed debugging information</td></tr><tr><td>INFO</td><td>Normal operational events</td></tr><tr><td>WARN</td><td>Unexpected but handled situations</td></tr><tr><td>ERROR</td><td>Errors that need attention</td></tr><tr><td>FATAL</td><td>System cannot continue</td></tr></tbody></table><h3 id=3-traces>3. Traces</h3><p>Request flow across services.</p><pre tabindex=0><code>Trace: abc123
+├── api-gateway (45ms)
+│   └── auth-service (12ms)
+├── order-service (156ms)
+│   ├── inventory-service (34ms)
+│   └── pricing-service (28ms)
+└── payment-service (89ms)
+    └── external-payment-provider (67ms)
+</code></pre><hr><h2 id=the-four-golden-signals-google-sre>The Four Golden Signals (Google SRE)</h2><h3 id=1-latency>1. Latency</h3><p>Time to service a request.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-promql data-lang=promql><span style=display:flex><span><span style=color:#75715e># p99 latency</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>histogram_quantile</span><span style=color:#f92672>(</span><span style=color:#ae81ff>0.99</span>, <span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_request_duration_seconds_bucket[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>))</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Average latency</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_request_duration_seconds_sum[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>)</span> <span style=color:#f92672>/</span> <span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_request_duration_seconds_count[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>)</span>
+</span></span></code></pre></div><p>Distinguish between:</p><ul><li>Successful request latency</li><li>Failed request latency</li></ul><h3 id=2-traffic>2. Traffic</h3><p>Demand on the system.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-promql data-lang=promql><span style=display:flex><span><span style=color:#75715e># Requests per second</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_requests_total[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># By endpoint</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>sum</span> <span style=color:#66d9ef>by</span> <span style=color:#f92672>(</span>path<span style=color:#f92672>)</span> <span style=color:#f92672>(</span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_requests_total[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>))</span>
+</span></span></code></pre></div><h3 id=3-errors>3. Errors</h3><p>Rate of failed requests.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-promql data-lang=promql><span style=display:flex><span><span style=color:#75715e># Error rate</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>sum</span><span style=color:#f92672>(</span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_requests_total{status<span style=color:#f92672>=~</span>&#34;<span style=color:#e6db74>5..</span>&#34;}[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>))</span> <span style=color:#f92672>/</span> <span style=color:#66d9ef>sum</span><span style=color:#f92672>(</span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_requests_total[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>))</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># By type</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>sum</span> <span style=color:#66d9ef>by</span> <span style=color:#f92672>(</span>status<span style=color:#f92672>)</span> <span style=color:#f92672>(</span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_requests_total{status<span style=color:#f92672>=~</span>&#34;<span style=color:#e6db74>[45]..</span>&#34;}[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>))</span>
+</span></span></code></pre></div><h3 id=4-saturation>4. Saturation</h3><p>How &ldquo;full&rdquo; the service is.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-promql data-lang=promql><span style=display:flex><span><span style=color:#75715e># CPU saturation</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>1</span> <span style=color:#f92672>-</span> <span style=color:#66d9ef>avg</span><span style=color:#f92672>(</span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>node_cpu_seconds_total{mode<span style=color:#f92672>=</span>&#34;<span style=color:#e6db74>idle</span>&#34;}[<span style=color:#e6db74>5m</span>]<span style=color:#f92672>))</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Memory saturation</span>
+</span></span><span style=display:flex><span>node_memory_MemTotal_bytes <span style=color:#f92672>-</span> node_memory_MemAvailable_bytes
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Queue depth</span>
+</span></span><span style=display:flex><span>queue_depth
+</span></span></code></pre></div><hr><h2 id=red-method-request-driven>RED Method (Request-driven)</h2><p>For services:</p><table><thead><tr><th>Metric</th><th>Description</th></tr></thead><tbody><tr><td><strong>R</strong>ate</td><td>Requests per second</td></tr><tr><td><strong>E</strong>rrors</td><td>Failed requests per second</td></tr><tr><td><strong>D</strong>uration</td><td>Time per request</td></tr></tbody></table><h2 id=use-method-resource-driven>USE Method (Resource-driven)</h2><p>For resources (CPU, memory, disk, network):</p><table><thead><tr><th>Metric</th><th>Description</th></tr></thead><tbody><tr><td><strong>U</strong>tilisation</td><td>% time resource is busy</td></tr><tr><td><strong>S</strong>aturation</td><td>Amount of work queued</td></tr><tr><td><strong>E</strong>rrors</td><td>Error events</td></tr></tbody></table><hr><h2 id=alerting-best-practices>Alerting Best Practices</h2><h3 id=alert-on-symptoms-not-causes>Alert on Symptoms, Not Causes</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Bad: alerts on cause</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>alert</span>: <span style=color:#ae81ff>HighCPU</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>expr</span>: <span style=color:#ae81ff>cpu_usage &gt; 80%</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># CPU can be high and system still healthy</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Good: alerts on symptom</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>alert</span>: <span style=color:#ae81ff>HighLatency</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>expr</span>: <span style=color:#ae81ff>http_request_duration_p99 &gt; 500ms</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># Directly impacts users</span>
+</span></span></code></pre></div><h3 id=actionable-alerts>Actionable Alerts</h3><p>Every alert should:</p><ul><li>Have a runbook</li><li>Require action</li><li>Be specific</li><li>Have appropriate severity</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>alert</span>: <span style=color:#ae81ff>PaymentServiceHighErrorRate</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>expr</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    sum(rate(http_requests_total{service=&#34;payment&#34;, status=~&#34;5..&#34;}[5m]))
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    / sum(rate(http_requests_total{service=&#34;payment&#34;}[5m])) &gt; 0.01</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>for</span>: <span style=color:#ae81ff>5m</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>severity</span>: <span style=color:#ae81ff>critical</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>team</span>: <span style=color:#ae81ff>payments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>summary</span>: <span style=color:#e6db74>&#34;Payment service error rate &gt; 1%&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runbook</span>: <span style=color:#e6db74>&#34;https://wiki/runbooks/payment-errors&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dashboard</span>: <span style=color:#e6db74>&#34;https://grafana/d/payments&#34;</span>
+</span></span></code></pre></div><h3 id=alert-fatigue-prevention>Alert Fatigue Prevention</h3><ul><li>Remove noisy alerts</li><li>Group related alerts</li><li>Use appropriate thresholds</li><li>Add &ldquo;for&rdquo; duration to avoid flapping</li><li>Page on symptoms, not causes</li></ul><h3 id=severity-levels>Severity Levels</h3><table><thead><tr><th>Severity</th><th>Response</th><th>Example</th></tr></thead><tbody><tr><td>Critical</td><td>Immediate (page)</td><td>Service down</td></tr><tr><td>Warning</td><td>Soon (ticket)</td><td>Degraded performance</td></tr><tr><td>Info</td><td>Review</td><td>Unusual pattern</td></tr></tbody></table><hr><h2 id=structured-logging>Structured Logging</h2><h3 id=consistent-format>Consistent Format</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;timestamp&#34;</span>: <span style=color:#e6db74>&#34;2024-01-15T10:30:45.123Z&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;level&#34;</span>: <span style=color:#e6db74>&#34;info&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;service&#34;</span>: <span style=color:#e6db74>&#34;order-api&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;version&#34;</span>: <span style=color:#e6db74>&#34;1.2.3&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;instance&#34;</span>: <span style=color:#e6db74>&#34;order-api-abc123&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;trace_id&#34;</span>: <span style=color:#e6db74>&#34;trace-xyz&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;span_id&#34;</span>: <span style=color:#e6db74>&#34;span-123&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;user_id&#34;</span>: <span style=color:#e6db74>&#34;user-456&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;message&#34;</span>: <span style=color:#e6db74>&#34;Order created&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;order_id&#34;</span>: <span style=color:#e6db74>&#34;order-789&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;amount&#34;</span>: <span style=color:#ae81ff>99.99</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;currency&#34;</span>: <span style=color:#e6db74>&#34;GBP&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;duration_ms&#34;</span>: <span style=color:#ae81ff>45</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=what-to-log>What to Log</h3><pre tabindex=0><code>✓ Request received (with trace ID)
+✓ Request completed (with duration)
+✓ External service calls
+✓ Errors and exceptions (with stack trace)
+✓ Business events (order placed, payment received)
+✓ Security events (login, permission denied)
+
+✗ Sensitive data (passwords, tokens, PII)
+✗ Health check noise
+✗ Redundant information
+</code></pre><h3 id=correlation-ids>Correlation IDs</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Propagate trace ID across services</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@app.middleware</span>(<span style=color:#e6db74>&#34;http&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>async</span> <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>add_trace_id</span>(request, call_next):
+</span></span><span style=display:flex><span>    trace_id <span style=color:#f92672>=</span> request<span style=color:#f92672>.</span>headers<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;X-Trace-ID&#34;</span>) <span style=color:#f92672>or</span> str(uuid<span style=color:#f92672>.</span>uuid4())
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>with</span> logger<span style=color:#f92672>.</span>contextvars(trace_id<span style=color:#f92672>=</span>trace_id):
+</span></span><span style=display:flex><span>        response <span style=color:#f92672>=</span> <span style=color:#66d9ef>await</span> call_next(request)
+</span></span><span style=display:flex><span>        response<span style=color:#f92672>.</span>headers[<span style=color:#e6db74>&#34;X-Trace-ID&#34;</span>] <span style=color:#f92672>=</span> trace_id
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> response
+</span></span></code></pre></div><hr><h2 id=distributed-tracing>Distributed Tracing</h2><h3 id=trace-propagation>Trace Propagation</h3><pre tabindex=0><code>Service A                    Service B                    Service C
+    │                            │                            │
+    │ trace_id: abc              │                            │
+    │ span_id: 001               │                            │
+    │──────────────────────────▶ │                            │
+    │                            │ trace_id: abc              │
+    │                            │ parent_span: 001           │
+    │                            │ span_id: 002               │
+    │                            │──────────────────────────▶ │
+    │                            │                            │ trace_id: abc
+    │                            │                            │ parent_span: 002
+    │                            │                            │ span_id: 003
+</code></pre><h3 id=trace-context-headers>Trace Context Headers</h3><table><thead><tr><th>Header</th><th>Description</th></tr></thead><tbody><tr><td><code>traceparent</code></td><td>W3C standard trace context</td></tr><tr><td><code>tracestate</code></td><td>Vendor-specific trace data</td></tr><tr><td><code>X-Request-ID</code></td><td>Legacy request correlation</td></tr><tr><td><code>X-B3-*</code></td><td>Zipkin B3 format</td></tr></tbody></table><h3 id=span-attributes>Span Attributes</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>with</span> tracer<span style=color:#f92672>.</span>start_as_current_span(<span style=color:#e6db74>&#34;process_order&#34;</span>) <span style=color:#66d9ef>as</span> span:
+</span></span><span style=display:flex><span>    span<span style=color:#f92672>.</span>set_attribute(<span style=color:#e6db74>&#34;order.id&#34;</span>, order_id)
+</span></span><span style=display:flex><span>    span<span style=color:#f92672>.</span>set_attribute(<span style=color:#e6db74>&#34;order.amount&#34;</span>, amount)
+</span></span><span style=display:flex><span>    span<span style=color:#f92672>.</span>set_attribute(<span style=color:#e6db74>&#34;customer.id&#34;</span>, customer_id)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Add events</span>
+</span></span><span style=display:flex><span>    span<span style=color:#f92672>.</span>add_event(<span style=color:#e6db74>&#34;validation_complete&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Record errors</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>        process(order)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>except</span> <span style=color:#a6e22e>Exception</span> <span style=color:#66d9ef>as</span> e:
+</span></span><span style=display:flex><span>        span<span style=color:#f92672>.</span>record_exception(e)
+</span></span><span style=display:flex><span>        span<span style=color:#f92672>.</span>set_status(Status(StatusCode<span style=color:#f92672>.</span>ERROR))
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>raise</span>
+</span></span></code></pre></div><hr><h2 id=dashboards>Dashboards</h2><h3 id=dashboard-hierarchy>Dashboard Hierarchy</h3><pre tabindex=0><code>Level 1: Executive Overview
+├── Key business metrics
+├── SLO status
+└── High-level health
+
+Level 2: Service Overview
+├── Golden signals per service
+├── Dependencies
+└── Recent deployments
+
+Level 3: Service Deep Dive
+├── Detailed metrics
+├── Resource utilisation
+└── Error breakdown
+
+Level 4: Debug/Investigation
+├── Individual requests
+├── Log correlation
+└── Trace analysis
+</code></pre><h3 id=dashboard-best-practices>Dashboard Best Practices</h3><ul><li><strong>Purpose</strong>: Each dashboard has a clear purpose</li><li><strong>Audience</strong>: Designed for specific users</li><li><strong>Context</strong>: Include relevant annotations</li><li><strong>Hierarchy</strong>: Drill down from overview to detail</li><li><strong>Consistency</strong>: Use standard layouts and colours</li></ul><h3 id=standard-layout>Standard Layout</h3><pre tabindex=0><code>┌─────────────────────────────────────────────────────────┐
+│                    Service Name                          │
+├─────────────────────────────────────────────────────────┤
+│  Request Rate  │  Error Rate  │  Latency p99  │  SLO   │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│              Request Rate Over Time                      │
+│                                                          │
+├──────────────────────────┬──────────────────────────────┤
+│                          │                               │
+│  Error Rate Over Time    │  Latency Distribution         │
+│                          │                               │
+├──────────────────────────┴──────────────────────────────┤
+│                                                          │
+│              Resource Utilisation (CPU, Memory)          │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+</code></pre><hr><h2 id=slis-slos-and-slas>SLIs, SLOs, and SLAs</h2><h3 id=service-level-indicator-sli>Service Level Indicator (SLI)</h3><p>A quantitative measure of service.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-promql data-lang=promql><span style=display:flex><span><span style=color:#75715e># Availability SLI</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>sum</span><span style=color:#f92672>(</span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_requests_total{status<span style=color:#f92672>!~</span>&#34;<span style=color:#e6db74>5..</span>&#34;}[<span style=color:#e6db74>30d</span>]<span style=color:#f92672>))</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/</span> <span style=color:#66d9ef>sum</span><span style=color:#f92672>(</span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_requests_total[<span style=color:#e6db74>30d</span>]<span style=color:#f92672>))</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Latency SLI</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>histogram_quantile</span><span style=color:#f92672>(</span><span style=color:#ae81ff>0.99</span>, <span style=color:#66d9ef>sum</span><span style=color:#f92672>(</span><span style=color:#66d9ef>rate</span><span style=color:#f92672>(</span>http_request_duration_seconds_bucket[<span style=color:#e6db74>30d</span>]<span style=color:#f92672>))</span> <span style=color:#66d9ef>by</span> <span style=color:#f92672>(</span>le<span style=color:#f92672>))</span>
+</span></span></code></pre></div><h3 id=service-level-objective-slo>Service Level Objective (SLO)</h3><p>Target value for an SLI.</p><table><thead><tr><th>SLI</th><th>SLO</th></tr></thead><tbody><tr><td>Availability</td><td>99.9%</td></tr><tr><td>Latency p99</td><td>&lt; 200ms</td></tr><tr><td>Error rate</td><td>&lt; 0.1%</td></tr></tbody></table><h3 id=error-budget>Error Budget</h3><pre tabindex=0><code>Error Budget = 100% - SLO
+
+For 99.9% availability SLO:
+- Error budget = 0.1%
+- Monthly: 43.2 minutes downtime allowed
+- Quarterly: 129.6 minutes downtime allowed
+</code></pre><h3 id=slo-based-alerting>SLO-Based Alerting</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Alert when burning error budget too fast</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>alert</span>: <span style=color:#ae81ff>HighErrorBudgetBurn</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>expr</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    (
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      1 - (sum(rate(http_requests_total{status!~&#34;5..&#34;}[1h]))
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          / sum(rate(http_requests_total[1h])))
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    ) &gt; 14.4 * (1 - 0.999)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>for</span>: <span style=color:#ae81ff>5m</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>summary</span>: <span style=color:#e6db74>&#34;Burning error budget 14.4x faster than allowed&#34;</span>
+</span></span></code></pre></div><hr><h2 id=quick-reference>Quick Reference</h2><pre tabindex=0><code>Observability Checklist:
+□ Metrics for all services (RED/USE)
+□ Structured logging with correlation IDs
+□ Distributed tracing enabled
+□ Dashboards for each service
+□ SLIs and SLOs defined
+□ Actionable alerts only
+□ Runbooks for all alerts
+□ Error budgets tracked
+□ Regular review of alerting rules
+□ Incident post-mortems feed improvements
+</code></pre><h3 id=tool-categories>Tool Categories</h3><table><thead><tr><th>Category</th><th>Tools</th></tr></thead><tbody><tr><td>Metrics</td><td>Prometheus, Datadog, CloudWatch</td></tr><tr><td>Logs</td><td>ELK, Loki, Splunk</td></tr><tr><td>Traces</td><td>Jaeger, Zipkin, Tempo</td></tr><tr><td>APM</td><td>Datadog, New Relic, Dynatrace</td></tr><tr><td>Dashboards</td><td>Grafana, Datadog</td></tr><tr><td>Alerting</td><td>PagerDuty, Opsgenie, AlertManager</td></tr></tbody></table></div></div><script src=/assets/shared-nav.js></script></body></html>

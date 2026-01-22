@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Amigas on rowstu.net</title><link>https://rowstu.net/amiga/</link><description>Recent content in Amigas on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/amiga/index.xml" rel="self" type="application/rss+xml"/><item><title>Commands in AmigaDOS</title><link>https://rowstu.net/amiga/commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/amiga/commands/</guid><description>&lt;h2 id="comparison-of-amigados-and-linux-commands"&gt;Comparison of AmigaDOS and Linux Commands&lt;/h2&gt;
+&lt;p&gt;The following table compares common AmigaDOS commands with their Linux counterparts. This can serve as a useful reference for users familiar with Linux who are transitioning to AmigaDOS or vice versa.&lt;/p&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;&lt;strong&gt;Functionality&lt;/strong&gt;&lt;/th&gt;
+ &lt;th&gt;&lt;strong&gt;AmigaDOS Command&lt;/strong&gt;&lt;/th&gt;
+ &lt;th&gt;&lt;strong&gt;Linux Command&lt;/strong&gt;&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;List Directory Contents&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;DIR [directory]&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;ls [directory]&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Copy Files&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;COPY source destination&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;cp source destination&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Delete Files&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;DELETE filename&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;rm filename&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Rename Files&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;RENAME oldname newname&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;mv oldname newname&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Create Directory&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;MKDIR new_directory_name&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;mkdir new_directory_name&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Remove Empty Directory&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;RMDIR empty_directory_name&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;rmdir empty_directory_name&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Display File Content&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;TYPE filename&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;cat filename&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Edit File&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;EDIT filename&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;nano filename&lt;/code&gt; or &lt;code&gt;vi filename&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Execute Program&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;RUN program_name&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;./program_name&lt;/code&gt; or &lt;code&gt;sh program_name&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Open New Shell&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;SHELL&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;bash&lt;/code&gt; or &lt;code&gt;sh&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Check Version&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;VERSION command&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;command --version&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Change User Context&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;USER user_name&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;su user_name&lt;/code&gt; or &lt;code&gt;sudo -u user_name&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Show Current Directory&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;CWD&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;&lt;code&gt;pwd&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="file-management-commands"&gt;File Management Commands&lt;/h2&gt;
+&lt;h3 id="copying-files"&gt;Copying Files&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;COPY source destination
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="deleting-files"&gt;Deleting Files&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;DELETE filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="renaming-files"&gt;Renaming Files&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;RENAME oldname newname
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="listing-directory-contents"&gt;Listing Directory Contents&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;DIR [directory]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="directory-management-commands"&gt;Directory Management Commands&lt;/h2&gt;
+&lt;h3 id="creating-directories"&gt;Creating Directories&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;MKDIR new_directory_name
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="removing-empty-directories"&gt;Removing Empty Directories&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;RMDIR empty_directory_name
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="text-file-operations"&gt;Text File Operations&lt;/h2&gt;
+&lt;h3 id="displaying-file-content"&gt;Displaying File Content&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;TYPE filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="editing-a-file"&gt;Editing a File&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;EDIT filename
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="running-programs"&gt;Running Programs&lt;/h2&gt;
+&lt;h3 id="executing-a-program"&gt;Executing a Program&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;RUN program_name
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="system-commands"&gt;System Commands&lt;/h2&gt;
+&lt;h3 id="opening-a-new-shell"&gt;Opening a New Shell&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;SHELL
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="checking-version"&gt;Checking Version&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;VERSION command
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="change-user-context"&gt;Change User Context&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;USER user_name
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="examples"&gt;Examples&lt;/h2&gt;
+&lt;h3 id="copying-files-example"&gt;Copying Files Example&lt;/h3&gt;
+&lt;p&gt;To copy a file named &lt;code&gt;example.txt&lt;/code&gt; to a directory called &lt;code&gt;backup&lt;/code&gt;, you would use:&lt;/p&gt;</description></item></channel></rss>

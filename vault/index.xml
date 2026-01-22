@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Vaults on rowstu.net</title><link>https://rowstu.net/vault/</link><description>Recent content in Vaults on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/vault/index.xml" rel="self" type="application/rss+xml"/><item><title>HashiCorp Vault – Comprehensive Notes &amp; Procedures</title><link>https://rowstu.net/vault/vault/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vault/vault/</guid><description>&lt;h3 id="11-overview"&gt;1.1 Overview&lt;/h3&gt;
+&lt;p&gt;HashiCorp Vault is a centralized secrets management and security platform designed to securely store, access, and manage sensitive data such as passwords, API keys, certificates, encryption keys, and tokens. It provides fine-grained access control, strong encryption, and detailed audit logging.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Key goals of Vault:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Eliminate hard-coded secrets in code and configuration&lt;/li&gt;
+&lt;li&gt;Centralize secret storage and access&lt;/li&gt;
+&lt;li&gt;Enforce least-privilege access&lt;/li&gt;
+&lt;li&gt;Provide auditable access to sensitive data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="12-key-features"&gt;1.2 Key Features&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Secrets Management&lt;/strong&gt;: Store static secrets or generate dynamic, short-lived secrets&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Encryption as a Service&lt;/strong&gt;: Encrypt/decrypt data without exposing keys&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Identity-Based Access Control&lt;/strong&gt;: Fine-grained policies tied to users, apps, or machines&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Audit Logging&lt;/strong&gt;: Track every access request&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pluggable Architecture&lt;/strong&gt;: Supports multiple auth methods and secret backends&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;High Availability (HA)&lt;/strong&gt;: Supports clustering and failover&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="13-common-use-cases"&gt;1.3 Common Use Cases&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Managing database credentials dynamically (e.g., MySQL, PostgreSQL)&lt;/li&gt;
+&lt;li&gt;Storing API keys and tokens for applications&lt;/li&gt;
+&lt;li&gt;PKI and certificate lifecycle management&lt;/li&gt;
+&lt;li&gt;Kubernetes secrets injection&lt;/li&gt;
+&lt;li&gt;Cloud IAM credential brokering (AWS, GCP, Azure)&lt;/li&gt;
+&lt;li&gt;Encrypting application data at rest&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="2-installation-and-setup"&gt;2. Installation and Setup&lt;/h2&gt;
+&lt;h3 id="21-installation-methods"&gt;2.1 Installation Methods&lt;/h3&gt;
+&lt;h4 id="211-linux-binary-install"&gt;2.1.1 Linux (Binary Install)&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;wget https://releases.hashicorp.com/vault/&amp;lt;version&amp;gt;/vault_&amp;lt;version&amp;gt;_linux_amd64.zip
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;unzip vault_&amp;lt;version&amp;gt;_linux_amd64.zip
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo mv vault /usr/local/bin/
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;vault --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="212-package-manager-example-debianubuntu"&gt;2.1.2 Package Manager (Example: Debian/Ubuntu)&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;echo &lt;span style="color:#e6db74"&gt;&amp;#34;deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com &lt;/span&gt;&lt;span style="color:#66d9ef"&gt;$(&lt;/span&gt;lsb_release -cs&lt;span style="color:#66d9ef"&gt;)&lt;/span&gt;&lt;span style="color:#e6db74"&gt; main&amp;#34;&lt;/span&gt; | sudo tee /etc/apt/sources.list.d/hashicorp.list
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt update &lt;span style="color:#f92672"&gt;&amp;amp;&amp;amp;&lt;/span&gt; sudo apt install vault
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="213-docker"&gt;2.1.3 Docker&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;docker run --cap-add&lt;span style="color:#f92672"&gt;=&lt;/span&gt;IPC_LOCK -p 8200:8200 hashicorp/vault
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id="22-initial-configuration"&gt;2.2 Initial Configuration&lt;/h3&gt;
+&lt;p&gt;Minimal configuration example (&lt;code&gt;/etc/vault.d/vault.hcl&lt;/code&gt;):&lt;/p&gt;</description></item></channel></rss>

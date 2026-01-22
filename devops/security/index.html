@@ -1,0 +1,305 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>DevSecOps // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>DevSecOps</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/devopssecurity/>Devopssecurity</a></div><div class="card markdown-content"><h1 id=devsecops-best-practices>DevSecOps Best Practices</h1><p>Integrating security into every phase of the software development lifecycle.</p><hr><h2 id=shift-left-security>Shift Left Security</h2><pre tabindex=0><code>Traditional:
+┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌──────────┐
+│ Plan  │→│ Code  │→│ Build │→│ Test  │→│Deploy │→│ Security │
+└───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └──────────┘
+                                                   ↑
+                                            (too late!)
+
+Shift Left:
+┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐
+│ Plan  │→│ Code  │→│ Build │→│ Test  │→│Deploy │→│Monitor│
+└───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └───────┘
+    ↑         ↑         ↑         ↑         ↑         ↑
+ Threat    SAST      SCA      DAST     Config    Runtime
+ Model    Linting   Scanning Testing   Audit    Protection
+</code></pre><hr><h2 id=security-in-the-development-lifecycle>Security in the Development Lifecycle</h2><h3 id=planning-phase>Planning Phase</h3><p><strong>Threat Modelling</strong></p><pre tabindex=0><code>STRIDE Framework:
+┌─────────────────┬────────────────────────────────────┐
+│ Threat          │ Example                            │
+├─────────────────┼────────────────────────────────────┤
+│ Spoofing        │ Impersonating another user         │
+│ Tampering       │ Modifying data in transit          │
+│ Repudiation     │ Denying actions taken              │
+│ Info Disclosure │ Exposing sensitive data            │
+│ Denial of Svc   │ Making service unavailable         │
+│ Elev of Priv    │ Gaining unauthorised access        │
+└─────────────────┴────────────────────────────────────┘
+</code></pre><p><strong>Security Requirements</strong></p><ul><li>Authentication requirements</li><li>Authorisation model</li><li>Data classification</li><li>Compliance requirements</li><li>Security testing requirements</li></ul><h3 id=coding-phase>Coding Phase</h3><p><strong>Secure Coding Practices</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Bad: SQL injection vulnerability</span>
+</span></span><span style=display:flex><span>query <span style=color:#f92672>=</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;SELECT * FROM users WHERE id = </span><span style=color:#e6db74>{</span>user_id<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Good: Parameterised query</span>
+</span></span><span style=display:flex><span>query <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;SELECT * FROM users WHERE id = </span><span style=color:#e6db74>%s</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>cursor<span style=color:#f92672>.</span>execute(query, (user_id,))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Bad: Hardcoded secrets</span>
+</span></span><span style=display:flex><span>API_KEY <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;sk-12345abcdef&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Good: Environment variables or secrets manager</span>
+</span></span><span style=display:flex><span>API_KEY <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;API_KEY&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#75715e># Or</span>
+</span></span><span style=display:flex><span>API_KEY <span style=color:#f92672>=</span> get_secret(<span style=color:#e6db74>&#34;api-key&#34;</span>)
+</span></span></code></pre></div><p><strong>Code Review Security Checklist</strong></p><ul><li><input disabled type=checkbox> Input validation</li><li><input disabled type=checkbox> Output encoding</li><li><input disabled type=checkbox> Authentication checks</li><li><input disabled type=checkbox> Authorisation checks</li><li><input disabled type=checkbox> No hardcoded secrets</li><li><input disabled type=checkbox> Secure error handling</li><li><input disabled type=checkbox> Logging without sensitive data</li><li><input disabled type=checkbox> Dependency versions pinned</li></ul><h3 id=build-phase>Build Phase</h3><p><strong>Static Application Security Testing (SAST)</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># GitHub Actions example</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run SAST</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>github/codeql-action/analyze@v2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run Semgrep</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>returntocorp/semgrep-action@v1</span>
+</span></span></code></pre></div><p><strong>Software Composition Analysis (SCA)</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Check dependencies</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    npm audit
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    safety check  # Python
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    snyk test</span>
+</span></span></code></pre></div><p><strong>Container Scanning</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Scan container image</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    trivy image myapp:latest
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    grype myapp:latest</span>
+</span></span></code></pre></div><h3 id=test-phase>Test Phase</h3><p><strong>Dynamic Application Security Testing (DAST)</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run DAST</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    zap-baseline.py -t https://staging.example.com</span>
+</span></span></code></pre></div><p><strong>Security Test Cases</strong></p><ul><li>Authentication bypass attempts</li><li>Authorisation boundary tests</li><li>Input validation tests</li><li>Session management tests</li><li>API security tests</li></ul><h3 id=deploy-phase>Deploy Phase</h3><p><strong>Infrastructure Security</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#75715e># Enforce encryption
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_s3_bucket_server_side_encryption_configuration&#34; &#34;example&#34;</span> {
+</span></span><span style=display:flex><span>  bucket <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>example</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>rule</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>apply_server_side_encryption_by_default</span> {
+</span></span><span style=display:flex><span>      sse_algorithm <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;aws:kms&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Enforce HTTPS
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_lb_listener&#34; &#34;https&#34;</span> {
+</span></span><span style=display:flex><span>  load_balancer_arn <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_lb</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>  port              <span style=color:#f92672>=</span> <span style=color:#ae81ff>443</span>
+</span></span><span style=display:flex><span>  protocol          <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;HTTPS&#34;</span>
+</span></span><span style=display:flex><span>  ssl_policy        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ELBSecurityPolicy-TLS13-1-2-2021-06&#34;</span>
+</span></span><span style=display:flex><span>  certificate_arn   <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_acm_certificate</span>.<span style=color:#66d9ef>main</span>.<span style=color:#66d9ef>arn</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>Policy as Code</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rego data-lang=rego><span style=display:flex><span><span style=color:#75715e># Deny containers running as root</span>
+</span></span><span style=display:flex><span>deny[<span style=color:#a6e22e>msg</span>] {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>input</span><span style=color:#f92672>.</span><span style=color:#a6e22e>kind</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;Deployment&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>container</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>input</span><span style=color:#f92672>.</span><span style=color:#a6e22e>spec</span><span style=color:#f92672>.</span><span style=color:#a6e22e>template</span><span style=color:#f92672>.</span><span style=color:#a6e22e>spec</span><span style=color:#f92672>.</span><span style=color:#a6e22e>containers</span>[<span style=color:#a6e22e>_</span>]
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>container</span><span style=color:#f92672>.</span><span style=color:#a6e22e>securityContext</span><span style=color:#f92672>.</span><span style=color:#a6e22e>runAsRoot</span> <span style=color:#f92672>==</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>msg</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#34;Container %v must not run as root&#34;</span><span style=color:#f92672>,</span> [<span style=color:#a6e22e>container</span><span style=color:#f92672>.</span><span style=color:#a6e22e>name</span>])
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=runtime-phase>Runtime Phase</h3><p><strong>Runtime Protection</strong></p><ul><li>Web Application Firewall (WAF)</li><li>Runtime Application Self-Protection (RASP)</li><li>Intrusion Detection/Prevention</li><li>Container runtime security</li></ul><hr><h2 id=owasp-top-10-prevention>OWASP Top 10 Prevention</h2><h3 id=1-broken-access-control>1. Broken Access Control</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Bad: No authorisation check</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@app.route</span>(<span style=color:#e6db74>&#34;/admin/users&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>admin_users</span>():
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> get_all_users()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Good: Proper authorisation</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@app.route</span>(<span style=color:#e6db74>&#34;/admin/users&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@require_role</span>(<span style=color:#e6db74>&#34;admin&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>admin_users</span>():
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> get_all_users()
+</span></span></code></pre></div><h3 id=2-cryptographic-failures>2. Cryptographic Failures</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Bad: Weak encryption</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> hashlib <span style=color:#f92672>import</span> md5
+</span></span><span style=display:flex><span>password_hash <span style=color:#f92672>=</span> md5(password<span style=color:#f92672>.</span>encode())<span style=color:#f92672>.</span>hexdigest()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Good: Strong encryption</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> argon2 <span style=color:#f92672>import</span> PasswordHasher
+</span></span><span style=display:flex><span>ph <span style=color:#f92672>=</span> PasswordHasher()
+</span></span><span style=display:flex><span>password_hash <span style=color:#f92672>=</span> ph<span style=color:#f92672>.</span>hash(password)
+</span></span></code></pre></div><h3 id=3-injection>3. Injection</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Bad: Command injection</span>
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>system(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;convert </span><span style=color:#e6db74>{</span>user_input<span style=color:#e6db74>}</span><span style=color:#e6db74> output.png&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Good: Safe subprocess</span>
+</span></span><span style=display:flex><span>subprocess<span style=color:#f92672>.</span>run([<span style=color:#e6db74>&#34;convert&#34;</span>, user_input, <span style=color:#e6db74>&#34;output.png&#34;</span>], check<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>)
+</span></span></code></pre></div><h3 id=4-insecure-design>4. Insecure Design</h3><ul><li>Threat modelling</li><li>Secure design patterns</li><li>Defence in depth</li><li>Principle of least privilege</li></ul><h3 id=5-security-misconfiguration>5. Security Misconfiguration</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Kubernetes security context</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>securityContext</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>runAsNonRoot</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>runAsUser</span>: <span style=color:#ae81ff>1000</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>readOnlyRootFilesystem</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>allowPrivilegeEscalation</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>capabilities</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>drop</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>ALL</span>
+</span></span></code></pre></div><h3 id=6-vulnerable-components>6. Vulnerable Components</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Regular dependency updates</span>
+</span></span><span style=display:flex><span>npm audit fix
+</span></span><span style=display:flex><span>pip-audit
+</span></span><span style=display:flex><span>snyk monitor
+</span></span></code></pre></div><h3 id=7-authentication-failures>7. Authentication Failures</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Implement rate limiting</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@limiter.limit</span>(<span style=color:#e6db74>&#34;5 per minute&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@app.route</span>(<span style=color:#e6db74>&#34;/login&#34;</span>, methods<span style=color:#f92672>=</span>[<span style=color:#e6db74>&#34;POST&#34;</span>])
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>login</span>():
+</span></span><span style=display:flex><span>    <span style=color:#75715e># ...</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Use MFA</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> user<span style=color:#f92672>.</span>mfa_enabled:
+</span></span><span style=display:flex><span>    require_mfa_verification()
+</span></span></code></pre></div><h3 id=8-software-and-data-integrity-failures>8. Software and Data Integrity Failures</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Verify signatures</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Verify artifact signature</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    cosign verify myregistry/myapp:latest \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      --key cosign.pub</span>
+</span></span></code></pre></div><h3 id=9-security-logging-and-monitoring>9. Security Logging and Monitoring</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Log security events</span>
+</span></span><span style=display:flex><span>logger<span style=color:#f92672>.</span>info(<span style=color:#e6db74>&#34;login_success&#34;</span>, extra<span style=color:#f92672>=</span>{
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;user_id&#34;</span>: user<span style=color:#f92672>.</span>id,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;ip_address&#34;</span>: request<span style=color:#f92672>.</span>remote_addr,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;user_agent&#34;</span>: request<span style=color:#f92672>.</span>user_agent<span style=color:#f92672>.</span>string
+</span></span><span style=display:flex><span>})
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>logger<span style=color:#f92672>.</span>warning(<span style=color:#e6db74>&#34;login_failure&#34;</span>, extra<span style=color:#f92672>=</span>{
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;username&#34;</span>: username,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;ip_address&#34;</span>: request<span style=color:#f92672>.</span>remote_addr,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;reason&#34;</span>: <span style=color:#e6db74>&#34;invalid_password&#34;</span>
+</span></span><span style=display:flex><span>})
+</span></span></code></pre></div><h3 id=10-server-side-request-forgery-ssrf>10. Server-Side Request Forgery (SSRF)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Bad: User-controlled URL</span>
+</span></span><span style=display:flex><span>response <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(user_provided_url)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Good: Validate and restrict</span>
+</span></span><span style=display:flex><span>allowed_hosts <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;api.example.com&#34;</span>, <span style=color:#e6db74>&#34;cdn.example.com&#34;</span>]
+</span></span><span style=display:flex><span>parsed <span style=color:#f92672>=</span> urlparse(user_provided_url)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> parsed<span style=color:#f92672>.</span>hostname <span style=color:#f92672>not</span> <span style=color:#f92672>in</span> allowed_hosts:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>raise</span> <span style=color:#a6e22e>ValueError</span>(<span style=color:#e6db74>&#34;Invalid URL&#34;</span>)
+</span></span><span style=display:flex><span>response <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(user_provided_url)
+</span></span></code></pre></div><hr><h2 id=secrets-management>Secrets Management</h2><h3 id=dont-do-this>Don&rsquo;t Do This</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Never commit secrets!</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>database</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>password</span>: <span style=color:#e6db74>&#34;supersecret123&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>API_KEY</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>value</span>: <span style=color:#e6db74>&#34;sk-12345abcdef&#34;</span>
+</span></span></code></pre></div><h3 id=do-this-instead>Do This Instead</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Reference external secrets</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>database</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>password</span>: <span style=color:#ae81ff>${VAULT_DB_PASSWORD}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>API_KEY</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>valueFrom</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>secretKeyRef</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>api-secrets</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>key</span>: <span style=color:#ae81ff>api-key</span>
+</span></span></code></pre></div><h3 id=secrets-management-tools>Secrets Management Tools</h3><table><thead><tr><th>Tool</th><th>Use Case</th></tr></thead><tbody><tr><td>HashiCorp Vault</td><td>Enterprise secrets management</td></tr><tr><td>AWS Secrets Manager</td><td>AWS-native secrets</td></tr><tr><td>Azure Key Vault</td><td>Azure-native secrets</td></tr><tr><td>GCP Secret Manager</td><td>GCP-native secrets</td></tr><tr><td>SOPS</td><td>Encrypted files in Git</td></tr><tr><td>sealed-secrets</td><td>Kubernetes secrets</td></tr></tbody></table><h3 id=secrets-best-practices>Secrets Best Practices</h3><ul><li>Rotate secrets regularly</li><li>Use short-lived credentials</li><li>Audit secret access</li><li>Never log secrets</li><li>Use different secrets per environment</li><li>Implement secret scanning in CI</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Pre-commit secret scanning</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>repo</span>: <span style=color:#ae81ff>https://github.com/Yelp/detect-secrets</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hooks</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>id</span>: <span style=color:#ae81ff>detect-secrets</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>args</span>: [<span style=color:#e6db74>&#39;--baseline&#39;</span>, <span style=color:#e6db74>&#39;.secrets.baseline&#39;</span>]
+</span></span></code></pre></div><hr><h2 id=container-security>Container Security</h2><h3 id=dockerfile-best-practices>Dockerfile Best Practices</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#75715e># Use specific version, not latest</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>FROM</span> <span style=color:#e6db74>python:3.11.4-slim-bookworm</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Run as non-root</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>RUN</span> useradd -m -u <span style=color:#ae81ff>1000</span> appuser<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>USER</span> <span style=color:#e6db74>appuser</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Don&#39;t store secrets in layers</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Use build-time secrets instead</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>RUN</span> --mount<span style=color:#f92672>=</span>type<span style=color:#f92672>=</span>secret,id<span style=color:#f92672>=</span>pip_conf,target<span style=color:#f92672>=</span>/etc/pip.conf <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    pip install -r requirements.txt<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Minimise attack surface</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>RUN</span> apt-get update <span style=color:#f92672>&amp;&amp;</span> apt-get install -y --no-install-recommends <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    package <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    <span style=color:#f92672>&amp;&amp;</span> rm -rf /var/lib/apt/lists/*<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Use COPY instead of ADD</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>COPY</span> --chown<span style=color:#f92672>=</span>appuser:appuser . /app<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Health check</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>HEALTHCHECK</span> --interval<span style=color:#f92672>=</span>30s --timeout<span style=color:#f92672>=</span>3s <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    <span style=color:#66d9ef>CMD</span> curl -f http://localhost:8080/health <span style=color:#f92672>||</span> exit <span style=color:#ae81ff>1</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span></code></pre></div><h3 id=kubernetes-security>Kubernetes Security</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>securityContext</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runAsNonRoot</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>seccompProfile</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>type</span>: <span style=color:#ae81ff>RuntimeDefault</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>app</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>securityContext</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>allowPrivilegeEscalation</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>readOnlyRootFilesystem</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>capabilities</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>drop</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>ALL</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>resources</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>limits</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>memory</span>: <span style=color:#e6db74>&#34;128Mi&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>cpu</span>: <span style=color:#e6db74>&#34;500m&#34;</span>
+</span></span></code></pre></div><h3 id=network-policies>Network Policies</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.k8s.io/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>NetworkPolicy</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>deny-all</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>podSelector</span>: {}
+</span></span><span style=display:flex><span>  <span style=color:#f92672>policyTypes</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Ingress</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Egress</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.k8s.io/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>NetworkPolicy</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>allow-web</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>podSelector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>app</span>: <span style=color:#ae81ff>web</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ingress</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>from</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>podSelector</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>app</span>: <span style=color:#ae81ff>frontend</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>port</span>: <span style=color:#ae81ff>8080</span>
+</span></span></code></pre></div><hr><h2 id=security-pipeline>Security Pipeline</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>Security Pipeline</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>on</span>: [<span style=color:#ae81ff>push, pull_request]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>sast</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run Semgrep</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>returntocorp/semgrep-action@v1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>sca</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run Snyk</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>snyk/actions/node@master</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>SNYK_TOKEN</span>: <span style=color:#ae81ff>${{ secrets.SNYK_TOKEN }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>secrets</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Detect secrets</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>trufflesecurity/trufflehog@main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>container</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Build image</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>docker build -t myapp:${{ github.sha }} .</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Scan image</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aquasecurity/trivy-action@master</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>image-ref</span>: <span style=color:#ae81ff>myapp:${{ github.sha }}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>severity</span>: <span style=color:#e6db74>&#39;CRITICAL,HIGH&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>iac</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run tfsec</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aquasecurity/tfsec-action@v1.0.0</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run Checkov</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>bridgecrewio/checkov-action@v12</span>
+</span></span></code></pre></div><hr><h2 id=quick-reference>Quick Reference</h2><pre tabindex=0><code>Security Checklist:
+
+□ Threat model completed
+□ Security requirements defined
+□ SAST in CI pipeline
+□ SCA in CI pipeline
+□ Container scanning enabled
+□ Secrets scanning enabled
+□ IaC security scanning
+□ DAST for staging/prod
+□ Runtime protection enabled
+□ Security logging enabled
+□ Incident response plan
+□ Regular security reviews
+</code></pre><h3 id=security-tools-by-category>Security Tools by Category</h3><table><thead><tr><th>Category</th><th>Tools</th></tr></thead><tbody><tr><td>SAST</td><td>CodeQL, Semgrep, SonarQube</td></tr><tr><td>SCA</td><td>Snyk, Dependabot, OWASP Dependency-Check</td></tr><tr><td>Container</td><td>Trivy, Grype, Clair</td></tr><tr><td>IaC</td><td>tfsec, Checkov, Terrascan</td></tr><tr><td>Secrets</td><td>TruffleHog, detect-secrets, git-secrets</td></tr><tr><td>DAST</td><td>OWASP ZAP, Burp Suite</td></tr><tr><td>Policy</td><td>OPA, Kyverno, Falco</td></tr></tbody></table></div></div><script src=/assets/shared-nav.js></script></body></html>

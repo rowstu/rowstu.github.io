@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Packers on rowstu.net</title><link>https://rowstu.net/packer/</link><description>Recent content in Packers on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/packer/index.xml" rel="self" type="application/rss+xml"/><item><title>HashiCorp Packer – Comprehensive Notes &amp; Procedures</title><link>https://rowstu.net/packer/notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/packer/notes/</guid><description>&lt;p&gt;&lt;strong&gt;HashiCorp Packer&lt;/strong&gt; is a tool for &lt;strong&gt;automating the creation of machine images&lt;/strong&gt; from a single source configuration.&lt;/p&gt;
+&lt;p&gt;A &lt;em&gt;machine image&lt;/em&gt; can be:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AWS AMI&lt;/li&gt;
+&lt;li&gt;Azure Managed Image&lt;/li&gt;
+&lt;li&gt;GCP Image&lt;/li&gt;
+&lt;li&gt;VMware / VirtualBox image&lt;/li&gt;
+&lt;li&gt;Docker image&lt;/li&gt;
+&lt;li&gt;Raw disk image (qcow2, vmdk, etc.)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Packer is &lt;strong&gt;image-focused&lt;/strong&gt;, not infrastructure-focused.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If Terraform creates &lt;em&gt;infrastructure&lt;/em&gt;, Packer creates the &lt;em&gt;golden images&lt;/em&gt; that infrastructure boots from.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h3 id="primary-use-cases"&gt;Primary Use Cases&lt;/h3&gt;
+&lt;p&gt;Packer is typically used to:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Build &lt;strong&gt;golden OS images&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Pre-install packages, agents, and configuration&lt;/li&gt;
+&lt;li&gt;Reduce boot-time configuration (faster scaling)&lt;/li&gt;
+&lt;li&gt;Enforce consistency across environments&lt;/li&gt;
+&lt;li&gt;Create immutable infrastructure&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Common examples:&lt;/p&gt;</description></item></channel></rss>

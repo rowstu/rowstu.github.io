@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>rowstu.net</title><link>https://rowstu.net/vagrant/</link><description>Recent content on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/vagrant/index.xml" rel="self" type="application/rss+xml"/><item><title>Vagrant – Notes, Procedures, and Best Practices</title><link>https://rowstu.net/vagrant/vagrant/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vagrant/vagrant/</guid><description>&lt;p&gt;Vagrant is a tool for building, configuring, and managing reproducible development environments. It provides a consistent workflow on top of virtualization and container technologies, allowing developers and operators to spin up identical environments across different machines.&lt;/p&gt;
+&lt;h3 id="core-terminology"&gt;Core Terminology&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Box&lt;/strong&gt;: A packaged base image (e.g. Ubuntu, CentOS) used to create VMs.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Provider&lt;/strong&gt;: The backend that runs the environment (VirtualBox, libvirt, VMware, Hyper-V, Docker).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vagrantfile&lt;/strong&gt;: The declarative configuration file that defines how the environment is built.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Provisioner&lt;/strong&gt;: A tool or script used to configure the VM after it boots (shell, Ansible, Puppet, Chef).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Synced Folder&lt;/strong&gt;: A directory shared between host and guest.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Environment&lt;/strong&gt;: A directory containing a Vagrantfile and associated state.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Multi-machine Environment&lt;/strong&gt;: A single Vagrantfile defining multiple VMs.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="why-vagrant-is-useful"&gt;Why Vagrant Is Useful&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Eliminates &amp;ldquo;works on my machine&amp;rdquo; problems&lt;/li&gt;
+&lt;li&gt;Standardizes dev and test environments&lt;/li&gt;
+&lt;li&gt;Speeds up onboarding&lt;/li&gt;
+&lt;li&gt;Encourages infrastructure-as-code practices&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="2-installation-and-setup"&gt;2. Installation and Setup&lt;/h2&gt;
+&lt;h3 id="general-requirements"&gt;General Requirements&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;A supported host OS (Linux, macOS, Windows)&lt;/li&gt;
+&lt;li&gt;A virtualization provider&lt;/li&gt;
+&lt;li&gt;Hardware virtualization enabled (Intel VT-x / AMD-V)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="install-vagrant"&gt;Install Vagrant&lt;/h3&gt;
+&lt;h4 id="linux-debianubuntu"&gt;Linux (Debian/Ubuntu)&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install vagrant
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="rhel--rocky--alma"&gt;RHEL / Rocky / Alma&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo dnf install vagrant
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="macos"&gt;macOS&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;brew install --cask vagrant
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="windows"&gt;Windows&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Download installer from HashiCorp&lt;/li&gt;
+&lt;li&gt;Ensure Hyper-V or VirtualBox is configured correctly&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="install-a-provider"&gt;Install a Provider&lt;/h3&gt;
+&lt;h4 id="virtualbox-most-common"&gt;VirtualBox (most common)&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install virtualbox
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="libvirt-linux-native-preferred-for-performance"&gt;libvirt (Linux-native, preferred for performance)&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install libvirt-daemon-system libvirt-clients vagrant-libvirt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="useful-plugins"&gt;Useful Plugins&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;vagrant plugin install vagrant-vbguest
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;vagrant plugin install vagrant-hostmanager
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;vagrant plugin install vagrant-disksize
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="3-vagrantfile-structure"&gt;3. Vagrantfile Structure&lt;/h2&gt;
+&lt;h3 id="basic-vagrantfile"&gt;Basic Vagrantfile&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-ruby" data-lang="ruby"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;Vagrant&lt;/span&gt;&lt;span style="color:#f92672"&gt;.&lt;/span&gt;configure(&lt;span style="color:#e6db74"&gt;&amp;#34;2&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;do&lt;/span&gt; &lt;span style="color:#f92672"&gt;|&lt;/span&gt;config&lt;span style="color:#f92672"&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; config&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;box &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;ubuntu/jammy64&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="common-configuration-sections"&gt;Common Configuration Sections&lt;/h3&gt;
+&lt;h4 id="box-configuration"&gt;Box Configuration&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-ruby" data-lang="ruby"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;box &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;ubuntu/jammy64&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;box_version &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;&amp;gt;= 20240101&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="provider-specific-settings"&gt;Provider-Specific Settings&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-ruby" data-lang="ruby"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;provider &lt;span style="color:#e6db74"&gt;&amp;#34;virtualbox&amp;#34;&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;do&lt;/span&gt; &lt;span style="color:#f92672"&gt;|&lt;/span&gt;vb&lt;span style="color:#f92672"&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; vb&lt;span style="color:#f92672"&gt;.&lt;/span&gt;memory &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2048&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; vb&lt;span style="color:#f92672"&gt;.&lt;/span&gt;cpus &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="synced-folders"&gt;Synced Folders&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-ruby" data-lang="ruby"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;synced_folder &lt;span style="color:#e6db74"&gt;&amp;#34;./app&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;/vagrant&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;type&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;rsync&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="multi-vm-definition"&gt;Multi-VM Definition&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-ruby" data-lang="ruby"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;define &lt;span style="color:#e6db74"&gt;&amp;#34;web&amp;#34;&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;do&lt;/span&gt; &lt;span style="color:#f92672"&gt;|&lt;/span&gt;web&lt;span style="color:#f92672"&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; web&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;hostname &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;web.local&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;define &lt;span style="color:#e6db74"&gt;&amp;#34;db&amp;#34;&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;do&lt;/span&gt; &lt;span style="color:#f92672"&gt;|&lt;/span&gt;db&lt;span style="color:#f92672"&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; db&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;hostname &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;db.local&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="4-common-commands"&gt;4. Common Commands&lt;/h2&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Command&lt;/th&gt;
+ &lt;th&gt;Description&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant init&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;Initialize a new Vagrantfile&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant up&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;Create and start the VM&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant halt&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;Stop the VM&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant destroy&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;Destroy the VM&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant reload&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;Restart and reapply config&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant ssh&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;SSH into the VM&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant status&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;Show VM state&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant provision&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;Re-run provisioners&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant box list&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;List installed boxes&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;code&gt;vagrant box prune&lt;/code&gt;&lt;/td&gt;
+ &lt;td&gt;Remove unused boxes&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id="5-provisioning"&gt;5. Provisioning&lt;/h2&gt;
+&lt;h3 id="shell-provisioning"&gt;Shell Provisioning&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-ruby" data-lang="ruby"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config&lt;span style="color:#f92672"&gt;.&lt;/span&gt;vm&lt;span style="color:#f92672"&gt;.&lt;/span&gt;provision &lt;span style="color:#e6db74"&gt;&amp;#34;shell&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;inline&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;lt;&amp;lt;-SHELL
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; apt install &lt;span style="color:#f92672"&gt;-&lt;/span&gt;y nginx
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;SHELL&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Best Practices&lt;/strong&gt;:&lt;/p&gt;</description></item></channel></rss>

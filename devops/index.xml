@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DevOps on rowstu.net</title><link>https://rowstu.net/devops/</link><description>Recent content in DevOps on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/devops/index.xml" rel="self" type="application/rss+xml"/><item><title>CI/CD Best Practices</title><link>https://rowstu.net/devops/ci-cd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/ci-cd/</guid><description>&lt;h1 id="cicd-best-practices"&gt;CI/CD Best Practices&lt;/h1&gt;
+&lt;p&gt;Continuous Integration and Continuous Delivery/Deployment practices for reliable software delivery.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="continuous-integration"&gt;Continuous Integration&lt;/h2&gt;
+&lt;h3 id="commit-frequently"&gt;Commit Frequently&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Good: Multiple small commits per day
+Bad: One large commit per week
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Commit at least daily&lt;/li&gt;
+&lt;li&gt;Small, focused commits&lt;/li&gt;
+&lt;li&gt;Each commit should be complete and working&lt;/li&gt;
+&lt;li&gt;Avoid long-lived branches&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="maintain-a-single-source-of-truth"&gt;Maintain a Single Source of Truth&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;One main branch (main/master)&lt;/li&gt;
+&lt;li&gt;All code lives in version control&lt;/li&gt;
+&lt;li&gt;Configuration in version control&lt;/li&gt;
+&lt;li&gt;Infrastructure as Code in version control&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="automated-build-on-every-commit"&gt;Automated Build on Every Commit&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Example: GitHub Actions&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;on&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;push&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;branches&lt;/span&gt;: [&lt;span style="color:#ae81ff"&gt;main]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;pull_request&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;branches&lt;/span&gt;: [&lt;span style="color:#ae81ff"&gt;main]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;jobs&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;build&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;runs-on&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ubuntu-latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;steps&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;uses&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;actions/checkout@v4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Build&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;make build&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="fix-broken-builds-immediately"&gt;Fix Broken Builds Immediately&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Broken build = top priority&lt;/li&gt;
+&lt;li&gt;Don&amp;rsquo;t commit on a broken build&lt;/li&gt;
+&lt;li&gt;Revert if can&amp;rsquo;t fix quickly&lt;/li&gt;
+&lt;li&gt;Build status visible to all&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="keep-the-build-fast"&gt;Keep the Build Fast&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Build Stage&lt;/th&gt;
+ &lt;th&gt;Target Time&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Unit tests&lt;/td&gt;
+ &lt;td&gt;&amp;lt; 5 minutes&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Full CI pipeline&lt;/td&gt;
+ &lt;td&gt;&amp;lt; 10 minutes&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Integration tests&lt;/td&gt;
+ &lt;td&gt;&amp;lt; 20 minutes&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;Parallelise tests&lt;/li&gt;
+&lt;li&gt;Use caching&lt;/li&gt;
+&lt;li&gt;Optimise slow tests&lt;/li&gt;
+&lt;li&gt;Consider test splitting&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="continuous-delivery-pipeline"&gt;Continuous Delivery Pipeline&lt;/h2&gt;
+&lt;h3 id="pipeline-stages"&gt;Pipeline Stages&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;┌─────────┐ ┌──────┐ ┌──────────┐ ┌─────────┐ ┌────────────┐
+│ Build │ → │ Test │ → │ Security │ → │ Package │ → │ Deploy │
+└─────────┘ └──────┘ └──────────┘ └─────────┘ └────────────┘
+ │
+ ┌───────────────────┼───────────────────┐
+ ▼ ▼ ▼
+ ┌─────────┐ ┌─────────┐ ┌─────────┐
+ │ Dev │ → │ Staging │ → │ Prod │
+ └─────────┘ └─────────┘ └─────────┘
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="build-stage"&gt;Build Stage&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Compile code&lt;/li&gt;
+&lt;li&gt;Generate artefacts&lt;/li&gt;
+&lt;li&gt;Create container images&lt;/li&gt;
+&lt;li&gt;Tag with version/commit SHA&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="test-stage"&gt;Test Stage&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;tests&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;unit&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Fast, isolated tests&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#66d9ef"&gt;No&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;external dependencies&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Run on every commit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;integration&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Test component interactions&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;May use test doubles&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Run on every commit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;e2e&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Full system tests&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Real dependencies&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Run before deployment&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;performance&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Load tests&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Baseline comparisons&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;Run periodically or before release&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="security-stage"&gt;Security Stage&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Static Application Security Testing (SAST)&lt;/li&gt;
+&lt;li&gt;Dependency vulnerability scanning&lt;/li&gt;
+&lt;li&gt;Container image scanning&lt;/li&gt;
+&lt;li&gt;Secrets detection&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="package-stage"&gt;Package Stage&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Build immutable artefacts&lt;/li&gt;
+&lt;li&gt;Version everything&lt;/li&gt;
+&lt;li&gt;Store in artefact repository&lt;/li&gt;
+&lt;li&gt;Sign artefacts&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="deploy-stage"&gt;Deploy Stage&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Deploy to each environment identically&lt;/li&gt;
+&lt;li&gt;Environment-specific config only&lt;/li&gt;
+&lt;li&gt;Automated smoke tests&lt;/li&gt;
+&lt;li&gt;Automated rollback capability&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="deployment-strategies"&gt;Deployment Strategies&lt;/h2&gt;
+&lt;h3 id="rolling-deployment"&gt;Rolling Deployment&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Before: [v1] [v1] [v1] [v1]
+During: [v2] [v1] [v1] [v1]
+During: [v2] [v2] [v1] [v1]
+During: [v2] [v2] [v2] [v1]
+After: [v2] [v2] [v2] [v2]
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Gradual replacement&lt;/li&gt;
+&lt;li&gt;No downtime&lt;/li&gt;
+&lt;li&gt;Easy rollback&lt;/li&gt;
+&lt;li&gt;Mixed versions during deployment&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="blue-green-deployment"&gt;Blue-Green Deployment&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt; ┌─────────────────┐
+ │ Load Balancer │
+ └────────┬────────┘
+ │
+ ┌─────────┴─────────┐
+ ▼ ▼
+ ┌─────────┐ ┌─────────┐
+ │ Blue │ │ Green │
+ │ (v1) │ │ (v2) │
+ │ ACTIVE │ │ IDLE │
+ └─────────┘ └─────────┘
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Two identical environments&lt;/li&gt;
+&lt;li&gt;Switch traffic instantly&lt;/li&gt;
+&lt;li&gt;Easy rollback (switch back)&lt;/li&gt;
+&lt;li&gt;Requires double resources&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="canary-deployment"&gt;Canary Deployment&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Traffic Split:
+├── 95% → v1 (stable)
+└── 5% → v2 (canary)
+
+If healthy, gradually increase:
+├── 90% → v1
+└── 10% → v2
+...
+├── 0% → v1
+└── 100% → v2
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Gradual traffic shift&lt;/li&gt;
+&lt;li&gt;Real user testing&lt;/li&gt;
+&lt;li&gt;Fast rollback&lt;/li&gt;
+&lt;li&gt;Requires good monitoring&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="feature-flags"&gt;Feature Flags&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; feature_flags&lt;span style="color:#f92672"&gt;.&lt;/span&gt;is_enabled(&lt;span style="color:#e6db74"&gt;&amp;#34;new_checkout&amp;#34;&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; new_checkout_flow()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;else&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; old_checkout_flow()
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Decouple deployment from release&lt;/li&gt;
+&lt;li&gt;A/B testing&lt;/li&gt;
+&lt;li&gt;Gradual rollout&lt;/li&gt;
+&lt;li&gt;Kill switch for features&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="pipeline-best-practices"&gt;Pipeline Best Practices&lt;/h2&gt;
+&lt;h3 id="pipeline-as-code"&gt;Pipeline as Code&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# .gitlab-ci.yml or Jenkinsfile or .github/workflows/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;stages&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;build&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;security&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;deploy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;build&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;stage&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;build&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;script&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;docker build -t app:$CI_COMMIT_SHA .&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Version controlled&lt;/li&gt;
+&lt;li&gt;Peer reviewed&lt;/li&gt;
+&lt;li&gt;Auditable&lt;/li&gt;
+&lt;li&gt;Reproducible&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="fail-fast"&gt;Fail Fast&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Run fastest tests first&lt;/li&gt;
+&lt;li&gt;Fail on first error&lt;/li&gt;
+&lt;li&gt;Parallelise independent jobs&lt;/li&gt;
+&lt;li&gt;Cache dependencies&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="environment-parity"&gt;Environment Parity&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Environment&lt;/th&gt;
+ &lt;th&gt;Purpose&lt;/th&gt;
+ &lt;th&gt;Data&lt;/th&gt;
+ &lt;th&gt;Config&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Dev&lt;/td&gt;
+ &lt;td&gt;Development&lt;/td&gt;
+ &lt;td&gt;Synthetic&lt;/td&gt;
+ &lt;td&gt;Dev&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Test&lt;/td&gt;
+ &lt;td&gt;Testing&lt;/td&gt;
+ &lt;td&gt;Synthetic&lt;/td&gt;
+ &lt;td&gt;Test&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Staging&lt;/td&gt;
+ &lt;td&gt;Pre-prod&lt;/td&gt;
+ &lt;td&gt;Anonymised prod&lt;/td&gt;
+ &lt;td&gt;Prod-like&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Prod&lt;/td&gt;
+ &lt;td&gt;Production&lt;/td&gt;
+ &lt;td&gt;Real&lt;/td&gt;
+ &lt;td&gt;Prod&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;Same deployment process everywhere&lt;/li&gt;
+&lt;li&gt;Same artefacts everywhere&lt;/li&gt;
+&lt;li&gt;Only config differs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="artefact-promotion"&gt;Artefact Promotion&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Build Once, Deploy Many:
+
+┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
+│ Build │ ──▶ │ Dev │ ──▶ │ Staging │ ──▶ │ Prod │
+│ app:abc │ │ app:abc │ │ app:abc │ │ app:abc │
+└─────────┘ └─────────┘ └─────────┘ └─────────┘
+ Same artefact promoted through environments
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Build once, deploy many times&lt;/li&gt;
+&lt;li&gt;Artefacts are immutable&lt;/li&gt;
+&lt;li&gt;Configuration is external&lt;/li&gt;
+&lt;li&gt;Promotes tested code&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="secrets-management"&gt;Secrets Management&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Bad&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;database_password&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;secret123&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Good&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;database_password&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;${VAULT_DB_PASSWORD}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Never commit secrets&lt;/li&gt;
+&lt;li&gt;Use secrets management (Vault, AWS Secrets Manager)&lt;/li&gt;
+&lt;li&gt;Rotate secrets regularly&lt;/li&gt;
+&lt;li&gt;Audit secret access&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="testing-pyramid"&gt;Testing Pyramid&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt; /\
+ / \
+ / E2E\ Few, slow, expensive
+ /──────\
+ / \
+ /Integration\ Some, moderate
+ /──────────────\
+ / \
+ / Unit Tests \ Many, fast, cheap
+ /────────────────────\
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="unit-tests"&gt;Unit Tests&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Test single units in isolation&lt;/li&gt;
+&lt;li&gt;Fast (milliseconds)&lt;/li&gt;
+&lt;li&gt;No external dependencies&lt;/li&gt;
+&lt;li&gt;High coverage&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="integration-tests"&gt;Integration Tests&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Test component interactions&lt;/li&gt;
+&lt;li&gt;Moderate speed&lt;/li&gt;
+&lt;li&gt;May use test containers&lt;/li&gt;
+&lt;li&gt;Focus on boundaries&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="end-to-end-tests"&gt;End-to-End Tests&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Test complete workflows&lt;/li&gt;
+&lt;li&gt;Slow (seconds to minutes)&lt;/li&gt;
+&lt;li&gt;Real or near-real dependencies&lt;/li&gt;
+&lt;li&gt;Critical paths only&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="monitoring-and-feedback"&gt;Monitoring and Feedback&lt;/h2&gt;
+&lt;h3 id="pipeline-metrics"&gt;Pipeline Metrics&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Build duration&lt;/li&gt;
+&lt;li&gt;Build success rate&lt;/li&gt;
+&lt;li&gt;Test coverage&lt;/li&gt;
+&lt;li&gt;Deployment frequency&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="deployment-metrics"&gt;Deployment Metrics&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Deployment duration&lt;/li&gt;
+&lt;li&gt;Deployment success rate&lt;/li&gt;
+&lt;li&gt;Rollback frequency&lt;/li&gt;
+&lt;li&gt;Time to recovery&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="alerting"&gt;Alerting&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;alerts&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;DeploymentFailed&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;condition&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;deployment_status == &amp;#34;failed&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;notify&lt;/span&gt;: [&lt;span style="color:#ae81ff"&gt;slack, pagerduty]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;PipelineSlow&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;condition&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;pipeline_duration &amp;gt; 15m&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;notify&lt;/span&gt;: [&lt;span style="color:#ae81ff"&gt;slack]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="quick-reference"&gt;Quick Reference&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;CI Checklist:
+□ Single source repository
+□ Automated build
+□ Automated tests
+□ Fast feedback (&amp;lt; 10 min)
+□ Fix broken builds immediately
+□ All tests pass before merge
+
+CD Checklist:
+□ Pipeline as code
+□ Environment parity
+□ Automated deployments
+□ Artefact promotion
+□ Secrets management
+□ Rollback capability
+□ Monitoring and alerting
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>DevOps Principles</title><link>https://rowstu.net/devops/principles/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/principles/</guid><description>&lt;h1 id="core-devops-principles"&gt;Core DevOps Principles&lt;/h1&gt;
+&lt;p&gt;DevOps is a set of practices that combines software development (Dev) and IT operations (Ops) to shorten the development lifecycle while delivering features, fixes, and updates frequently and reliably.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="the-three-ways"&gt;The Three Ways&lt;/h2&gt;
+&lt;h3 id="1-flow-systems-thinking"&gt;1. Flow (Systems Thinking)&lt;/h3&gt;
+&lt;p&gt;Focus on the performance of the entire system, not just individual silos.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Optimise for global goals, not local departmental goals&lt;/li&gt;
+&lt;li&gt;Reduce batch sizes and work in progress&lt;/li&gt;
+&lt;li&gt;Eliminate constraints and bottlenecks&lt;/li&gt;
+&lt;li&gt;Never pass defects downstream&lt;/li&gt;
+&lt;li&gt;Create smooth, fast flow from development to operations to customer&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-feedback-amplify-feedback-loops"&gt;2. Feedback (Amplify Feedback Loops)&lt;/h3&gt;
+&lt;p&gt;Create fast, constant feedback at all stages.&lt;/p&gt;</description></item><item><title>DevSecOps</title><link>https://rowstu.net/devops/security/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/security/</guid><description>&lt;h1 id="devsecops-best-practices"&gt;DevSecOps Best Practices&lt;/h1&gt;
+&lt;p&gt;Integrating security into every phase of the software development lifecycle.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="shift-left-security"&gt;Shift Left Security&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Traditional:
+┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌──────────┐
+│ Plan │→│ Code │→│ Build │→│ Test │→│Deploy │→│ Security │
+└───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └──────────┘
+ ↑
+ (too late!)
+
+Shift Left:
+┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐
+│ Plan │→│ Code │→│ Build │→│ Test │→│Deploy │→│Monitor│
+└───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └───────┘
+ ↑ ↑ ↑ ↑ ↑ ↑
+ Threat SAST SCA DAST Config Runtime
+ Model Linting Scanning Testing Audit Protection
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id="security-in-the-development-lifecycle"&gt;Security in the Development Lifecycle&lt;/h2&gt;
+&lt;h3 id="planning-phase"&gt;Planning Phase&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Threat Modelling&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Incident Management</title><link>https://rowstu.net/devops/incident-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/incident-management/</guid><description>&lt;h1 id="incident-management-best-practices"&gt;Incident Management Best Practices&lt;/h1&gt;
+&lt;p&gt;Responding to, managing, and learning from incidents effectively.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="incident-lifecycle"&gt;Incident Lifecycle&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+│ Detect │ → │ Respond │ → │ Resolve │ → │ Review │ → │ Improve │
+└──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id="incident-severity-levels"&gt;Incident Severity Levels&lt;/h2&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Severity&lt;/th&gt;
+ &lt;th&gt;Impact&lt;/th&gt;
+ &lt;th&gt;Response Time&lt;/th&gt;
+ &lt;th&gt;Example&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;SEV1&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;Critical - Major outage&lt;/td&gt;
+ &lt;td&gt;Immediate (page)&lt;/td&gt;
+ &lt;td&gt;Complete service down&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;SEV2&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;High - Significant degradation&lt;/td&gt;
+ &lt;td&gt;&amp;lt; 30 min&lt;/td&gt;
+ &lt;td&gt;Partial outage, major feature broken&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;SEV3&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;Medium - Minor degradation&lt;/td&gt;
+ &lt;td&gt;&amp;lt; 4 hours&lt;/td&gt;
+ &lt;td&gt;Non-critical feature affected&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;SEV4&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;Low - Minimal impact&lt;/td&gt;
+ &lt;td&gt;Next business day&lt;/td&gt;
+ &lt;td&gt;Cosmetic issues&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="severity-criteria"&gt;Severity Criteria&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;SEV1 - Critical&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Infrastructure as Code</title><link>https://rowstu.net/devops/infrastructure-as-code/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/infrastructure-as-code/</guid><description>&lt;h1 id="infrastructure-as-code-best-practices"&gt;Infrastructure as Code Best Practices&lt;/h1&gt;
+&lt;p&gt;Managing infrastructure through code for consistency, repeatability, and automation.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="core-principles"&gt;Core Principles&lt;/h2&gt;
+&lt;h3 id="declarative-over-imperative"&gt;Declarative over Imperative&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-hcl" data-lang="hcl"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Declarative (preferred) - describe desired state
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;resource&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;aws_instance&amp;#34; &amp;#34;web&amp;#34;&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; ami &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;ami-12345678&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; instance_type &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;t3.micro&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; tags &lt;span style="color:#f92672"&gt;=&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Name &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;web-server&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Imperative - describe steps to achieve state&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;aws ec2 run-instances --image-id ami-12345678 --instance-type t3.micro
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;aws ec2 create-tags --resources i-xxx --tags Key&lt;span style="color:#f92672"&gt;=&lt;/span&gt;Name,Value&lt;span style="color:#f92672"&gt;=&lt;/span&gt;web-server
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Declarative: what you want&lt;/li&gt;
+&lt;li&gt;Imperative: how to get there&lt;/li&gt;
+&lt;li&gt;Declarative is idempotent&lt;/li&gt;
+&lt;li&gt;Easier to understand and maintain&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="idempotency"&gt;Idempotency&lt;/h3&gt;
+&lt;p&gt;Running the same code multiple times produces the same result.&lt;/p&gt;</description></item><item><title>Monitoring and Observability</title><link>https://rowstu.net/devops/monitoring-observability/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/monitoring-observability/</guid><description>&lt;h1 id="monitoring-and-observability-best-practices"&gt;Monitoring and Observability Best Practices&lt;/h1&gt;
+&lt;p&gt;Understanding system behaviour through metrics, logs, and traces.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="observability-vs-monitoring"&gt;Observability vs Monitoring&lt;/h2&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Monitoring&lt;/th&gt;
+ &lt;th&gt;Observability&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Known unknowns&lt;/td&gt;
+ &lt;td&gt;Unknown unknowns&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Predefined questions&lt;/td&gt;
+ &lt;td&gt;Ad-hoc exploration&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Dashboards and alerts&lt;/td&gt;
+ &lt;td&gt;Investigation and debugging&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&amp;ldquo;Is it working?&amp;rdquo;&lt;/td&gt;
+ &lt;td&gt;&amp;ldquo;Why isn&amp;rsquo;t it working?&amp;rdquo;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id="three-pillars-of-observability"&gt;Three Pillars of Observability&lt;/h2&gt;
+&lt;h3 id="1-metrics"&gt;1. Metrics&lt;/h3&gt;
+&lt;p&gt;Numerical measurements over time.&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;http_requests_total{method=&amp;#34;GET&amp;#34;, path=&amp;#34;/api/users&amp;#34;, status=&amp;#34;200&amp;#34;} 1234
+http_request_duration_seconds{quantile=&amp;#34;0.99&amp;#34;} 0.245
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Types:&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Type&lt;/th&gt;
+ &lt;th&gt;Description&lt;/th&gt;
+ &lt;th&gt;Example&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Counter&lt;/td&gt;
+ &lt;td&gt;Only increases&lt;/td&gt;
+ &lt;td&gt;Total requests&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Gauge&lt;/td&gt;
+ &lt;td&gt;Can increase or decrease&lt;/td&gt;
+ &lt;td&gt;Current connections&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Histogram&lt;/td&gt;
+ &lt;td&gt;Distribution of values&lt;/td&gt;
+ &lt;td&gt;Request latency buckets&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Summary&lt;/td&gt;
+ &lt;td&gt;Quantiles over time&lt;/td&gt;
+ &lt;td&gt;p99 latency&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="2-logs"&gt;2. Logs&lt;/h3&gt;
+&lt;p&gt;Discrete events with context.&lt;/p&gt;</description></item></channel></rss>

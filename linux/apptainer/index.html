@@ -1,0 +1,409 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Apptainer // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Apptainer</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/linuxapptainer/>Linuxapptainer</a></div><div class="card markdown-content"><h1 id=apptainer-formerly-singularity>Apptainer (formerly Singularity)</h1><p>Apptainer is a container platform designed for HPC and scientific computing. Unlike Docker, it runs containers as the current user without requiring root privileges, making it ideal for shared computing environments.</p><hr><h2 id=installation>Installation</h2><h3 id=debianubuntu>Debian/Ubuntu</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt update
+</span></span><span style=display:flex><span>sudo apt install -y software-properties-common
+</span></span><span style=display:flex><span>sudo add-apt-repository -y ppa:apptainer/ppa
+</span></span><span style=display:flex><span>sudo apt update
+</span></span><span style=display:flex><span>sudo apt install -y apptainer
+</span></span></code></pre></div><h3 id=rhelcentosrockyalma>RHEL/CentOS/Rocky/Alma</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># EPEL required</span>
+</span></span><span style=display:flex><span>sudo dnf install -y epel-release
+</span></span><span style=display:flex><span>sudo dnf install -y apptainer
+</span></span></code></pre></div><h3 id=from-source>From Source</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install dependencies</span>
+</span></span><span style=display:flex><span>sudo apt install -y build-essential libseccomp-dev pkg-config <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    uidmap squashfs-tools squashfuse fuse2fs fuse-overlayfs <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    fakeroot cryptsetup curl wget git
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Install Go (required)</span>
+</span></span><span style=display:flex><span>export VERSION<span style=color:#f92672>=</span>1.21.0
+</span></span><span style=display:flex><span>wget https://go.dev/dl/go<span style=color:#e6db74>${</span>VERSION<span style=color:#e6db74>}</span>.linux-amd64.tar.gz
+</span></span><span style=display:flex><span>sudo tar -C /usr/local -xzf go<span style=color:#e6db74>${</span>VERSION<span style=color:#e6db74>}</span>.linux-amd64.tar.gz
+</span></span><span style=display:flex><span>export PATH<span style=color:#f92672>=</span>$PATH:/usr/local/go/bin
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Clone and build</span>
+</span></span><span style=display:flex><span>git clone https://github.com/apptainer/apptainer.git
+</span></span><span style=display:flex><span>cd apptainer
+</span></span><span style=display:flex><span>./mconfig
+</span></span><span style=display:flex><span>make -C builddir
+</span></span><span style=display:flex><span>sudo make -C builddir install
+</span></span></code></pre></div><h3 id=verify-installation>Verify Installation</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>apptainer --version
+</span></span><span style=display:flex><span>apptainer run library://alpine
+</span></span></code></pre></div><hr><h2 id=basic-concepts>Basic Concepts</h2><table><thead><tr><th>Term</th><th>Description</th></tr></thead><tbody><tr><td><strong>SIF</strong></td><td>Singularity Image Format - portable container image</td></tr><tr><td><strong>Definition file</strong></td><td>Recipe to build a container (<code>.def</code>)</td></tr><tr><td><strong>Sandbox</strong></td><td>Writable directory container format</td></tr><tr><td><strong>Overlay</strong></td><td>Writable layer on top of read-only container</td></tr><tr><td><strong>Bind mount</strong></td><td>Mount host directories into container</td></tr><tr><td><strong>Fakeroot</strong></td><td>User namespace emulation for rootless builds</td></tr></tbody></table><hr><h2 id=running-containers>Running Containers</h2><h3 id=basic-commands>Basic Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Run container (executes runscript)</span>
+</span></span><span style=display:flex><span>apptainer run container.sif
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run with arguments</span>
+</span></span><span style=display:flex><span>apptainer run container.sif arg1 arg2
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Execute specific command</span>
+</span></span><span style=display:flex><span>apptainer exec container.sif python script.py
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Interactive shell</span>
+</span></span><span style=display:flex><span>apptainer shell container.sif
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show container metadata</span>
+</span></span><span style=display:flex><span>apptainer inspect container.sif
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show definition file used to build</span>
+</span></span><span style=display:flex><span>apptainer inspect --deffile container.sif
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show runscript</span>
+</span></span><span style=display:flex><span>apptainer inspect --runscript container.sif
+</span></span></code></pre></div><h3 id=running-from-registries>Running from Registries</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Docker Hub</span>
+</span></span><span style=display:flex><span>apptainer run docker://python:3.11
+</span></span><span style=display:flex><span>apptainer exec docker://ubuntu:22.04 cat /etc/os-release
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Sylabs Cloud Library</span>
+</span></span><span style=display:flex><span>apptainer run library://alpine
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># GitHub Container Registry</span>
+</span></span><span style=display:flex><span>apptainer run docker://ghcr.io/owner/image:tag
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Quay.io</span>
+</span></span><span style=display:flex><span>apptainer run docker://quay.io/biocontainers/samtools:1.17
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># NVIDIA NGC</span>
+</span></span><span style=display:flex><span>apptainer run docker://nvcr.io/nvidia/pytorch:23.10-py3
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># OCI archives</span>
+</span></span><span style=display:flex><span>apptainer run oci-archive:container.tar
+</span></span></code></pre></div><hr><h2 id=pulling-and-building-images>Pulling and Building Images</h2><h3 id=pull-images>Pull Images</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Pull and convert to SIF</span>
+</span></span><span style=display:flex><span>apptainer pull docker://python:3.11
+</span></span><span style=display:flex><span>apptainer pull library://alpine
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Specify output filename</span>
+</span></span><span style=display:flex><span>apptainer pull python_3.11.sif docker://python:3.11
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Pull to cache only (no SIF created)</span>
+</span></span><span style=display:flex><span>apptainer pull --disable-cache<span style=color:#f92672>=</span>false docker://ubuntu:22.04
+</span></span></code></pre></div><h3 id=build-images>Build Images</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Build from definition file</span>
+</span></span><span style=display:flex><span>apptainer build container.sif container.def
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Build from Docker image</span>
+</span></span><span style=display:flex><span>apptainer build ubuntu.sif docker://ubuntu:22.04
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Build sandbox (writable directory)</span>
+</span></span><span style=display:flex><span>apptainer build --sandbox ubuntu_sandbox docker://ubuntu:22.04
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Build with fakeroot (no sudo required)</span>
+</span></span><span style=display:flex><span>apptainer build --fakeroot container.sif container.def
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Force overwrite existing</span>
+</span></span><span style=display:flex><span>apptainer build --force container.sif container.def
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Build without cleanup (for debugging)</span>
+</span></span><span style=display:flex><span>apptainer build --no-cleanup container.sif container.def
+</span></span></code></pre></div><h3 id=convert-sandbox-to-sif>Convert Sandbox to SIF</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>apptainer build container.sif ubuntu_sandbox/
+</span></span></code></pre></div><hr><h2 id=definition-files>Definition Files</h2><h3 id=basic-structure>Basic Structure</h3><pre tabindex=0><code>Bootstrap: docker
+From: ubuntu:22.04
+
+%labels
+    Author Your Name
+    Version 1.0
+    Description My container
+
+%help
+    This container does X, Y, Z.
+    Usage: apptainer run container.sif [args]
+
+%setup
+    # Runs on host before container is built
+    touch ${APPTAINER_ROOTFS}/setup_file.txt
+
+%files
+    # Copy files from host to container
+    local_file.txt /opt/
+    scripts/ /opt/scripts/
+
+%post
+    # Runs inside container during build
+    apt-get update &amp;&amp; apt-get install -y \
+        python3 \
+        python3-pip \
+        curl \
+        wget
+    pip3 install numpy pandas
+
+    # Clean up
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+%environment
+    # Set environment variables
+    export PATH=/opt/bin:$PATH
+    export LC_ALL=C
+
+%runscript
+    # Default action when container is run
+    echo &#34;Running container...&#34;
+    exec python3 &#34;$@&#34;
+
+%startscript
+    # For instance/service mode
+    exec /opt/server --daemon
+
+%test
+    # Test the container after build
+    python3 --version
+    python3 -c &#34;import numpy; print(numpy.__version__)&#34;
+</code></pre><h3 id=bootstrap-agents>Bootstrap Agents</h3><pre tabindex=0><code># From Docker Hub
+Bootstrap: docker
+From: python:3.11-slim
+
+# From Sylabs Library
+Bootstrap: library
+From: ubuntu:22.04
+
+# From local image
+Bootstrap: localimage
+From: /path/to/base.sif
+
+# From OCI archive
+Bootstrap: oci-archive
+From: container.tar
+
+# From scratch (minimal)
+Bootstrap: scratch
+
+# From yum/dnf repository
+Bootstrap: yum
+OSVersion: 9
+MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/BaseOS/$basearch/os/
+Include: dnf
+
+# From debootstrap
+Bootstrap: debootstrap
+OSVersion: jammy
+MirrorURL: http://archive.ubuntu.com/ubuntu/
+</code></pre><h3 id=multi-stage-builds>Multi-Stage Builds</h3><pre tabindex=0><code>Bootstrap: docker
+From: golang:1.21 as builder
+Stage: build
+
+%post
+    cd /go
+    git clone https://github.com/example/app.git
+    cd app
+    go build -o /app
+
+Bootstrap: docker
+From: alpine:latest
+
+%files from builder
+    /app /usr/local/bin/app
+
+%runscript
+    exec /usr/local/bin/app &#34;$@&#34;
+</code></pre><h3 id=condamamba-environment>Conda/Mamba Environment</h3><pre tabindex=0><code>Bootstrap: docker
+From: mambaforge/mambaforge:latest
+
+%files
+    environment.yml /opt/
+
+%post
+    mamba env create -f /opt/environment.yml -n myenv
+    mamba clean --all -y
+
+%environment
+    export PATH=/opt/conda/envs/myenv/bin:$PATH
+
+%runscript
+    exec &#34;$@&#34;
+</code></pre><h3 id=gpu-support-cuda>GPU Support (CUDA)</h3><pre tabindex=0><code>Bootstrap: docker
+From: nvidia/cuda:12.2.0-runtime-ubuntu22.04
+
+%post
+    apt-get update &amp;&amp; apt-get install -y python3-pip
+    pip3 install torch torchvision
+
+%environment
+    export CUDA_HOME=/usr/local/cuda
+
+%runscript
+    exec python3 &#34;$@&#34;
+</code></pre><hr><h2 id=bind-mounts-and-file-access>Bind Mounts and File Access</h2><h3 id=automatic-bind-mounts>Automatic Bind Mounts</h3><p>By default, Apptainer binds:</p><ul><li><code>$HOME</code></li><li><code>/tmp</code></li><li><code>/proc</code></li><li><code>/sys</code></li><li><code>/dev</code></li><li>Current working directory</li></ul><h3 id=manual-bind-mounts>Manual Bind Mounts</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Bind single directory</span>
+</span></span><span style=display:flex><span>apptainer exec --bind /data:/data container.sif ls /data
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Bind with different destination</span>
+</span></span><span style=display:flex><span>apptainer exec --bind /host/path:/container/path container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Multiple binds</span>
+</span></span><span style=display:flex><span>apptainer exec --bind /data:/data,/scratch:/scratch container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Read-only bind</span>
+</span></span><span style=display:flex><span>apptainer exec --bind /data:/data:ro container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Bind a file</span>
+</span></span><span style=display:flex><span>apptainer exec --bind /etc/hosts:/etc/hosts container.sif cat /etc/hosts
+</span></span></code></pre></div><h3 id=disable-default-binds>Disable Default Binds</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># No home directory</span>
+</span></span><span style=display:flex><span>apptainer exec --no-home container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Contain - minimal binds</span>
+</span></span><span style=display:flex><span>apptainer exec --contain container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Containall - maximum isolation</span>
+</span></span><span style=display:flex><span>apptainer exec --containall container.sif command
+</span></span></code></pre></div><h3 id=writable-containers>Writable Containers</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Sandbox (writable directory)</span>
+</span></span><span style=display:flex><span>apptainer shell --writable ubuntu_sandbox/
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Overlay (writable layer on SIF)</span>
+</span></span><span style=display:flex><span>apptainer shell --overlay my_overlay.img container.sif
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Create overlay image</span>
+</span></span><span style=display:flex><span>dd <span style=color:#66d9ef>if</span><span style=color:#f92672>=</span>/dev/zero of<span style=color:#f92672>=</span>overlay.img bs<span style=color:#f92672>=</span>1M count<span style=color:#f92672>=</span><span style=color:#ae81ff>500</span>
+</span></span><span style=display:flex><span>mkfs.ext3 overlay.img
+</span></span></code></pre></div><hr><h2 id=environment-variables>Environment Variables</h2><h3 id=setting-variables>Setting Variables</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Pass environment variable</span>
+</span></span><span style=display:flex><span>apptainer exec --env VAR<span style=color:#f92672>=</span>value container.sif printenv VAR
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Pass multiple</span>
+</span></span><span style=display:flex><span>apptainer exec --env VAR1<span style=color:#f92672>=</span>val1,VAR2<span style=color:#f92672>=</span>val2 container.sif env
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># From file</span>
+</span></span><span style=display:flex><span>apptainer exec --env-file env.txt container.sif env
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Pass all host environment</span>
+</span></span><span style=display:flex><span>apptainer exec --cleanenv container.sif env  <span style=color:#75715e># Clean environment</span>
+</span></span></code></pre></div><h3 id=apptainer-variables>Apptainer Variables</h3><table><thead><tr><th>Variable</th><th>Description</th></tr></thead><tbody><tr><td><code>APPTAINER_BIND</code></td><td>Default bind paths</td></tr><tr><td><code>APPTAINER_BINDPATH</code></td><td>Alias for APPTAINER_BIND</td></tr><tr><td><code>APPTAINER_CACHEDIR</code></td><td>Cache directory location</td></tr><tr><td><code>APPTAINER_TMPDIR</code></td><td>Temporary directory</td></tr><tr><td><code>APPTAINER_NAME</code></td><td>Container name</td></tr><tr><td><code>APPTAINER_CONTAINER</code></td><td>Path to container</td></tr></tbody></table><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Set default binds via environment</span>
+</span></span><span style=display:flex><span>export APPTAINER_BIND<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;/data,/scratch&#34;</span>
+</span></span><span style=display:flex><span>apptainer run container.sif
+</span></span></code></pre></div><hr><h2 id=networking>Networking</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Use host network (default)</span>
+</span></span><span style=display:flex><span>apptainer exec container.sif curl http://example.com
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># No network</span>
+</span></span><span style=display:flex><span>apptainer exec --net --network none container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Bridge network (requires root or fakeroot)</span>
+</span></span><span style=display:flex><span>apptainer exec --net --network bridge container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Custom network namespace</span>
+</span></span><span style=display:flex><span>apptainer exec --net --network-args <span style=color:#e6db74>&#34;portmap=8080:80/tcp&#34;</span> container.sif command
+</span></span></code></pre></div><hr><h2 id=gpu-support>GPU Support</h2><h3 id=nvidia-gpus>NVIDIA GPUs</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Enable NVIDIA GPU support</span>
+</span></span><span style=display:flex><span>apptainer exec --nv container.sif nvidia-smi
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># With CUDA libraries</span>
+</span></span><span style=display:flex><span>apptainer exec --nv docker://nvidia/cuda:12.2.0-runtime-ubuntu22.04 nvidia-smi
+</span></span></code></pre></div><h3 id=amd-gpus-rocm>AMD GPUs (ROCm)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>apptainer exec --rocm container.sif rocm-smi
+</span></span></code></pre></div><hr><h2 id=instances-services>Instances (Services)</h2><p>Run containers as background services.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Start instance</span>
+</span></span><span style=display:flex><span>apptainer instance start container.sif myservice
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Start with binds</span>
+</span></span><span style=display:flex><span>apptainer instance start --bind /data:/data container.sif myservice
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># List instances</span>
+</span></span><span style=display:flex><span>apptainer instance list
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Execute in instance</span>
+</span></span><span style=display:flex><span>apptainer exec instance://myservice command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Shell into instance</span>
+</span></span><span style=display:flex><span>apptainer shell instance://myservice
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Stop instance</span>
+</span></span><span style=display:flex><span>apptainer instance stop myservice
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Stop all instances</span>
+</span></span><span style=display:flex><span>apptainer instance stop --all
+</span></span></code></pre></div><hr><h2 id=caching>Caching</h2><h3 id=cache-management>Cache Management</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Show cache location</span>
+</span></span><span style=display:flex><span>apptainer cache list
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show cache contents</span>
+</span></span><span style=display:flex><span>apptainer cache list -v
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Clean cache</span>
+</span></span><span style=display:flex><span>apptainer cache clean
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Clean specific types</span>
+</span></span><span style=display:flex><span>apptainer cache clean --type<span style=color:#f92672>=</span>blob,oci
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Set cache directory</span>
+</span></span><span style=display:flex><span>export APPTAINER_CACHEDIR<span style=color:#f92672>=</span>/scratch/apptainer_cache
+</span></span></code></pre></div><hr><h2 id=signing-and-verification>Signing and Verification</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Generate key</span>
+</span></span><span style=display:flex><span>apptainer key newpair
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># List keys</span>
+</span></span><span style=display:flex><span>apptainer key list
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Sign container</span>
+</span></span><span style=display:flex><span>apptainer sign container.sif
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Verify signature</span>
+</span></span><span style=display:flex><span>apptainer verify container.sif
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Push signed container</span>
+</span></span><span style=display:flex><span>apptainer push container.sif library://user/collection/container:tag
+</span></span></code></pre></div><hr><h2 id=remote-endpoints>Remote Endpoints</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Login to Sylabs Cloud</span>
+</span></span><span style=display:flex><span>apptainer remote login
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Add remote endpoint</span>
+</span></span><span style=display:flex><span>apptainer remote add myregistry https://registry.example.com
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Use remote</span>
+</span></span><span style=display:flex><span>apptainer remote use myregistry
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># List remotes</span>
+</span></span><span style=display:flex><span>apptainer remote list
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Login to Docker registry</span>
+</span></span><span style=display:flex><span>apptainer remote login --username user docker://registry.example.com
+</span></span></code></pre></div><hr><h2 id=integration-with-hpc-schedulers>Integration with HPC Schedulers</h2><h3 id=slurm>SLURM</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/bin/bash
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#SBATCH --job-name=container_job</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#SBATCH --nodes=1</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#SBATCH --ntasks=1</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#SBATCH --cpus-per-task=4</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#SBATCH --mem=16G</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#SBATCH --gres=gpu:1</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#SBATCH --time=01:00:00</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>apptainer exec --nv --bind /scratch:/scratch container.sif python train.py
+</span></span></code></pre></div><h3 id=htcondor>HTCondor</h3><pre tabindex=0><code>universe = container
+container_image = /path/to/container.sif
+executable = /usr/bin/python3
+arguments = script.py
+transfer_input_files = script.py
+queue
+</code></pre><hr><h2 id=troubleshooting>Troubleshooting</h2><h3 id=common-issues>Common Issues</h3><p><strong>Permission denied:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Use fakeroot for builds</span>
+</span></span><span style=display:flex><span>apptainer build --fakeroot container.sif container.def
+</span></span></code></pre></div><p><strong>Out of space during build:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Set different temp directory</span>
+</span></span><span style=display:flex><span>export APPTAINER_TMPDIR<span style=color:#f92672>=</span>/scratch/tmp
+</span></span><span style=display:flex><span>apptainer build container.sif container.def
+</span></span></code></pre></div><p><strong>CUDA not found:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Ensure --nv flag is used</span>
+</span></span><span style=display:flex><span>apptainer exec --nv container.sif nvidia-smi
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Check NVIDIA driver compatibility</span>
+</span></span><span style=display:flex><span>apptainer exec --nv container.sif cat /proc/driver/nvidia/version
+</span></span></code></pre></div><p><strong>Missing libraries:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Check library dependencies</span>
+</span></span><span style=display:flex><span>apptainer exec container.sif ldd /path/to/binary
+</span></span></code></pre></div><h3 id=debugging>Debugging</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Verbose output</span>
+</span></span><span style=display:flex><span>apptainer -v exec container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Debug output</span>
+</span></span><span style=display:flex><span>apptainer -d exec container.sif command
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Shell into failed build</span>
+</span></span><span style=display:flex><span>apptainer build --sandbox --fix-perms debug_sandbox/ container.def
+</span></span><span style=display:flex><span>apptainer shell debug_sandbox/
+</span></span></code></pre></div><hr><h2 id=quick-reference>Quick Reference</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Run containers</span>
+</span></span><span style=display:flex><span>apptainer run container.sif           <span style=color:#75715e># Run default action</span>
+</span></span><span style=display:flex><span>apptainer exec container.sif cmd      <span style=color:#75715e># Run specific command</span>
+</span></span><span style=display:flex><span>apptainer shell container.sif         <span style=color:#75715e># Interactive shell</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Build containers</span>
+</span></span><span style=display:flex><span>apptainer build img.sif def.def       <span style=color:#75715e># Build from definition</span>
+</span></span><span style=display:flex><span>apptainer build img.sif docker://x    <span style=color:#75715e># Build from Docker</span>
+</span></span><span style=display:flex><span>apptainer build --fakeroot img.sif x  <span style=color:#75715e># Build without root</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Pull images</span>
+</span></span><span style=display:flex><span>apptainer pull docker://python:3.11   <span style=color:#75715e># Pull from Docker Hub</span>
+</span></span><span style=display:flex><span>apptainer pull library://alpine       <span style=color:#75715e># Pull from Sylabs</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Options</span>
+</span></span><span style=display:flex><span>--bind /host:/container               <span style=color:#75715e># Mount directory</span>
+</span></span><span style=display:flex><span>--nv                                  <span style=color:#75715e># NVIDIA GPU support</span>
+</span></span><span style=display:flex><span>--cleanenv                            <span style=color:#75715e># Clean environment</span>
+</span></span><span style=display:flex><span>--contain                             <span style=color:#75715e># Minimal isolation</span>
+</span></span><span style=display:flex><span>--writable                            <span style=color:#75715e># Writable sandbox</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Instances</span>
+</span></span><span style=display:flex><span>apptainer instance start img.sif name <span style=color:#75715e># Start service</span>
+</span></span><span style=display:flex><span>apptainer instance list               <span style=color:#75715e># List services</span>
+</span></span><span style=display:flex><span>apptainer instance stop name          <span style=color:#75715e># Stop service</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Management</span>
+</span></span><span style=display:flex><span>apptainer cache clean                 <span style=color:#75715e># Clean cache</span>
+</span></span><span style=display:flex><span>apptainer inspect img.sif             <span style=color:#75715e># Show metadata</span>
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>
