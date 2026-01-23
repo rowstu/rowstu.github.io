@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IncusOS Preseed Generator | Create Installation Seeds</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="bg-atmosphere">
+        <div class="bg-grid"></div>
+        <div class="bg-glow bg-glow-1"></div>
+        <div class="bg-glow bg-glow-2"></div>
+        <div class="bg-scanlines"></div>
+    </div>
+
+    <main class="container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">&#x2B22;</span>
+                <h1 class="logo-text">IncusOS Preseed</h1>
+            </div>
+            <p class="tagline">Generate installation seeds for automated IncusOS deployments</p>
+        </header>
+
+        <form id="preseed-form" class="preseed-form">
+            <!-- Image Configuration -->
+            <section class="form-section">
+                <h2 class="section-title">
+                    <span class="section-icon">&#x25B6;</span>
+                    Image Configuration
+                </h2>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Image Type</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="imageType" value="iso" checked>
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">ISO <span class="radio-desc">Read-only, virtual media</span></span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="imageType" value="usb">
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">USB <span class="radio-desc">Writable, direct operation</span></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Architecture</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="arch" value="x86_64" checked>
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">x86_64</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="arch" value="aarch64">
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">aarch64</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Application</label>
+                        <div class="radio-group radio-group-vertical">
+                            <label class="radio-option">
+                                <input type="radio" name="application" value="incus" checked>
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">Incus <span class="radio-desc">Container & VM hypervisor</span></span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="application" value="operations-center">
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">Operations Center <span class="radio-desc">Cluster management</span></span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="application" value="migration-manager">
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">Migration Manager <span class="radio-desc">VM migration tool</span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Installation Target -->
+            <section class="form-section">
+                <h2 class="section-title">
+                    <span class="section-icon">&#x25C9;</span>
+                    Installation Target
+                </h2>
+
+                <div class="form-grid">
+                    <div class="form-group form-group-full">
+                        <label class="form-label" for="targetDrive">Target Drive Identifier</label>
+                        <input type="text" id="targetDrive" class="input-field" placeholder="e.g., nvme-Samsung_SSD or sda">
+                        <span class="input-hint">Partial match against /dev/disk/by-id. Leave empty to auto-detect single drive.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="wipeDrive">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-text">Wipe target drive</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="autoReboot" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-text">Auto-reboot after installation</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authentication -->
+            <section class="form-section">
+                <h2 class="section-title">
+                    <span class="section-icon">&#x1F511;</span>
+                    Authentication
+                </h2>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="applyDefaults" checked>
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-text">Apply default configuration</span>
+                        </label>
+                        <span class="input-hint">Creates default ZFS storage pool and network bridge</span>
+                    </div>
+
+                    <div class="form-group form-group-full">
+                        <label class="form-label" for="clientCert">TLS Client Certificate (PEM)</label>
+                        <textarea id="clientCert" class="textarea-field" rows="8" placeholder="-----BEGIN CERTIFICATE-----
+MIICvDCCAaSgAwIBAgIIYXus...
+-----END CERTIFICATE-----"></textarea>
+                        <span class="input-hint">Required for API/UI authentication. Paste your client.crt contents here.</span>
+                    </div>
+
+                    <div class="form-group form-group-full">
+                        <label class="form-label" for="certName">Certificate Name</label>
+                        <input type="text" id="certName" class="input-field" placeholder="admin" value="admin">
+                    </div>
+                </div>
+            </section>
+
+            <!-- OIDC Authentication (Optional) -->
+            <section class="form-section collapsible">
+                <button type="button" class="section-toggle" aria-expanded="false">
+                    <h2 class="section-title">
+                        <span class="section-icon">&#x1F310;</span>
+                        OIDC Authentication
+                        <span class="optional-badge">Optional</span>
+                    </h2>
+                    <span class="toggle-icon">&#x25BC;</span>
+                </button>
+
+                <div class="section-content collapsed">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="oidcIssuer">Issuer URL</label>
+                            <input type="url" id="oidcIssuer" class="input-field" placeholder="https://auth.example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="oidcClientId">Client ID</label>
+                            <input type="text" id="oidcClientId" class="input-field" placeholder="incus-client">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="oidcScopes">Scopes</label>
+                            <input type="text" id="oidcScopes" class="input-field" placeholder="openid email profile">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="oidcClaim">Login Claim</label>
+                            <input type="text" id="oidcClaim" class="input-field" placeholder="email">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Advanced Settings -->
+            <section class="form-section collapsible">
+                <button type="button" class="section-toggle" aria-expanded="false">
+                    <h2 class="section-title">
+                        <span class="section-icon">&#x2699;</span>
+                        Advanced Settings
+                        <span class="optional-badge">Optional</span>
+                    </h2>
+                    <span class="toggle-icon">&#x25BC;</span>
+                </button>
+
+                <div class="section-content collapsed">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="imageChannel">Image Channel</label>
+                            <select id="imageChannel" class="select-field">
+                                <option value="stable" selected>Stable</option>
+                                <option value="candidate">Candidate</option>
+                                <option value="beta">Beta</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Boot Security</label>
+                            <div class="radio-group radio-group-vertical">
+                                <label class="radio-option">
+                                    <input type="radio" name="bootSecurity" value="optimal" checked>
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">Optimal <span class="radio-desc">UEFI Secure Boot & TPM 2.0</span></span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="bootSecurity" value="no-tpm">
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">Degraded <span class="radio-desc">No TPM 2.0</span></span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="bootSecurity" value="no-secureboot">
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">Degraded <span class="radio-desc">No Secure Boot</span></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group form-group-full">
+                            <label class="form-label" for="networkConfig">Network Configuration (YAML)</label>
+                            <textarea id="networkConfig" class="textarea-field mono" rows="6" placeholder="# Custom network configuration
+# Leave empty for DHCP/SLAAC auto-configuration"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <button type="button" id="generateBtn" class="btn-primary">
+                    <span class="btn-icon">&#x2B07;</span>
+                    Generate & Download Seed
+                </button>
+                <button type="button" id="previewBtn" class="btn-secondary">
+                    <span class="btn-icon">&#x1F441;</span>
+                    Preview Files
+                </button>
+            </div>
+        </form>
+
+        <!-- Preview Section -->
+        <section id="preview" class="preview-section hidden">
+            <div class="preview-header">
+                <h2 class="preview-title">Generated Seed Files</h2>
+                <div class="preview-tabs" id="previewTabs">
+                    <!-- Tabs generated dynamically -->
+                </div>
+            </div>
+            <div class="preview-content">
+                <pre id="previewCode" class="preview-code"></pre>
+            </div>
+            <div class="preview-actions">
+                <button type="button" id="copyBtn" class="btn-copy">
+                    <span class="copy-icon">&#x1F4CB;</span>
+                    Copy to Clipboard
+                </button>
+                <button type="button" id="downloadFromPreview" class="btn-download">
+                    <span class="download-icon">&#x2B07;</span>
+                    Download as TAR
+                </button>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p class="footer-note">
+                Generates preseed files compatible with
+                <a href="https://linuxcontainers.org/incus-os/" target="_blank" rel="noopener">IncusOS</a>
+            </p>
+            <p class="footer-hint">
+                Place the downloaded seed.tar in the second partition of your install media,
+                or extract to a FAT-formatted USB drive labeled SEED_DATA.
+            </p>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
