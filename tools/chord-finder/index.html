@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChordScope | Song Key & Chord Analyzer</title>
+
+    <!-- Distinctive typography choices -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Atmospheric background -->
+    <div class="bg-atmosphere">
+        <div class="bg-grid"></div>
+        <div class="bg-glow bg-glow-1"></div>
+        <div class="bg-glow bg-glow-2"></div>
+        <div class="bg-noise"></div>
+    </div>
+
+    <main class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">♯</span>
+                <h1 class="logo-text">ChordScope</h1>
+            </div>
+            <p class="tagline">Analyze song keys, chord progressions & Nashville numbers</p>
+        </header>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <form id="search-form" class="search-form">
+                <div class="input-group">
+                    <label for="song-input" class="input-label">Song Title</label>
+                    <input
+                        type="text"
+                        id="song-input"
+                        class="input-field"
+                        placeholder="e.g., Hotel California"
+                        required
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="artist-input" class="input-label">Artist</label>
+                    <input
+                        type="text"
+                        id="artist-input"
+                        class="input-field"
+                        placeholder="e.g., Eagles"
+                        required
+                        autocomplete="off"
+                    >
+                </div>
+                <button type="submit" class="btn-search" id="search-btn">
+                    <span class="btn-text">Analyze Chords</span>
+                    <span class="btn-icon">→</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading hidden">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text">Searching chord databases...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-container" class="error-container hidden">
+            <div class="error-icon">⚠</div>
+            <h3 class="error-title">Something went wrong</h3>
+            <p id="error-message" class="error-message"></p>
+            <button id="retry-btn" class="btn-retry">Try Again</button>
+        </div>
+
+        <!-- Results Section -->
+        <section id="results" class="results-section hidden">
+            <!-- Song Info Header -->
+            <div class="song-header">
+                <div class="song-info">
+                    <h2 id="result-song" class="song-title"></h2>
+                    <p id="result-artist" class="song-artist"></p>
+                </div>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" data-view="formatted">Formatted</button>
+                    <button class="toggle-btn" data-view="markdown">Markdown</button>
+                </div>
+            </div>
+
+            <!-- Key Analysis -->
+            <div class="analysis-card key-analysis">
+                <h3 class="card-title">
+                    <span class="card-icon">🎵</span>
+                    Key Analysis
+                </h3>
+                <div id="key-display" class="key-display">
+                    <!-- Keys will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Chord Legend -->
+            <div class="analysis-card chord-legend">
+                <h3 class="card-title">
+                    <span class="card-icon">🔢</span>
+                    Nashville Numbers
+                </h3>
+                <div id="chord-legend" class="legend-grid">
+                    <!-- Chord numbering legend -->
+                </div>
+            </div>
+
+            <!-- Song Structure -->
+            <div class="analysis-card song-structure">
+                <h3 class="card-title">
+                    <span class="card-icon">📋</span>
+                    Song Structure
+                </h3>
+                <div id="song-structure" class="structure-content">
+                    <!-- Song sections will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Markdown View (hidden by default) -->
+            <div id="markdown-view" class="markdown-view hidden">
+                <pre id="markdown-content" class="markdown-content"></pre>
+                <button id="copy-markdown" class="btn-copy">
+                    <span class="copy-icon">📋</span>
+                    Copy Markdown
+                </button>
+            </div>
+        </section>
+
+        <!-- Source Attribution -->
+        <footer class="footer">
+            <p class="source-note">
+                <span id="source-attribution"></span>
+            </p>
+            <p class="disclaimer">
+                Chord data aggregated from public sources.
+                For educational purposes only.
+            </p>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

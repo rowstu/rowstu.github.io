@@ -1,0 +1,120 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>GitHub Actions Pipeline // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>GitHub Actions Pipeline</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ansiblecicd/>Ansiblecicd</a></div><div class="card markdown-content"><ul><li><strong>Syntax check</strong></li><li><strong>Role linting</strong></li><li><strong>Playbook dry-run</strong></li><li><strong>Optional: run Molecule tests</strong></li></ul><hr><h2 id=add-file>Add file:</h2><pre tabindex=0><code>.github/workflows/ansible-ci.yml
+</code></pre><h3 id=workflow-ansible-ciyml>Workflow: <code>ansible-ci.yml</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ansible CI</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>push</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [ <span style=color:#ae81ff>main, master ]</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull_request</span>:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>lint</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Checkout repo</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup Python</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/setup-python@v5</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>python-version</span>: <span style=color:#e6db74>&#39;3.11&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Ansible &amp; tools</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          python -m pip install --upgrade pip
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          pip install ansible ansible-lint yamllint</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Lint YAML</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          yamllint -c .yamllint.yml .</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Lint Ansible</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          ansible-lint playbooks/*.yml roles/*/tasks/*.yml</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>syntax-check</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>needs</span>: <span style=color:#ae81ff>lint</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Checkout repo</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Ansible</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          python -m pip install --upgrade pip
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          pip install ansible</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ansible syntax check</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          ansible-playbook playbooks/site.yml --syntax-check -i inventory/staging.yml</span>
+</span></span></code></pre></div><hr><h1 id=optional-molecule-tests>Optional: Molecule Tests</h1><p>If you want to add <strong>role testing</strong>, you can enable Molecule.</p><h3 id=add-to-workflow>Add to workflow:</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>  <span style=color:#f92672>molecule</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>needs</span>: <span style=color:#ae81ff>syntax-check</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/setup-python@v5</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>python-version</span>: <span style=color:#e6db74>&#39;3.11&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install dependencies</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          pip install ansible molecule docker
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          pip install molecule-docker</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run Molecule tests</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          cd roles/common
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          molecule test</span>
+</span></span></code></pre></div><hr><h1 id=gitlab-ci-pipeline>GitLab CI Pipeline</h1><h2 id=-add-file>🔹 Add file:</h2><pre tabindex=0><code>.gitlab-ci.yml
+</code></pre><h3 id=-pipeline-example>✅ Pipeline Example:</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>lint</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>syntax</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>test</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>variables</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ANSIBLE_FORCE_COLOR</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>before_script</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>python -V</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>pip install --upgrade pip</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>pip install ansible ansible-lint yamllint</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>lint</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>lint</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>script</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>yamllint -c .yamllint.yml .</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>ansible-lint playbooks/*.yml roles/*/tasks/*.yml</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>syntax-check</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>syntax</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>script</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>ansible-playbook playbooks/site.yml --syntax-check -i inventory/staging.yml</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>molecule</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>test</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>image</span>: <span style=color:#ae81ff>docker:24.0.2</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>services</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>docker:dind</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>variables</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>DOCKER_HOST</span>: <span style=color:#ae81ff>tcp://docker:2375/</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>before_script</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>apk add --no-cache python3 py3-pip</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>pip3 install ansible molecule docker molecule-docker</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>script</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>cd roles/common</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>molecule test</span>
+</span></span></code></pre></div><hr><h1 id=supporting-config-files>Supporting Config Files</h1><h3 id=-yamllintyml>📌 <code>.yamllint.yml</code></h3><p>Place at repo root:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>extends</span>: <span style=color:#ae81ff>default</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>line-length</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>max</span>: <span style=color:#ae81ff>120</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>level</span>: <span style=color:#ae81ff>warning</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>indentation</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>spaces</span>: <span style=color:#ae81ff>2</span>
+</span></span></code></pre></div><hr><h1 id=optional-secrets--vault-in-ci>Optional: Secrets / Vault in CI</h1><p>If you use <strong>Ansible Vault</strong>, you must provide the password in CI:</p><h3 id=github-actions>GitHub Actions</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run playbook with vault</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>run</span>: <span style=color:#ae81ff>ansible-playbook playbooks/site.yml -i inventory/staging.yml --vault-password-file .vault_pass</span>
+</span></span></code></pre></div><p><strong>Secure the password using GitHub Secrets</strong>:</p><pre tabindex=0><code>VAULT_PASSWORD
+</code></pre><p>Then write a temp file in workflow:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Create vault password file</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>run</span>: <span style=color:#ae81ff>echo &#34;${{ secrets.VAULT_PASSWORD }}&#34; &gt; /tmp/.vault_pass</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Run playbook</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>run</span>: <span style=color:#ae81ff>ansible-playbook playbooks/site.yml -i inventory/staging.yml --vault-password-file /tmp/.vault_pass</span>
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>

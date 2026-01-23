@@ -1,4 +1,20 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Vmwares on rowstu.net</title><link>https://rowstu.net/vmware/</link><description>Recent content in Vmwares on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>VMware ESXi- Notes, Procedures &amp; Best Practices</title><link>https://rowstu.net/vmware/esxi_notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/esxi_notes/</guid><description>&lt;p&gt;VMware ESXi is a &lt;strong&gt;bare-metal hypervisor&lt;/strong&gt; that installs directly on server hardware and enables you to run multiple virtual machines (VMs) on a single physical host.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Vmwares on rowstu.net</title><link>https://rowstu.net/vmware/</link><description>Recent content in Vmwares on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>VMware Aria</title><link>https://rowstu.net/vmware/aria/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/aria/</guid><description>&lt;p&gt;&lt;strong&gt;Aria Operations&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Unified operations management: performance, capacity, configuration, and compliance across vSphere and hybrid cloud. (&lt;a href="https://techdocs.broadcom.com/us/en/vmware-cis/aria.html?utm_source=chatgpt.com" title="VMware Aria - Broadcom Techdocs"&gt;techdocs.broadcom.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Predictive analytics and intelligent remediation with dashboards and alerts. (&lt;a href="https://techdocs.broadcom.com/us/en/vmware-cis/aria.html?utm_source=chatgpt.com" title="VMware Aria - Broadcom Techdocs"&gt;techdocs.broadcom.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;NSX-centric dashboards showing distributed firewall, edge performance and transport node metrics. (&lt;a href="https://techdocs2-prod.adobecqms.net/content/dam/broadcom/techdocs/us/en/pdf/vmware/aria/aria-operations/vmware-aria-operations-8-18.pdf?utm_source=chatgpt.com" title="VMware Aria Operations 8.18"&gt;techdocs2-prod.adobecqms.net&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Aria Automation&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Infrastructure provisioning and lifecycle automation (formerly vRealize Automation). (&lt;a href="https://techdocs.broadcom.com/us/en/vmware-cis/aria.html?utm_source=chatgpt.com" title="VMware Aria - Broadcom Techdocs"&gt;techdocs.broadcom.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Self-service catalog, policy-based governance, “infrastructure-as-code” templates. (&lt;a href="https://www.vmware.com/content/dam/digitalmarketing/vmware/en/pdf/products/aria-automation-config-ds.pdf?utm_source=chatgpt.com" title="Datasheet 
+VMware Aria Automation 
+Modern infrastr"&gt;vmware.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Native integrations: REST APIs, SaltStack config automation, Network and Kubernetes automation. (&lt;a href="https://www.vmware.com/content/dam/digitalmarketing/vmware/en/pdf/products/aria-automation-config-ds.pdf?utm_source=chatgpt.com" title="Datasheet 
+VMware Aria Automation 
+Modern infrastr"&gt;vmware.com&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Aria Operations for Networks&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>VMware ESXi</title><link>https://rowstu.net/vmware/esxi_notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/esxi_notes/</guid><description>&lt;p&gt;VMware ESXi is a &lt;strong&gt;bare-metal hypervisor&lt;/strong&gt; that installs directly on server hardware and enables you to run multiple virtual machines (VMs) on a single physical host.&lt;/p&gt;
 &lt;h3 id="key-concepts"&gt;&lt;strong&gt;Key Concepts&lt;/strong&gt;&lt;/h3&gt;
 &lt;table&gt;
  &lt;thead&gt;
@@ -68,7 +84,7 @@
 &lt;h3 id="requirements"&gt;&lt;strong&gt;Requirements&lt;/strong&gt;&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;strong&gt;ESXi ISO&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>VMware NSX - Notes, Procedures &amp; Best Practices</title><link>https://rowstu.net/vmware/nsx_notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/nsx_notes/</guid><description>&lt;p&gt;VMware NSX is a &lt;strong&gt;software-defined networking (SDN)&lt;/strong&gt; platform that virtualizes network functions and security services, enabling network automation, micro-segmentation, and scalable network operations inside virtualized environments.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ESXi ISO&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>VMware NSX</title><link>https://rowstu.net/vmware/nsx_notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/nsx_notes/</guid><description>&lt;p&gt;VMware NSX is a &lt;strong&gt;software-defined networking (SDN)&lt;/strong&gt; platform that virtualizes network functions and security services, enabling network automation, micro-segmentation, and scalable network operations inside virtualized environments.&lt;/p&gt;
 &lt;h3 id="core-value"&gt;&lt;strong&gt;Core Value&lt;/strong&gt;&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Network abstraction&lt;/strong&gt;: decouples network services from physical hardware&lt;/li&gt;

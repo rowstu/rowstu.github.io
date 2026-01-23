@@ -1,0 +1,508 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Ansible Templates // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Ansible Templates</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ansibletemplates/>Ansibletemplates</a></div><div class="card markdown-content"><h1 id=ansible-templates>Ansible Templates</h1><p>A collection of reusable Ansible templates for Linux administration. Supports both Debian/Ubuntu and RHEL/CentOS families.</p><h2 id=project-structure>Project Structure</h2><pre tabindex=0><code>ansible/
+├── ansible.cfg
+├── inventory/
+│   ├── staging.yml
+│   └── production.yml
+├── group_vars/
+│   ├── all.yml
+│   ├── webservers.yml
+│   └── dbservers.yml
+├── host_vars/
+│   └── web1.prod.example.com.yml
+├── roles/
+│   ├── common/
+│   ├── users/
+│   ├── packages/
+│   ├── firewall/
+│   ├── nginx/
+│   ├── docker/
+│   └── kubernetes/
+├── playbooks/
+├── vars/
+├── files/
+│   └── keys/
+├── scripts/
+├── requirements.yml
+└── README.md
+</code></pre><hr><h2 id=configuration>Configuration</h2><h3 id=ansiblecfg>ansible.cfg</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[defaults]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>inventory</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>inventory</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>roles_path</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>roles</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>host_key_checking</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>False</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>retry_files_enabled</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>False</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>forks</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>20</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>deprecation_warnings</span><span style=color:#f92672>=</span><span style=color:#e6db74>False</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[privilege_escalation]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>become</span><span style=color:#f92672>=</span><span style=color:#e6db74>True</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>become_method</span><span style=color:#f92672>=</span><span style=color:#e6db74>sudo</span>
+</span></span></code></pre></div><h3 id=requirementsyml>requirements.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#75715e># Add galaxy roles here if needed</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># - src: geerlingguy.firewall</span>
+</span></span></code></pre></div><hr><h2 id=inventory>Inventory</h2><h3 id=stagingyml>staging.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>all</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>vars</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ansible_user</span>: <span style=color:#ae81ff>ansible</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ansible_become</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ansible_python_interpreter</span>: <span style=color:#ae81ff>/usr/bin/python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>children</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>web</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web1.staging.example.com</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web2.staging.example.com</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>db</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>db1.staging.example.com</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>all_linux</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web1.staging.example.com</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web2.staging.example.com</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>db1.staging.example.com</span>:
+</span></span></code></pre></div><h3 id=productionyml>production.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>all</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>vars</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ansible_user</span>: <span style=color:#ae81ff>ansible</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ansible_become</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ansible_python_interpreter</span>: <span style=color:#ae81ff>/usr/bin/python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>children</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>web</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web1.prod.example.com</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web2.prod.example.com</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>db</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>db1.prod.example.com</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>all_linux</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web1.prod.example.com</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web2.prod.example.com</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>db1.prod.example.com</span>:
+</span></span></code></pre></div><hr><h2 id=group-variables>Group Variables</h2><h3 id=group_varsallyml>group_vars/all.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#75715e># Global defaults for all hosts</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>timezone</span>: <span style=color:#ae81ff>UTC</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Package lists</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>common_packages</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>vim</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>git</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>curl</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>htop</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>unzip</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># firewall defaults</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>firewall_allowed_ports</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>22</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>443</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># docker defaults</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>docker_packages</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>docker-ce</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>docker-ce-cli</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>containerd.io</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>docker-compose-plugin</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># kubernetes defaults</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>k8s_packages</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>kubelet</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>kubeadm</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>kubectl</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># user management defaults</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>default_users</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>username</span>: <span style=color:#ae81ff>deploy</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>groups</span>: <span style=color:#ae81ff>sudo</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ssh_key_file</span>: <span style=color:#ae81ff>files/keys/deploy.pub</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>username</span>: <span style=color:#ae81ff>ops</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>groups</span>: <span style=color:#ae81ff>sudo</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ssh_key_file</span>: <span style=color:#ae81ff>files/keys/ops.pub</span>
+</span></span></code></pre></div><h3 id=group_varswebserversyml>group_vars/webservers.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#75715e># Web server specific variables</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>nginx_worker_processes</span>: <span style=color:#ae81ff>auto</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>nginx_worker_connections</span>: <span style=color:#ae81ff>1024</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>nginx_server_name</span>: <span style=color:#e6db74>&#34;{{ inventory_hostname }}&#34;</span>
+</span></span></code></pre></div><h3 id=group_varsdbserversyml>group_vars/dbservers.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#75715e># DB server specific variables</span>
+</span></span></code></pre></div><hr><h2 id=host-variables>Host Variables</h2><h3 id=host_varsweb1prodexamplecomyml>host_vars/web1.prod.example.com.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#75715e># host-specific overrides</span>
+</span></span></code></pre></div><hr><h2 id=variables>Variables</h2><h3 id=varscommonyml>vars/common.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#75715e># Variables shared by multiple playbooks</span>
+</span></span></code></pre></div><h3 id=varssecretsyml>vars/secrets.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#75715e># Example secret values (encrypt with ansible-vault)</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>db_root_password</span>: <span style=color:#e6db74>&#34;CHANGE_ME&#34;</span>
+</span></span></code></pre></div><hr><h2 id=playbooks>Playbooks</h2><h3 id=siteyml---main-playbook>site.yml - Main Playbook</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Apply baseline configuration</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>gather_facts</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>common</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>users</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>packages</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>firewall</span>
+</span></span></code></pre></div><h3 id=updateyml---system-updates>update.yml - System Updates</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Update and upgrade all hosts</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>gather_facts</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>tasks</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Update cache (Debian)</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Upgrade packages (Debian)</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>upgrade</span>: <span style=color:#ae81ff>dist</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Upgrade packages (RHEL)</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#39;*&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>state</span>: <span style=color:#ae81ff>latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span></code></pre></div><h3 id=usersyml>users.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>User management</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>users</span>
+</span></span></code></pre></div><h3 id=packagesyml>packages.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Package installation</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>packages</span>
+</span></span></code></pre></div><h3 id=securityyml>security.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Apply security hardening baseline</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>firewall</span>
+</span></span></code></pre></div><h3 id=nginxyml>nginx.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Deploy nginx web server</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>web</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>gather_facts</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>nginx</span>
+</span></span></code></pre></div><h3 id=dockeryml>docker.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Docker</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>gather_facts</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>docker</span>
+</span></span></code></pre></div><h3 id=kubernetesyml>kubernetes.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Kubernetes components</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>gather_facts</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>kubernetes</span>
+</span></span></code></pre></div><hr><h2 id=roles>Roles</h2><h3 id=common>common</h3><p><strong>defaults/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>motd_message</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  Welcome to {{ inventory_hostname }}!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  Managed by Ansible.</span>
+</span></span></code></pre></div><p><strong>tasks/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure timezone is set</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>timezone</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ timezone }}&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure MOTD is configured</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>src</span>: <span style=color:#ae81ff>motd.j2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dest</span>: <span style=color:#ae81ff>/etc/motd</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>owner</span>: <span style=color:#ae81ff>root</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>group</span>: <span style=color:#ae81ff>root</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>mode</span>: <span style=color:#e6db74>&#34;0644&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure NTP/chrony is installed (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>chrony</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure chrony is installed (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>chrony</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure chrony service is enabled and running (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>chronyd</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>started</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure chrony service is enabled and running (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>chrony</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>started</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span></code></pre></div><p><strong>templates/motd.j2</strong></p><pre tabindex=0><code class=language-jinja2 data-lang=jinja2>{{ motd_message }}
+</code></pre><p><strong>handlers/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#75715e># Reserved for common handlers</span>
+</span></span></code></pre></div><hr><h3 id=users>users</h3><p><strong>defaults/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>users</span>: []
+</span></span></code></pre></div><p><strong>tasks/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure user groups exist</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>group</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ item.groups }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ users }}&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>item.groups is defined and item.groups != &#34;&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure user accounts exist</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>user</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ item.username }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>groups</span>: <span style=color:#e6db74>&#34;{{ item.groups | default(omit) }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>shell</span>: <span style=color:#e6db74>&#34;{{ item.shell | default(&#39;/bin/bash&#39;) }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>create_home</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ users }}&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure authorized_keys are present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>authorized_key</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>user</span>: <span style=color:#e6db74>&#34;{{ item.username }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>key</span>: <span style=color:#e6db74>&#34;{{ lookup(&#39;file&#39;, item.ssh_key_file) }}&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ users }}&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>item.ssh_key_file is defined</span>
+</span></span></code></pre></div><hr><h3 id=packages>packages</h3><p><strong>defaults/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>packages</span>: []
+</span></span></code></pre></div><p><strong>tasks/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install packages (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ packages }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install packages (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ packages }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span></code></pre></div><hr><h3 id=firewall>firewall</h3><p><strong>defaults/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>firewall_allowed_ports</span>: []
+</span></span></code></pre></div><p><strong>tasks/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install firewalld (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>firewalld</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure firewalld is enabled and running (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>firewalld</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>started</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Open allowed ports (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>firewalld</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#e6db74>&#34;{{ item }}/tcp&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>permanent</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>enabled</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ firewall_allowed_ports }}&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Reload firewalld (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>firewalld</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>reloaded</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install UFW (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ufw</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Allow ports (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ufw</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>rule</span>: <span style=color:#ae81ff>allow</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#e6db74>&#34;{{ item }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proto</span>: <span style=color:#ae81ff>tcp</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ firewall_allowed_ports }}&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Enable UFW (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ufw</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>enabled</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>policy</span>: <span style=color:#ae81ff>deny</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span></code></pre></div><hr><h3 id=nginx>nginx</h3><p><strong>defaults/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>nginx_worker_processes</span>: <span style=color:#ae81ff>auto</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>nginx_worker_connections</span>: <span style=color:#ae81ff>1024</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>nginx_server_name</span>: <span style=color:#e6db74>&#34;{{ inventory_hostname }}&#34;</span>
+</span></span></code></pre></div><p><strong>tasks/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Nginx (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>nginx</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Nginx (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>nginx</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Deploy nginx.conf</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>src</span>: <span style=color:#ae81ff>nginx.conf.j2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dest</span>: <span style=color:#ae81ff>/etc/nginx/nginx.conf</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>owner</span>: <span style=color:#ae81ff>root</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>group</span>: <span style=color:#ae81ff>root</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>mode</span>: <span style=color:#e6db74>&#34;0644&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>notify</span>: <span style=color:#ae81ff>Reload nginx</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure nginx is running</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>nginx</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>started</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>yes</span>
+</span></span></code></pre></div><p><strong>templates/nginx.conf.j2</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nginx data-lang=nginx><span style=display:flex><span><span style=color:#66d9ef>user</span> <span style=color:#e6db74>nginx</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>worker_processes</span> {<span style=color:#f92672>{</span> <span style=color:#e6db74>nginx_worker_processes</span> <span style=color:#960050;background-color:#1e0010>}}</span>;
+</span></span><span style=display:flex><span><span style=color:#f92672>error_log</span> <span style=color:#e6db74>/var/log/nginx/error.log</span> <span style=color:#e6db74>warn</span>;
+</span></span><span style=display:flex><span><span style=color:#f92672>pid</span> <span style=color:#e6db74>/var/run/nginx.pid</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>events</span> {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>worker_connections</span> {<span style=color:#f92672>{</span> <span style=color:#e6db74>nginx_worker_connections</span> <span style=color:#960050;background-color:#1e0010>}}</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>http</span> {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>include</span> <span style=color:#e6db74>/etc/nginx/mime.types</span>;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>default_type</span> <span style=color:#e6db74>application/octet-stream</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>sendfile</span> <span style=color:#66d9ef>on</span>;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>keepalive_timeout</span> <span style=color:#ae81ff>65</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>server</span> {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>listen</span> <span style=color:#ae81ff>80</span>;
+</span></span><span style=display:flex><span>        <span style=color:#f92672>server_name</span> {<span style=color:#f92672>{</span> <span style=color:#e6db74>nginx_server_name</span> <span style=color:#960050;background-color:#1e0010>}}</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>location</span> <span style=color:#e6db74>/</span> {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>return</span> <span style=color:#ae81ff>200</span> <span style=color:#e6db74>&#39;ok&#39;</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>handlers/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Reload nginx</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>nginx</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>reloaded</span>
+</span></span></code></pre></div><hr><h3 id=docker>docker</h3><p><strong>defaults/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>docker_packages</span>: []
+</span></span><span style=display:flex><span><span style=color:#f92672>docker_users</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>deploy</span>
+</span></span></code></pre></div><p><strong>tasks/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install prerequisites (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>apt-transport-https</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>ca-certificates</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>gnupg</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>lsb-release</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Add Docker GPG key (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ansible.builtin.apt_key</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>url</span>: <span style=color:#ae81ff>https://download.docker.com/linux/{{ ansible_facts[&#39;distribution&#39;] | lower }}/gpg</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Add Docker repo (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ansible.builtin.apt_repository</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>repo</span>: <span style=color:#e6db74>&#34;deb [arch=amd64] https://download.docker.com/linux/{{ ansible_facts[&#39;distribution&#39;] | lower }} {{ ansible_facts[&#39;distribution_release&#39;] }} stable&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Docker packages (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ docker_packages }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Docker packages (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ docker_packages }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure docker service is enabled and running</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>docker</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>started</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Add users to docker group</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>user</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ item }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>groups</span>: <span style=color:#ae81ff>docker</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>append</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ docker_users }}&#34;</span>
+</span></span></code></pre></div><hr><h3 id=kubernetes>kubernetes</h3><p><strong>defaults/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>k8s_packages</span>: []
+</span></span><span style=display:flex><span><span style=color:#f92672>k8s_repo_url_debian</span>: <span style=color:#e6db74>&#34;https://apt.kubernetes.io/&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>k8s_repo_url_rhel</span>: <span style=color:#e6db74>&#34;https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64&#34;</span>
+</span></span></code></pre></div><p><strong>tasks/main.yml</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install prerequisites (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>apt-transport-https</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>ca-certificates</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>curl</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Add Kubernetes apt key (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ansible.builtin.apt_key</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>url</span>: <span style=color:#ae81ff>https://packages.cloud.google.com/apt/doc/apt-key.gpg</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Add Kubernetes apt repo (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ansible.builtin.apt_repository</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>repo</span>: <span style=color:#e6db74>&#34;deb {{ k8s_repo_url_debian }} kubernetes-xenial main&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Kubernetes packages (Debian)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ k8s_packages }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;Debian&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install Kubernetes packages (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ k8s_packages }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#ae81ff>ansible_facts[&#39;os_family&#39;] == &#39;RedHat&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure kubelet is enabled</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kubelet</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>started</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>when</span>: <span style=color:#e6db74>&#34;&#39;kubelet&#39; in k8s_packages&#34;</span>
+</span></span></code></pre></div><hr><h2 id=scripts>Scripts</h2><h3 id=ansible-vault-rotatesh>ansible-vault-rotate.sh</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> <span style=color:#f92672>[[</span> $# -lt <span style=color:#ae81ff>1</span> <span style=color:#f92672>]]</span>; <span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>  echo <span style=color:#e6db74>&#34;Usage: </span>$0<span style=color:#e6db74> &lt;file&gt;&#34;</span>
+</span></span><span style=display:flex><span>  exit <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fi</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>file<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span>$1<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>ansible-vault rekey <span style=color:#e6db74>&#34;</span>$file<span style=color:#e6db74>&#34;</span>
+</span></span></code></pre></div><hr><h2 id=quick-start>Quick Start</h2><h3 id=install-dependencies>Install dependencies</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>pip install ansible
+</span></span></code></pre></div><h3 id=run-a-playbook>Run a playbook</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>ansible-playbook -i inventory/staging.yml playbooks/site.yml
+</span></span></code></pre></div><h3 id=using-vault-for-secrets>Using Vault for secrets</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Encrypt secrets file</span>
+</span></span><span style=display:flex><span>ansible-vault encrypt vars/secrets.yml
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run playbook with vault password</span>
+</span></span><span style=display:flex><span>ansible-playbook -i inventory/staging.yml playbooks/site.yml --ask-vault-pass
+</span></span></code></pre></div><hr><h2 id=notes>Notes</h2><ul><li>Uses <code>ansible_facts['os_family']</code> to branch tasks for Debian/RHEL support</li><li>Use <code>group_vars</code> for environment-wide defaults</li><li>Use <code>host_vars</code> for per-host overrides</li></ul></div></div><script src=/assets/shared-nav.js></script></body></html>

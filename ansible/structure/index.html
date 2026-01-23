@@ -1,0 +1,120 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>example file system sctructure for an Ansible server // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>example file system sctructure for an Ansible server</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ansiblestructure/>Ansiblestructure</a></div><div class="card markdown-content"><pre tabindex=0><code>ansible/
+├── ansible.cfg
+├── inventory/
+│   ├── production.yml
+│   └── staging.yml
+├── group_vars/
+│   ├── all.yml
+│   ├── webservers.yml
+│   └── dbservers.yml
+├── host_vars/
+│   ├── host1.yml
+│   └── host2.yml
+├── roles/
+│   ├── common/
+│   │   ├── tasks/
+│   │   │   └── main.yml
+│   │   ├── handlers/
+│   │   │   └── main.yml
+│   │   ├── templates/
+│   │   │   └── motd.j2
+│   │   ├── files/
+│   │   └── defaults/
+│   │       └── main.yml
+│   ├── users/
+│   │   ├── tasks/main.yml
+│   │   ├── defaults/main.yml
+│   │   └── vars/main.yml
+│   ├── packages/
+│   │   ├── tasks/main.yml
+│   │   └── vars/main.yml
+│   ├── firewall/
+│   │   ├── tasks/main.yml
+│   │   └── defaults/main.yml
+│   └── nginx/
+│       ├── tasks/main.yml
+│       ├── templates/nginx.conf.j2
+│       ├── handlers/main.yml
+│       └── defaults/main.yml
+├── playbooks/
+│   ├── site.yml
+│   ├── users.yml
+│   ├── packages.yml
+│   ├── security.yml
+│   └── update.yml
+├── vars/
+│   ├── secrets.yml (encrypted with Vault)
+│   └── common.yml
+├── scripts/
+│   └── ansible-vault-rotate.sh
+├── README.md
+└── requirements.yml
+</code></pre><hr><h1 id=-explanation-of-key-files>📌 Explanation of Key Files</h1><h3 id=ansiblecfg><code>ansible.cfg</code></h3><p>A minimal config:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[defaults]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>inventory</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>inventory</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>host_key_checking</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>False</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>retry_files_enabled</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>False</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>roles_path</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>roles</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>forks</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>20</span>
+</span></span></code></pre></div><hr><h3 id=inventoryproductionyml><code>inventory/production.yml</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>all</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>children</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>web</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web1.example.com</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>web2.example.com</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>db</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>db1.example.com</span>:
+</span></span></code></pre></div><hr><h3 id=group_varsallyml><code>group_vars/all.yml</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>ansible_user</span>: <span style=color:#ae81ff>admin</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>ansible_become</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>timezone</span>: <span style=color:#ae81ff>UTC</span>
+</span></span></code></pre></div><hr><h3 id=rolescommontasksmainyml><code>roles/common/tasks/main.yml</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure MOTD is configured</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>src</span>: <span style=color:#ae81ff>motd.j2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dest</span>: <span style=color:#ae81ff>/etc/motd</span>
+</span></span></code></pre></div><hr><h3 id=rolesuserstasksmainyml><code>roles/users/tasks/main.yml</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Create users</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>user</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ item.username }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>groups</span>: <span style=color:#e6db74>&#34;{{ item.groups }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>shell</span>: <span style=color:#ae81ff>/bin/bash</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ users }}&#34;</span>
+</span></span></code></pre></div><hr><h3 id=rolespackagestasksmainyml><code>roles/packages/tasks/main.yml</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install base packages</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>package</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ packages }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span></code></pre></div><hr><h3 id=playbookssiteyml><code>playbooks/site.yml</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Apply baseline configuration to all hosts</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>common</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>users</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>packages</span>
+</span></span></code></pre></div><hr><h3 id=playbooksupdateyml><code>playbooks/update.yml</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Perform system updates</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>tasks</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Update package cache</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>package</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Upgrade all packages</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>package</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>upgrade</span>: <span style=color:#66d9ef>yes</span>
+</span></span></code></pre></div><hr><h1 id=-secrets-with-ansible-vault>🔐 Secrets with Ansible Vault</h1><p>Store secrets in <code>vars/secrets.yml</code> and encrypt:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>ansible-vault encrypt vars/secrets.yml
+</span></span></code></pre></div><p>Use in playbook:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>vars_files</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>vars/secrets.yml</span>
+</span></span></code></pre></div><hr><h1 id=-extra-tools>📌 Extra Tools</h1><h3 id=scriptsansible-vault-rotatesh><code>scripts/ansible-vault-rotate.sh</code></h3><p>A simple vault rotation helper:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/bin/bash
+</span></span></span><span style=display:flex><span>ansible-vault rekey vars/secrets.yml
+</span></span></code></pre></div><hr><h1 id=-requirementsyml-optional>🧰 <code>requirements.yml</code> (Optional)</h1><p>For roles from Ansible Galaxy:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>src</span>: <span style=color:#ae81ff>geerlingguy.firewall</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>src</span>: <span style=color:#ae81ff>geerlingguy.ntp</span>
+</span></span></code></pre></div><p>Install with:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>ansible-galaxy install -r requirements.yml
+</span></span></code></pre></div><hr><h1 id=-why-this-structure-works>✅ Why This Structure Works</h1><p>✔ <strong>Modular & reusable</strong> (roles)
+✔ <strong>Clean separation</strong> of environment configs
+✔ <strong>Easy scaling</strong> across dozens or hundreds of hosts
+✔ <strong>Security-ready</strong> with Vault built-in
+✔ <strong>Clear separation</strong> of playbooks vs roles vs vars</p></div></div><script src=/assets/shared-nav.js></script></body></html>

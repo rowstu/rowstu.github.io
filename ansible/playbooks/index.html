@@ -1,0 +1,130 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Ansible Playbooks // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Ansible Playbooks</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ansibleplaybooks/>Ansibleplaybooks</a></div><div class="card markdown-content"><p>An <strong>Ansible Playbook</strong> is a YAML file that describes automation tasks:</p><ul><li>What to run</li><li>On which hosts</li><li>In what order</li><li>With what variables</li></ul><p>Playbooks make automation readable, repeatable, and version-controlled.</p><hr><h3 id=-anatomy-of-a-playbook>▶️ Anatomy of a Playbook</h3><p>A playbook consists of:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Description of the play</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>group_or_host</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>become</span>: <span style=color:#66d9ef>yes</span><span style=color:#ae81ff>/no             </span> <span style=color:#75715e># escalate privileges</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>vars</span>:                       <span style=color:#75715e># local variables</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>var1</span>: <span style=color:#ae81ff>value</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>tasks</span>:                      <span style=color:#75715e># task list</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Task description</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>module_name</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>parameter1</span>: <span style=color:#ae81ff>value</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>parameter2</span>: <span style=color:#ae81ff>value</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>handlers</span>:                   <span style=color:#75715e># optional event handlers</span>
+</span></span></code></pre></div><hr><h3 id=-key-concepts--syntax>▶️ Key Concepts & Syntax</h3><ul><li><strong>Inventory</strong> determines hosts and groups (INI or YAML).</li><li><strong>Modules</strong> are actions: <code>yum</code>, <code>apt</code>, <code>user</code>, <code>copy</code>, <code>service</code>, etc.</li><li><strong>Tasks</strong> are the basic building blocks.</li><li><strong>Handlers</strong> run when notified (e.g., restart service on config change).</li><li><strong>Roles</strong> encapsulate reusable logic.</li></ul><hr><h3 id=-good-naming-conventions>▶️ Good Naming Conventions</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plaintext data-lang=plaintext><span style=display:flex><span>playbooks/
+</span></span><span style=display:flex><span>  users.yml
+</span></span><span style=display:flex><span>  packages.yml
+</span></span><span style=display:flex><span>  system_update.yml
+</span></span><span style=display:flex><span>roles/
+</span></span><span style=display:flex><span>  common/
+</span></span><span style=display:flex><span>  webserver/
+</span></span></code></pre></div><hr><h2 id=-2-linux-administration-tasks>📌 2. Linux Administration Tasks</h2><p>Here are practical playbook examples for common administration tasks.</p><hr><h3 id=-user-management>✔ User Management</h3><p><strong>Create users and groups:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure users and groups exist</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>linux</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>become</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>vars</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>users</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>username</span>: <span style=color:#ae81ff>alice</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>groups</span>: <span style=color:#ae81ff>sudo</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>username</span>: <span style=color:#ae81ff>bob</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>groups</span>: <span style=color:#ae81ff>developers</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>tasks</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Create group</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>group</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ item.groups }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ users }}&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Create user accounts</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>user</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;{{ item.username }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>groups</span>: <span style=color:#e6db74>&#34;{{ item.groups }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>shell</span>: <span style=color:#ae81ff>/bin/bash</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>loop</span>: <span style=color:#e6db74>&#34;{{ users }}&#34;</span>
+</span></span></code></pre></div><p><strong>Common Pitfalls</strong></p><ul><li>Missing <code>become: yes</code> prevents user creation.</li><li>Forgetting to manage SSH keys.</li></ul><p><strong>Add SSH key:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Add SSH key for user</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>authorized_key</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>user</span>: <span style=color:#ae81ff>alice</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>key</span>: <span style=color:#e6db74>&#34;{{ lookup(&#39;file&#39;, &#39;files/alice.pub&#39;) }}&#34;</span>
+</span></span></code></pre></div><hr><h3 id=-package-installations>✔ Package Installations</h3><p><strong>Debian/Ubuntu:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install packages on Debian/Ubuntu</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>vim</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>htop</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>git</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span></code></pre></div><p><strong>RHEL/CentOS:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install packages on RHEL</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>vim</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>wget</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>curl</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>present</span>
+</span></span></code></pre></div><p><strong>Pitfall</strong></p><ul><li>Forgetting <code>update_cache: yes</code> causes stale package indexes.</li><li>Hard-coding versions without variables reduces flexibility.</li></ul><hr><h3 id=-system-configurations>✔ System Configurations</h3><p><strong>Manage services:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Ensure nginx is running</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>nginx</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>started</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>yes</span>
+</span></span></code></pre></div><p><strong>Templating a config:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Push custom config</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>src</span>: <span style=color:#ae81ff>nginx.conf.j2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dest</span>: <span style=color:#ae81ff>/etc/nginx/nginx.conf</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>notify</span>: <span style=color:#ae81ff>Restart nginx</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>handlers</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Restart nginx</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>service</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>nginx</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>state</span>: <span style=color:#ae81ff>restarted</span>
+</span></span></code></pre></div><hr><h2 id=-3-updates-and-upgrades>📌 3. Updates and Upgrades</h2><p>Automating updates is powerful but risky on production.</p><hr><h3 id=-safe-update-playbook-ubuntu>✔ Safe Update Playbook (Ubuntu)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Perform safe updates</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>linux</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>become</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>tasks</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Update apt cache</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>update_cache</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Upgrade all packages</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>apt</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>upgrade</span>: <span style=color:#ae81ff>dist</span>
+</span></span></code></pre></div><hr><h3 id=-rhelcentos-updates>✔ RHEL/CentOS Updates</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Update all packages (RHEL)</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>yum</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#39;*&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>state</span>: <span style=color:#ae81ff>latest</span>
+</span></span></code></pre></div><hr><h3 id=-tips-for-production>▶ Tips for Production</h3><ul><li><strong>Run in staging first</strong></li><li>Use <code>--check</code> (dry-run)</li><li>Schedule maintenance windows</li><li>Snapshot or backup before upgrading</li><li>Notify teams when reboots happen</li></ul><hr><h2 id=-4-troubleshooting>📌 4. Troubleshooting</h2><p>Here are the most common problems and how to resolve them.</p><hr><h3 id=-permission-denied>❗ “Permission denied”</h3><p><strong>Cause:</strong> no privilege escalation
+<strong>Fix:</strong> add:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>become</span>: <span style=color:#66d9ef>yes</span>
+</span></span></code></pre></div><hr><h3 id=-module-not-found>❗ “Module not found”</h3><p><strong>Cause:</strong> Ansible version mismatch
+<strong>Fix:</strong> update Ansible or specify the correct module.</p><hr><h3 id=-connection-timed-out>❗ “Connection timed out”</h3><p><strong>Cause:</strong> SSH issue
+<strong>Fix:</strong></p><ul><li>Test SSH manually</li><li>Add <code>ansible_user</code>, <code>ansible_port</code>, <code>ansible_ssh_private_key_file</code> in inventory</li></ul><hr><h3 id=-idempotency-problems>❗ Idempotency Problems</h3><p>Idempotency means the play can run many times with the same result.
+<strong>Fix:</strong> use Ansible modules (not shell/command).
+Example avoid:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>shell</span>: <span style=color:#ae81ff>echo &#34;hello&#34;</span>
+</span></span></code></pre></div><p>Use:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>lineinfile</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/etc/motd</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>line</span>: <span style=color:#e6db74>&#34;hello&#34;</span>
+</span></span></code></pre></div><hr><h2 id=-5-deployments>📌 5. Deployments</h2><p>Ansible excels at deploying apps and infrastructure.</p><hr><h3 id=-pattern-infrastructure-as-code>▶ Pattern: Infrastructure as Code</h3><p>Preferred structure:</p><pre tabindex=0><code>roles/
+  webserver/
+    tasks/
+    templates/
+    handlers/
+</code></pre><hr><h3 id=-deploy-nginx-with-a-role>▶ Deploy Nginx with a Role</h3><p><strong>Role directory</strong></p><pre tabindex=0><code>roles/nginx/tasks/main.yml
+roles/nginx/templates/nginx.conf.j2
+</code></pre><p><strong>Playbook:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>web</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>become</span>: <span style=color:#66d9ef>yes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>roles</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>nginx</span>
+</span></span></code></pre></div><hr><h3 id=-rolling-deployments>▶ Rolling Deployments</h3><p>Use <code>serial</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>hosts</span>: <span style=color:#ae81ff>web</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>serial</span>: <span style=color:#ae81ff>2</span>
+</span></span></code></pre></div><p>This ensures you update 2 servers at a time.</p><hr><h2 id=-6-security-considerations>📌 6. Security Considerations</h2><hr><h3 id=-handling-secrets>🔐 Handling Secrets</h3><p>Never store passwords in plaintext!</p><p><strong>Use Ansible Vault</strong>
+Encrypt files:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>ansible-vault encrypt vars/secret.yml
+</span></span></code></pre></div><p>Use in play:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>vars_files</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>vars/secret.yml</span>
+</span></span></code></pre></div><hr><h3 id=-ssh-best-practices>▶ SSH Best Practices</h3><ul><li>Use key-based auth</li><li>Disable root login</li><li>Use dedicated service accounts</li></ul><hr><h3 id=-least-privilege>▶ Least Privilege</h3><p>Grant only required sudo rights:</p><pre tabindex=0><code>alice ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nginx
+</code></pre><hr><h2 id=-7-performance-optimization>📌 7. Performance Optimization</h2><hr><h3 id=-run-faster>🛠 Run Faster</h3><ul><li>Use <strong>async</strong> + <strong>poll</strong> for long tasks:</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Long running task</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>command</span>: <span style=color:#ae81ff>/path/to/script</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>async</span>: <span style=color:#ae81ff>1800</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>poll</span>: <span style=color:#ae81ff>0</span>
+</span></span></code></pre></div><ul><li>Limit hosts in parallel:</li></ul><pre tabindex=0><code>ansible-playbook playbook.yml -f 20
+</code></pre><hr><h3 id=-use-facts-wisely>🧠 Use Facts Wisely</h3><p>Facts cost time. Disable if not needed:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>gather_facts</span>: <span style=color:#66d9ef>no</span>
+</span></span></code></pre></div><hr><h3 id=-use-roles-to-scale>🗂 Use Roles to Scale</h3><p>Roles make code maintainable and shareable.</p><hr><h2 id=-8-common-pitfalls--how-to-avoid-them>📌 8. Common Pitfalls & How to Avoid Them</h2><table><thead><tr><th>Issue</th><th>Why It Happens</th><th>Fix</th></tr></thead><tbody><tr><td>Playbook fails on first run but succeeds second</td><td>Missing cache or fact dependency</td><td>Force <code>update_cache</code></td></tr><tr><td>Plays succeed locally but fail on prod</td><td>Hard-coded values</td><td>Use variables & inventories</td></tr><tr><td>Unexpected reboot</td><td>Package updates trigger reboot</td><td>Use handler & notify</td></tr></tbody></table></div></div><script src=/assets/shared-nav.js></script></body></html>

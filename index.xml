@@ -71,7 +71,279 @@ if __name__ == &amp;#34;__main__&amp;#34;:
 &lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="https://www.javatpoint.com/how-to-convert-binary-to-decimal-numbers-in-python"&gt;https://www.javatpoint.com/how-to-convert-binary-to-decimal-numbers-in-python&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;The second parameter of int() function indicates that the number is in base-2 (binary) format.&lt;/p&gt;</description></item><item><title>Apptainer</title><link>https://rowstu.net/linux/apptainer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/apptainer/</guid><description>&lt;h1 id="apptainer-formerly-singularity"&gt;Apptainer (formerly Singularity)&lt;/h1&gt;
+&lt;p&gt;The second parameter of int() function indicates that the number is in base-2 (binary) format.&lt;/p&gt;</description></item><item><title>Ansible Playbooks</title><link>https://rowstu.net/ansible/playbooks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/ansible/playbooks/</guid><description>&lt;p&gt;An &lt;strong&gt;Ansible Playbook&lt;/strong&gt; is a YAML file that describes automation tasks:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;What to run&lt;/li&gt;
+&lt;li&gt;On which hosts&lt;/li&gt;
+&lt;li&gt;In what order&lt;/li&gt;
+&lt;li&gt;With what variables&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Playbooks make automation readable, repeatable, and version-controlled.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="-anatomy-of-a-playbook"&gt;▶️ Anatomy of a Playbook&lt;/h3&gt;
+&lt;p&gt;A playbook consists of:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Description of the play&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;group_or_host&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;become&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;yes&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;/no &lt;/span&gt; &lt;span style="color:#75715e"&gt;# escalate privileges&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;vars&lt;/span&gt;: &lt;span style="color:#75715e"&gt;# local variables&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;var1&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;value&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;tasks&lt;/span&gt;: &lt;span style="color:#75715e"&gt;# task list&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Task description&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;module_name&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;parameter1&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;value&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;parameter2&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;value&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;handlers&lt;/span&gt;: &lt;span style="color:#75715e"&gt;# optional event handlers&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id="-key-concepts--syntax"&gt;▶️ Key Concepts &amp;amp; Syntax&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Inventory&lt;/strong&gt; determines hosts and groups (INI or YAML).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Modules&lt;/strong&gt; are actions: &lt;code&gt;yum&lt;/code&gt;, &lt;code&gt;apt&lt;/code&gt;, &lt;code&gt;user&lt;/code&gt;, &lt;code&gt;copy&lt;/code&gt;, &lt;code&gt;service&lt;/code&gt;, etc.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Tasks&lt;/strong&gt; are the basic building blocks.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Handlers&lt;/strong&gt; run when notified (e.g., restart service on config change).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Roles&lt;/strong&gt; encapsulate reusable logic.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id="-good-naming-conventions"&gt;▶️ Good Naming Conventions&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;playbooks/
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; users.yml
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; packages.yml
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; system_update.yml
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;roles/
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; common/
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; webserver/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="-2-linux-administration-tasks"&gt;📌 2. Linux Administration Tasks&lt;/h2&gt;
+&lt;p&gt;Here are practical playbook examples for common administration tasks.&lt;/p&gt;</description></item><item><title>Ansible Templates</title><link>https://rowstu.net/ansible/templates/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/ansible/templates/</guid><description>&lt;h1 id="ansible-templates"&gt;Ansible Templates&lt;/h1&gt;
+&lt;p&gt;A collection of reusable Ansible templates for Linux administration. Supports both Debian/Ubuntu and RHEL/CentOS families.&lt;/p&gt;
+&lt;h2 id="project-structure"&gt;Project Structure&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;ansible/
+├── ansible.cfg
+├── inventory/
+│ ├── staging.yml
+│ └── production.yml
+├── group_vars/
+│ ├── all.yml
+│ ├── webservers.yml
+│ └── dbservers.yml
+├── host_vars/
+│ └── web1.prod.example.com.yml
+├── roles/
+│ ├── common/
+│ ├── users/
+│ ├── packages/
+│ ├── firewall/
+│ ├── nginx/
+│ ├── docker/
+│ └── kubernetes/
+├── playbooks/
+├── vars/
+├── files/
+│ └── keys/
+├── scripts/
+├── requirements.yml
+└── README.md
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id="configuration"&gt;Configuration&lt;/h2&gt;
+&lt;h3 id="ansiblecfg"&gt;ansible.cfg&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-ini" data-lang="ini"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;[defaults]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;inventory&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;inventory&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;roles_path&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;roles&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;host_key_checking&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;retry_files_enabled&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;forks&lt;/span&gt; &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;20&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;deprecation_warnings&lt;/span&gt;&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;[privilege_escalation]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;become&lt;/span&gt;&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;become_method&lt;/span&gt;&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;sudo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="requirementsyml"&gt;requirements.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Add galaxy roles here if needed&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# - src: geerlingguy.firewall&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="inventory"&gt;Inventory&lt;/h2&gt;
+&lt;h3 id="stagingyml"&gt;staging.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;all&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;vars&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;ansible_user&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ansible&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;ansible_become&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;ansible_python_interpreter&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;/usr/bin/python3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;children&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web1.staging.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web2.staging.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;db&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;db1.staging.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;all_linux&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web1.staging.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web2.staging.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;db1.staging.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="productionyml"&gt;production.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;all&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;vars&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;ansible_user&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ansible&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;ansible_become&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;ansible_python_interpreter&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;/usr/bin/python3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;children&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web1.prod.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web2.prod.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;db&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;db1.prod.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;all_linux&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web1.prod.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;web2.prod.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;db1.prod.example.com&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="group-variables"&gt;Group Variables&lt;/h2&gt;
+&lt;h3 id="group_varsallyml"&gt;group_vars/all.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Global defaults for all hosts&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;timezone&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;UTC&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Package lists&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;common_packages&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;vim&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;git&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;curl&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;htop&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;unzip&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# firewall defaults&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;firewall_allowed_ports&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;22&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;80&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;443&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# docker defaults&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;docker_packages&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;docker-ce&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;docker-ce-cli&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;containerd.io&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;docker-compose-plugin&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# kubernetes defaults&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;k8s_packages&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;kubelet&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;kubeadm&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;kubectl&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# user management defaults&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;default_users&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;username&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;deploy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;groups&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;sudo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;ssh_key_file&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;files/keys/deploy.pub&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;username&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ops&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;groups&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;sudo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;ssh_key_file&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;files/keys/ops.pub&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="group_varswebserversyml"&gt;group_vars/webservers.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Web server specific variables&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;nginx_worker_processes&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;auto&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;nginx_worker_connections&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;1024&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;nginx_server_name&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;{{ inventory_hostname }}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="group_varsdbserversyml"&gt;group_vars/dbservers.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# DB server specific variables&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="host-variables"&gt;Host Variables&lt;/h2&gt;
+&lt;h3 id="host_varsweb1prodexamplecomyml"&gt;host_vars/web1.prod.example.com.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# host-specific overrides&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="variables"&gt;Variables&lt;/h2&gt;
+&lt;h3 id="varscommonyml"&gt;vars/common.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Variables shared by multiple playbooks&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="varssecretsyml"&gt;vars/secrets.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Example secret values (encrypt with ansible-vault)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;db_root_password&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;CHANGE_ME&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="playbooks"&gt;Playbooks&lt;/h2&gt;
+&lt;h3 id="siteyml---main-playbook"&gt;site.yml - Main Playbook&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Apply baseline configuration&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;all&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;gather_facts&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;yes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;roles&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;common&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;users&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;packages&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;firewall&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="updateyml---system-updates"&gt;update.yml - System Updates&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Update and upgrade all hosts&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;all&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;gather_facts&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;yes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;tasks&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Update cache (Debian)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;apt&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;update_cache&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;yes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;when&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ansible_facts[&amp;#39;os_family&amp;#39;] == &amp;#39;Debian&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Upgrade packages (Debian)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;apt&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;upgrade&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;dist&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;when&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ansible_facts[&amp;#39;os_family&amp;#39;] == &amp;#39;Debian&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Upgrade packages (RHEL)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;yum&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#39;*&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;state&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;when&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ansible_facts[&amp;#39;os_family&amp;#39;] == &amp;#39;RedHat&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="usersyml"&gt;users.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;User management&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;all&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;roles&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;users&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="packagesyml"&gt;packages.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Package installation&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;all&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;roles&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;packages&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="securityyml"&gt;security.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Apply security hardening baseline&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;all&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;roles&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;firewall&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="nginxyml"&gt;nginx.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Deploy nginx web server&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;web&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;gather_facts&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;yes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;roles&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;nginx&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="dockeryml"&gt;docker.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Install Docker&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;all&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;gather_facts&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;yes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;roles&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;docker&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="kubernetesyml"&gt;kubernetes.yml&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;---
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;- &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Install Kubernetes components&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;hosts&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;all&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;gather_facts&lt;/span&gt;: &lt;span style="color:#66d9ef"&gt;yes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;roles&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;kubernetes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="roles"&gt;Roles&lt;/h2&gt;
+&lt;h3 id="common"&gt;common&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;defaults/main.yml&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Apptainer</title><link>https://rowstu.net/linux/apptainer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/apptainer/</guid><description>&lt;h1 id="apptainer-formerly-singularity"&gt;Apptainer (formerly Singularity)&lt;/h1&gt;
 &lt;p&gt;Apptainer is a container platform designed for HPC and scientific computing. Unlike Docker, it runs containers as the current user without requiring root privileges, making it ideal for shared computing environments.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2 id="installation"&gt;Installation&lt;/h2&gt;
@@ -352,7 +624,111 @@ From: nvidia/cuda:12.2.0-runtime-ubuntu22.04
 &lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
 &lt;h2 id="bind-mounts-and-file-access"&gt;Bind Mounts and File Access&lt;/h2&gt;
 &lt;h3 id="automatic-bind-mounts"&gt;Automatic Bind Mounts&lt;/h3&gt;
-&lt;p&gt;By default, Apptainer binds:&lt;/p&gt;</description></item><item><title>AWS Provider</title><link>https://rowstu.net/tf/aws-provider/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/tf/aws-provider/</guid><description>&lt;h1 id="aws-provider-configuration"&gt;AWS Provider Configuration&lt;/h1&gt;
+&lt;p&gt;By default, Apptainer binds:&lt;/p&gt;</description></item><item><title>AWS CI/CD Pipeline Examples</title><link>https://rowstu.net/aws/cicd-aws-github/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/aws/cicd-aws-github/</guid><description>&lt;h2 id="github-actions-example"&gt;GitHub Actions Example&lt;/h2&gt;
+&lt;h3 id="cigithub-actionsdeployyml"&gt;&lt;code&gt;ci/github-actions/deploy.yml&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;This pipeline:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Builds and deploys code to S3&lt;/li&gt;
+&lt;li&gt;Optionally triggers Lambda deployment&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Deploy to AWS&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;on&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;push&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;branches&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#ae81ff"&gt;main&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;jobs&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;deploy&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;runs-on&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ubuntu-latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;steps&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Checkout repo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;uses&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;actions/checkout@v4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Install AWS CLI&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; sudo apt install -y awscli&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Configure AWS credentials&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;env&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;AWS_ACCESS_KEY_ID&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;${{ secrets.AWS_ACCESS_KEY_ID }}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;AWS_SECRET_ACCESS_KEY&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;${{ secrets.AWS_SECRET_ACCESS_KEY }}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;AWS_REGION&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;us-east-1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; aws configure set aws_access_key_id &amp;#34;$AWS_ACCESS_KEY_ID&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; aws configure set aws_secret_access_key &amp;#34;$AWS_SECRET_ACCESS_KEY&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; aws configure set region &amp;#34;$AWS_REGION&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Deploy to S3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; ./scripts/s3/sync-to-s3.sh \
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; BUCKET=&amp;#34;my-prod-bucket&amp;#34; \
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; LOCAL_DIR=&amp;#34;./build&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Deploy Lambda (optional)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; ./scripts/lambda/deploy-lambda.sh \
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; FUNCTION_NAME=&amp;#34;my-function&amp;#34; \
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; ZIP_FILE=&amp;#34;./build/function.zip&amp;#34; \
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; ROLE_ARN=&amp;#34;arn:aws:iam::123456789012:role/lambda-role&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="github-actions-example-ec2-deployment"&gt;GitHub Actions Example (EC2 Deployment)&lt;/h2&gt;
+&lt;h3 id="cigithub-actionsdeploy-ec2yml"&gt;&lt;code&gt;ci/github-actions/deploy-ec2.yml&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;This pipeline launches an EC2 instance and tags it.&lt;/p&gt;</description></item><item><title>AWS Command line scripts</title><link>https://rowstu.net/aws/commandline/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/aws/commandline/</guid><description>&lt;h2 id="1-basic-aws-cli-setup"&gt;1. &lt;strong&gt;Basic AWS CLI Setup&lt;/strong&gt;&lt;/h2&gt;
+&lt;h3 id="11-installation-steps-linux"&gt;&lt;strong&gt;1.1 Installation Steps (Linux)&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Debian/Ubuntu&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install awscli -y
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;RHEL/CentOS&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo yum install awscli -y
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="option-b-install-via-official-aws-installer-latest-version"&gt;&lt;strong&gt;Option B: Install via Official AWS Installer (Latest Version)&lt;/strong&gt;&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl &lt;span style="color:#e6db74"&gt;&amp;#34;https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip&amp;#34;&lt;/span&gt; -o &lt;span style="color:#e6db74"&gt;&amp;#34;awscliv2.zip&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;unzip awscliv2.zip
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo ./aws/install
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="verify-installation"&gt;&lt;strong&gt;Verify Installation&lt;/strong&gt;&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;aws --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id="12-configure-aws-credentials"&gt;&lt;strong&gt;1.2 Configure AWS Credentials&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;Run:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;aws configure
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Then enter:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;AWS Access Key ID [None]: YOUR_ACCESS_KEY
+AWS Secret Access Key [None]: YOUR_SECRET_KEY
+Default region name [None]: us-east-1
+Default output format [None]: json
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id="13-where-credentials-are-stored"&gt;&lt;strong&gt;1.3 Where Credentials Are Stored&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;AWS stores credentials at:&lt;/p&gt;</description></item><item><title>AWS example CLI scripts</title><link>https://rowstu.net/aws/scripts/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/aws/scripts/</guid><description>&lt;h2 id="repository-structure"&gt;Repository Structure&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;aws-cli-automation/
+├── README.md
+├── scripts/
+│ ├── ec2/
+│ │ ├── launch-ec2.sh
+│ │ ├── terminate-ec2.sh
+│ │ ├── list-ec2.sh
+│ ├── s3/
+│ │ ├── sync-to-s3.sh
+│ │ ├── delete-old-objects.sh
+│ ├── iam/
+│ │ ├── create-role.sh
+│ │ ├── attach-policy.sh
+│ ├── lambda/
+│ │ ├── deploy-lambda.sh
+│ │ ├── invoke-lambda.sh
+│ ├── common/
+│ │ ├── aws-env.sh
+│ │ ├── utils.sh
+├── ci/
+│ ├── github-actions/
+│ │ ├── deploy.yml
+│ │ ├── lint.yml
+└── .gitignore
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h1 id="core-automation-scripts"&gt;Core Automation Scripts&lt;/h1&gt;
+&lt;h2 id="scriptscommonaws-envsh"&gt;&lt;code&gt;scripts/common/aws-env.sh&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;This loads AWS profile, region, and output format.&lt;/p&gt;</description></item><item><title>AWS Provider</title><link>https://rowstu.net/tf/aws-provider/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/tf/aws-provider/</guid><description>&lt;h1 id="aws-provider-configuration"&gt;AWS Provider Configuration&lt;/h1&gt;
 &lt;p&gt;Basic setup for the AWS provider in Terraform.&lt;/p&gt;
 &lt;h2 id="provider-block"&gt;Provider Block&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-hcl" data-lang="hcl"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;terraform&lt;/span&gt; {
@@ -541,7 +917,14 @@ purloined
 &lt;li&gt;an advocate of a system in which two or more states, groups, principles, sources of authority, etc., coexist. &amp;ldquo;religious pluralists&amp;rdquo;&lt;/li&gt;
 &lt;li&gt;a member of the clergy who holds more than one ecclesiastical office at a time: &amp;ldquo;today many Anglican clergy in rural areas are technically pluralists&amp;rdquo;&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;catechism - a summary of the principles of Christian religion in the form of questions and answers, used for religious instruction.&lt;/p&gt;</description></item><item><title>Buddhist Noble Truths</title><link>https://rowstu.net/personal/buddhist-noble-truths/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/buddhist-noble-truths/</guid><description>&lt;h2 id="the-four-noble-truths"&gt;The Four Noble Truths&lt;/h2&gt;
+&lt;p&gt;catechism - a summary of the principles of Christian religion in the form of questions and answers, used for religious instruction.&lt;/p&gt;</description></item><item><title>Browser tweaks</title><link>https://rowstu.net/onlinetools/browser/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/onlinetools/browser/</guid><description>&lt;h2 id="modifications"&gt;Modifications&lt;/h2&gt;
+&lt;p&gt;Use tweaks from &lt;a href="https://justthebrowser.com"&gt;https://justthebrowser.com&lt;/a&gt; to remove all the unnecassary nonsense browsers have added to them.&lt;/p&gt;
+&lt;h2 id="extensions"&gt;Extensions&lt;/h2&gt;
+&lt;p&gt;Essential browser extensions are:&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/gorhill/uBlock#ublock-origin"&gt;https://github.com/gorhill/uBlock#ublock-origin&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://privacybadger.org/"&gt;https://privacybadger.org/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.one-tab.com/"&gt;http://www.one-tab.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Also see notes on Firefox tweaks in the Linux notes section&lt;/p&gt;</description></item><item><title>Buddhist Noble Truths</title><link>https://rowstu.net/personal/buddhist-noble-truths/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/buddhist-noble-truths/</guid><description>&lt;h2 id="the-four-noble-truths"&gt;The Four Noble Truths&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Dukkha (Suffering):&lt;/strong&gt;&lt;br&gt;
@@ -2383,14 +2766,129 @@ Shift Left:
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;output&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;private_ip&amp;#34;&lt;/span&gt; {
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; value &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;aws_instance&lt;/span&gt;.&lt;span style="color:#66d9ef"&gt;web&lt;/span&gt;.&lt;span style="color:#66d9ef"&gt;private_ip&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item><item><title>Fear</title><link>https://rowstu.net/personal/fear/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/fear/</guid><description>&lt;p&gt;Fear of life is really the fear of emotion. It is not the facts that we fear but our feelings about them&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item><item><title>example file system sctructure for an Ansible server</title><link>https://rowstu.net/ansible/structure/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/ansible/structure/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;ansible/
+├── ansible.cfg
+├── inventory/
+│ ├── production.yml
+│ └── staging.yml
+├── group_vars/
+│ ├── all.yml
+│ ├── webservers.yml
+│ └── dbservers.yml
+├── host_vars/
+│ ├── host1.yml
+│ └── host2.yml
+├── roles/
+│ ├── common/
+│ │ ├── tasks/
+│ │ │ └── main.yml
+│ │ ├── handlers/
+│ │ │ └── main.yml
+│ │ ├── templates/
+│ │ │ └── motd.j2
+│ │ ├── files/
+│ │ └── defaults/
+│ │ └── main.yml
+│ ├── users/
+│ │ ├── tasks/main.yml
+│ │ ├── defaults/main.yml
+│ │ └── vars/main.yml
+│ ├── packages/
+│ │ ├── tasks/main.yml
+│ │ └── vars/main.yml
+│ ├── firewall/
+│ │ ├── tasks/main.yml
+│ │ └── defaults/main.yml
+│ └── nginx/
+│ ├── tasks/main.yml
+│ ├── templates/nginx.conf.j2
+│ ├── handlers/main.yml
+│ └── defaults/main.yml
+├── playbooks/
+│ ├── site.yml
+│ ├── users.yml
+│ ├── packages.yml
+│ ├── security.yml
+│ └── update.yml
+├── vars/
+│ ├── secrets.yml (encrypted with Vault)
+│ └── common.yml
+├── scripts/
+│ └── ansible-vault-rotate.sh
+├── README.md
+└── requirements.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h1 id="-explanation-of-key-files"&gt;📌 Explanation of Key Files&lt;/h1&gt;
+&lt;h3 id="ansiblecfg"&gt;&lt;code&gt;ansible.cfg&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;A minimal config:&lt;/p&gt;</description></item><item><title>Fear</title><link>https://rowstu.net/personal/fear/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/fear/</guid><description>&lt;p&gt;Fear of life is really the fear of emotion. It is not the facts that we fear but our feelings about them&lt;/p&gt;
 &lt;p&gt;Fear conquered by greater fear of something worse is still fear&lt;/p&gt;
 &lt;h1 id="conquering-fear"&gt;Conquering Fear&lt;/h1&gt;
 &lt;p&gt;Excerpts from the writings of Paramahansa Yogananda&lt;/p&gt;
 &lt;p&gt;Do not take life&amp;rsquo;s experiences too seriously. Above all, do not let them hurt you, for in reality they are nothing but dream experiences&amp;hellip;.Trust in God and destroy fear, which paralyzes all efforts to succeed and attracts the very thing you fear.&lt;/p&gt;</description></item><item><title>Flow</title><link>https://rowstu.net/books/flow/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/flow/</guid><description>&lt;p&gt;Notes on the book Flow: The Psychology of Optimal Experience by Mihaly Csikszentmihalyi&lt;/p&gt;
 &lt;p&gt;The book explores the concept of &amp;ldquo;flow,&amp;rdquo; which is a state of mind characterized by total immersion in an activity.&lt;/p&gt;
 &lt;p&gt;In flow, people typically feel a sense of control, loss of self-consciousness, and enjoyment.&lt;/p&gt;
-&lt;p&gt;The book says that people are happiest when they are in a state of flow, and that achieving flow is essential for leading a fulfilling life.&lt;/p&gt;</description></item><item><title>Grammar</title><link>https://rowstu.net/personal/grammar/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/grammar/</guid><description>&lt;h1 id="grammar-groups"&gt;Grammar Groups&lt;/h1&gt;
+&lt;p&gt;The book says that people are happiest when they are in a state of flow, and that achieving flow is essential for leading a fulfilling life.&lt;/p&gt;</description></item><item><title>GitHub Actions Pipeline</title><link>https://rowstu.net/ansible/cicd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/ansible/cicd/</guid><description>&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Syntax check&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Role linting&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Playbook dry-run&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Optional: run Molecule tests&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="add-file"&gt;Add file:&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;.github/workflows/ansible-ci.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="workflow-ansible-ciyml"&gt;Workflow: &lt;code&gt;ansible-ci.yml&lt;/code&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Ansible CI&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;on&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;push&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;branches&lt;/span&gt;: [ &lt;span style="color:#ae81ff"&gt;main, master ]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;pull_request&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;jobs&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;lint&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;runs-on&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ubuntu-latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;steps&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Checkout repo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;uses&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;actions/checkout@v4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Setup Python&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;uses&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;actions/setup-python@v5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;with&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;python-version&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#39;3.11&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Install Ansible &amp;amp; tools&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; python -m pip install --upgrade pip
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; pip install ansible ansible-lint yamllint&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Lint YAML&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; yamllint -c .yamllint.yml .&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Lint Ansible&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; ansible-lint playbooks/*.yml roles/*/tasks/*.yml&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;syntax-check&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;runs-on&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;ubuntu-latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;needs&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;lint&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;steps&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Checkout repo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;uses&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;actions/checkout@v4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Install Ansible&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; python -m pip install --upgrade pip
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; pip install ansible&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; - &lt;span style="color:#f92672"&gt;name&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;Ansible syntax check&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;run&lt;/span&gt;: |&lt;span style="color:#e6db74"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt; ansible-playbook playbooks/site.yml --syntax-check -i inventory/staging.yml&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id="optional-molecule-tests"&gt;Optional: Molecule Tests&lt;/h1&gt;
+&lt;p&gt;If you want to add &lt;strong&gt;role testing&lt;/strong&gt;, you can enable Molecule.&lt;/p&gt;</description></item><item><title>Grammar</title><link>https://rowstu.net/personal/grammar/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/grammar/</guid><description>&lt;h3 id="building-words"&gt;Building words&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.uefap.org/vocabulary-building-affixes-roots/"&gt;https://www.uefap.org/vocabulary-building-affixes-roots/&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id="grammar-groups"&gt;Grammar Groups&lt;/h1&gt;
 &lt;h2 id="nouns"&gt;Nouns&lt;/h2&gt;
 &lt;p&gt;A noun is a person, place, thing, or idea. It can be the subject or object of a sentence.&lt;/p&gt;
 &lt;ul&gt;
@@ -3623,7 +4121,26 @@ Billy Connolly - Rambling Man
 Arnie - Be useful
 Prosperity consciousness by Philip lehrman
 Fantastic voyage by Ray kurzweil
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Lockdown Firefox</title><link>https://rowstu.net/linux/lockdown-firefox/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/lockdown-firefox/</guid><description>&lt;h1 id="aboutconfig-settings-to-make-firefox-more-secure"&gt;about:config settings to make Firefox more secure&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Linux from scratch</title><link>https://rowstu.net/linux/scratch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/scratch/</guid><description>&lt;p&gt;Experimenting with building bare bones Linux OS without having to build the Linux from scratch sources.&lt;/p&gt;
+&lt;h3 id="1-prepare-the-environment"&gt;&lt;strong&gt;1. Prepare the Environment&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Boot into a live Linux environment using an ArchLinux, Debian, or RHEL-based ISO.&lt;/li&gt;
+&lt;li&gt;Ensure you have tools like &lt;code&gt;fdisk&lt;/code&gt;, &lt;code&gt;mkfs&lt;/code&gt;, and &lt;code&gt;wget&lt;/code&gt; available.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id="2-partition-and-format-the-disk"&gt;&lt;strong&gt;2. Partition and Format the Disk&lt;/strong&gt;&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Partition the Disk:&lt;/strong&gt;
+Use &lt;code&gt;fdisk&lt;/code&gt; or &lt;code&gt;parted&lt;/code&gt; to create:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Boot Partition (e.g., 1 GB, ext4).&lt;/li&gt;
+&lt;li&gt;Root Partition (e.g., 20–50 GB, ext4).&lt;/li&gt;
+&lt;li&gt;Optional Swap Partition.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Format the Partitions:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Lockdown Firefox</title><link>https://rowstu.net/linux/lockdown-firefox/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/lockdown-firefox/</guid><description>&lt;h1 id="aboutconfig-settings-to-make-firefox-more-secure"&gt;about:config settings to make Firefox more secure&lt;/h1&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;geo.enabled: FALSE: This disables Firefox from sharing your location. 
 browser.safebrowsing.malware.enabled: FALSE: This disables Google’s malware monitoring. 
 dom.battery.enabled: FALSE: This setting blocks sending battery level information. 
@@ -3823,7 +4340,58 @@ if __name__ == &amp;#34;__main__&amp;#34;:
 &lt;p&gt;(()((())))&lt;/p&gt;
 &lt;p&gt;(()(()(()))&lt;/p&gt;
 &lt;p&gt;Sample output&lt;/p&gt;
-&lt;p&gt;yes&lt;/p&gt;</description></item><item><title>Pdf</title><link>https://rowstu.net/linux/pdf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/pdf/</guid><description>&lt;h1 id="working-with-pdf-files"&gt;Working with pdf files&lt;/h1&gt;
+&lt;p&gt;yes&lt;/p&gt;</description></item><item><title>OpenShift &amp; Kubernetes</title><link>https://rowstu.net/kubernetes/openshift/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/kubernetes/openshift/</guid><description>&lt;h3 id="what-openshift-is"&gt;What OpenShift Is&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;OpenShift&lt;/strong&gt; is &lt;strong&gt;Red Hat’s enterprise Kubernetes distribution&lt;/strong&gt; that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ships with Kubernetes plus opinionated defaults&lt;/li&gt;
+&lt;li&gt;Adds enterprise security, CI/CD, and developer tooling&lt;/li&gt;
+&lt;li&gt;Enforces stricter security (non-root containers by default)&lt;/li&gt;
+&lt;li&gt;Includes built-in components (Ingress, Registry, Monitoring, OAuth)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Think of OpenShift as:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;“Kubernetes + guardrails + batteries included”&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h3 id="how-they-relate"&gt;How They Relate&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Kubernetes&lt;/th&gt;
+ &lt;th&gt;OpenShift&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Upstream project&lt;/td&gt;
+ &lt;td&gt;Enterprise distribution&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;DIY setup&lt;/td&gt;
+ &lt;td&gt;Opinionated &amp;amp; integrated&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Flexible but risky&lt;/td&gt;
+ &lt;td&gt;Secure by default&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Many add-ons&lt;/td&gt;
+ &lt;td&gt;Built-in platform services&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;OpenShift &lt;strong&gt;is Kubernetes&lt;/strong&gt;, but &lt;strong&gt;not all Kubernetes clusters behave like OpenShift&lt;/strong&gt;.&lt;/p&gt;</description></item><item><title>OverTheWire Notes</title><link>https://rowstu.net/overthewire/guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/overthewire/guide/</guid><description>&lt;h3 id="essential-setup"&gt;Essential Setup&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Basic SSH connection pattern used across games&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;ssh username@game.labs.overthewire.org -p PORT
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Create working directories in /tmp for scratch work&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;mktemp -d
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="bandit-linux-command-line-fundamentals"&gt;Bandit: Linux Command Line Fundamentals&lt;/h2&gt;
+&lt;p&gt;Bandit is the ideal starting point, teaching essential Linux skills through 33+ progressive levels. Each level reveals a password needed for the next, reinforcing the concept that access builds on knowledge.&lt;/p&gt;
+&lt;h3 id="core-concepts-covered"&gt;Core Concepts Covered&lt;/h3&gt;
+&lt;h4 id="1-file-navigation-and-reading"&gt;1. File Navigation and Reading&lt;/h4&gt;
+&lt;p&gt;The earliest levels teach fundamental file operations:&lt;/p&gt;</description></item><item><title>Pdf</title><link>https://rowstu.net/linux/pdf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/pdf/</guid><description>&lt;h1 id="working-with-pdf-files"&gt;Working with pdf files&lt;/h1&gt;
 &lt;p&gt;reduce the file size of a pdf&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;# ensure ghostscript is installed to use postscript tools
 pacman -S ghostscript
@@ -4014,8 +4582,7 @@ ps2pdf -dPDFSETTINGS=/ebook input.pdf output.pdf
 &lt;/table&gt;</description></item><item><title>Phrases</title><link>https://rowstu.net/personal/phrases/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/phrases/</guid><description>&lt;h1 id="notes-on-phrases-used-in-language"&gt;Notes on Phrases used in language&lt;/h1&gt;
 &lt;h2 id="privacy"&gt;Privacy&lt;/h2&gt;
 &lt;p&gt;Arguing that you don&amp;rsquo;t care about the right to privacy because you have nothing to hide is no different than saying you don&amp;rsquo;t care about free speech because you have nothing to say. &amp;ndash; Edward Snowdon&lt;/p&gt;
-&lt;p&gt;How to reply to &amp;ldquo;If you&amp;rsquo;ve done nothing wrong, you have nothing to hide.&amp;rdquo; - &amp;ldquo;Then why do you have a bathroom door? What wrong things are you doing in that bathroom when you close that door?&lt;/p&gt;</description></item><item><title>Prefixes Suffixes</title><link>https://rowstu.net/personal/prefixes-suffixes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/prefixes-suffixes/</guid><description>&lt;h3 id="building-words"&gt;Building words&lt;/h3&gt;
-&lt;p&gt;&lt;a href="https://www.uefap.com/vocab/build/building.htm"&gt;https://www.uefap.com/vocab/build/building.htm&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Proxmox notes</title><link>https://rowstu.net/proxmox/notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/proxmox/notes/</guid><description>&lt;p&gt;&lt;strong&gt;Proxmox VE&lt;/strong&gt; is an open-source virtualization platform based on &lt;strong&gt;Debian Linux&lt;/strong&gt; that integrates:&lt;/p&gt;
+&lt;p&gt;How to reply to &amp;ldquo;If you&amp;rsquo;ve done nothing wrong, you have nothing to hide.&amp;rdquo; - &amp;ldquo;Then why do you have a bathroom door? What wrong things are you doing in that bathroom when you close that door?&lt;/p&gt;</description></item><item><title>Proxmox notes</title><link>https://rowstu.net/proxmox/notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/proxmox/notes/</guid><description>&lt;p&gt;&lt;strong&gt;Proxmox VE&lt;/strong&gt; is an open-source virtualization platform based on &lt;strong&gt;Debian Linux&lt;/strong&gt; that integrates:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;KVM&lt;/strong&gt; – full virtual machines (Windows, Linux, BSD)&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;LXC&lt;/strong&gt; – lightweight system containers&lt;/li&gt;
@@ -4526,7 +5093,33 @@ There is nothing either good or bad but thinking makes it so.
 
 In my whole life, I have known no wise people who didn’t read all the time - none ... ZERO.
 -Charlie Munger
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Regex Examples</title><link>https://rowstu.net/python/regex-examples/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/regex-examples/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import re
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Raspberry Pi from scratch</title><link>https://rowstu.net/linux/pi-scratch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/pi-scratch/</guid><description>&lt;h3 id="1-prepare-the-sd-card"&gt;&lt;strong&gt;1. Prepare the SD Card&lt;/strong&gt;&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Insert the SD Card:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Insert the SD card into your computer.&lt;/li&gt;
+&lt;li&gt;Identify the device name (e.g., &lt;code&gt;/dev/sdX&lt;/code&gt;) using &lt;code&gt;lsblk&lt;/code&gt; or &lt;code&gt;fdisk -l&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Partition the SD Card:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Use &lt;code&gt;fdisk&lt;/code&gt; to create:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Boot Partition:&lt;/strong&gt; FAT32, ~128 MB (for the Pi’s firmware and kernel).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Root Partition:&lt;/strong&gt; ext4, the remaining space (for the OS).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fdisk /dev/sdX
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Create a partition table (&lt;code&gt;o&lt;/code&gt;), then partitions (&lt;code&gt;n&lt;/code&gt;), and write (&lt;code&gt;w&lt;/code&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Format the Partitions:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Regex Examples</title><link>https://rowstu.net/python/regex-examples/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/regex-examples/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import re
 
 def regex_examples():
  # 1. Basic Pattern Matching
@@ -4970,7 +5563,21 @@ Maltego: &lt;a href="https://www.maltego.com/"&gt;https://www.maltego.com/&lt;/a
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;output&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;website_endpoint&amp;#34;&lt;/span&gt; {
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; value &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;aws_s3_bucket_website_configuration&lt;/span&gt;.&lt;span style="color:#66d9ef"&gt;website&lt;/span&gt;.&lt;span style="color:#66d9ef"&gt;website_endpoint&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item><item><title>Simplify Expressions</title><link>https://rowstu.net/maths/simplify_expressions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/maths/simplify_expressions/</guid><description>&lt;h1 id="simplifying-expressions"&gt;Simplifying Expressions&lt;/h1&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item><item><title>sed &amp; awk notes</title><link>https://rowstu.net/linux/sed-awk/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/sed-awk/</guid><description>&lt;h1 id="1-introduction-to-sed--awk"&gt;&lt;strong&gt;1. Introduction to sed &amp;amp; awk&lt;/strong&gt;&lt;/h1&gt;
+&lt;h2 id="11-what-is"&gt;&lt;strong&gt;1.1 What is &lt;code&gt;sed&lt;/code&gt;?&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;sed&lt;/code&gt; (Stream EDitor) is a &lt;strong&gt;line-based text processor&lt;/strong&gt; that reads input line-by-line, applies operations, and outputs the result.
+It’s ideal for &lt;strong&gt;simple text transformations&lt;/strong&gt;, like substitutions and deletions.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Typical uses:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Find-and-replace text&lt;/li&gt;
+&lt;li&gt;Delete lines&lt;/li&gt;
+&lt;li&gt;Insert lines&lt;/li&gt;
+&lt;li&gt;Basic file editing in pipelines&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="12-what-is"&gt;&lt;strong&gt;1.2 What is &lt;code&gt;awk&lt;/code&gt;?&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;awk&lt;/code&gt; is a &lt;strong&gt;pattern scanning and processing language&lt;/strong&gt;.
+It is used for &lt;strong&gt;structured text&lt;/strong&gt;, especially &lt;strong&gt;column-based data&lt;/strong&gt;.&lt;/p&gt;</description></item><item><title>Simplify Expressions</title><link>https://rowstu.net/maths/simplify_expressions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/maths/simplify_expressions/</guid><description>&lt;h1 id="simplifying-expressions"&gt;Simplifying Expressions&lt;/h1&gt;
 &lt;h2 id="problem"&gt;Problem&lt;/h2&gt;
 &lt;p&gt;Simplify the following expression:&lt;/p&gt;
 &lt;pre style="font-size: 1.2em; text-align: center; padding: 1em;"&gt;
@@ -5034,7 +5641,63 @@ sudo_provider = ipa
 &lt;pre tabindex="0"&gt;&lt;code&gt;sudo sssctl cache-expire
 sudo sssctl domain-list
 sudo sssctl user-checks username
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;add debug to logging sssd.conf&lt;/p&gt;</description></item><item><title>Suffering Desire</title><link>https://rowstu.net/personal/suffering-desire/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/suffering-desire/</guid><description>&lt;h1 id="notes-on-suffering-and-desire"&gt;Notes on Suffering and Desire&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;add debug to logging sssd.conf&lt;/p&gt;</description></item><item><title>Storage notes</title><link>https://rowstu.net/linux/storage/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/storage/</guid><description>&lt;h2 id="local-storage"&gt;Local Storage&lt;/h2&gt;
+&lt;p&gt;Local storage is directly attached to a host (SATA/SAS/NVMe). It offers low latency and high performance but limited sharing unless abstracted.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="software-raid"&gt;Software RAID&lt;/h2&gt;
+&lt;h3 id="what-it-is"&gt;What It Is&lt;/h3&gt;
+&lt;p&gt;RAID implemented by the operating system (e.g., &lt;code&gt;mdadm&lt;/code&gt; on Linux, Windows Storage Spaces).&lt;/p&gt;
+&lt;h3 id="common-raid-levels"&gt;Common RAID Levels&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;RAID&lt;/th&gt;
+ &lt;th&gt;Min Disks&lt;/th&gt;
+ &lt;th&gt;Fault Tolerance&lt;/th&gt;
+ &lt;th&gt;Performance&lt;/th&gt;
+ &lt;th&gt;Use Case&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;RAID 0&lt;/td&gt;
+ &lt;td&gt;2&lt;/td&gt;
+ &lt;td&gt;None&lt;/td&gt;
+ &lt;td&gt;Excellent&lt;/td&gt;
+ &lt;td&gt;Scratch, ephemeral data&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;RAID 1&lt;/td&gt;
+ &lt;td&gt;2&lt;/td&gt;
+ &lt;td&gt;1 disk&lt;/td&gt;
+ &lt;td&gt;Good reads&lt;/td&gt;
+ &lt;td&gt;OS disks&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;RAID 5&lt;/td&gt;
+ &lt;td&gt;3&lt;/td&gt;
+ &lt;td&gt;1 disk&lt;/td&gt;
+ &lt;td&gt;Read-heavy&lt;/td&gt;
+ &lt;td&gt;Legacy arrays&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;RAID 6&lt;/td&gt;
+ &lt;td&gt;4&lt;/td&gt;
+ &lt;td&gt;2 disks&lt;/td&gt;
+ &lt;td&gt;Slower writes&lt;/td&gt;
+ &lt;td&gt;Large SATA arrays&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;RAID 10&lt;/td&gt;
+ &lt;td&gt;4&lt;/td&gt;
+ &lt;td&gt;1 per mirror&lt;/td&gt;
+ &lt;td&gt;Excellent&lt;/td&gt;
+ &lt;td&gt;Databases, VMs&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Rule of thumb&lt;/strong&gt;: RAID 10 beats RAID 5/6 for rebuild speed and predictability.&lt;/p&gt;</description></item><item><title>Suffering Desire</title><link>https://rowstu.net/personal/suffering-desire/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/suffering-desire/</guid><description>&lt;h1 id="notes-on-suffering-and-desire"&gt;Notes on Suffering and Desire&lt;/h1&gt;
 &lt;p&gt;The more you desire something, the more it slips from your grasp. the more you seek, the more you lose the way.&lt;/p&gt;
 &lt;p&gt;What to do, well, nothing, you can&amp;rsquo;t simply say, &amp;ldquo;stop desiring&amp;rdquo;. It just won&amp;rsquo;t work, in the same way that you cannot stop thinking about something by thinking about it. It&amp;rsquo;s a paradox, that exists because of thought.&lt;/p&gt;
 &lt;p&gt;So how do you achieve something? In simple terms, you don&amp;rsquo;t? By trying to achieve, you are pushing away. by relaxing and going with the flow of things is where the magic happens, being with the universe, saying yes, all of these things are going with the flow.&lt;/p&gt;</description></item><item><title>Sysadmin Tools</title><link>https://rowstu.net/personal/sysadmin-tools/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/sysadmin-tools/</guid><description>&lt;h1 id="sites-for-sysadmin-tasks"&gt;Sites for sysadmin tasks&lt;/h1&gt;
@@ -5050,7 +5713,70 @@ sudo sssctl user-checks username
 &lt;p&gt;&lt;a href="https://ifelse.io/2019/01/12/secure-ad-free-internet-anywhere-with-streisand-and-pi-hole/"&gt;https://ifelse.io/2019/01/12/secure-ad-free-internet-anywhere-with-streisand-and-pi-hole/&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id="bash"&gt;BASH&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://github.com/onceupon/Bash-Oneliner"&gt;https://github.com/onceupon/Bash-Oneliner&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://github.com/metal3d/bashsimplecurses"&gt;https://github.com/metal3d/bashsimplecurses&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Teach</title><link>https://rowstu.net/personal/teach/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/teach/</guid><description>&lt;h1 id="ideas-list-for-what-to-teach-my-kids"&gt;Ideas list for what to teach my kids&lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://github.com/metal3d/bashsimplecurses"&gt;https://github.com/metal3d/bashsimplecurses&lt;/a&gt;&lt;/p&gt;</description></item><item><title>systemd - Notes, Procedures, and Best Practices</title><link>https://rowstu.net/linux/systemd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/systemd/</guid><description>&lt;h2 id="1-introduction-to-systemd"&gt;1. Introduction to systemd&lt;/h2&gt;
+&lt;h3 id="what-systemd-is"&gt;What systemd Is&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;systemd&lt;/strong&gt; is the init system and service manager used by most modern Linux distributions (RHEL, Fedora, Debian, Ubuntu, Arch, SUSE).&lt;/p&gt;
+&lt;p&gt;It is responsible for:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bootstrapping the system (PID 1)&lt;/li&gt;
+&lt;li&gt;Starting and stopping services&lt;/li&gt;
+&lt;li&gt;Managing dependencies&lt;/li&gt;
+&lt;li&gt;Logging (journald)&lt;/li&gt;
+&lt;li&gt;Resource control (cgroups)&lt;/li&gt;
+&lt;li&gt;Timers, sockets, mounts, devices, and more&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="purpose"&gt;Purpose&lt;/h3&gt;
+&lt;p&gt;systemd replaces fragmented tooling with a &lt;strong&gt;unified, dependency-aware, event-driven framework&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3 id="how-systemd-differs-from-other-init-systems"&gt;How systemd Differs from Other Init Systems&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Feature&lt;/th&gt;
+ &lt;th&gt;sysvinit&lt;/th&gt;
+ &lt;th&gt;Upstart&lt;/th&gt;
+ &lt;th&gt;systemd&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Dependency handling&lt;/td&gt;
+ &lt;td&gt;Manual&lt;/td&gt;
+ &lt;td&gt;Event-based&lt;/td&gt;
+ &lt;td&gt;Automatic, declarative&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Parallel startup&lt;/td&gt;
+ &lt;td&gt;❌&lt;/td&gt;
+ &lt;td&gt;⚠️&lt;/td&gt;
+ &lt;td&gt;✅&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Service monitoring&lt;/td&gt;
+ &lt;td&gt;❌&lt;/td&gt;
+ &lt;td&gt;⚠️&lt;/td&gt;
+ &lt;td&gt;✅&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Logging&lt;/td&gt;
+ &lt;td&gt;syslog&lt;/td&gt;
+ &lt;td&gt;syslog&lt;/td&gt;
+ &lt;td&gt;journald&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Resource control&lt;/td&gt;
+ &lt;td&gt;❌&lt;/td&gt;
+ &lt;td&gt;❌&lt;/td&gt;
+ &lt;td&gt;cgroups&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Socket activation&lt;/td&gt;
+ &lt;td&gt;❌&lt;/td&gt;
+ &lt;td&gt;❌&lt;/td&gt;
+ &lt;td&gt;✅&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Key difference: &lt;strong&gt;systemd manages &lt;em&gt;state&lt;/em&gt;&lt;/strong&gt;, not just process start/stop.&lt;/p&gt;</description></item><item><title>Teach</title><link>https://rowstu.net/personal/teach/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/personal/teach/</guid><description>&lt;h1 id="ideas-list-for-what-to-teach-my-kids"&gt;Ideas list for what to teach my kids&lt;/h1&gt;
 &lt;ul&gt;
 &lt;li&gt;How to send a good email&lt;/li&gt;
 &lt;li&gt;Role models to pick&lt;/li&gt;
@@ -6773,7 +7499,23 @@ Visual: v V Ctrl+v &amp;gt; &amp;lt; =
 Search: / ? n N * # :%s/old/new/g
 Windows: Ctrl+w s/v/h/j/k/l/q
 Files: :e :w :q :wq :ls :bn :bp
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>VMware ESXi- Notes, Procedures &amp; Best Practices</title><link>https://rowstu.net/vmware/esxi_notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/esxi_notes/</guid><description>&lt;p&gt;VMware ESXi is a &lt;strong&gt;bare-metal hypervisor&lt;/strong&gt; that installs directly on server hardware and enables you to run multiple virtual machines (VMs) on a single physical host.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>VMware Aria</title><link>https://rowstu.net/vmware/aria/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/aria/</guid><description>&lt;p&gt;&lt;strong&gt;Aria Operations&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Unified operations management: performance, capacity, configuration, and compliance across vSphere and hybrid cloud. (&lt;a href="https://techdocs.broadcom.com/us/en/vmware-cis/aria.html?utm_source=chatgpt.com" title="VMware Aria - Broadcom Techdocs"&gt;techdocs.broadcom.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Predictive analytics and intelligent remediation with dashboards and alerts. (&lt;a href="https://techdocs.broadcom.com/us/en/vmware-cis/aria.html?utm_source=chatgpt.com" title="VMware Aria - Broadcom Techdocs"&gt;techdocs.broadcom.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;NSX-centric dashboards showing distributed firewall, edge performance and transport node metrics. (&lt;a href="https://techdocs2-prod.adobecqms.net/content/dam/broadcom/techdocs/us/en/pdf/vmware/aria/aria-operations/vmware-aria-operations-8-18.pdf?utm_source=chatgpt.com" title="VMware Aria Operations 8.18"&gt;techdocs2-prod.adobecqms.net&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Aria Automation&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Infrastructure provisioning and lifecycle automation (formerly vRealize Automation). (&lt;a href="https://techdocs.broadcom.com/us/en/vmware-cis/aria.html?utm_source=chatgpt.com" title="VMware Aria - Broadcom Techdocs"&gt;techdocs.broadcom.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Self-service catalog, policy-based governance, “infrastructure-as-code” templates. (&lt;a href="https://www.vmware.com/content/dam/digitalmarketing/vmware/en/pdf/products/aria-automation-config-ds.pdf?utm_source=chatgpt.com" title="Datasheet 
+VMware Aria Automation 
+Modern infrastr"&gt;vmware.com&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Native integrations: REST APIs, SaltStack config automation, Network and Kubernetes automation. (&lt;a href="https://www.vmware.com/content/dam/digitalmarketing/vmware/en/pdf/products/aria-automation-config-ds.pdf?utm_source=chatgpt.com" title="Datasheet 
+VMware Aria Automation 
+Modern infrastr"&gt;vmware.com&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Aria Operations for Networks&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>VMware ESXi</title><link>https://rowstu.net/vmware/esxi_notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/esxi_notes/</guid><description>&lt;p&gt;VMware ESXi is a &lt;strong&gt;bare-metal hypervisor&lt;/strong&gt; that installs directly on server hardware and enables you to run multiple virtual machines (VMs) on a single physical host.&lt;/p&gt;
 &lt;h3 id="key-concepts"&gt;&lt;strong&gt;Key Concepts&lt;/strong&gt;&lt;/h3&gt;
 &lt;table&gt;
  &lt;thead&gt;
@@ -6843,7 +7585,7 @@ Files: :e :w :q :wq :ls :bn :bp
 &lt;h3 id="requirements"&gt;&lt;strong&gt;Requirements&lt;/strong&gt;&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;strong&gt;ESXi ISO&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>VMware NSX - Notes, Procedures &amp; Best Practices</title><link>https://rowstu.net/vmware/nsx_notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/nsx_notes/</guid><description>&lt;p&gt;VMware NSX is a &lt;strong&gt;software-defined networking (SDN)&lt;/strong&gt; platform that virtualizes network functions and security services, enabling network automation, micro-segmentation, and scalable network operations inside virtualized environments.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ESXi ISO&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>VMware NSX</title><link>https://rowstu.net/vmware/nsx_notes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/nsx_notes/</guid><description>&lt;p&gt;VMware NSX is a &lt;strong&gt;software-defined networking (SDN)&lt;/strong&gt; platform that virtualizes network functions and security services, enabling network automation, micro-segmentation, and scalable network operations inside virtualized environments.&lt;/p&gt;
 &lt;h3 id="core-value"&gt;&lt;strong&gt;Core Value&lt;/strong&gt;&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Network abstraction&lt;/strong&gt;: decouples network services from physical hardware&lt;/li&gt;

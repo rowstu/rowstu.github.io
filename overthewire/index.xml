@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Overthewires on rowstu.net</title><link>https://rowstu.net/overthewire/</link><description>Recent content in Overthewires on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/overthewire/index.xml" rel="self" type="application/rss+xml"/><item><title>OverTheWire Notes</title><link>https://rowstu.net/overthewire/guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/overthewire/guide/</guid><description>&lt;h3 id="essential-setup"&gt;Essential Setup&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Basic SSH connection pattern used across games&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;ssh username@game.labs.overthewire.org -p PORT
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Create working directories in /tmp for scratch work&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;mktemp -d
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="bandit-linux-command-line-fundamentals"&gt;Bandit: Linux Command Line Fundamentals&lt;/h2&gt;
+&lt;p&gt;Bandit is the ideal starting point, teaching essential Linux skills through 33+ progressive levels. Each level reveals a password needed for the next, reinforcing the concept that access builds on knowledge.&lt;/p&gt;
+&lt;h3 id="core-concepts-covered"&gt;Core Concepts Covered&lt;/h3&gt;
+&lt;h4 id="1-file-navigation-and-reading"&gt;1. File Navigation and Reading&lt;/h4&gt;
+&lt;p&gt;The earliest levels teach fundamental file operations:&lt;/p&gt;</description></item></channel></rss>

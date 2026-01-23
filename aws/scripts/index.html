@@ -1,0 +1,166 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>AWS example CLI scripts // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>AWS example CLI scripts</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/awsscripts/>Awsscripts</a></div><div class="card markdown-content"><h2 id=repository-structure>Repository Structure</h2><pre tabindex=0><code>aws-cli-automation/
+├── README.md
+├── scripts/
+│   ├── ec2/
+│   │   ├── launch-ec2.sh
+│   │   ├── terminate-ec2.sh
+│   │   ├── list-ec2.sh
+│   ├── s3/
+│   │   ├── sync-to-s3.sh
+│   │   ├── delete-old-objects.sh
+│   ├── iam/
+│   │   ├── create-role.sh
+│   │   ├── attach-policy.sh
+│   ├── lambda/
+│   │   ├── deploy-lambda.sh
+│   │   ├── invoke-lambda.sh
+│   ├── common/
+│   │   ├── aws-env.sh
+│   │   ├── utils.sh
+├── ci/
+│   ├── github-actions/
+│   │   ├── deploy.yml
+│   │   ├── lint.yml
+└── .gitignore
+</code></pre><hr><h1 id=core-automation-scripts>Core Automation Scripts</h1><h2 id=scriptscommonaws-envsh><code>scripts/common/aws-env.sh</code></h2><p>This loads AWS profile, region, and output format.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Set AWS profile and region</span>
+</span></span><span style=display:flex><span>AWS_PROFILE<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>AWS_PROFILE<span style=color:#66d9ef>:-</span>default<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>AWS_REGION<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>AWS_REGION<span style=color:#66d9ef>:-</span>us-east-1<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>export AWS_PROFILE AWS_REGION
+</span></span></code></pre></div><hr><h2 id=scriptscommonutilssh><code>scripts/common/utils.sh</code></h2><p>Reusable helpers.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> log<span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  echo <span style=color:#e6db74>&#34;[</span><span style=color:#66d9ef>$(</span>date +<span style=color:#e6db74>&#39;%Y-%m-%d %H:%M:%S&#39;</span><span style=color:#66d9ef>)</span><span style=color:#e6db74>] </span>$*<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> die<span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  log <span style=color:#e6db74>&#34;ERROR: </span>$*<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>  exit <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><hr><h2 id=ec2-scripts>EC2 Scripts</h2><h3 id=scriptsec2launch-ec2sh><code>scripts/ec2/launch-ec2.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>source ../common/aws-env.sh
+</span></span><span style=display:flex><span>source ../common/utils.sh
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>AMI_ID<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>AMI_ID<span style=color:#66d9ef>:-</span>ami-0abcdef1234567890<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>INSTANCE_TYPE<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>INSTANCE_TYPE<span style=color:#66d9ef>:-</span>t3.micro<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>KEY_NAME<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>KEY_NAME<span style=color:#66d9ef>:-</span>my-keypair<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>SEC_GROUP<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>SEC_GROUP<span style=color:#66d9ef>:-</span>sg-0123456789abcdef0<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>SUBNET_ID<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>SUBNET_ID<span style=color:#66d9ef>:-</span>subnet-0123456789abcdef0<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Launching EC2 instance...&#34;</span>
+</span></span><span style=display:flex><span>aws ec2 run-instances <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --image-id <span style=color:#e6db74>&#34;</span>$AMI_ID<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --instance-type <span style=color:#e6db74>&#34;</span>$INSTANCE_TYPE<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --key-name <span style=color:#e6db74>&#34;</span>$KEY_NAME<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --security-group-ids <span style=color:#e6db74>&#34;</span>$SEC_GROUP<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --subnet-id <span style=color:#e6db74>&#34;</span>$SUBNET_ID<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --count <span style=color:#ae81ff>1</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --tag-specifications <span style=color:#e6db74>&#39;ResourceType=instance,Tags=[{Key=Name,Value=automation-instance}]&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;EC2 instance launched.&#34;</span>
+</span></span></code></pre></div><hr><h3 id=scriptsec2terminate-ec2sh><code>scripts/ec2/terminate-ec2.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>source ../common/aws-env.sh
+</span></span><span style=display:flex><span>source ../common/utils.sh
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>INSTANCE_ID<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>INSTANCE_ID:?Provide INSTANCE_ID<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Terminating EC2 instance </span>$INSTANCE_ID<span style=color:#e6db74>...&#34;</span>
+</span></span><span style=display:flex><span>aws ec2 terminate-instances --instance-ids <span style=color:#e6db74>&#34;</span>$INSTANCE_ID<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Termination requested.&#34;</span>
+</span></span></code></pre></div><hr><h2 id=s3-scripts>S3 Scripts</h2><h3 id=scriptss3sync-to-s3sh><code>scripts/s3/sync-to-s3.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>source ../common/aws-env.sh
+</span></span><span style=display:flex><span>source ../common/utils.sh
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>LOCAL_DIR<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>LOCAL_DIR:?Provide LOCAL_DIR<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>BUCKET<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>BUCKET:?Provide BUCKET<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Syncing </span>$LOCAL_DIR<span style=color:#e6db74> to s3://</span>$BUCKET<span style=color:#e6db74> ...&#34;</span>
+</span></span><span style=display:flex><span>aws s3 sync <span style=color:#e6db74>&#34;</span>$LOCAL_DIR<span style=color:#e6db74>&#34;</span> <span style=color:#e6db74>&#34;s3://</span>$BUCKET<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Sync complete.&#34;</span>
+</span></span></code></pre></div><hr><h3 id=scriptss3delete-old-objectssh><code>scripts/s3/delete-old-objects.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>source ../common/aws-env.sh
+</span></span><span style=display:flex><span>source ../common/utils.sh
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>BUCKET<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>BUCKET:?Provide BUCKET<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>DAYS<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>DAYS<span style=color:#66d9ef>:-</span>30<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Deleting objects older than </span>$DAYS<span style=color:#e6db74> days in s3://</span>$BUCKET<span style=color:#e6db74> ...&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>aws s3api list-objects-v2 --bucket <span style=color:#e6db74>&#34;</span>$BUCKET<span style=color:#e6db74>&#34;</span> --query <span style=color:#e6db74>&#34;Contents[?LastModified&lt;=\`</span><span style=color:#66d9ef>$(</span>date -d <span style=color:#e6db74>&#34;</span>$DAYS<span style=color:#e6db74> days ago&#34;</span> --utc +%Y-%m-%dT%H:%M:%SZ<span style=color:#66d9ef>)</span><span style=color:#e6db74>\`]&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --output json | jq -r <span style=color:#e6db74>&#39;.[].Key&#39;</span> | <span style=color:#66d9ef>while</span> read -r key; <span style=color:#66d9ef>do</span>
+</span></span><span style=display:flex><span>    aws s3 rm <span style=color:#e6db74>&#34;s3://</span>$BUCKET<span style=color:#e6db74>/</span>$key<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>done</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Old objects deleted.&#34;</span>
+</span></span></code></pre></div><hr><h2 id=iam-scripts>IAM Scripts</h2><h3 id=scriptsiamcreate-rolesh><code>scripts/iam/create-role.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>source ../common/aws-env.sh
+</span></span><span style=display:flex><span>source ../common/utils.sh
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>ROLE_NAME<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>ROLE_NAME:?Provide ROLE_NAME<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>TRUST_POLICY_FILE<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>TRUST_POLICY_FILE:?Provide TRUST_POLICY_FILE<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Creating role </span>$ROLE_NAME<span style=color:#e6db74> ...&#34;</span>
+</span></span><span style=display:flex><span>aws iam create-role <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --role-name <span style=color:#e6db74>&#34;</span>$ROLE_NAME<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --assume-role-policy-document file://<span style=color:#e6db74>&#34;</span>$TRUST_POLICY_FILE<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Role created.&#34;</span>
+</span></span></code></pre></div><hr><h3 id=scriptsiamattach-policysh><code>scripts/iam/attach-policy.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>source ../common/aws-env.sh
+</span></span><span style=display:flex><span>source ../common/utils.sh
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>ROLE_NAME<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>ROLE_NAME:?Provide ROLE_NAME<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>POLICY_ARN<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>POLICY_ARN:?Provide POLICY_ARN<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Attaching policy </span>$POLICY_ARN<span style=color:#e6db74> to role </span>$ROLE_NAME<span style=color:#e6db74> ...&#34;</span>
+</span></span><span style=display:flex><span>aws iam attach-role-policy --role-name <span style=color:#e6db74>&#34;</span>$ROLE_NAME<span style=color:#e6db74>&#34;</span> --policy-arn <span style=color:#e6db74>&#34;</span>$POLICY_ARN<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Policy attached.&#34;</span>
+</span></span></code></pre></div><hr><h2 id=lambda-scripts>Lambda Scripts</h2><h3 id=scriptslambdadeploy-lambdash><code>scripts/lambda/deploy-lambda.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>source ../common/aws-env.sh
+</span></span><span style=display:flex><span>source ../common/utils.sh
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>FUNCTION_NAME<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>FUNCTION_NAME:?Provide FUNCTION_NAME<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>ZIP_FILE<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>ZIP_FILE:?Provide ZIP_FILE<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>ROLE_ARN<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>ROLE_ARN:?Provide ROLE_ARN<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>HANDLER<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>HANDLER<span style=color:#66d9ef>:-</span>index.handler<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>RUNTIME<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>RUNTIME<span style=color:#66d9ef>:-</span>nodejs18.x<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Deploying Lambda function </span>$FUNCTION_NAME<span style=color:#e6db74> ...&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>aws lambda create-function <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --function-name <span style=color:#e6db74>&#34;</span>$FUNCTION_NAME<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --runtime <span style=color:#e6db74>&#34;</span>$RUNTIME<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --role <span style=color:#e6db74>&#34;</span>$ROLE_ARN<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --handler <span style=color:#e6db74>&#34;</span>$HANDLER<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --zip-file <span style=color:#e6db74>&#34;fileb://</span>$ZIP_FILE<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --publish
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Lambda deployed.&#34;</span>
+</span></span></code></pre></div><hr><h3 id=scriptslambdainvoke-lambdash><code>scripts/lambda/invoke-lambda.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span>set -euo pipefail
+</span></span><span style=display:flex><span>source ../common/aws-env.sh
+</span></span><span style=display:flex><span>source ../common/utils.sh
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>FUNCTION_NAME<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>FUNCTION_NAME:?Provide FUNCTION_NAME<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>PAYLOAD<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>PAYLOAD<span style=color:#66d9ef>:-</span>{<span style=color:#e6db74>}</span><span style=color:#e6db74>}&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Invoking </span>$FUNCTION_NAME<span style=color:#e6db74> ...&#34;</span>
+</span></span><span style=display:flex><span>aws lambda invoke <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --function-name <span style=color:#e6db74>&#34;</span>$FUNCTION_NAME<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --payload <span style=color:#e6db74>&#34;</span>$PAYLOAD<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  output.json
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Output saved to output.json&#34;</span>
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>
