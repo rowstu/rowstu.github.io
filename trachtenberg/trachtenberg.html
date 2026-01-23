@@ -1,0 +1,2941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trachtenberg Speed Mathematics</title>
+
+    <!-- Distinctive Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* =============================================
+           CSS VARIABLES & THEME
+           A warm, academic aesthetic inspired by
+           vintage mathematics textbooks
+           ============================================= */
+        :root {
+            /* Primary palette - aged parchment & ink */
+            --bg-primary: #f7f3eb;
+            --bg-secondary: #efe9dd;
+            --bg-card: #fffef9;
+            --bg-dark: #2c2520;
+
+            /* Ink colors */
+            --ink-primary: #1a1612;
+            --ink-secondary: #4a4035;
+            --ink-muted: #7a6f60;
+
+            /* Accent colors - vintage academic */
+            --accent-primary: #8b4513;
+            --accent-secondary: #1e4d6b;
+            --accent-gold: #c9a227;
+            --accent-success: #2d5a3d;
+            --accent-error: #8b2635;
+            --accent-highlight: #fef3c7;
+
+            /* Typography */
+            --font-serif: 'Libre Baskerville', 'Crimson Pro', Georgia, serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Borders & Shadows */
+            --border-subtle: 1px solid rgba(139, 69, 19, 0.15);
+            --border-emphasis: 2px solid var(--accent-primary);
+            --shadow-soft: 0 2px 8px rgba(26, 22, 18, 0.08);
+            --shadow-medium: 0 4px 16px rgba(26, 22, 18, 0.12);
+            --shadow-lifted: 0 8px 32px rgba(26, 22, 18, 0.16);
+
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* =============================================
+           RESET & BASE STYLES
+           ============================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            color: var(--ink-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+
+            /* Subtle paper texture effect */
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(201, 162, 39, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(139, 69, 19, 0.03) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        /* =============================================
+           HEADER & NAVIGATION
+           ============================================= */
+        header {
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #3a322b 100%);
+            color: var(--bg-primary);
+            padding: var(--space-lg) var(--space-xl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-gold);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--bg-dark);
+            transform: rotate(-3deg);
+            box-shadow: 0 2px 8px rgba(201, 162, 39, 0.3);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 span {
+            color: var(--accent-gold);
+            font-style: italic;
+        }
+
+        nav {
+            display: flex;
+            gap: var(--space-xs);
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid rgba(247, 243, 235, 0.2);
+            color: var(--bg-primary);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 6px;
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-gold);
+            transform: scaleX(0);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(247, 243, 235, 0.1);
+            border-color: var(--accent-gold);
+        }
+
+        .nav-btn.active::before {
+            transform: scaleX(1);
+        }
+
+        /* =============================================
+           MAIN CONTENT AREA
+           ============================================= */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+
+        section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =============================================
+           TYPOGRAPHY
+           ============================================= */
+        h2 {
+            font-size: 2rem;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-sm);
+            border-bottom: 3px double var(--accent-primary);
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--accent-gold);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            color: var(--accent-secondary);
+            margin: var(--space-lg) 0 var(--space-md);
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            color: var(--ink-secondary);
+            margin: var(--space-md) 0 var(--space-sm);
+        }
+
+        p {
+            margin-bottom: var(--space-md);
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        /* =============================================
+           CARDS & CONTAINERS
+           ============================================= */
+        .card {
+            background: var(--bg-card);
+            border: var(--border-subtle);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition-smooth);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-md);
+            border-bottom: var(--border-subtle);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .technique-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+            margin-top: var(--space-xl);
+        }
+
+        .technique-card {
+            background: var(--bg-card);
+            border: var(--border-subtle);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .technique-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-primary);
+            transform: scaleY(0);
+            transition: var(--transition-smooth);
+        }
+
+        .technique-card:hover {
+            box-shadow: var(--shadow-lifted);
+            transform: translateY(-4px);
+        }
+
+        .technique-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .technique-card h4 {
+            color: var(--accent-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .technique-card p {
+            font-size: 0.9rem;
+            color: var(--ink-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .difficulty-beginner {
+            background: rgba(45, 90, 61, 0.15);
+            color: var(--accent-success);
+        }
+        .difficulty-intermediate {
+            background: rgba(201, 162, 39, 0.15);
+            color: var(--accent-primary);
+        }
+        .difficulty-advanced {
+            background: rgba(139, 38, 53, 0.15);
+            color: var(--accent-error);
+        }
+
+        /* =============================================
+           MATH DISPLAY
+           ============================================= */
+        .math-display {
+            font-family: var(--font-mono);
+            background: var(--bg-secondary);
+            border: var(--border-subtle);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            margin: var(--space-md) 0;
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+            overflow-x: auto;
+        }
+
+        .math-display.large {
+            font-size: 2rem;
+        }
+
+        .math-step {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            margin: var(--space-sm) 0;
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent-gold);
+            border-radius: 0 8px 8px 0;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--accent-secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content code {
+            font-family: var(--font-mono);
+            background: var(--accent-highlight);
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+            font-size: 1.1em;
+        }
+
+        .highlight-digit {
+            background: var(--accent-highlight);
+            padding: 0.1em 0.2em;
+            border-radius: 3px;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .carry {
+            color: var(--accent-error);
+            font-size: 0.8em;
+            vertical-align: super;
+        }
+
+        /* =============================================
+           INTERACTIVE ELEMENTS
+           ============================================= */
+        .btn {
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), #a0522d);
+            color: white;
+            box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(139, 69, 19, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--ink-primary);
+            border: var(--border-subtle);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent-primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent-success), #3d7a4d);
+            color: white;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--accent-gold), #d4b02e);
+            color: var(--bg-dark);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            padding: var(--space-md);
+            border: 2px solid var(--bg-secondary);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--ink-primary);
+            text-align: center;
+            width: 100%;
+            max-width: 200px;
+            transition: var(--transition-fast);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
+        }
+
+        input.correct {
+            border-color: var(--accent-success);
+            background: rgba(45, 90, 61, 0.1);
+        }
+
+        input.incorrect {
+            border-color: var(--accent-error);
+            background: rgba(139, 38, 53, 0.1);
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* =============================================
+           PROGRESS & STATS
+           ============================================= */
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: var(--space-md) 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-success), var(--accent-gold));
+            border-radius: 6px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: var(--border-subtle);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* =============================================
+           TUTORIAL CONTENT
+           ============================================= */
+        .tutorial-section {
+            background: var(--bg-card);
+            border: var(--border-subtle);
+            border-radius: 12px;
+            padding: var(--space-xl);
+            margin: var(--space-lg) 0;
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, rgba(30, 77, 107, 0.05), rgba(139, 69, 19, 0.05));
+            border: 1px dashed var(--accent-secondary);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            margin: var(--space-md) 0;
+        }
+
+        .tip-box {
+            background: rgba(201, 162, 39, 0.1);
+            border-left: 4px solid var(--accent-gold);
+            padding: var(--space-md) var(--space-lg);
+            margin: var(--space-md) 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tip-box strong {
+            color: var(--accent-primary);
+        }
+
+        .rule-box {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            margin: var(--space-lg) 0;
+            position: relative;
+        }
+
+        .rule-box::before {
+            content: 'RULE';
+            position: absolute;
+            top: -10px;
+            left: var(--space-md);
+            background: var(--accent-primary);
+            color: white;
+            padding: 0.2em 0.6em;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            border-radius: 4px;
+        }
+
+        /* =============================================
+           PRACTICE MODE
+           ============================================= */
+        .practice-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .problem-display {
+            background: var(--bg-card);
+            border: var(--border-emphasis);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            margin: var(--space-xl) 0;
+            text-align: center;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .problem-text {
+            font-family: var(--font-mono);
+            font-size: 2.5rem;
+            color: var(--ink-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .problem-technique {
+            font-size: 0.9rem;
+            color: var(--ink-muted);
+            margin-bottom: var(--space-md);
+        }
+
+        .answer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .feedback {
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-md);
+        }
+
+        .feedback-correct {
+            color: var(--accent-success);
+            font-weight: 600;
+        }
+
+        .feedback-incorrect {
+            color: var(--accent-error);
+        }
+
+        .hint-section {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--space-md);
+            margin-top: var(--space-md);
+            text-align: left;
+        }
+
+        .hint-toggle {
+            background: none;
+            border: none;
+            color: var(--accent-secondary);
+            cursor: pointer;
+            font-family: var(--font-serif);
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+
+        /* =============================================
+           TEST MODE
+           ============================================= */
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .timer {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            color: var(--accent-secondary);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: var(--border-subtle);
+        }
+
+        .question-counter {
+            font-size: 1rem;
+            color: var(--ink-muted);
+        }
+
+        .test-results {
+            text-align: center;
+            padding: var(--space-2xl);
+        }
+
+        .score-display {
+            font-family: var(--font-mono);
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin: var(--space-lg) 0;
+        }
+
+        .grade {
+            font-size: 1.5rem;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .results-breakdown {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            flex-wrap: wrap;
+            margin: var(--space-xl) 0;
+        }
+
+        /* =============================================
+           PROGRESS TRACKING
+           ============================================= */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--space-lg) 0;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: var(--space-md);
+            text-align: left;
+            border-bottom: var(--border-subtle);
+        }
+
+        .history-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--accent-secondary);
+        }
+
+        .history-table tr:hover td {
+            background: var(--bg-secondary);
+        }
+
+        .mastery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .mastery-item {
+            background: var(--bg-card);
+            border: var(--border-subtle);
+            border-radius: 8px;
+            padding: var(--space-md);
+        }
+
+        .mastery-item h4 {
+            margin-bottom: var(--space-sm);
+            font-size: 0.95rem;
+        }
+
+        .mastery-level {
+            display: flex;
+            gap: 4px;
+        }
+
+        .mastery-star {
+            width: 20px;
+            height: 20px;
+            opacity: 0.2;
+        }
+
+        .mastery-star.filled {
+            opacity: 1;
+            color: var(--accent-gold);
+        }
+
+        /* =============================================
+           RESPONSIVE DESIGN
+           ============================================= */
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+
+            header {
+                padding: var(--space-md);
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav {
+                justify-content: center;
+            }
+
+            main {
+                padding: var(--space-md);
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .problem-text {
+                font-size: 1.8rem;
+            }
+
+            .math-display {
+                font-size: 1.2rem;
+                padding: var(--space-md);
+            }
+
+            .technique-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-btn {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: 0.8rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .score-display {
+                font-size: 3rem;
+            }
+        }
+
+        /* =============================================
+           ANIMATIONS
+           ============================================= */
+        .animate-pop {
+            animation: pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .animate-glow {
+            animation: glow 0.6s ease;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--shadow-soft); }
+            50% { box-shadow: 0 0 20px rgba(201, 162, 39, 0.4); }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        /* Loading states */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* =============================================
+           PRINT STYLES
+           ============================================= */
+        @media print {
+            header, nav, .btn, .practice-container {
+                display: none;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+
+            section {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- =============================================
+         HEADER & NAVIGATION
+         ============================================= -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">T</div>
+                <h1>Trachtenberg <span>Speed Math</span></h1>
+            </div>
+            <nav>
+                <button class="nav-btn active" data-section="home">Home</button>
+                <button class="nav-btn" data-section="learn">Learn</button>
+                <button class="nav-btn" data-section="practice">Practice</button>
+                <button class="nav-btn" data-section="test">Test</button>
+                <button class="nav-btn" data-section="progress">Progress</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- =============================================
+             HOME SECTION
+             ============================================= -->
+        <section id="home" class="active">
+            <h2>Welcome to Speed Mathematics</h2>
+
+            <div class="card">
+                <p>
+                    The <strong>Trachtenberg System</strong> is a system of rapid mental calculation,
+                    developed by the Russian Jewish engineer Jakow Trachtenberg during his years as a
+                    political prisoner in a Nazi concentration camp. Using only simple techniques, you
+                    can perform complex calculations in your head faster than most people can with a calculator.
+                </p>
+
+                <div class="tip-box">
+                    <strong>Historical Note:</strong> Jakow Trachtenberg developed this system to keep
+                    his mind occupied and his spirit alive during his imprisonment from 1941 to 1944.
+                    The system was later refined and published, becoming a celebrated method for
+                    teaching rapid mental arithmetic.
+                </div>
+            </div>
+
+            <h3>What You'll Learn</h3>
+
+            <div class="technique-grid">
+                <div class="technique-card" onclick="showLearnSection('mult11')">
+                    <h4>Multiplication by 11</h4>
+                    <p>The foundation technique - multiply any number by 11 instantly.</p>
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                </div>
+
+                <div class="technique-card" onclick="showLearnSection('mult12')">
+                    <h4>Multiplication by 12</h4>
+                    <p>Extend your skills to multiply by 12 with ease.</p>
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                </div>
+
+                <div class="technique-card" onclick="showLearnSection('mult5')">
+                    <h4>Multiplication by 5</h4>
+                    <p>A simple technique using halving and shifting.</p>
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                </div>
+
+                <div class="technique-card" onclick="showLearnSection('mult6')">
+                    <h4>Multiplication by 6</h4>
+                    <p>Build on multiplication by 5 to handle 6.</p>
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                </div>
+
+                <div class="technique-card" onclick="showLearnSection('mult7')">
+                    <h4>Multiplication by 7</h4>
+                    <p>Master the doubling technique for 7.</p>
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                </div>
+
+                <div class="technique-card" onclick="showLearnSection('mult9')">
+                    <h4>Multiplication by 9</h4>
+                    <p>Learn the elegant complement method.</p>
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                </div>
+
+                <div class="technique-card" onclick="showLearnSection('mult8')">
+                    <h4>Multiplication by 8</h4>
+                    <p>Combine techniques for multiplication by 8.</p>
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                </div>
+
+                <div class="technique-card" onclick="showLearnSection('general')">
+                    <h4>General Multiplication</h4>
+                    <p>The two-finger method for any multiplication.</p>
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                </div>
+            </div>
+
+            <div class="stats-grid" style="margin-top: var(--space-2xl);">
+                <div class="stat-card">
+                    <span class="stat-value" id="total-problems">0</span>
+                    <span class="stat-label">Problems Solved</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="accuracy-rate">0%</span>
+                    <span class="stat-label">Accuracy</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="current-streak">0</span>
+                    <span class="stat-label">Current Streak</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="techniques-mastered">0/8</span>
+                    <span class="stat-label">Techniques Mastered</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- =============================================
+             LEARN SECTION
+             ============================================= -->
+        <section id="learn">
+            <h2>Learn the Techniques</h2>
+
+            <div id="learn-navigation" class="card">
+                <p>Select a technique below to learn the step-by-step method:</p>
+                <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md);">
+                    <button class="btn btn-secondary" onclick="showLearnSection('mult11')">×11</button>
+                    <button class="btn btn-secondary" onclick="showLearnSection('mult12')">×12</button>
+                    <button class="btn btn-secondary" onclick="showLearnSection('mult5')">×5</button>
+                    <button class="btn btn-secondary" onclick="showLearnSection('mult6')">×6</button>
+                    <button class="btn btn-secondary" onclick="showLearnSection('mult7')">×7</button>
+                    <button class="btn btn-secondary" onclick="showLearnSection('mult8')">×8</button>
+                    <button class="btn btn-secondary" onclick="showLearnSection('mult9')">×9</button>
+                    <button class="btn btn-secondary" onclick="showLearnSection('general')">General</button>
+                </div>
+            </div>
+
+            <!-- Multiplication by 11 -->
+            <div id="learn-mult11" class="tutorial-section" style="display: none;">
+                <h3>Multiplication by 11</h3>
+
+                <p>
+                    Multiplying by 11 is the perfect starting point for the Trachtenberg system.
+                    The rule is beautifully simple: <em>add each digit to its neighbor on the right</em>.
+                </p>
+
+                <div class="rule-box">
+                    <p><strong>For each digit of the answer:</strong> Add that digit to its right-hand neighbor.
+                    If there's no neighbor (rightmost digit), just write that digit.
+                    If the sum is 10 or more, carry 1 to the next position.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example: 352 × 11</h4>
+                    <div class="math-display">352 × 11 = ?</div>
+
+                    <div id="mult11-steps"></div>
+
+                    <button class="btn btn-primary" onclick="animateSteps('mult11', [352, 11])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <div class="tip-box">
+                    <strong>Pro Tip:</strong> Work from right to left, building your answer digit by digit.
+                    Always remember to carry when the sum exceeds 9.
+                </div>
+
+                <h4>Try Another Example</h4>
+                <div class="example-box">
+                    <h4>Example: 7293 × 11</h4>
+                    <div class="math-display">7293 × 11 = ?</div>
+                    <div id="mult11-steps2"></div>
+                    <button class="btn btn-primary" onclick="animateSteps('mult11-2', [7293, 11])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <button class="btn btn-gold" onclick="startPractice('mult11')" style="margin-top: var(--space-lg);">
+                    Practice ×11
+                </button>
+            </div>
+
+            <!-- Multiplication by 12 -->
+            <div id="learn-mult12" class="tutorial-section" style="display: none;">
+                <h3>Multiplication by 12</h3>
+
+                <p>
+                    Multiplication by 12 extends the ×11 technique. Instead of just adding a digit
+                    to its neighbor, we <em>double the digit and add its neighbor</em>.
+                </p>
+
+                <div class="rule-box">
+                    <p><strong>For each digit of the answer:</strong> Double the digit, then add its
+                    right-hand neighbor. Carry if necessary.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example: 426 × 12</h4>
+                    <div class="math-display">426 × 12 = ?</div>
+
+                    <div id="mult12-steps"></div>
+
+                    <button class="btn btn-primary" onclick="animateSteps('mult12', [426, 12])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <div class="tip-box">
+                    <strong>Memory Aid:</strong> Think of 12 as "11 + 1", so you're doing the ×11 rule
+                    plus adding the digit again (which is doubling).
+                </div>
+
+                <button class="btn btn-gold" onclick="startPractice('mult12')" style="margin-top: var(--space-lg);">
+                    Practice ×12
+                </button>
+            </div>
+
+            <!-- Multiplication by 5 -->
+            <div id="learn-mult5" class="tutorial-section" style="display: none;">
+                <h3>Multiplication by 5</h3>
+
+                <p>
+                    Multiplying by 5 uses a clever insight: 5 is half of 10. So multiplying by 5
+                    is the same as dividing by 2 and multiplying by 10.
+                </p>
+
+                <div class="rule-box">
+                    <p><strong>The Rule:</strong> Take half the neighbor. If the digit is odd, add 5.
+                    Start from the rightmost digit (which has no neighbor, so half of 0).</p>
+                    <p><em>Alternative view:</em> Half the digit, then shift (multiply by 10),
+                    adding 5 if odd.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example: 743 × 5</h4>
+                    <div class="math-display">743 × 5 = ?</div>
+
+                    <div id="mult5-steps"></div>
+
+                    <button class="btn btn-primary" onclick="animateSteps('mult5', [743, 5])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <div class="tip-box">
+                    <strong>Quick Check:</strong> The last digit of any number × 5 is always 0 or 5.
+                </div>
+
+                <button class="btn btn-gold" onclick="startPractice('mult5')" style="margin-top: var(--space-lg);">
+                    Practice ×5
+                </button>
+            </div>
+
+            <!-- Multiplication by 6 -->
+            <div id="learn-mult6" class="tutorial-section" style="display: none;">
+                <h3>Multiplication by 6</h3>
+
+                <p>
+                    Multiplication by 6 builds on the ×5 rule. Since 6 = 5 + 1, we apply the
+                    ×5 rule and add the digit itself.
+                </p>
+
+                <div class="rule-box">
+                    <p><strong>The Rule:</strong> Add half the neighbor to the digit. If the digit
+                    is odd, add 5 to the result. Carry as needed.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example: 328 × 6</h4>
+                    <div class="math-display">328 × 6 = ?</div>
+
+                    <div id="mult6-steps"></div>
+
+                    <button class="btn btn-primary" onclick="animateSteps('mult6', [328, 6])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <button class="btn btn-gold" onclick="startPractice('mult6')" style="margin-top: var(--space-lg);">
+                    Practice ×6
+                </button>
+            </div>
+
+            <!-- Multiplication by 7 -->
+            <div id="learn-mult7" class="tutorial-section" style="display: none;">
+                <h3>Multiplication by 7</h3>
+
+                <p>
+                    For multiplication by 7, we use a doubling technique combined with the neighbor rule.
+                </p>
+
+                <div class="rule-box">
+                    <p><strong>The Rule:</strong> Double the digit, then add half the neighbor.
+                    If the digit is odd, add 5 to the result.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example: 452 × 7</h4>
+                    <div class="math-display">452 × 7 = ?</div>
+
+                    <div id="mult7-steps"></div>
+
+                    <button class="btn btn-primary" onclick="animateSteps('mult7', [452, 7])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <button class="btn btn-gold" onclick="startPractice('mult7')" style="margin-top: var(--space-lg);">
+                    Practice ×7
+                </button>
+            </div>
+
+            <!-- Multiplication by 8 -->
+            <div id="learn-mult8" class="tutorial-section" style="display: none;">
+                <h3>Multiplication by 8</h3>
+
+                <p>
+                    Multiplication by 8 uses the complement approach - we work with
+                    what's needed to reach 10 (the "complement" of each digit).
+                </p>
+
+                <div class="rule-box">
+                    <p><strong>The Rule:</strong> From the first non-zero digit: subtract the digit
+                    from 10 (for the first position) or from 9 (for subsequent positions), then
+                    add the neighbor. Special handling for the rightmost digit.</p>
+                    <p><em>Simplified:</em> Double the digit twice (×4), then double again (×8) can
+                    also work for mental verification.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example: 234 × 8</h4>
+                    <div class="math-display">234 × 8 = ?</div>
+
+                    <div id="mult8-steps"></div>
+
+                    <button class="btn btn-primary" onclick="animateSteps('mult8', [234, 8])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <button class="btn btn-gold" onclick="startPractice('mult8')" style="margin-top: var(--space-lg);">
+                    Practice ×8
+                </button>
+            </div>
+
+            <!-- Multiplication by 9 -->
+            <div id="learn-mult9" class="tutorial-section" style="display: none;">
+                <h3>Multiplication by 9</h3>
+
+                <p>
+                    The ×9 rule uses the complement method - we work with 10 minus each digit.
+                </p>
+
+                <div class="rule-box">
+                    <p><strong>The Rule:</strong> Subtract the rightmost digit from 10 for the
+                    units. For each subsequent digit, subtract from 9 and add the neighbor.
+                    For the leftmost position, subtract 1 from the first digit (this is your carry).</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example: 467 × 9</h4>
+                    <div class="math-display">467 × 9 = ?</div>
+
+                    <div id="mult9-steps"></div>
+
+                    <button class="btn btn-primary" onclick="animateSteps('mult9', [467, 9])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <div class="tip-box">
+                    <strong>Verification Trick:</strong> The digits of any multiple of 9 always sum to 9
+                    (or a multiple of 9). Use this to check your work!
+                </div>
+
+                <button class="btn btn-gold" onclick="startPractice('mult9')" style="margin-top: var(--space-lg);">
+                    Practice ×9
+                </button>
+            </div>
+
+            <!-- General Multiplication -->
+            <div id="learn-general" class="tutorial-section" style="display: none;">
+                <h3>General Multiplication (Two-Finger Method)</h3>
+
+                <p>
+                    The crown jewel of the Trachtenberg system: a method to multiply any two
+                    numbers together using a systematic approach called the "two-finger method."
+                </p>
+
+                <div class="rule-box">
+                    <p><strong>Core Principle:</strong> Place two fingers on the digits being multiplied.
+                    Multiply outer pair, multiply inner pair, then add cross-products. Build the
+                    answer from right to left, carrying as needed.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example: 23 × 14</h4>
+                    <div class="math-display">23 × 14 = ?</div>
+
+                    <div id="general-steps"></div>
+
+                    <button class="btn btn-primary" onclick="animateSteps('general', [23, 14])">
+                        Show Step-by-Step
+                    </button>
+                </div>
+
+                <h4>Breaking Down the Method</h4>
+                <p>
+                    For two 2-digit numbers AB × CD:
+                </p>
+                <ul style="margin-left: var(--space-lg); margin-bottom: var(--space-md);">
+                    <li>Units: B × D</li>
+                    <li>Tens: (A × D) + (B × C)</li>
+                    <li>Hundreds: A × C</li>
+                </ul>
+                <p>Add carries between each position.</p>
+
+                <button class="btn btn-gold" onclick="startPractice('general')" style="margin-top: var(--space-lg);">
+                    Practice General Multiplication
+                </button>
+            </div>
+        </section>
+
+        <!-- =============================================
+             PRACTICE SECTION
+             ============================================= -->
+        <section id="practice">
+            <h2>Practice Mode</h2>
+
+            <div class="card">
+                <h3>Select a Technique to Practice</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md);">
+                    <button class="btn btn-secondary technique-btn" data-technique="mult11">×11</button>
+                    <button class="btn btn-secondary technique-btn" data-technique="mult12">×12</button>
+                    <button class="btn btn-secondary technique-btn" data-technique="mult5">×5</button>
+                    <button class="btn btn-secondary technique-btn" data-technique="mult6">×6</button>
+                    <button class="btn btn-secondary technique-btn" data-technique="mult7">×7</button>
+                    <button class="btn btn-secondary technique-btn" data-technique="mult8">×8</button>
+                    <button class="btn btn-secondary technique-btn" data-technique="mult9">×9</button>
+                    <button class="btn btn-secondary technique-btn" data-technique="general">General</button>
+                    <button class="btn btn-gold technique-btn" data-technique="mixed">Mixed Practice</button>
+                </div>
+            </div>
+
+            <div class="practice-container" id="practice-area" style="display: none;">
+                <div class="problem-display">
+                    <div class="problem-technique" id="current-technique"></div>
+                    <div class="problem-text" id="problem-text">Loading...</div>
+
+                    <div class="answer-section">
+                        <input type="text" id="answer-input" placeholder="Your answer"
+                               autocomplete="off" inputmode="numeric">
+                        <button class="btn btn-primary" id="submit-answer">Check Answer</button>
+                    </div>
+
+                    <div class="feedback" id="feedback"></div>
+                </div>
+
+                <div class="hint-section" id="hint-section" style="display: none;">
+                    <button class="hint-toggle" onclick="toggleHint()">Show Hint</button>
+                    <div id="hint-content" style="display: none; margin-top: var(--space-md);"></div>
+                </div>
+
+                <div style="display: flex; gap: var(--space-md); justify-content: center; margin-top: var(--space-lg);">
+                    <button class="btn btn-secondary" id="skip-btn">Skip</button>
+                    <button class="btn btn-primary" id="next-btn" style="display: none;">Next Problem</button>
+                </div>
+
+                <div class="stats-grid" style="margin-top: var(--space-xl);">
+                    <div class="stat-card">
+                        <span class="stat-value" id="session-correct">0</span>
+                        <span class="stat-label">Correct</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="session-total">0</span>
+                        <span class="stat-label">Attempted</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="session-streak">0</span>
+                        <span class="stat-label">Streak</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =============================================
+             TEST SECTION
+             ============================================= -->
+        <section id="test">
+            <h2>Assessment Test</h2>
+
+            <div id="test-setup" class="card">
+                <h3>Configure Your Test</h3>
+
+                <div style="margin: var(--space-lg) 0;">
+                    <h4>Select Techniques to Include:</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md);">
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" class="test-technique" value="mult11" checked> ×11
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" class="test-technique" value="mult12" checked> ×12
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" class="test-technique" value="mult5" checked> ×5
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" class="test-technique" value="mult6"> ×6
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" class="test-technique" value="mult7"> ×7
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" class="test-technique" value="mult8"> ×8
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" class="test-technique" value="mult9"> ×9
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" class="test-technique" value="general"> General
+                        </label>
+                    </div>
+                </div>
+
+                <div style="margin: var(--space-lg) 0;">
+                    <h4>Number of Questions:</h4>
+                    <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-md);">
+                        <button class="btn btn-secondary question-count active" data-count="10">10</button>
+                        <button class="btn btn-secondary question-count" data-count="20">20</button>
+                        <button class="btn btn-secondary question-count" data-count="30">30</button>
+                    </div>
+                </div>
+
+                <div style="margin: var(--space-lg) 0;">
+                    <h4>Time Limit:</h4>
+                    <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-md);">
+                        <button class="btn btn-secondary time-limit" data-time="0">No Limit</button>
+                        <button class="btn btn-secondary time-limit active" data-time="300">5 min</button>
+                        <button class="btn btn-secondary time-limit" data-time="600">10 min</button>
+                        <button class="btn btn-secondary time-limit" data-time="900">15 min</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-gold" id="start-test" style="margin-top: var(--space-lg);">
+                    Begin Test
+                </button>
+            </div>
+
+            <div id="test-active" style="display: none;">
+                <div class="test-header">
+                    <div class="question-counter">
+                        Question <span id="test-current">1</span> of <span id="test-total">10</span>
+                    </div>
+                    <div class="timer" id="test-timer">05:00</div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="test-progress" style="width: 0%;"></div>
+                </div>
+
+                <div class="problem-display">
+                    <div class="problem-technique" id="test-technique"></div>
+                    <div class="problem-text" id="test-problem">Loading...</div>
+
+                    <div class="answer-section">
+                        <input type="text" id="test-answer" placeholder="Your answer"
+                               autocomplete="off" inputmode="numeric">
+                        <button class="btn btn-primary" id="test-submit">Submit</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="test-results" class="test-results" style="display: none;">
+                <h3>Test Complete!</h3>
+                <div class="score-display" id="final-score">0%</div>
+                <div class="grade" id="final-grade">Grade: A</div>
+
+                <div class="results-breakdown">
+                    <div class="stat-card">
+                        <span class="stat-value" id="result-correct">0</span>
+                        <span class="stat-label">Correct</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="result-wrong">0</span>
+                        <span class="stat-label">Wrong</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="result-time">0:00</span>
+                        <span class="stat-label">Time Used</span>
+                    </div>
+                </div>
+
+                <div id="result-breakdown" class="card" style="text-align: left; margin-top: var(--space-xl);">
+                    <h4>Performance by Technique</h4>
+                    <div id="technique-breakdown"></div>
+                </div>
+
+                <div style="margin-top: var(--space-xl);">
+                    <button class="btn btn-primary" onclick="resetTest()">Take Another Test</button>
+                    <button class="btn btn-secondary" onclick="reviewMistakes()">Review Mistakes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =============================================
+             PROGRESS SECTION
+             ============================================= -->
+        <section id="progress">
+            <h2>Your Progress</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value" id="progress-total">0</span>
+                    <span class="stat-label">Total Problems</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="progress-accuracy">0%</span>
+                    <span class="stat-label">Overall Accuracy</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="progress-best-streak">0</span>
+                    <span class="stat-label">Best Streak</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="progress-tests">0</span>
+                    <span class="stat-label">Tests Completed</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Technique Mastery</h3>
+                <p>Mastery is based on accuracy and number of problems solved for each technique.</p>
+
+                <div class="mastery-grid" id="mastery-grid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Recent Test History</h3>
+                <table class="history-table" id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Score</th>
+                            <th>Questions</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Data Management</h3>
+                <p>Your progress is saved locally in your browser.</p>
+                <div style="display: flex; gap: var(--space-md); margin-top: var(--space-md);">
+                    <button class="btn btn-secondary" onclick="exportProgress()">Export Data</button>
+                    <button class="btn btn-secondary" onclick="importProgress()">Import Data</button>
+                    <button class="btn btn-secondary" onclick="clearProgress()"
+                            style="color: var(--accent-error);">Clear All Data</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        /**
+         * =============================================
+         * TRACHTENBERG SPEED MATHEMATICS APPLICATION
+         * =============================================
+         *
+         * This application teaches and tests the Trachtenberg
+         * method of speed mathematics through interactive
+         * lessons, practice exercises, and assessments.
+         *
+         * Author: Generated for rowstu.net
+         * License: MIT
+         */
+
+        // =============================================
+        // APPLICATION STATE
+        // =============================================
+
+        /**
+         * Main application state object
+         * Tracks current session data and user progress
+         */
+        const state = {
+            currentSection: 'home',
+            currentTechnique: null,
+            currentProblem: null,
+
+            // Practice session
+            sessionCorrect: 0,
+            sessionTotal: 0,
+            sessionStreak: 0,
+
+            // Test mode
+            testActive: false,
+            testQuestions: [],
+            testCurrentIndex: 0,
+            testAnswers: [],
+            testStartTime: null,
+            testTimeLimit: 300,
+            testTimer: null,
+
+            // User progress (persisted)
+            progress: {
+                totalProblems: 0,
+                totalCorrect: 0,
+                bestStreak: 0,
+                currentStreak: 0,
+                techniques: {
+                    mult11: { attempted: 0, correct: 0 },
+                    mult12: { attempted: 0, correct: 0 },
+                    mult5: { attempted: 0, correct: 0 },
+                    mult6: { attempted: 0, correct: 0 },
+                    mult7: { attempted: 0, correct: 0 },
+                    mult8: { attempted: 0, correct: 0 },
+                    mult9: { attempted: 0, correct: 0 },
+                    general: { attempted: 0, correct: 0 }
+                },
+                testHistory: []
+            }
+        };
+
+        // =============================================
+        // INITIALIZATION
+        // =============================================
+
+        /**
+         * Initialize the application when DOM is loaded
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
+            setupNavigation();
+            setupPractice();
+            setupTest();
+            updateStats();
+            updateProgressDisplay();
+        });
+
+        /**
+         * Load saved progress from localStorage
+         */
+        function loadProgress() {
+            const saved = localStorage.getItem('trachtenberg-progress');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    // Merge with default structure to handle new properties
+                    state.progress = { ...state.progress, ...parsed };
+                } catch (e) {
+                    console.error('Error loading progress:', e);
+                }
+            }
+        }
+
+        /**
+         * Save progress to localStorage
+         */
+        function saveProgress() {
+            localStorage.setItem('trachtenberg-progress', JSON.stringify(state.progress));
+        }
+
+        // =============================================
+        // NAVIGATION
+        // =============================================
+
+        /**
+         * Setup navigation button event listeners
+         */
+        function setupNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const section = btn.dataset.section;
+                    showSection(section);
+                });
+            });
+        }
+
+        /**
+         * Show a specific section and update navigation
+         * @param {string} sectionId - ID of section to show
+         */
+        function showSection(sectionId) {
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.section === sectionId);
+            });
+
+            // Update sections
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.toggle('active', section.id === sectionId);
+            });
+
+            state.currentSection = sectionId;
+
+            // Update displays when showing certain sections
+            if (sectionId === 'progress') {
+                updateProgressDisplay();
+            }
+            if (sectionId === 'home') {
+                updateStats();
+            }
+        }
+
+        /**
+         * Show a specific learning technique section
+         * @param {string} technique - Technique identifier
+         */
+        function showLearnSection(technique) {
+            showSection('learn');
+
+            // Hide all tutorial sections
+            document.querySelectorAll('.tutorial-section').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Show the selected one
+            const section = document.getElementById(`learn-${technique}`);
+            if (section) {
+                section.style.display = 'block';
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // =============================================
+        // TRACHTENBERG METHODS
+        // =============================================
+
+        /**
+         * Technique definitions with rules and problem generation
+         */
+        const techniques = {
+            mult11: {
+                name: 'Multiplication by 11',
+                multiplier: 11,
+                minDigits: 2,
+                maxDigits: 4,
+                generateProblem: () => {
+                    const digits = Math.floor(Math.random() * 3) + 2;
+                    const min = Math.pow(10, digits - 1);
+                    const max = Math.pow(10, digits) - 1;
+                    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                    return { num1: num, num2: 11, answer: num * 11 };
+                },
+                getSteps: (num) => {
+                    const digits = num.toString().split('').map(Number);
+                    const steps = [];
+                    let result = '';
+                    let carry = 0;
+
+                    // Work right to left
+                    for (let i = digits.length - 1; i >= -1; i--) {
+                        const current = i >= 0 ? digits[i] : 0;
+                        const neighbor = i < digits.length - 1 ? digits[i + 1] : 0;
+                        let sum = current + neighbor + carry;
+                        carry = Math.floor(sum / 10);
+                        const digit = sum % 10;
+
+                        let explanation = '';
+                        if (i === digits.length - 1) {
+                            explanation = `Rightmost digit: ${current} (no neighbor to add) = ${digit}`;
+                        } else if (i >= 0) {
+                            explanation = `${current} + ${neighbor}${carry > 0 ? ` + carry(${Math.floor((current + neighbor) / 10)})` : ''} = ${sum}, write ${digit}${carry > 0 ? ', carry ' + carry : ''}`;
+                        } else if (carry > 0) {
+                            explanation = `Final carry: ${carry}`;
+                        }
+
+                        if (i >= 0 || carry > 0) {
+                            steps.push({
+                                position: i,
+                                digit: digit,
+                                carry: carry,
+                                explanation: explanation
+                            });
+                            result = digit + result;
+                        }
+                    }
+
+                    return steps;
+                },
+                getHint: (num) => {
+                    return `Add each digit to its right neighbor. Start from the right: ${num.toString().split('').join(' + neighbor → ')}`;
+                }
+            },
+
+            mult12: {
+                name: 'Multiplication by 12',
+                multiplier: 12,
+                minDigits: 2,
+                maxDigits: 3,
+                generateProblem: () => {
+                    const digits = Math.floor(Math.random() * 2) + 2;
+                    const min = Math.pow(10, digits - 1);
+                    const max = Math.pow(10, digits) - 1;
+                    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                    return { num1: num, num2: 12, answer: num * 12 };
+                },
+                getSteps: (num) => {
+                    const digits = num.toString().split('').map(Number);
+                    const steps = [];
+                    let carry = 0;
+
+                    for (let i = digits.length - 1; i >= -1; i--) {
+                        const current = i >= 0 ? digits[i] : 0;
+                        const neighbor = i < digits.length - 1 ? digits[i + 1] : 0;
+                        let sum = (current * 2) + neighbor + carry;
+                        carry = Math.floor(sum / 10);
+                        const digit = sum % 10;
+
+                        let explanation = '';
+                        if (i === digits.length - 1) {
+                            explanation = `Double ${current} = ${current * 2}, write ${digit}${carry > 0 ? ', carry ' + carry : ''}`;
+                        } else if (i >= 0) {
+                            explanation = `Double ${current} (${current * 2}) + neighbor ${neighbor}${carry > 0 ? ' + carry' : ''} = ${sum}, write ${digit}${carry > 0 ? ', carry ' + carry : ''}`;
+                        } else if (carry > 0) {
+                            explanation = `Final carry: ${carry}`;
+                        }
+
+                        if (i >= 0 || carry > 0) {
+                            steps.push({ position: i, digit, carry, explanation });
+                        }
+                    }
+
+                    return steps;
+                },
+                getHint: (num) => {
+                    return `Double each digit and add its right neighbor.`;
+                }
+            },
+
+            mult5: {
+                name: 'Multiplication by 5',
+                multiplier: 5,
+                minDigits: 2,
+                maxDigits: 4,
+                generateProblem: () => {
+                    const digits = Math.floor(Math.random() * 3) + 2;
+                    const min = Math.pow(10, digits - 1);
+                    const max = Math.pow(10, digits) - 1;
+                    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                    return { num1: num, num2: 5, answer: num * 5 };
+                },
+                getSteps: (num) => {
+                    const digits = num.toString().split('').map(Number);
+                    const steps = [];
+                    let carry = 0;
+
+                    for (let i = digits.length - 1; i >= -1; i--) {
+                        const current = i >= 0 ? digits[i] : 0;
+                        const neighbor = i < digits.length - 1 ? digits[i + 1] : 0;
+
+                        let halfNeighbor = Math.floor(neighbor / 2);
+                        let addFive = current % 2 === 1 ? 5 : 0;
+                        let sum = halfNeighbor + addFive + carry;
+
+                        if (i === -1) {
+                            // Leftmost position
+                            sum = Math.floor(digits[0] / 2) + carry;
+                        }
+
+                        carry = Math.floor(sum / 10);
+                        const digit = sum % 10;
+
+                        let explanation = '';
+                        if (i === digits.length - 1) {
+                            explanation = `Half of 0 (no neighbor) ${addFive ? '+ 5 (odd digit)' : ''} = ${digit}`;
+                        } else if (i >= 0) {
+                            explanation = `Half of ${neighbor} = ${halfNeighbor}${addFive ? ', + 5 (odd digit ' + current + ')' : ''} = ${sum}, write ${digit}`;
+                        } else {
+                            explanation = `Final: half of ${digits[0]} = ${Math.floor(digits[0] / 2)}${carry > 0 ? ' + carry' : ''}, write ${digit}`;
+                        }
+
+                        if (i >= -1) {
+                            steps.push({ position: i, digit, carry, explanation });
+                        }
+                    }
+
+                    return steps;
+                },
+                getHint: (num) => {
+                    return `Take half the neighbor. If the digit is odd, add 5.`;
+                }
+            },
+
+            mult6: {
+                name: 'Multiplication by 6',
+                multiplier: 6,
+                minDigits: 2,
+                maxDigits: 3,
+                generateProblem: () => {
+                    const digits = Math.floor(Math.random() * 2) + 2;
+                    const min = Math.pow(10, digits - 1);
+                    const max = Math.pow(10, digits) - 1;
+                    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                    return { num1: num, num2: 6, answer: num * 6 };
+                },
+                getSteps: (num) => {
+                    const digits = num.toString().split('').map(Number);
+                    const steps = [];
+                    let carry = 0;
+
+                    for (let i = digits.length - 1; i >= -1; i--) {
+                        const current = i >= 0 ? digits[i] : 0;
+                        const neighbor = i < digits.length - 1 ? digits[i + 1] : 0;
+
+                        let halfNeighbor = Math.floor(neighbor / 2);
+                        let addFive = current % 2 === 1 ? 5 : 0;
+                        let sum = current + halfNeighbor + addFive + carry;
+
+                        if (i === -1) {
+                            sum = Math.floor(digits[0] / 2) + carry;
+                        }
+
+                        carry = Math.floor(sum / 10);
+                        const digit = sum % 10;
+
+                        let explanation = '';
+                        if (i === digits.length - 1) {
+                            explanation = `${current} + 0 (half neighbor) ${addFive ? '+ 5 (odd)' : ''} = ${sum}, write ${digit}`;
+                        } else if (i >= 0) {
+                            explanation = `${current} + ${halfNeighbor} (half of ${neighbor})${addFive ? ' + 5 (odd)' : ''}${carry > 0 ? ' + carry' : ''} = ${sum}, write ${digit}`;
+                        } else {
+                            explanation = `Final: ${Math.floor(digits[0] / 2)}${carry > 0 ? ' + carry' : ''} = ${digit}`;
+                        }
+
+                        if (i >= -1) {
+                            steps.push({ position: i, digit, carry, explanation });
+                        }
+                    }
+
+                    return steps;
+                },
+                getHint: (num) => {
+                    return `Add the digit to half its neighbor. If odd, add 5.`;
+                }
+            },
+
+            mult7: {
+                name: 'Multiplication by 7',
+                multiplier: 7,
+                minDigits: 2,
+                maxDigits: 3,
+                generateProblem: () => {
+                    const digits = Math.floor(Math.random() * 2) + 2;
+                    const min = Math.pow(10, digits - 1);
+                    const max = Math.pow(10, digits) - 1;
+                    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                    return { num1: num, num2: 7, answer: num * 7 };
+                },
+                getSteps: (num) => {
+                    const digits = num.toString().split('').map(Number);
+                    const steps = [];
+                    let carry = 0;
+
+                    for (let i = digits.length - 1; i >= -1; i--) {
+                        const current = i >= 0 ? digits[i] : 0;
+                        const neighbor = i < digits.length - 1 ? digits[i + 1] : 0;
+
+                        let doubled = current * 2;
+                        let halfNeighbor = Math.floor(neighbor / 2);
+                        let addFive = current % 2 === 1 ? 5 : 0;
+                        let sum = doubled + halfNeighbor + addFive + carry;
+
+                        if (i === -1) {
+                            sum = Math.floor(digits[0] / 2) + carry;
+                        }
+
+                        carry = Math.floor(sum / 10);
+                        const digit = sum % 10;
+
+                        let explanation = '';
+                        if (i === digits.length - 1) {
+                            explanation = `Double ${current} = ${doubled}${addFive ? ' + 5 (odd)' : ''} = ${sum}, write ${digit}`;
+                        } else if (i >= 0) {
+                            explanation = `Double ${current} (${doubled}) + half of ${neighbor} (${halfNeighbor})${addFive ? ' + 5' : ''}${carry > 0 ? ' + carry' : ''} = ${sum}, write ${digit}`;
+                        } else {
+                            explanation = `Final: half of ${digits[0]}${carry > 0 ? ' + carry' : ''} = ${digit}`;
+                        }
+
+                        if (i >= -1) {
+                            steps.push({ position: i, digit, carry, explanation });
+                        }
+                    }
+
+                    return steps;
+                },
+                getHint: (num) => {
+                    return `Double the digit, add half the neighbor. If odd, add 5.`;
+                }
+            },
+
+            mult8: {
+                name: 'Multiplication by 8',
+                multiplier: 8,
+                minDigits: 2,
+                maxDigits: 3,
+                generateProblem: () => {
+                    const digits = Math.floor(Math.random() * 2) + 2;
+                    const min = Math.pow(10, digits - 1);
+                    const max = Math.pow(10, digits) - 1;
+                    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                    return { num1: num, num2: 8, answer: num * 8 };
+                },
+                getSteps: (num) => {
+                    // For simplicity, showing standard multiplication approach
+                    const steps = [];
+                    const answer = num * 8;
+                    steps.push({
+                        position: 0,
+                        digit: null,
+                        carry: 0,
+                        explanation: `${num} × 8 = ${num} × 2 × 2 × 2`
+                    });
+                    steps.push({
+                        position: 1,
+                        digit: null,
+                        carry: 0,
+                        explanation: `${num} × 2 = ${num * 2}`
+                    });
+                    steps.push({
+                        position: 2,
+                        digit: null,
+                        carry: 0,
+                        explanation: `${num * 2} × 2 = ${num * 4}`
+                    });
+                    steps.push({
+                        position: 3,
+                        digit: null,
+                        carry: 0,
+                        explanation: `${num * 4} × 2 = ${answer}`
+                    });
+                    return steps;
+                },
+                getHint: (num) => {
+                    return `Double three times: ${num} → ${num*2} → ${num*4} → ${num*8}`;
+                }
+            },
+
+            mult9: {
+                name: 'Multiplication by 9',
+                multiplier: 9,
+                minDigits: 2,
+                maxDigits: 3,
+                generateProblem: () => {
+                    const digits = Math.floor(Math.random() * 2) + 2;
+                    const min = Math.pow(10, digits - 1);
+                    const max = Math.pow(10, digits) - 1;
+                    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                    return { num1: num, num2: 9, answer: num * 9 };
+                },
+                getSteps: (num) => {
+                    const digits = num.toString().split('').map(Number);
+                    const steps = [];
+                    const answer = num * 9;
+
+                    steps.push({
+                        position: 0,
+                        digit: null,
+                        carry: 0,
+                        explanation: `First digit of answer: ${digits[0]} - 1 = ${digits[0] - 1}`
+                    });
+
+                    // For each middle digit
+                    for (let i = 0; i < digits.length - 1; i++) {
+                        const complement = 9 - digits[i];
+                        const neighbor = digits[i + 1];
+                        steps.push({
+                            position: i + 1,
+                            digit: null,
+                            carry: 0,
+                            explanation: `(9 - ${digits[i]}) + ${neighbor} = ${complement} + ${neighbor} = ${complement + neighbor}`
+                        });
+                    }
+
+                    // Last digit
+                    steps.push({
+                        position: digits.length,
+                        digit: null,
+                        carry: 0,
+                        explanation: `Last digit: 10 - ${digits[digits.length - 1]} = ${10 - digits[digits.length - 1]}`
+                    });
+
+                    steps.push({
+                        position: digits.length + 1,
+                        digit: null,
+                        carry: 0,
+                        explanation: `Final answer: ${answer}`
+                    });
+
+                    return steps;
+                },
+                getHint: (num) => {
+                    const digits = num.toString().split('').map(Number);
+                    return `First digit: ${digits[0]}-1. For middle: (9-digit)+neighbor. Last: 10-${digits[digits.length-1]}`;
+                }
+            },
+
+            general: {
+                name: 'General Multiplication',
+                multiplier: null,
+                minDigits: 2,
+                maxDigits: 2,
+                generateProblem: () => {
+                    const num1 = Math.floor(Math.random() * 90) + 10;
+                    const num2 = Math.floor(Math.random() * 90) + 10;
+                    return { num1, num2, answer: num1 * num2 };
+                },
+                getSteps: (num1, num2) => {
+                    const a = Math.floor(num1 / 10);
+                    const b = num1 % 10;
+                    const c = Math.floor(num2 / 10);
+                    const d = num2 % 10;
+
+                    const steps = [];
+
+                    steps.push({
+                        position: 0,
+                        digit: null,
+                        carry: 0,
+                        explanation: `Break down: ${num1} = ${a}×10 + ${b}, ${num2} = ${c}×10 + ${d}`
+                    });
+
+                    const units = b * d;
+                    steps.push({
+                        position: 1,
+                        digit: units % 10,
+                        carry: Math.floor(units / 10),
+                        explanation: `Units: ${b} × ${d} = ${units}`
+                    });
+
+                    const tens = (a * d) + (b * c) + Math.floor(units / 10);
+                    steps.push({
+                        position: 2,
+                        digit: tens % 10,
+                        carry: Math.floor(tens / 10),
+                        explanation: `Tens: (${a} × ${d}) + (${b} × ${c}) + carry = ${a*d} + ${b*c} + ${Math.floor(units/10)} = ${tens}`
+                    });
+
+                    const hundreds = (a * c) + Math.floor(tens / 10);
+                    steps.push({
+                        position: 3,
+                        digit: null,
+                        carry: 0,
+                        explanation: `Hundreds: ${a} × ${c} + carry = ${a*c} + ${Math.floor(tens/10)} = ${hundreds}`
+                    });
+
+                    steps.push({
+                        position: 4,
+                        digit: null,
+                        carry: 0,
+                        explanation: `Final answer: ${num1 * num2}`
+                    });
+
+                    return steps;
+                },
+                getHint: (num1, num2) => {
+                    return `Units: rightmost × rightmost. Tens: cross-multiply and add. Hundreds: leftmost × leftmost.`;
+                }
+            }
+        };
+
+        // =============================================
+        // STEP-BY-STEP ANIMATIONS
+        // =============================================
+
+        /**
+         * Animate step-by-step solution for a technique
+         * @param {string} techniqueId - Technique identifier
+         * @param {Array} numbers - Numbers to multiply
+         */
+        function animateSteps(techniqueId, numbers) {
+            let containerId, steps;
+
+            if (techniqueId === 'mult11') {
+                containerId = 'mult11-steps';
+                steps = techniques.mult11.getSteps(numbers[0]);
+            } else if (techniqueId === 'mult11-2') {
+                containerId = 'mult11-steps2';
+                steps = techniques.mult11.getSteps(numbers[0]);
+            } else if (techniqueId === 'mult12') {
+                containerId = 'mult12-steps';
+                steps = techniques.mult12.getSteps(numbers[0]);
+            } else if (techniqueId === 'mult5') {
+                containerId = 'mult5-steps';
+                steps = techniques.mult5.getSteps(numbers[0]);
+            } else if (techniqueId === 'mult6') {
+                containerId = 'mult6-steps';
+                steps = techniques.mult6.getSteps(numbers[0]);
+            } else if (techniqueId === 'mult7') {
+                containerId = 'mult7-steps';
+                steps = techniques.mult7.getSteps(numbers[0]);
+            } else if (techniqueId === 'mult8') {
+                containerId = 'mult8-steps';
+                steps = techniques.mult8.getSteps(numbers[0]);
+            } else if (techniqueId === 'mult9') {
+                containerId = 'mult9-steps';
+                steps = techniques.mult9.getSteps(numbers[0]);
+            } else if (techniqueId === 'general') {
+                containerId = 'general-steps';
+                steps = techniques.general.getSteps(numbers[0], numbers[1]);
+            }
+
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    const stepEl = document.createElement('div');
+                    stepEl.className = 'math-step';
+                    stepEl.innerHTML = `
+                        <span class="step-number">${index + 1}</span>
+                        <div class="step-content">${step.explanation}</div>
+                    `;
+                    container.appendChild(stepEl);
+                    stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, index * 600);
+            });
+
+            // Show final answer
+            setTimeout(() => {
+                const finalEl = document.createElement('div');
+                finalEl.className = 'math-step animate-glow';
+                finalEl.style.borderLeftColor = 'var(--accent-success)';
+                const answer = numbers[0] * numbers[1];
+                finalEl.innerHTML = `
+                    <span class="step-number" style="background: var(--accent-success);">✓</span>
+                    <div class="step-content"><strong>Answer: ${numbers[0]} × ${numbers[1]} = ${answer}</strong></div>
+                `;
+                container.appendChild(finalEl);
+            }, steps.length * 600);
+        }
+
+        // =============================================
+        // PRACTICE MODE
+        // =============================================
+
+        /**
+         * Setup practice mode event listeners
+         */
+        function setupPractice() {
+            // Technique selection buttons
+            document.querySelectorAll('.technique-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const technique = btn.dataset.technique;
+                    startPractice(technique);
+                });
+            });
+
+            // Answer submission
+            document.getElementById('submit-answer').addEventListener('click', checkPracticeAnswer);
+            document.getElementById('answer-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkPracticeAnswer();
+            });
+
+            // Skip and next buttons
+            document.getElementById('skip-btn').addEventListener('click', skipProblem);
+            document.getElementById('next-btn').addEventListener('click', nextProblem);
+        }
+
+        /**
+         * Start practice mode for a specific technique
+         * @param {string} technique - Technique to practice
+         */
+        function startPractice(technique) {
+            showSection('practice');
+
+            state.currentTechnique = technique;
+            state.sessionCorrect = 0;
+            state.sessionTotal = 0;
+            state.sessionStreak = 0;
+
+            document.getElementById('practice-area').style.display = 'block';
+
+            generatePracticeProb();
+            updateSessionStats();
+        }
+
+        /**
+         * Generate a new practice problem
+         */
+        function generatePracticeProb() {
+            let technique = state.currentTechnique;
+
+            // If mixed, randomly select
+            if (technique === 'mixed') {
+                const available = Object.keys(techniques);
+                technique = available[Math.floor(Math.random() * available.length)];
+            }
+
+            const techData = techniques[technique];
+            state.currentProblem = {
+                ...techData.generateProblem(),
+                technique: technique
+            };
+
+            // Update display
+            document.getElementById('current-technique').textContent = techData.name;
+            document.getElementById('problem-text').textContent =
+                `${state.currentProblem.num1} × ${state.currentProblem.num2}`;
+
+            // Reset input
+            const input = document.getElementById('answer-input');
+            input.value = '';
+            input.className = '';
+            input.disabled = false;
+            input.focus();
+
+            // Reset feedback and buttons
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('skip-btn').style.display = 'inline-flex';
+            document.getElementById('submit-answer').style.display = 'inline-flex';
+
+            // Setup hint
+            const hintContent = document.getElementById('hint-content');
+            if (state.currentProblem.technique === 'general') {
+                hintContent.innerHTML = techData.getHint(state.currentProblem.num1, state.currentProblem.num2);
+            } else {
+                hintContent.innerHTML = techData.getHint(state.currentProblem.num1);
+            }
+            hintContent.style.display = 'none';
+            document.getElementById('hint-section').style.display = 'block';
+        }
+
+        /**
+         * Check the user's practice answer
+         */
+        function checkPracticeAnswer() {
+            const input = document.getElementById('answer-input');
+            const userAnswer = parseInt(input.value.trim());
+            const correct = userAnswer === state.currentProblem.answer;
+
+            state.sessionTotal++;
+            state.progress.totalProblems++;
+            state.progress.techniques[state.currentProblem.technique].attempted++;
+
+            const feedback = document.getElementById('feedback');
+
+            if (correct) {
+                state.sessionCorrect++;
+                state.sessionStreak++;
+                state.progress.totalCorrect++;
+                state.progress.currentStreak++;
+                state.progress.techniques[state.currentProblem.technique].correct++;
+
+                if (state.progress.currentStreak > state.progress.bestStreak) {
+                    state.progress.bestStreak = state.progress.currentStreak;
+                }
+
+                input.className = 'correct';
+                feedback.innerHTML = `
+                    <div class="feedback-correct animate-pop">
+                        <strong>Correct!</strong> Excellent work.
+                    </div>
+                `;
+            } else {
+                state.sessionStreak = 0;
+                state.progress.currentStreak = 0;
+
+                input.className = 'incorrect';
+                feedback.innerHTML = `
+                    <div class="feedback-incorrect">
+                        <strong>Not quite.</strong> The answer is <strong>${state.currentProblem.answer}</strong>
+                    </div>
+                `;
+            }
+
+            input.disabled = true;
+            document.getElementById('submit-answer').style.display = 'none';
+            document.getElementById('skip-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-flex';
+
+            updateSessionStats();
+            saveProgress();
+            updateStats();
+        }
+
+        /**
+         * Skip the current practice problem
+         */
+        function skipProblem() {
+            state.sessionTotal++;
+            state.sessionStreak = 0;
+            state.progress.currentStreak = 0;
+
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = `
+                <div class="feedback-incorrect">
+                    Skipped. The answer was <strong>${state.currentProblem.answer}</strong>
+                </div>
+            `;
+
+            document.getElementById('answer-input').disabled = true;
+            document.getElementById('submit-answer').style.display = 'none';
+            document.getElementById('skip-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-flex';
+
+            updateSessionStats();
+            saveProgress();
+        }
+
+        /**
+         * Move to the next practice problem
+         */
+        function nextProblem() {
+            generatePracticeProb();
+        }
+
+        /**
+         * Toggle hint visibility
+         */
+        function toggleHint() {
+            const hint = document.getElementById('hint-content');
+            const btn = document.querySelector('.hint-toggle');
+
+            if (hint.style.display === 'none') {
+                hint.style.display = 'block';
+                btn.textContent = 'Hide Hint';
+            } else {
+                hint.style.display = 'none';
+                btn.textContent = 'Show Hint';
+            }
+        }
+
+        /**
+         * Update session statistics display
+         */
+        function updateSessionStats() {
+            document.getElementById('session-correct').textContent = state.sessionCorrect;
+            document.getElementById('session-total').textContent = state.sessionTotal;
+            document.getElementById('session-streak').textContent = state.sessionStreak;
+        }
+
+        // =============================================
+        // TEST MODE
+        // =============================================
+
+        /**
+         * Setup test mode event listeners
+         */
+        function setupTest() {
+            // Question count buttons
+            document.querySelectorAll('.question-count').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.question-count').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // Time limit buttons
+            document.querySelectorAll('.time-limit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.time-limit').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // Start test button
+            document.getElementById('start-test').addEventListener('click', startTest);
+
+            // Test answer submission
+            document.getElementById('test-submit').addEventListener('click', submitTestAnswer);
+            document.getElementById('test-answer').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') submitTestAnswer();
+            });
+        }
+
+        /**
+         * Start a new test
+         */
+        function startTest() {
+            // Get selected techniques
+            const selectedTechniques = [];
+            document.querySelectorAll('.test-technique:checked').forEach(cb => {
+                selectedTechniques.push(cb.value);
+            });
+
+            if (selectedTechniques.length === 0) {
+                alert('Please select at least one technique to test.');
+                return;
+            }
+
+            // Get question count
+            const questionCount = parseInt(document.querySelector('.question-count.active').dataset.count);
+
+            // Get time limit
+            state.testTimeLimit = parseInt(document.querySelector('.time-limit.active').dataset.time);
+
+            // Generate questions
+            state.testQuestions = [];
+            for (let i = 0; i < questionCount; i++) {
+                const technique = selectedTechniques[Math.floor(Math.random() * selectedTechniques.length)];
+                const problem = techniques[technique].generateProblem();
+                state.testQuestions.push({
+                    ...problem,
+                    technique,
+                    techniqueName: techniques[technique].name
+                });
+            }
+
+            // Initialize test state
+            state.testCurrentIndex = 0;
+            state.testAnswers = [];
+            state.testStartTime = Date.now();
+            state.testActive = true;
+
+            // Show test interface
+            document.getElementById('test-setup').style.display = 'none';
+            document.getElementById('test-results').style.display = 'none';
+            document.getElementById('test-active').style.display = 'block';
+
+            // Update totals
+            document.getElementById('test-total').textContent = questionCount;
+
+            // Start timer if time limit set
+            if (state.testTimeLimit > 0) {
+                startTestTimer();
+            } else {
+                document.getElementById('test-timer').textContent = '--:--';
+            }
+
+            showTestQuestion();
+        }
+
+        /**
+         * Start the test timer
+         */
+        function startTestTimer() {
+            let timeLeft = state.testTimeLimit;
+
+            const updateDisplay = () => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('test-timer').textContent =
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            };
+
+            updateDisplay();
+
+            state.testTimer = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(state.testTimer);
+                    endTest();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Display the current test question
+         */
+        function showTestQuestion() {
+            const question = state.testQuestions[state.testCurrentIndex];
+
+            document.getElementById('test-current').textContent = state.testCurrentIndex + 1;
+            document.getElementById('test-technique').textContent = question.techniqueName;
+            document.getElementById('test-problem').textContent = `${question.num1} × ${question.num2}`;
+
+            // Update progress bar
+            const progress = (state.testCurrentIndex / state.testQuestions.length) * 100;
+            document.getElementById('test-progress').style.width = `${progress}%`;
+
+            // Reset input
+            const input = document.getElementById('test-answer');
+            input.value = '';
+            input.focus();
+        }
+
+        /**
+         * Submit answer for current test question
+         */
+        function submitTestAnswer() {
+            const input = document.getElementById('test-answer');
+            const userAnswer = parseInt(input.value.trim()) || null;
+            const question = state.testQuestions[state.testCurrentIndex];
+
+            state.testAnswers.push({
+                question,
+                userAnswer,
+                correct: userAnswer === question.answer
+            });
+
+            state.testCurrentIndex++;
+
+            if (state.testCurrentIndex >= state.testQuestions.length) {
+                endTest();
+            } else {
+                showTestQuestion();
+            }
+        }
+
+        /**
+         * End the test and show results
+         */
+        function endTest() {
+            state.testActive = false;
+
+            if (state.testTimer) {
+                clearInterval(state.testTimer);
+            }
+
+            const endTime = Date.now();
+            const timeTaken = Math.floor((endTime - state.testStartTime) / 1000);
+
+            // Calculate results
+            const correct = state.testAnswers.filter(a => a.correct).length;
+            const total = state.testQuestions.length;
+            const percentage = Math.round((correct / total) * 100);
+
+            // Determine grade
+            let grade;
+            if (percentage >= 90) grade = 'A';
+            else if (percentage >= 80) grade = 'B';
+            else if (percentage >= 70) grade = 'C';
+            else if (percentage >= 60) grade = 'D';
+            else grade = 'F';
+
+            // Update displays
+            document.getElementById('final-score').textContent = `${percentage}%`;
+            document.getElementById('final-grade').textContent = `Grade: ${grade}`;
+            document.getElementById('result-correct').textContent = correct;
+            document.getElementById('result-wrong').textContent = total - correct;
+
+            const minutes = Math.floor(timeTaken / 60);
+            const seconds = timeTaken % 60;
+            document.getElementById('result-time').textContent =
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            // Calculate breakdown by technique
+            const breakdown = {};
+            state.testAnswers.forEach(answer => {
+                const tech = answer.question.technique;
+                if (!breakdown[tech]) {
+                    breakdown[tech] = { correct: 0, total: 0, name: answer.question.techniqueName };
+                }
+                breakdown[tech].total++;
+                if (answer.correct) breakdown[tech].correct++;
+            });
+
+            const breakdownEl = document.getElementById('technique-breakdown');
+            breakdownEl.innerHTML = '';
+            Object.keys(breakdown).forEach(tech => {
+                const data = breakdown[tech];
+                const pct = Math.round((data.correct / data.total) * 100);
+                breakdownEl.innerHTML += `
+                    <div style="margin: var(--space-md) 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs);">
+                            <span>${data.name}</span>
+                            <span>${data.correct}/${data.total} (${pct}%)</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${pct}%;"></div>
+                        </div>
+                    </div>
+                `;
+
+                // Update progress stats
+                state.progress.techniques[tech].attempted += data.total;
+                state.progress.techniques[tech].correct += data.correct;
+            });
+
+            // Save to history
+            state.progress.testHistory.unshift({
+                date: new Date().toISOString(),
+                score: percentage,
+                correct,
+                total,
+                time: timeTaken,
+                techniques: Object.keys(breakdown)
+            });
+
+            // Keep only last 20 tests
+            if (state.progress.testHistory.length > 20) {
+                state.progress.testHistory.pop();
+            }
+
+            state.progress.totalProblems += total;
+            state.progress.totalCorrect += correct;
+
+            saveProgress();
+
+            // Show results
+            document.getElementById('test-active').style.display = 'none';
+            document.getElementById('test-results').style.display = 'block';
+        }
+
+        /**
+         * Reset test to setup screen
+         */
+        function resetTest() {
+            document.getElementById('test-results').style.display = 'none';
+            document.getElementById('test-setup').style.display = 'block';
+        }
+
+        /**
+         * Review mistakes from the last test
+         */
+        function reviewMistakes() {
+            const mistakes = state.testAnswers.filter(a => !a.correct);
+
+            if (mistakes.length === 0) {
+                alert('Perfect score! No mistakes to review.');
+                return;
+            }
+
+            let reviewHTML = '<h4>Incorrect Answers:</h4>';
+            mistakes.forEach((m, i) => {
+                reviewHTML += `
+                    <div class="math-step" style="margin-top: var(--space-md);">
+                        <span class="step-number">${i + 1}</span>
+                        <div class="step-content">
+                            <strong>${m.question.num1} × ${m.question.num2}</strong><br>
+                            Your answer: <span style="color: var(--accent-error);">${m.userAnswer || 'skipped'}</span><br>
+                            Correct answer: <span style="color: var(--accent-success);">${m.question.answer}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('result-breakdown').innerHTML = reviewHTML;
+        }
+
+        // =============================================
+        // PROGRESS TRACKING
+        // =============================================
+
+        /**
+         * Update home page statistics
+         */
+        function updateStats() {
+            document.getElementById('total-problems').textContent = state.progress.totalProblems;
+
+            const accuracy = state.progress.totalProblems > 0
+                ? Math.round((state.progress.totalCorrect / state.progress.totalProblems) * 100)
+                : 0;
+            document.getElementById('accuracy-rate').textContent = `${accuracy}%`;
+
+            document.getElementById('current-streak').textContent = state.progress.currentStreak;
+
+            // Calculate mastered techniques (>80% accuracy with >10 attempts)
+            let mastered = 0;
+            Object.values(state.progress.techniques).forEach(t => {
+                if (t.attempted >= 10 && (t.correct / t.attempted) >= 0.8) {
+                    mastered++;
+                }
+            });
+            document.getElementById('techniques-mastered').textContent = `${mastered}/8`;
+        }
+
+        /**
+         * Update progress page displays
+         */
+        function updateProgressDisplay() {
+            // Overall stats
+            document.getElementById('progress-total').textContent = state.progress.totalProblems;
+
+            const accuracy = state.progress.totalProblems > 0
+                ? Math.round((state.progress.totalCorrect / state.progress.totalProblems) * 100)
+                : 0;
+            document.getElementById('progress-accuracy').textContent = `${accuracy}%`;
+
+            document.getElementById('progress-best-streak').textContent = state.progress.bestStreak;
+            document.getElementById('progress-tests').textContent = state.progress.testHistory.length;
+
+            // Mastery grid
+            const masteryGrid = document.getElementById('mastery-grid');
+            masteryGrid.innerHTML = '';
+
+            Object.keys(state.progress.techniques).forEach(tech => {
+                const data = state.progress.techniques[tech];
+                const pct = data.attempted > 0 ? Math.round((data.correct / data.attempted) * 100) : 0;
+
+                // Calculate stars (1-5 based on accuracy and volume)
+                let stars = 0;
+                if (data.attempted >= 5 && pct >= 40) stars = 1;
+                if (data.attempted >= 10 && pct >= 60) stars = 2;
+                if (data.attempted >= 20 && pct >= 70) stars = 3;
+                if (data.attempted >= 30 && pct >= 80) stars = 4;
+                if (data.attempted >= 50 && pct >= 90) stars = 5;
+
+                const techName = techniques[tech]?.name || tech;
+
+                masteryGrid.innerHTML += `
+                    <div class="mastery-item">
+                        <h4>${techName}</h4>
+                        <div style="font-size: 0.85rem; color: var(--ink-muted); margin-bottom: var(--space-sm);">
+                            ${data.correct}/${data.attempted} (${pct}%)
+                        </div>
+                        <div class="mastery-level">
+                            ${[1,2,3,4,5].map(i => `
+                                <span class="mastery-star ${i <= stars ? 'filled' : ''}" style="font-size: 1.2rem;">★</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Test history
+            const historyBody = document.getElementById('history-body');
+            historyBody.innerHTML = '';
+
+            state.progress.testHistory.forEach(test => {
+                const date = new Date(test.date).toLocaleDateString();
+                const time = Math.floor(test.time / 60) + ':' + (test.time % 60).toString().padStart(2, '0');
+
+                historyBody.innerHTML += `
+                    <tr>
+                        <td>${date}</td>
+                        <td><strong>${test.score}%</strong></td>
+                        <td>${test.correct}/${test.total}</td>
+                        <td>${time}</td>
+                    </tr>
+                `;
+            });
+
+            if (state.progress.testHistory.length === 0) {
+                historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--ink-muted);">No tests completed yet</td></tr>';
+            }
+        }
+
+        /**
+         * Export progress data as JSON
+         */
+        function exportProgress() {
+            const data = JSON.stringify(state.progress, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'trachtenberg-progress.json';
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
+
+        /**
+         * Import progress data from JSON file
+         */
+        function importProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        state.progress = { ...state.progress, ...data };
+                        saveProgress();
+                        updateProgressDisplay();
+                        updateStats();
+                        alert('Progress imported successfully!');
+                    } catch (err) {
+                        alert('Error importing file. Please ensure it is a valid JSON file.');
+                    }
+                };
+
+                reader.readAsText(file);
+            };
+
+            input.click();
+        }
+
+        /**
+         * Clear all progress data
+         */
+        function clearProgress() {
+            if (confirm('Are you sure you want to clear all progress? This cannot be undone.')) {
+                localStorage.removeItem('trachtenberg-progress');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
