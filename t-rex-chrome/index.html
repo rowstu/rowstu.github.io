@@ -1,21 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>t-rex run</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="app.js"></script>
-  </head>
-  <body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dino Dash - Endless Runner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-wrapper">
+        <!-- Main Menu -->
+        <div class="screen active" id="menuScreen">
+            <div class="menu-content">
+                <h1 class="game-title">
+                    <span class="title-dino">Dino</span>
+                    <span class="title-dash">Dash</span>
+                </h1>
+                <p class="tagline">How far can you run?</p>
 
-    <div id="desert">
-        <h2 id="alert"></h2>
-        <div class="grid">
-            <div class="dino"></div>
+                <div class="menu-buttons">
+                    <button class="btn-play" onclick="startGame()">
+                        <span class="btn-icon">▶</span>
+                        Play
+                    </button>
+                    <button class="btn-menu" onclick="showScreen('characterScreen')">
+                        <span class="btn-icon">🦖</span>
+                        Characters
+                    </button>
+                    <button class="btn-menu" onclick="showScreen('optionsScreen')">
+                        <span class="btn-icon">⚙</span>
+                        Options
+                    </button>
+                </div>
+
+                <div class="high-score-display">
+                    <span class="hs-label">High Score</span>
+                    <span class="hs-value" id="menuHighScore">0</span>
+                </div>
+            </div>
+
+            <div class="menu-dino-preview" id="menuDinoPreview"></div>
+        </div>
+
+        <!-- Character Select Screen -->
+        <div class="screen" id="characterScreen">
+            <button class="back-btn" onclick="showScreen('menuScreen')">← Back</button>
+            <h2 class="screen-title">Choose Your Runner</h2>
+
+            <div class="character-grid" id="characterGrid">
+                <!-- Characters populated by JS -->
+            </div>
+
+            <div class="character-info" id="characterInfo">
+                <h3 id="charName">T-Rex</h3>
+                <p id="charDesc">The classic dinosaur runner</p>
+                <div class="char-stats">
+                    <div class="stat"><span class="stat-label">Speed</span><div class="stat-bar"><div class="stat-fill" id="statSpeed"></div></div></div>
+                    <div class="stat"><span class="stat-label">Jump</span><div class="stat-bar"><div class="stat-fill" id="statJump"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options Screen -->
+        <div class="screen" id="optionsScreen">
+            <button class="back-btn" onclick="showScreen('menuScreen')">← Back</button>
+            <h2 class="screen-title">Options</h2>
+
+            <div class="options-list">
+                <div class="option-item">
+                    <span class="option-label">Sound Effects</span>
+                    <button class="toggle-switch active" id="sfxToggle" onclick="toggleSFX()">
+                        <span class="toggle-thumb"></span>
+                    </button>
+                </div>
+                <div class="option-item">
+                    <span class="option-label">Music</span>
+                    <button class="toggle-switch active" id="musicToggle" onclick="toggleMusic()">
+                        <span class="toggle-thumb"></span>
+                    </button>
+                </div>
+                <div class="option-item">
+                    <span class="option-label">Vibration</span>
+                    <button class="toggle-switch active" id="vibrationToggle" onclick="toggleVibration()">
+                        <span class="toggle-thumb"></span>
+                    </button>
+                </div>
+                <div class="option-item">
+                    <span class="option-label">Show FPS</span>
+                    <button class="toggle-switch" id="fpsToggle" onclick="toggleFPS()">
+                        <span class="toggle-thumb"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="options-actions">
+                <button class="btn-danger" onclick="resetProgress()">Reset All Progress</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="screen" id="gameScreen">
+            <div class="game-hud">
+                <div class="hud-left">
+                    <div class="score-display">
+                        <span class="score-label">Score</span>
+                        <span class="score-value" id="currentScore">0</span>
+                    </div>
+                </div>
+                <div class="hud-center">
+                    <div class="level-display" id="levelDisplay">
+                        <span class="level-badge">Level 1</span>
+                        <span class="level-name">Desert Dawn</span>
+                    </div>
+                </div>
+                <div class="hud-right">
+                    <div class="combo-display hidden" id="comboDisplay">
+                        <span class="combo-value">x2</span>
+                    </div>
+                    <button class="btn-pause" id="pauseBtn" onclick="togglePause()">❚❚</button>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas"></canvas>
+
+            <div class="mobile-controls" id="mobileControls">
+                <div class="control-zone control-left" id="controlLeft">
+                    <span class="control-label">SLIDE</span>
+                </div>
+                <div class="control-zone control-right" id="controlRight">
+                    <span class="control-label">JUMP</span>
+                </div>
+            </div>
+
+            <div class="fps-counter hidden" id="fpsCounter">60 FPS</div>
+        </div>
+
+        <!-- Pause Menu -->
+        <div class="overlay hidden" id="pauseOverlay">
+            <div class="pause-menu">
+                <h2>Paused</h2>
+                <div class="pause-buttons">
+                    <button class="btn-play" onclick="togglePause()">
+                        <span class="btn-icon">▶</span>
+                        Resume
+                    </button>
+                    <button class="btn-menu" onclick="restartGame()">
+                        <span class="btn-icon">↺</span>
+                        Restart
+                    </button>
+                    <button class="btn-menu" onclick="quitToMenu()">
+                        <span class="btn-icon">🏠</span>
+                        Main Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div class="overlay hidden" id="gameOverOverlay">
+            <div class="game-over-content">
+                <h2 class="game-over-title">Game Over!</h2>
+
+                <div class="final-score">
+                    <span class="fs-label">Score</span>
+                    <span class="fs-value" id="finalScore">0</span>
+                </div>
+
+                <div class="score-breakdown">
+                    <div class="breakdown-item">
+                        <span>Distance</span>
+                        <span id="finalDistance">0m</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Coins</span>
+                        <span id="finalCoins">0</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Level Reached</span>
+                        <span id="finalLevel">1</span>
+                    </div>
+                </div>
+
+                <div class="new-high-score hidden" id="newHighScore">
+                    <span class="nhs-badge">★ NEW HIGH SCORE ★</span>
+                </div>
+
+                <div class="game-over-buttons">
+                    <button class="btn-play" onclick="restartGame()">
+                        <span class="btn-icon">↺</span>
+                        Play Again
+                    </button>
+                    <button class="btn-menu" onclick="quitToMenu()">
+                        <span class="btn-icon">🏠</span>
+                        Main Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Up Notification -->
+        <div class="level-up-notification hidden" id="levelUpNotification">
+            <div class="level-up-content">
+                <span class="level-up-text">LEVEL UP!</span>
+                <span class="level-up-name" id="levelUpName">Jungle Run</span>
+            </div>
+        </div>
+
+        <!-- Power-up Indicator -->
+        <div class="powerup-indicator hidden" id="powerupIndicator">
+            <span class="powerup-icon" id="powerupIcon">🛡️</span>
+            <div class="powerup-timer">
+                <div class="powerup-timer-fill" id="powerupTimerFill"></div>
+            </div>
         </div>
     </div>
 
-  </body>
+    <script src="game.js"></script>
+</body>
 </html>
