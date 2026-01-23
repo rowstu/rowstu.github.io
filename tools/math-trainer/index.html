@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathFlow - Mental Arithmetic Trainer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Atmospheric Background -->
+    <div class="atmosphere">
+        <div class="grid-overlay"></div>
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo" onclick="showScreen('menu')">
+                <span class="logo-icon">∑</span>
+                <h1>MathFlow</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" id="statsToggle" title="Toggle Progress Tracking">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="soundToggle" title="Toggle Sound">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Menu Screen -->
+        <main class="screen active" id="menuScreen">
+            <div class="menu-hero">
+                <h2>Train Your Mind</h2>
+                <p>Master mental arithmetic through practice, games, and proven techniques</p>
+            </div>
+
+            <div class="mode-cards">
+                <button class="mode-card" onclick="startPractice()">
+                    <div class="mode-icon">🎯</div>
+                    <h3>Practice</h3>
+                    <p>Custom quizzes with your choice of operations, difficulty, and question count</p>
+                </button>
+
+                <button class="mode-card" onclick="startSpeedChallenge()">
+                    <div class="mode-icon">⚡</div>
+                    <h3>Speed Challenge</h3>
+                    <p>Race against the clock — how fast can you answer 20 questions?</p>
+                </button>
+
+                <button class="mode-card" onclick="startEndless()">
+                    <div class="mode-icon">∞</div>
+                    <h3>Endless Mode</h3>
+                    <p>Keep your streak alive! Three strikes and you're out</p>
+                </button>
+
+                <button class="mode-card" onclick="startDaily()">
+                    <div class="mode-icon">📅</div>
+                    <h3>Daily Challenge</h3>
+                    <p>Same problems every day — compete with yourself and others</p>
+                </button>
+
+                <button class="mode-card tutorials-card" onclick="showScreen('tutorials')">
+                    <div class="mode-icon">📚</div>
+                    <h3>Tutorials</h3>
+                    <p>Learn mental math tricks and paper calculation methods</p>
+                </button>
+            </div>
+
+            <div class="stats-panel" id="statsPanel">
+                <h3>Your Progress</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalAnswered">0</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalCorrect">0</span>
+                        <span class="stat-label">Correct</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="accuracy">0%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="bestStreak">0</span>
+                        <span class="stat-label">Best Streak</span>
+                    </div>
+                </div>
+                <button class="btn-text" onclick="resetStats()">Reset Statistics</button>
+            </div>
+        </main>
+
+        <!-- Practice Setup Screen -->
+        <main class="screen" id="practiceSetupScreen">
+            <button class="back-btn" onclick="showScreen('menu')">← Back</button>
+
+            <div class="setup-container">
+                <h2>Practice Setup</h2>
+
+                <div class="setup-section">
+                    <label>Operations</label>
+                    <div class="toggle-group operations-toggle">
+                        <button class="toggle-btn active" data-op="add">+ Add</button>
+                        <button class="toggle-btn active" data-op="subtract">− Subtract</button>
+                        <button class="toggle-btn active" data-op="multiply">× Multiply</button>
+                        <button class="toggle-btn active" data-op="divide">÷ Divide</button>
+                    </div>
+                </div>
+
+                <div class="setup-section">
+                    <label>Difficulty</label>
+                    <div class="toggle-group difficulty-toggle">
+                        <button class="toggle-btn" data-diff="easy">Easy</button>
+                        <button class="toggle-btn active" data-diff="medium">Medium</button>
+                        <button class="toggle-btn" data-diff="hard">Hard</button>
+                        <button class="toggle-btn" data-diff="expert">Expert</button>
+                    </div>
+                    <p class="hint" id="difficultyHint">Numbers up to 12 × 12</p>
+                </div>
+
+                <div class="setup-section">
+                    <label>Number of Questions</label>
+                    <div class="toggle-group question-count-toggle">
+                        <button class="toggle-btn" data-count="5">5</button>
+                        <button class="toggle-btn active" data-count="10">10</button>
+                        <button class="toggle-btn" data-count="15">15</button>
+                        <button class="toggle-btn" data-count="20">20</button>
+                        <button class="toggle-btn" data-count="custom">Custom</button>
+                    </div>
+                    <input type="number" id="customCount" class="custom-input hidden" min="1" max="100" value="25" placeholder="Enter number">
+                </div>
+
+                <div class="setup-section">
+                    <label>Timer</label>
+                    <div class="toggle-group timer-toggle">
+                        <button class="toggle-btn active" data-timer="off">No Timer</button>
+                        <button class="toggle-btn" data-timer="relaxed">Relaxed (30s)</button>
+                        <button class="toggle-btn" data-timer="standard">Standard (15s)</button>
+                        <button class="toggle-btn" data-timer="speed">Speed (10s)</button>
+                    </div>
+                </div>
+
+                <button class="btn-primary start-btn" onclick="beginPractice()">Start Practice</button>
+            </div>
+        </main>
+
+        <!-- Game Screen -->
+        <main class="screen" id="gameScreen">
+            <div class="game-header">
+                <button class="back-btn" onclick="confirmQuit()">← Quit</button>
+                <div class="game-info">
+                    <span class="mode-badge" id="modeBadge">Practice</span>
+                    <span class="progress-text" id="progressText">1 / 10</span>
+                </div>
+                <div class="game-stats">
+                    <span class="streak-display" id="streakDisplay">🔥 0</span>
+                    <span class="score-display" id="scoreDisplay">Score: 0</span>
+                </div>
+            </div>
+
+            <div class="timer-bar" id="timerBar">
+                <div class="timer-fill" id="timerFill"></div>
+            </div>
+
+            <div class="question-area">
+                <div class="lives-display hidden" id="livesDisplay">
+                    <span class="life">❤️</span>
+                    <span class="life">❤️</span>
+                    <span class="life">❤️</span>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text" id="questionText">12 × 8</div>
+                    <div class="answer-input-container">
+                        <input type="number" id="answerInput" class="answer-input" placeholder="?" autocomplete="off" inputmode="numeric">
+                        <button class="submit-btn" id="submitBtn" onclick="submitAnswer()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="feedback-area hidden" id="feedbackArea">
+                    <div class="feedback-card" id="feedbackCard">
+                        <div class="feedback-icon" id="feedbackIcon">✓</div>
+                        <div class="feedback-message" id="feedbackMessage">Correct!</div>
+                        <div class="feedback-explanation hidden" id="feedbackExplanation"></div>
+                        <div class="feedback-actions">
+                            <button class="btn-secondary" id="retryBtn" onclick="retryQuestion()">Try Again <span class="key-hint">(R)</span></button>
+                            <button class="btn-primary" id="nextBtn" onclick="nextQuestion()">Next <span class="key-hint">(Enter)</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Results Screen -->
+        <main class="screen" id="resultsScreen">
+            <div class="results-container">
+                <div class="results-header">
+                    <h2 id="resultsTitle">Practice Complete!</h2>
+                    <p class="results-subtitle" id="resultsSubtitle">Great effort!</p>
+                </div>
+
+                <div class="results-score-ring">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="ring-bg" cx="60" cy="60" r="54"/>
+                        <circle class="ring-progress" id="scoreRing" cx="60" cy="60" r="54"/>
+                    </svg>
+                    <div class="ring-content">
+                        <span class="ring-value" id="finalScore">0</span>
+                        <span class="ring-label">Score</span>
+                    </div>
+                </div>
+
+                <div class="results-stats">
+                    <div class="result-stat">
+                        <span class="result-value" id="correctCount">0</span>
+                        <span class="result-label">Correct</span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-value" id="wrongCount">0</span>
+                        <span class="result-label">Wrong</span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-value" id="avgTime">0s</span>
+                        <span class="result-label">Avg Time</span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-value" id="finalStreak">0</span>
+                        <span class="result-label">Best Streak</span>
+                    </div>
+                </div>
+
+                <div class="results-breakdown" id="resultsBreakdown">
+                    <h3>Question Review</h3>
+                    <div class="breakdown-list" id="breakdownList"></div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn-secondary" onclick="showScreen('menu')">Main Menu</button>
+                    <button class="btn-primary" onclick="playAgain()">Play Again</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Tutorials Screen -->
+        <main class="screen" id="tutorialsScreen">
+            <button class="back-btn" onclick="showScreen('menu')">← Back</button>
+
+            <div class="tutorials-container">
+                <h2>Mental Math Tutorials</h2>
+                <p class="tutorials-intro">Master these techniques to calculate faster in your head and on paper.</p>
+
+                <div class="tutorial-tabs">
+                    <button class="tab-btn active" data-tab="mental">Mental Math</button>
+                    <button class="tab-btn" data-tab="paper">Paper Methods</button>
+                </div>
+
+                <!-- Mental Math Tutorials -->
+                <div class="tutorial-content active" id="mentalTab">
+                    <div class="tutorial-section">
+                        <h3>🔢 Addition Tricks</h3>
+
+                        <div class="technique">
+                            <h4>Making Tens (Complements)</h4>
+                            <p>Look for pairs that make 10, then add the rest.</p>
+                            <div class="example">
+                                <code>7 + 8 + 3 + 2</code>
+                                <span class="arrow">→</span>
+                                <code>(7 + 3) + (8 + 2) = 10 + 10 = <strong>20</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Left-to-Right Addition</h4>
+                            <p>Add from left to right instead of right to left — it's more natural for mental math.</p>
+                            <div class="example">
+                                <code>47 + 36</code>
+                                <span class="arrow">→</span>
+                                <code>40 + 30 = 70, then 7 + 6 = 13 → <strong>83</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Round and Adjust</h4>
+                            <p>Round to an easy number, calculate, then adjust back.</p>
+                            <div class="example">
+                                <code>67 + 29</code>
+                                <span class="arrow">→</span>
+                                <code>67 + 30 = 97, minus 1 = <strong>96</strong></code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-section">
+                        <h3>➖ Subtraction Tricks</h3>
+
+                        <div class="technique">
+                            <h4>Counting Up (Shopkeeper's Method)</h4>
+                            <p>Instead of subtracting, count up from the smaller number.</p>
+                            <div class="example">
+                                <code>83 - 47</code>
+                                <span class="arrow">→</span>
+                                <code>47 → 50 (3) → 80 (30) → 83 (3) = <strong>36</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Round and Adjust</h4>
+                            <p>Round the number you're subtracting, then compensate.</p>
+                            <div class="example">
+                                <code>92 - 37</code>
+                                <span class="arrow">→</span>
+                                <code>92 - 40 = 52, plus 3 = <strong>55</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Same Change Method</h4>
+                            <p>Add or subtract the same amount from both numbers to make easier calculations.</p>
+                            <div class="example">
+                                <code>84 - 39</code>
+                                <span class="arrow">→</span>
+                                <code>85 - 40 = <strong>45</strong></code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-section">
+                        <h3>✖️ Multiplication Tricks</h3>
+
+                        <div class="technique">
+                            <h4>Multiplying by 11</h4>
+                            <p>For 2-digit numbers: add the digits and put the sum in the middle.</p>
+                            <div class="example">
+                                <code>36 × 11</code>
+                                <span class="arrow">→</span>
+                                <code>3 _ 6, insert 3+6=9 → <strong>396</strong></code>
+                            </div>
+                            <p class="note">If the sum is 10+, carry the 1: 57 × 11 = 5_(12)_7 = 627</p>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Multiplying by 5</h4>
+                            <p>Multiply by 10, then halve the result.</p>
+                            <div class="example">
+                                <code>48 × 5</code>
+                                <span class="arrow">→</span>
+                                <code>48 × 10 = 480, halve = <strong>240</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Multiplying by 9</h4>
+                            <p>Multiply by 10, then subtract the original number.</p>
+                            <div class="example">
+                                <code>23 × 9</code>
+                                <span class="arrow">→</span>
+                                <code>23 × 10 = 230, minus 23 = <strong>207</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Doubling and Halving</h4>
+                            <p>Make one number easier by doubling it and halving the other.</p>
+                            <div class="example">
+                                <code>16 × 25</code>
+                                <span class="arrow">→</span>
+                                <code>8 × 50 = 4 × 100 = <strong>400</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Squaring Numbers Ending in 5</h4>
+                            <p>Take the tens digit, multiply by (itself + 1), append 25.</p>
+                            <div class="example">
+                                <code>35²</code>
+                                <span class="arrow">→</span>
+                                <code>3 × 4 = 12, append 25 → <strong>1225</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Breaking Apart (Distribution)</h4>
+                            <p>Split one number into parts, multiply separately, add results.</p>
+                            <div class="example">
+                                <code>7 × 23</code>
+                                <span class="arrow">→</span>
+                                <code>7 × 20 = 140, 7 × 3 = 21 → <strong>161</strong></code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-section">
+                        <h3>➗ Division Tricks</h3>
+
+                        <div class="technique">
+                            <h4>Divisibility Rules</h4>
+                            <div class="rules-grid">
+                                <div class="rule"><strong>÷2:</strong> Last digit is even</div>
+                                <div class="rule"><strong>÷3:</strong> Digit sum divisible by 3</div>
+                                <div class="rule"><strong>÷4:</strong> Last 2 digits ÷ 4</div>
+                                <div class="rule"><strong>÷5:</strong> Ends in 0 or 5</div>
+                                <div class="rule"><strong>÷6:</strong> Divisible by both 2 and 3</div>
+                                <div class="rule"><strong>÷9:</strong> Digit sum divisible by 9</div>
+                                <div class="rule"><strong>÷10:</strong> Ends in 0</div>
+                                <div class="rule"><strong>÷11:</strong> Alternating sum = 0 or ÷11</div>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Dividing by 5</h4>
+                            <p>Double the number, then divide by 10.</p>
+                            <div class="example">
+                                <code>135 ÷ 5</code>
+                                <span class="arrow">→</span>
+                                <code>135 × 2 = 270, ÷ 10 = <strong>27</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Halving Repeatedly</h4>
+                            <p>To divide by 4, halve twice. To divide by 8, halve three times.</p>
+                            <div class="example">
+                                <code>96 ÷ 8</code>
+                                <span class="arrow">→</span>
+                                <code>96 → 48 → 24 → <strong>12</strong></code>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Factor and Conquer</h4>
+                            <p>Break the divisor into factors and divide step by step.</p>
+                            <div class="example">
+                                <code>180 ÷ 12</code>
+                                <span class="arrow">→</span>
+                                <code>180 ÷ 3 = 60, ÷ 4 = <strong>15</strong></code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-section">
+                        <h3>🧠 Advanced: Trachtenberg System</h3>
+                        <p class="section-intro">The Trachtenberg system uses special rules for multiplying by specific numbers without traditional multiplication tables.</p>
+
+                        <div class="technique">
+                            <h4>Multiply by 12</h4>
+                            <p>Double each digit and add its right neighbor.</p>
+                            <div class="example">
+                                <code>346 × 12</code>
+                                <div class="trach-steps">
+                                    <div>Start from right: (6×2)+0 = 12 → write 2, carry 1</div>
+                                    <div>(4×2)+6+1 = 15 → write 5, carry 1</div>
+                                    <div>(3×2)+4+1 = 11 → write 1, carry 1</div>
+                                    <div>0+3+1 = 4</div>
+                                    <div>Result: <strong>4152</strong></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="technique">
+                            <h4>Multiply by 6</h4>
+                            <p>Add half the neighbor (or half neighbor + 5 if digit is odd).</p>
+                            <div class="example">
+                                <code>428 × 6</code>
+                                <span class="arrow">→</span>
+                                <code>Working right to left with the rule gives <strong>2568</strong></code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paper Methods Tutorials -->
+                <div class="tutorial-content" id="paperTab">
+                    <div class="tutorial-section">
+                        <h3>✏️ Long Multiplication</h3>
+
+                        <div class="technique paper-technique">
+                            <h4>Standard Long Multiplication</h4>
+                            <p>Multiply each digit of the bottom number by the entire top number, shift each row, then add.</p>
+                            <div class="paper-example">
+                                <pre class="calculation">
+    347
+  ×  23
+  ─────
+   1041   ← 347 × 3
+   694    ← 347 × 2 (shifted left)
+  ─────
+   7981   ← Add columns
+                                </pre>
+                            </div>
+                        </div>
+
+                        <div class="technique paper-technique">
+                            <h4>Grid Method (Box Method)</h4>
+                            <p>Break numbers into parts, multiply in a grid, sum the results. Great for visual learners!</p>
+                            <div class="paper-example">
+                                <pre class="calculation">
+23 × 47 = (20 + 3) × (40 + 7)
+
+      │  40   │   7  │
+  ────┼───────┼──────┤
+   20 │  800  │  140 │  = 940
+  ────┼───────┼──────┤
+    3 │  120  │   21 │  = 141
+  ────┴───────┴──────┘
+                  Total: 1081
+                                </pre>
+                            </div>
+                        </div>
+
+                        <div class="technique paper-technique">
+                            <h4>Lattice Multiplication</h4>
+                            <p>Draw a grid with diagonals, multiply pairs, add along diagonals.</p>
+                            <div class="paper-example">
+                                <pre class="calculation">
+34 × 27:
+    3     4
+  ┌───┬───┐
+  │0/6│0/8│ 2
+  ├───┼───┤
+  │2/1│2/8│ 7
+  └───┴───┘
+Read diagonals from bottom-right:
+8 → (1+8+6)=15 → (2+0+0+1)=3 → 9
+Result: 918
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-section">
+                        <h3>✏️ Short Division</h3>
+
+                        <div class="technique paper-technique">
+                            <h4>Bus Stop Method</h4>
+                            <p>Divide digit by digit, carrying remainders to the next digit.</p>
+                            <div class="paper-example">
+                                <pre class="calculation">
+432 ÷ 4 = ?
+
+    1 0 8
+   ┌─────
+ 4 │ 4 ³3 ²2
+
+4÷4=1 r0, 03÷4=0 r3, 32÷4=8 r0
+Answer: 108
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-section">
+                        <h3>✏️ Long Division</h3>
+
+                        <div class="technique paper-technique">
+                            <h4>Step-by-Step Long Division</h4>
+                            <p>Divide → Multiply → Subtract → Bring down → Repeat</p>
+                            <div class="paper-example">
+                                <pre class="calculation">
+852 ÷ 23 = ?
+
+      37
+    ┌─────
+ 23 │ 852
+    - 69↓    ← 23 × 3 = 69
+    ─────
+      162
+    - 161    ← 23 × 7 = 161
+    ─────
+        1    ← Remainder
+
+Answer: 37 remainder 1 (or 37 r1)
+                                </pre>
+                            </div>
+                            <div class="steps-list">
+                                <ol>
+                                    <li><strong>Divide:</strong> How many times does 23 go into 85? → 3 times</li>
+                                    <li><strong>Multiply:</strong> 23 × 3 = 69</li>
+                                    <li><strong>Subtract:</strong> 85 - 69 = 16</li>
+                                    <li><strong>Bring down:</strong> Bring down the 2 to make 162</li>
+                                    <li><strong>Repeat:</strong> 23 goes into 162 → 7 times (23 × 7 = 161)</li>
+                                    <li><strong>Subtract:</strong> 162 - 161 = 1 (remainder)</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="technique paper-technique">
+                            <h4>Estimation Checkpoint</h4>
+                            <p>Always estimate first to catch errors!</p>
+                            <div class="example">
+                                <code>852 ÷ 23</code>
+                                <span class="arrow">→</span>
+                                <code>≈ 900 ÷ 25 = 36</code>
+                            </div>
+                            <p class="note">Our answer of 37 is close to 36 ✓</p>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-section">
+                        <h3>💡 Tips for Paper Calculations</h3>
+                        <ul class="tips-list">
+                            <li><strong>Line up your digits</strong> — Use grid paper if needed to keep columns straight</li>
+                            <li><strong>Write carry digits small</strong> — Above the column they belong to</li>
+                            <li><strong>Estimate first</strong> — Get a rough answer before calculating</li>
+                            <li><strong>Check by reversing</strong> — Verify division with multiplication</li>
+                            <li><strong>Double-check subtractions</strong> — Most errors happen in the subtract step</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
