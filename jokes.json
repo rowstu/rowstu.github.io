@@ -3,12 +3,12 @@
         {
             "title": "batman",
             "type": "pun",
-            "body": "My boss said “dress for the job you want, not for the job you have.” So I went in as Batman."
+            "body": "My boss said \"dress for the job you want, not for the job you have.\" So I went in as Batman."
         },
         {
             "title": "aquarium",
             "type": "pun",
-            "body": "I went to the aquarium this weekend, but I didn’t stay long. There’s something fishy about that place."
+            "body": "I went to the aquarium this weekend, but I didn't stay long. There's something fishy about that place."
         },
         {
             "title": "sheep",
@@ -53,7 +53,7 @@
         {
             "title": "cold house",
             "type": "pun",
-            "body": "If your house is cold, just stand in the corner. It’s always 90 degrees there."
+            "body": "If your house is cold, just stand in the corner. It's always 90 degrees there."
         },
         {
             "title": "thesaurus",
@@ -82,7 +82,7 @@
             "body": "I stayed up all night wondering where the sun went, and then it dawned on me."
         },
         {
-            "title": "shorter",
+            "title": "holy water",
             "type": "question",
             "body": "How do you make holy water?",
             "answer": "You boil the hell out of it."
@@ -101,13 +101,13 @@
         {
             "title": "pterodactyl",
             "type": "question",
-            "body": "Why can’t you hear a pterodactyl go to the bathroom?",
+            "body": "Why can't you hear a pterodactyl go to the bathroom?",
             "answer": "The P is silent."
         },
         {
-            "title": "pterodactyl",
+            "title": "labrathor",
             "type": "question",
-            "body": "What’s a dog’s favorite Marvel character?",
+            "body": "What's a dog's favorite Marvel character?",
             "answer": "Labra-Thor."
         },
         {
@@ -115,6 +115,483 @@
             "type": "question",
             "body": "What do you say when a chicken is looking at salad?",
             "answer": "Chicken sees a salad."
+        },
+        {
+            "title": "velcro",
+            "type": "pun",
+            "body": "Velcro. What a rip-off."
+        },
+        {
+            "title": "crime in a lift",
+            "type": "pun",
+            "body": "Crime in multi-storey car parks. That is wrong on so many levels."
+        },
+        {
+            "title": "exit signs",
+            "type": "pun",
+            "body": "Exit signs. They're on the way out."
+        },
+        {
+            "title": "arrested",
+            "type": "pun",
+            "body": "I was arrested for flying into a rage. The other passengers were terrified."
+        },
+        {
+            "title": "fencing",
+            "type": "pun",
+            "body": "I've just been to the gym and there's a new machine there. I used it for an hour and felt sick. It's brilliant though. It does everything: Mars bars, KitKats, crisps..."
+        },
+        {
+            "title": "gardening",
+            "type": "pun",
+            "body": "I rang up my local swimming baths. I said, \"Is that the local swimming baths?\" They said, \"It depends where you're calling from.\""
+        },
+        {
+            "title": "black horse",
+            "type": "pun",
+            "body": "Black Beauty. Now there's a dark horse."
+        },
+        {
+            "title": "alphabet",
+            "type": "pun",
+            "body": "The first rule of alphabet club is you don't talk about alphabet club. The second rule of alphabet club is you don't talk about alphabet club. The third rule..."
+        },
+        {
+            "title": "ship",
+            "type": "pun",
+            "body": "I saw this bloke chatting up a cheetah. I thought, he's trying to pull a fast one."
+        },
+        {
+            "title": "diving",
+            "type": "pun",
+            "body": "I saw a documentary on how ships are kept together. Riveting."
+        },
+        {
+            "title": "calendar",
+            "type": "pun",
+            "body": "I'm reading a book about anti-gravity. It's impossible to put down."
+        },
+        {
+            "title": "umbrella",
+            "type": "pun",
+            "body": "I asked my girlfriend if she wanted to go to the gym. She said, \"I'm not that fit.\" I said, \"Just wear baggy clothes then.\""
+        },
+        {
+            "title": "spiders",
+            "type": "pun",
+            "body": "Spiders are brilliant web designers."
+        },
+        {
+            "title": "kidnapping",
+            "type": "pun",
+            "body": "So I rang up British Telecom. I said, \"I want to report a nuisance caller.\" They said, \"Not you again.\""
+        },
+        {
+            "title": "whiteboards",
+            "type": "pun",
+            "body": "Whiteboards are remarkable."
+        },
+        {
+            "title": "scarecrow",
+            "type": "question",
+            "body": "Why did the scarecrow win an award?",
+            "answer": "Because he was outstanding in his field."
+        },
+        {
+            "title": "broken pencil",
+            "type": "pun",
+            "body": "I was going to tell you a joke about a broken pencil, but there's no point."
+        },
+        {
+            "title": "ceiling",
+            "type": "pun",
+            "body": "The ceiling isn't the best thing in the world, but it's up there."
+        },
+        {
+            "title": "backwards",
+            "type": "pun",
+            "body": "I used to hate facial hair, but then it grew on me."
+        },
+        {
+            "title": "calendar2",
+            "type": "pun",
+            "body": "My calendar's days are numbered."
+        },
+        {
+            "title": "belt",
+            "type": "pun",
+            "body": "I got a belt made of watches for my birthday. It was a waist of time."
+        },
+        {
+            "title": "ocean",
+            "type": "question",
+            "body": "Why don't scientists trust atoms?",
+            "answer": "Because they make up everything."
+        },
+        {
+            "title": "invisible",
+            "type": "pun",
+            "body": "I used to be invisible, but nobody noticed."
+        },
+        {
+            "title": "baker",
+            "type": "pun",
+            "body": "A man walks into a library and asks for books about paranoia. The librarian whispers, \"They're right behind you.\""
+        },
+        {
+            "title": "pirate",
+            "type": "question",
+            "body": "What's a pirate's favorite letter?",
+            "answer": "You'd think it's R, but it's the C they love."
+        },
+        {
+            "title": "bicycle",
+            "type": "pun",
+            "body": "I couldn't work out how to fasten my seatbelt. Then it clicked."
+        },
+        {
+            "title": "electrician",
+            "type": "pun",
+            "body": "I'm friends with an electrician. He's a very current person."
+        },
+        {
+            "title": "batteries",
+            "type": "pun",
+            "body": "I bought some batteries, but they weren't included."
+        },
+        {
+            "title": "restaurant",
+            "type": "pun",
+            "body": "I went to a seafood disco last week. I pulled a mussel."
+        },
+        {
+            "title": "stairs",
+            "type": "pun",
+            "body": "I don't trust stairs. They're always up to something."
+        },
+        {
+            "title": "grapes",
+            "type": "pun",
+            "body": "I tried to catch fog yesterday. Mist."
+        },
+        {
+            "title": "camping",
+            "type": "question",
+            "body": "Why did the campfire break up with the tent?",
+            "answer": "Because the tent was too intense."
+        },
+        {
+            "title": "tree",
+            "type": "pun",
+            "body": "I'm thinking about removing my spine. I feel it's holding me back."
+        },
+        {
+            "title": "window",
+            "type": "pun",
+            "body": "I had a job crushing cans. It was soda pressing."
+        },
+        {
+            "title": "magician",
+            "type": "pun",
+            "body": "A magician was driving down the road. Then he turned into a driveway."
+        },
+        {
+            "title": "shovel",
+            "type": "pun",
+            "body": "The shovel was a ground-breaking invention."
+        },
+        {
+            "title": "broom",
+            "type": "pun",
+            "body": "I'm sweeping the nation. I'm a broom."
+        },
+        {
+            "title": "cheese",
+            "type": "question",
+            "body": "What do you call cheese that isn't yours?",
+            "answer": "Nacho cheese."
+        },
+        {
+            "title": "hipster",
+            "type": "pun",
+            "body": "I burned my Hawaiian pizza today. Should've put it on aloha temperature."
+        },
+        {
+            "title": "kidnap",
+            "type": "pun",
+            "body": "Did you hear about the kidnapping at school? It's fine, he woke up."
+        },
+        {
+            "title": "skeleton",
+            "type": "question",
+            "body": "Why didn't the skeleton go to the party?",
+            "answer": "He had no body to go with."
+        },
+        {
+            "title": "almond",
+            "type": "pun",
+            "body": "I'm nuts about you. I'm an almond."
+        },
+        {
+            "title": "math",
+            "type": "pun",
+            "body": "Parallel lines have so much in common. It's a shame they'll never meet."
+        },
+        {
+            "title": "elevator",
+            "type": "pun",
+            "body": "My first job was working in an orange juice factory, but I got canned. Couldn't concentrate."
+        },
+        {
+            "title": "origami",
+            "type": "pun",
+            "body": "I'm reading a horror story in Braille. Something bad is about to happen, I can feel it."
+        },
+        {
+            "title": "rope",
+            "type": "question",
+            "body": "What did the ocean say to the beach?",
+            "answer": "Nothing, it just waved."
+        },
+        {
+            "title": "frog",
+            "type": "question",
+            "body": "What do you call a frog with no legs?",
+            "answer": "Unhoppy."
+        },
+        {
+            "title": "comedian",
+            "type": "pun",
+            "body": "I told my wife she was drawing her eyebrows too high. She looked surprised."
+        },
+        {
+            "title": "paper",
+            "type": "pun",
+            "body": "I'm afraid of speed bumps, but I'm slowly getting over it."
+        },
+        {
+            "title": "furniture",
+            "type": "pun",
+            "body": "I used to work at a calendar factory but I got fired for taking a few days off."
+        },
+        {
+            "title": "crossword",
+            "type": "pun",
+            "body": "I've got a phobia of over-engineered buildings. It's a complex complex complex."
+        },
+        {
+            "title": "hat",
+            "type": "question",
+            "body": "What do you call a fish without eyes?",
+            "answer": "A fsh."
+        },
+        {
+            "title": "tennis",
+            "type": "pun",
+            "body": "Tennis players don't marry because love means nothing to them."
+        },
+        {
+            "title": "needle",
+            "type": "pun",
+            "body": "I wondered why the frisbee was getting bigger. Then it hit me."
+        },
+        {
+            "title": "astronaut",
+            "type": "question",
+            "body": "How do you organize a space party?",
+            "answer": "You planet."
+        },
+        {
+            "title": "clock",
+            "type": "pun",
+            "body": "I asked the clock if it wanted some food. It went back four seconds."
+        },
+        {
+            "title": "towel",
+            "type": "pun",
+            "body": "I threw a boomerang a few years ago. I now live in constant fear."
+        },
+        {
+            "title": "dictionary",
+            "type": "pun",
+            "body": "Irony. The opposite of wrinkly."
+        },
+        {
+            "title": "butcher",
+            "type": "pun",
+            "body": "A butcher backed into the meat grinder and got a little behind in his work."
+        },
+        {
+            "title": "doctor",
+            "type": "question",
+            "body": "What do you call a fake noodle?",
+            "answer": "An impasta."
+        },
+        {
+            "title": "snowman",
+            "type": "question",
+            "body": "What do you call a snowman with a six-pack?",
+            "answer": "An abdominal snowman."
+        },
+        {
+            "title": "music",
+            "type": "pun",
+            "body": "I can't believe I got fired from the calendar factory. All I did was take a day off."
+        },
+        {
+            "title": "bee",
+            "type": "question",
+            "body": "What do you call a bee that can't make up its mind?",
+            "answer": "A maybe."
+        },
+        {
+            "title": "banana",
+            "type": "question",
+            "body": "Why did the banana go to the doctor?",
+            "answer": "It wasn't peeling well."
+        },
+        {
+            "title": "shoe",
+            "type": "pun",
+            "body": "What do you call shoes made of bananas? Slippers."
+        },
+        {
+            "title": "bread",
+            "type": "pun",
+            "body": "A man walked into a bar with a piece of tarmac under his arm. He said, \"A pint please, and one for the road.\""
+        },
+        {
+            "title": "claustrophobia",
+            "type": "pun",
+            "body": "Claustrophobic people are more productive thinking outside the box."
+        },
+        {
+            "title": "nose",
+            "type": "question",
+            "body": "What did one eye say to the other?",
+            "answer": "Between you and me, something smells."
+        },
+        {
+            "title": "photon",
+            "type": "pun",
+            "body": "A photon checks into a hotel. The bellboy asks if he needs help with his luggage. The photon says, \"No thanks, I'm traveling light.\""
+        },
+        {
+            "title": "coffee",
+            "type": "question",
+            "body": "How does Moses make his coffee?",
+            "answer": "Hebrews it."
+        },
+        {
+            "title": "wiper",
+            "type": "pun",
+            "body": "I bought a dog from a blacksmith. As soon as I got him home, he made a bolt for the door."
+        },
+        {
+            "title": "eggs",
+            "type": "pun",
+            "body": "I was going to tell a time-traveling joke, but you didn't like it."
+        },
+        {
+            "title": "zoo",
+            "type": "pun",
+            "body": "I went to the zoo and saw a baguette in a cage. The zookeeper said it was bread in captivity."
+        },
+        {
+            "title": "computer",
+            "type": "question",
+            "body": "Why was the computer cold?",
+            "answer": "It left its Windows open."
+        },
+        {
+            "title": "mirror",
+            "type": "pun",
+            "body": "I broke my arm in two places. The doctor told me to stop going to those places."
+        },
+        {
+            "title": "lettuce",
+            "type": "pun",
+            "body": "Lettuce romaine calm. We'll get through this."
+        },
+        {
+            "title": "penguin",
+            "type": "question",
+            "body": "What do you call a penguin in the desert?",
+            "answer": "Lost."
+        },
+        {
+            "title": "vampire",
+            "type": "question",
+            "body": "Why don't vampires attack Taylor Swift?",
+            "answer": "Because she's got bad blood."
+        },
+        {
+            "title": "piano",
+            "type": "pun",
+            "body": "I used to play piano by ear. Now I use my hands."
+        },
+        {
+            "title": "gym2",
+            "type": "pun",
+            "body": "I told my gym instructor I wanted to do splits. He said, \"How flexible are you?\" I said, \"I can't do Tuesdays.\""
+        },
+        {
+            "title": "pasttime",
+            "type": "pun",
+            "body": "Nostalgia isn't what it used to be."
+        },
+        {
+            "title": "buffet",
+            "type": "pun",
+            "body": "I went to a buffet with my laptop. I was hoping for the Wi-Fi to be free too."
+        },
+        {
+            "title": "gardener",
+            "type": "question",
+            "body": "Why do gardeners make good detectives?",
+            "answer": "They're always digging up dirt."
+        },
+        {
+            "title": "reverse",
+            "type": "pun",
+            "body": "I used to be addicted to the hokey cokey. But I turned myself around."
+        },
+        {
+            "title": "leftovers",
+            "type": "pun",
+            "body": "My wife told me to stop acting like a flamingo. I had to put my foot down."
+        },
+        {
+            "title": "sausage",
+            "type": "pun",
+            "body": "I'm in a band called Missing Cat. You've probably seen our posters."
+        },
+        {
+            "title": "sheep2",
+            "type": "question",
+            "body": "What do you call a sheep with no legs?",
+            "answer": "A cloud."
+        },
+        {
+            "title": "doors",
+            "type": "pun",
+            "body": "I've decided to sell my vacuum cleaner. It was just gathering dust."
+        },
+        {
+            "title": "hospital",
+            "type": "pun",
+            "body": "I have a fear of elevators, so I'm taking steps to avoid them."
+        },
+        {
+            "title": "windmill",
+            "type": "question",
+            "body": "What do you call a wind turbine that doesn't work?",
+            "answer": "Not a fan."
+        },
+        {
+            "title": "mountain",
+            "type": "pun",
+            "body": "I'm addicted to brake fluid. But I can stop whenever I want."
         }
     ]
 }
