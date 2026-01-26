@@ -1,0 +1,349 @@
+# =============================================================================
+# robots.txt - Security-Focused Crawler Control
+# rowstu.net
+# =============================================================================
+# This file restricts access from search engine crawlers and LLM/AI training
+# bots. While this is an advisory protocol (bots can ignore it), reputable
+# crawlers generally respect these directives.
+# =============================================================================
+
+# =============================================================================
+# LLM / AI TRAINING CRAWLERS
+# Block bots that scrape content for AI model training
+# =============================================================================
+
+# OpenAI's GPTBot - Used to train ChatGPT and other OpenAI models
+User-agent: GPTBot
+Disallow: /
+
+# OpenAI's ChatGPT plugins and browsing
+User-agent: ChatGPT-User
+Disallow: /
+
+# Google's AI training crawler (separate from search indexing)
+User-agent: Google-Extended
+Disallow: /
+
+# Common Crawl - Large-scale web archive used for AI training
+User-agent: CCBot
+Disallow: /
+
+# Anthropic's Claude training crawler
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# Cohere's AI training crawler
+User-agent: cohere-ai
+Disallow: /
+
+# Meta/Facebook AI training
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: Meta-ExternalFetcher
+Disallow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Disallow: /
+
+# ByteDance/TikTok AI
+User-agent: Bytespider
+Disallow: /
+
+# Amazon AI crawlers
+User-agent: Amazonbot
+Disallow: /
+
+# Apple's Applebot (used for Siri and ML features)
+User-agent: Applebot-Extended
+Disallow: /
+
+# Diffbot - AI data extraction
+User-agent: Diffbot
+Disallow: /
+
+# Omgili/Webz.io - Data harvesting for AI
+User-agent: omgili
+Disallow: /
+
+User-agent: omgilibot
+Disallow: /
+
+# YouBot - You.com AI search
+User-agent: YouBot
+Disallow: /
+
+# Neeva AI (now part of Snowflake)
+User-agent: NeevaBot
+Disallow: /
+
+# Timpi AI crawler
+User-agent: Timpibot
+Disallow: /
+
+# Scrapy-based AI crawlers
+User-agent: img2dataset
+Disallow: /
+
+# Hugging Face dataset collectors
+User-agent: DataForSeoBot
+Disallow: /
+
+# Sentibot
+User-agent: Sentibot
+Disallow: /
+
+# PiplBot - People search/data aggregation
+User-agent: PiplBot
+Disallow: /
+
+# =============================================================================
+# SEARCH ENGINE CRAWLERS
+# Block major search engine indexing
+# =============================================================================
+
+# Google Search
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Googlebot-Image
+Disallow: /
+
+User-agent: Googlebot-Video
+Disallow: /
+
+User-agent: Googlebot-News
+Disallow: /
+
+User-agent: Storebot-Google
+Disallow: /
+
+# Bing/Microsoft
+User-agent: Bingbot
+Disallow: /
+
+User-agent: BingPreview
+Disallow: /
+
+User-agent: msnbot
+Disallow: /
+
+User-agent: msnbot-media
+Disallow: /
+
+# Yahoo (uses Bing but has its own crawler too)
+User-agent: Slurp
+Disallow: /
+
+# Yandex (Russian search engine)
+User-agent: Yandex
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: YandexImages
+Disallow: /
+
+# Baidu (Chinese search engine)
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: Baiduspider-image
+Disallow: /
+
+User-agent: Baiduspider-video
+Disallow: /
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Disallow: /
+
+# Sogou (Chinese search engine)
+User-agent: Sogou
+Disallow: /
+
+User-agent: sogou spider
+Disallow: /
+
+# Seznam (Czech search engine)
+User-agent: SeznamBot
+Disallow: /
+
+# Qwant (European privacy-focused search)
+User-agent: Qwantify
+Disallow: /
+
+# Mojeek (UK-based search)
+User-agent: MojeekBot
+Disallow: /
+
+# Naver (Korean search engine)
+User-agent: Yeti
+Disallow: /
+
+# =============================================================================
+# SOCIAL MEDIA CRAWLERS
+# Block social media preview crawlers
+# =============================================================================
+
+# Twitter/X
+User-agent: Twitterbot
+Disallow: /
+
+# LinkedIn
+User-agent: LinkedInBot
+Disallow: /
+
+# Pinterest
+User-agent: Pinterest
+Disallow: /
+
+User-agent: Pinterestbot
+Disallow: /
+
+# Slack
+User-agent: Slackbot
+Disallow: /
+
+User-agent: Slackbot-LinkExpanding
+Disallow: /
+
+# Discord
+User-agent: Discordbot
+Disallow: /
+
+# Telegram
+User-agent: TelegramBot
+Disallow: /
+
+# WhatsApp
+User-agent: WhatsApp
+Disallow: /
+
+# =============================================================================
+# SEO / ANALYTICS / RESEARCH CRAWLERS
+# Block SEO tools and analytics crawlers
+# =============================================================================
+
+# Ahrefs
+User-agent: AhrefsBot
+Disallow: /
+
+# SEMrush
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: SemrushBot-SA
+Disallow: /
+
+# Moz
+User-agent: rogerbot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Majestic
+User-agent: MJ12bot
+Disallow: /
+
+# Screaming Frog
+User-agent: Screaming Frog SEO Spider
+Disallow: /
+
+# Sistrix
+User-agent: SISTRIX
+Disallow: /
+
+# Serpstat
+User-agent: serpstatbot
+Disallow: /
+
+# BLEXBot
+User-agent: BLEXBot
+Disallow: /
+
+# =============================================================================
+# ARCHIVE / RESEARCH CRAWLERS
+# Block archiving and research bots
+# =============================================================================
+
+# Internet Archive Wayback Machine
+User-agent: ia_archiver
+Disallow: /
+
+# Petey
+User-agent: archive.org_bot
+Disallow: /
+
+# =============================================================================
+# AGGRESSIVE / MALICIOUS CRAWLERS
+# Known aggressive or problematic bots
+# =============================================================================
+
+User-agent: AhrefsSiteAudit
+Disallow: /
+
+User-agent: MegaIndex
+Disallow: /
+
+User-agent: ltx71
+Disallow: /
+
+User-agent: BomboraBot
+Disallow: /
+
+User-agent: Buck
+Disallow: /
+
+User-agent: Cincraw
+Disallow: /
+
+User-agent: GrapeshotCrawler
+Disallow: /
+
+User-agent: newspaper
+Disallow: /
+
+User-agent: ScoutJet
+Disallow: /
+
+User-agent: VelenPublicWebCrawler
+Disallow: /
+
+User-agent: Webzio-Extended
+Disallow: /
+
+# =============================================================================
+# CATCH-ALL FOR UNSPECIFIED BOTS
+# Default rule for any bot not explicitly listed above
+# =============================================================================
+
+User-agent: *
+Disallow: /
+
+# =============================================================================
+# SITEMAP
+# No sitemap provided - intentionally omitted for privacy
+# =============================================================================
+
+# =============================================================================
+# NOTES
+# =============================================================================
+# 1. robots.txt is advisory - malicious bots will ignore it
+# 2. For stronger protection, consider:
+#    - HTTP headers (X-Robots-Tag)
+#    - Meta robots tags in HTML
+#    - .htaccess/nginx rules to block user-agents
+#    - Cloudflare or similar WAF rules
+# 3. Some legitimate tools (accessibility checkers, validators) may be blocked
+# 4. This configuration prevents search engine indexing entirely
+# =============================================================================

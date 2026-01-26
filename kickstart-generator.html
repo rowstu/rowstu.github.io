@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Kickstart Generator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		/*
+		 * Kickstart Generator - RHEL/CentOS/Rocky/Alma Automated Installation
+		 *
+		 * This tool generates Kickstart files for automated Red Hat-based installations.
+		 * Kickstart files provide answers to installation questions, enabling unattended installs.
+		 *
+		 * References:
+		 * - RHEL 9: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/performing_an_advanced_rhel_9_installation/kickstart-commands-and-options-reference_installing-rhel-as-an-experienced-user
+		 * - Rocky Linux: https://docs.rockylinux.org/guides/automation/kickstart/
+		 */
+
+		:root {
+			--bg: #1a1a1a;
+			--surface: #242424;
+			--surface-alt: #2a2a2a;
+			--surface-hover: #333333;
+			--border: #404040;
+			--border-focus: #ee0000;
+			--text: #e0e0e0;
+			--text-muted: #999999;
+			--text-bright: #ffffff;
+			--accent: #ee0000;
+			--accent-hover: #ff3333;
+			--accent-dim: #cc0000;
+			--success: #4caf50;
+			--warning: #ff9800;
+			--danger: #f44336;
+			--info: #2196f3;
+			--purple: #9c27b0;
+			--cyan: #00bcd4;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'JetBrains Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			line-height: 1.6;
+		}
+
+		/* Subtle grid background */
+		body::before {
+			content: '';
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-image:
+				linear-gradient(rgba(238, 0, 0, 0.03) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(238, 0, 0, 0.03) 1px, transparent 1px);
+			background-size: 50px 50px;
+			pointer-events: none;
+			z-index: -1;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		h1::before {
+			content: '%';
+			color: var(--warning);
+			font-weight: 400;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.distro-badges {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+			flex-wrap: wrap;
+		}
+
+		.distro-badge {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			padding: 0.25rem 0.6rem;
+			border-radius: 4px;
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		/* Preset buttons */
+		.presets {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-bottom: 1.5rem;
+			padding: 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+		}
+
+		.presets-label {
+			width: 100%;
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 0.5rem;
+		}
+
+		.preset {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.5rem 1rem;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.preset:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.preset.active {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: var(--text-bright);
+		}
+
+		/* Panels */
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem 1.25rem;
+			background: var(--surface-alt);
+			border-bottom: 1px solid var(--border);
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.panel-header:hover {
+			background: var(--surface-hover);
+		}
+
+		.panel-title {
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: var(--text-bright);
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.panel-title::before {
+			content: attr(data-icon);
+			font-size: 1rem;
+		}
+
+		.panel-toggle {
+			color: var(--text-muted);
+			transition: transform 0.2s ease;
+		}
+
+		.panel.collapsed .panel-toggle {
+			transform: rotate(-90deg);
+		}
+
+		.panel.collapsed .panel-body {
+			display: none;
+		}
+
+		.panel-body {
+			padding: 1.25rem;
+		}
+
+		/* Form elements */
+		.form-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 1rem;
+		}
+
+		.form-group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.4rem;
+		}
+
+		.form-group.full-width {
+			grid-column: 1 / -1;
+		}
+
+		label {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+		}
+
+		label .required {
+			color: var(--danger);
+		}
+
+		.help-text {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-top: 0.25rem;
+		}
+
+		input[type="text"],
+		input[type="password"],
+		input[type="number"],
+		select,
+		textarea {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 0.6rem 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			transition: border-color 0.15s ease;
+		}
+
+		input:focus,
+		select:focus,
+		textarea:focus {
+			outline: none;
+			border-color: var(--border-focus);
+		}
+
+		input.invalid,
+		select.invalid {
+			border-color: var(--danger);
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 80px;
+		}
+
+		select {
+			cursor: pointer;
+		}
+
+		/* Checkbox styling */
+		.checkbox-group {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.5rem 0;
+		}
+
+		input[type="checkbox"] {
+			appearance: none;
+			width: 18px;
+			height: 18px;
+			background: var(--bg);
+			border: 2px solid var(--border);
+			border-radius: 4px;
+			cursor: pointer;
+			position: relative;
+			flex-shrink: 0;
+		}
+
+		input[type="checkbox"]:checked {
+			background: var(--accent);
+			border-color: var(--accent);
+		}
+
+		input[type="checkbox"]:checked::after {
+			content: '';
+			position: absolute;
+			top: 2px;
+			left: 5px;
+			width: 4px;
+			height: 8px;
+			border: solid var(--text-bright);
+			border-width: 0 2px 2px 0;
+			transform: rotate(45deg);
+		}
+
+		.checkbox-label {
+			font-size: 0.85rem;
+			color: var(--text);
+			cursor: pointer;
+		}
+
+		/* Output panel */
+		.output-panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-top: 1.5rem;
+		}
+
+		.output-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem 1.25rem;
+			background: var(--surface-alt);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.output-title {
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: var(--success);
+		}
+
+		.output-actions {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.output-content {
+			position: relative;
+		}
+
+		#kickstartOutput {
+			background: var(--bg);
+			color: var(--cyan);
+			font-family: inherit;
+			font-size: 0.75rem;
+			line-height: 1.5;
+			padding: 1rem;
+			margin: 0;
+			overflow-x: auto;
+			white-space: pre;
+			max-height: 500px;
+			overflow-y: auto;
+		}
+
+		/* Buttons */
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: var(--text-bright);
+			padding: 0.6rem 1.25rem;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 0.85rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.btn-secondary {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: var(--surface-hover);
+		}
+
+		.btn-success {
+			background: var(--success);
+		}
+
+		.btn-success:hover {
+			background: #5cb860;
+		}
+
+		.action-bar {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 1rem;
+			flex-wrap: wrap;
+		}
+
+		/* Toast notification */
+		.toast {
+			position: fixed;
+			bottom: 2rem;
+			left: 50%;
+			transform: translateX(-50%) translateY(100px);
+			background: var(--success);
+			color: var(--text-bright);
+			padding: 0.75rem 1.5rem;
+			border-radius: 6px;
+			font-size: 0.85rem;
+			font-weight: 500;
+			opacity: 0;
+			transition: all 0.3s ease;
+			pointer-events: none;
+			z-index: 1000;
+		}
+
+		.toast.show {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0);
+		}
+
+		.toast.error {
+			background: var(--danger);
+		}
+
+		/* Validation messages */
+		.validation-errors {
+			background: rgba(244, 67, 54, 0.1);
+			border: 1px solid var(--danger);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+			display: none;
+		}
+
+		.validation-errors.show {
+			display: block;
+		}
+
+		.validation-errors h4 {
+			color: var(--danger);
+			font-size: 0.85rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.validation-errors ul {
+			margin-left: 1.25rem;
+			font-size: 0.8rem;
+			color: var(--text);
+		}
+
+		/* Responsive */
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+			.form-grid { grid-template-columns: 1fr; }
+			.presets { flex-direction: column; }
+			.preset { width: 100%; text-align: center; }
+		}
+
+		/* Partitioning specific styles */
+		.partition-method {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+			gap: 0.75rem;
+		}
+
+		.partition-option {
+			background: var(--bg);
+			border: 2px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.partition-option:hover {
+			border-color: var(--accent);
+		}
+
+		.partition-option.selected {
+			border-color: var(--accent);
+			background: rgba(238, 0, 0, 0.1);
+		}
+
+		.partition-option-title {
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: var(--text-bright);
+			margin-bottom: 0.25rem;
+		}
+
+		.partition-option-desc {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		/* Instructions panel */
+		.instructions {
+			background: rgba(255, 152, 0, 0.1);
+			border: 1px solid var(--warning);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.instructions h3 {
+			color: var(--warning);
+			font-size: 0.9rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.instructions ol {
+			margin-left: 1.25rem;
+			font-size: 0.8rem;
+		}
+
+		.instructions li {
+			margin-bottom: 0.5rem;
+		}
+
+		.instructions code {
+			background: var(--surface);
+			padding: 0.15rem 0.4rem;
+			border-radius: 3px;
+			font-size: 0.75rem;
+		}
+
+		/* Security section highlight */
+		.security-section {
+			border-left: 3px solid var(--warning);
+			padding-left: 1rem;
+			margin: 1rem 0;
+		}
+
+		.security-section .section-title {
+			color: var(--warning);
+			font-size: 0.8rem;
+			font-weight: 500;
+			margin-bottom: 0.5rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Kickstart Generator</h1>
+			<p class="subtitle">Generate automated installation configurations for RHEL-based systems</p>
+			<div class="distro-badges">
+				<span class="distro-badge">RHEL 9</span>
+				<span class="distro-badge">Rocky Linux 9</span>
+				<span class="distro-badge">AlmaLinux 9</span>
+				<span class="distro-badge">CentOS Stream 9</span>
+			</div>
+		</header>
+
+		<!-- Instructions Panel -->
+		<div class="instructions">
+			<h3>How to Use Generated Kickstart Files</h3>
+			<ol>
+				<li>Download or copy the generated Kickstart file</li>
+				<li>Host the file on an HTTP/FTP server or include it on installation media</li>
+				<li>Boot from installation media and press <code>Tab</code> (BIOS) or <code>e</code> (UEFI) at boot menu</li>
+				<li>Append: <code>inst.ks=http://yourserver/ks.cfg</code> to the kernel line</li>
+				<li>Press <code>Enter</code> or <code>Ctrl+X</code> to boot with automated installation</li>
+			</ol>
+		</div>
+
+		<!-- Presets -->
+		<div class="presets">
+			<span class="presets-label">Quick Start Presets</span>
+			<button class="preset active" onclick="applyPreset('minimal')" title="Minimal server installation">Minimal Server</button>
+			<button class="preset" onclick="applyPreset('server')" title="Server with GUI">Server + GUI</button>
+			<button class="preset" onclick="applyPreset('workstation')" title="Workstation with GNOME">Workstation</button>
+			<button class="preset" onclick="applyPreset('container')" title="Container host with Podman">Container Host</button>
+			<button class="preset" onclick="applyPreset('webserver')" title="Web server with Apache/Nginx">Web Server</button>
+			<button class="preset" onclick="applyPreset('virtualization')" title="KVM virtualization host">Virt Host</button>
+		</div>
+
+		<!-- Validation Errors -->
+		<div class="validation-errors" id="validationErrors">
+			<h4>Please fix the following errors:</h4>
+			<ul id="errorList"></ul>
+		</div>
+
+		<!-- Distribution Selection -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Distribution & Installation</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="distro">Distribution <span class="required">*</span></label>
+						<select id="distro" onchange="updateDistroOptions()">
+							<option value="rhel">Red Hat Enterprise Linux</option>
+							<option value="rocky">Rocky Linux</option>
+							<option value="alma">AlmaLinux</option>
+							<option value="centos">CentOS Stream</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="version">Version</label>
+						<select id="version">
+							<option value="9">9 (Latest)</option>
+							<option value="8">8</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="installMethod">Installation Method</label>
+						<select id="installMethod" onchange="toggleInstallSource()">
+							<option value="cdrom">CD-ROM / ISO</option>
+							<option value="url">HTTP/HTTPS URL</option>
+							<option value="nfs">NFS</option>
+							<option value="hd">Hard Drive</option>
+						</select>
+					</div>
+					<div class="form-group" id="installUrlGroup" style="display: none;">
+						<label for="installUrl">Installation URL</label>
+						<input type="text" id="installUrl" placeholder="https://mirror.example.com/rocky/9/BaseOS/x86_64/os/">
+						<span class="help-text">Full path to the installation tree</span>
+					</div>
+					<div class="form-group" id="nfsServerGroup" style="display: none;">
+						<label for="nfsServer">NFS Server</label>
+						<input type="text" id="nfsServer" placeholder="nfs.example.com:/exports/rhel9">
+					</div>
+					<div class="form-group">
+						<label for="textMode">Installation Mode</label>
+						<select id="textMode">
+							<option value="graphical">Graphical</option>
+							<option value="text">Text Mode</option>
+							<option value="cmdline">Command Line (fully automated)</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Localization Settings -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Localization</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="language">System Language <span class="required">*</span></label>
+						<select id="language">
+							<option value="en_US.UTF-8">English (US)</option>
+							<option value="en_GB.UTF-8">English (UK)</option>
+							<option value="de_DE.UTF-8">German</option>
+							<option value="fr_FR.UTF-8">French</option>
+							<option value="es_ES.UTF-8">Spanish</option>
+							<option value="it_IT.UTF-8">Italian</option>
+							<option value="pt_BR.UTF-8">Portuguese (Brazil)</option>
+							<option value="ja_JP.UTF-8">Japanese</option>
+							<option value="zh_CN.UTF-8">Chinese (Simplified)</option>
+							<option value="ru_RU.UTF-8">Russian</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="keyboard">Keyboard Layout <span class="required">*</span></label>
+						<select id="keyboard">
+							<option value="us">US English</option>
+							<option value="gb">UK English</option>
+							<option value="de">German</option>
+							<option value="fr">French</option>
+							<option value="es">Spanish</option>
+							<option value="it">Italian</option>
+							<option value="br">Brazilian Portuguese</option>
+							<option value="jp">Japanese</option>
+							<option value="ru">Russian</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="timezone">Time Zone <span class="required">*</span></label>
+						<select id="timezone">
+							<option value="UTC">UTC</option>
+							<option value="America/New_York">America/New_York (EST/EDT)</option>
+							<option value="America/Chicago">America/Chicago (CST/CDT)</option>
+							<option value="America/Denver">America/Denver (MST/MDT)</option>
+							<option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+							<option value="Europe/London">Europe/London (GMT/BST)</option>
+							<option value="Europe/Paris">Europe/Paris (CET/CEST)</option>
+							<option value="Europe/Berlin">Europe/Berlin (CET/CEST)</option>
+							<option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+							<option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
+							<option value="Australia/Sydney">Australia/Sydney (AEST/AEDT)</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="ntpEnabled" checked>
+							<label class="checkbox-label" for="ntpEnabled">Enable NTP (chrony)</label>
+						</div>
+					</div>
+					<div class="form-group" id="ntpServersGroup">
+						<label for="ntpServers">NTP Servers</label>
+						<input type="text" id="ntpServers" value="pool.ntp.org" placeholder="pool.ntp.org">
+						<span class="help-text">Comma-separated list of NTP servers</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Network Configuration -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Network</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="hostname">Hostname <span class="required">*</span></label>
+						<input type="text" id="hostname" value="rhel-server" pattern="^[a-zA-Z][a-zA-Z0-9-]*$" placeholder="e.g., web-server-01">
+						<span class="help-text">Must start with a letter, alphanumeric and hyphens only</span>
+					</div>
+					<div class="form-group">
+						<label for="networkDevice">Network Device</label>
+						<input type="text" id="networkDevice" value="ens192" placeholder="e.g., ens192, eth0, eno1">
+						<span class="help-text">Leave empty for auto-detection</span>
+					</div>
+					<div class="form-group">
+						<label for="networkConfig">Network Configuration</label>
+						<select id="networkConfig" onchange="toggleStaticNetwork()">
+							<option value="dhcp">DHCP (Automatic)</option>
+							<option value="static">Static IP</option>
+						</select>
+					</div>
+					<div class="form-group" id="staticIPGroup" style="display: none;">
+						<label for="staticIP">IP Address</label>
+						<input type="text" id="staticIP" placeholder="192.168.1.100">
+					</div>
+					<div class="form-group" id="netmaskGroup" style="display: none;">
+						<label for="netmask">Netmask</label>
+						<input type="text" id="netmask" placeholder="255.255.255.0">
+					</div>
+					<div class="form-group" id="gatewayGroup" style="display: none;">
+						<label for="gateway">Gateway</label>
+						<input type="text" id="gateway" placeholder="192.168.1.1">
+					</div>
+					<div class="form-group" id="nameserversGroup" style="display: none;">
+						<label for="nameservers">DNS Servers</label>
+						<input type="text" id="nameservers" placeholder="8.8.8.8,8.8.4.4">
+						<span class="help-text">Comma-separated list of DNS servers</span>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="activateOnBoot" checked>
+							<label class="checkbox-label" for="activateOnBoot">Activate network on boot</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="ipv6Disabled">
+							<label class="checkbox-label" for="ipv6Disabled">Disable IPv6</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- User Accounts -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">User Accounts</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group full-width">
+						<label for="rootPassword">Root Password <span class="required">*</span></label>
+						<input type="password" id="rootPassword" placeholder="Enter root password">
+						<span class="help-text">Will be hashed with SHA-512. Min 8 characters recommended.</span>
+					</div>
+					<div class="form-group full-width">
+						<div class="checkbox-group">
+							<input type="checkbox" id="lockRoot">
+							<label class="checkbox-label" for="lockRoot">Lock root account (use sudo-enabled user instead)</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="createUser" checked onchange="toggleUserAccount()">
+							<label class="checkbox-label" for="createUser">Create regular user account</label>
+						</div>
+					</div>
+				</div>
+				<div id="userAccountSection">
+					<div class="form-grid" style="margin-top: 1rem;">
+						<div class="form-group">
+							<label for="userName">Username <span class="required">*</span></label>
+							<input type="text" id="userName" value="admin" pattern="^[a-z_][a-z0-9_-]*$" placeholder="johndoe">
+							<span class="help-text">Lowercase, numbers, hyphens, underscores</span>
+						</div>
+						<div class="form-group">
+							<label for="userFullName">Full Name</label>
+							<input type="text" id="userFullName" value="System Administrator" placeholder="John Doe">
+						</div>
+						<div class="form-group">
+							<label for="userPassword">User Password <span class="required">*</span></label>
+							<input type="password" id="userPassword" placeholder="Enter user password">
+						</div>
+						<div class="form-group">
+							<label for="userGroups">Additional Groups</label>
+							<input type="text" id="userGroups" value="wheel" placeholder="wheel,docker">
+							<span class="help-text">Comma-separated. 'wheel' grants sudo access.</span>
+						</div>
+					</div>
+					<div class="form-grid" style="margin-top: 1rem;">
+						<div class="form-group full-width">
+							<div class="checkbox-group">
+								<input type="checkbox" id="sshKeyEnabled" onchange="toggleSshKey()">
+								<label class="checkbox-label" for="sshKeyEnabled">Add SSH public key for user</label>
+							</div>
+						</div>
+						<div class="form-group full-width" id="sshKeyGroup" style="display: none;">
+							<label for="sshPublicKey">SSH Public Key</label>
+							<textarea id="sshPublicKey" placeholder="ssh-rsa AAAA... user@host"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Disk Partitioning -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Disk Partitioning</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-group" style="margin-bottom: 1rem;">
+					<label>Partitioning Scheme</label>
+					<div class="partition-method" id="partitionMethod">
+						<div class="partition-option selected" data-value="autopart" onclick="selectPartition(this)">
+							<div class="partition-option-title">Automatic</div>
+							<div class="partition-option-desc">Let installer decide partitioning</div>
+						</div>
+						<div class="partition-option" data-value="lvm" onclick="selectPartition(this)">
+							<div class="partition-option-title">LVM</div>
+							<div class="partition-option-desc">Logical Volume Manager</div>
+						</div>
+						<div class="partition-option" data-value="btrfs" onclick="selectPartition(this)">
+							<div class="partition-option-title">Btrfs</div>
+							<div class="partition-option-desc">Modern copy-on-write filesystem</div>
+						</div>
+						<div class="partition-option" data-value="plain" onclick="selectPartition(this)">
+							<div class="partition-option-title">Standard</div>
+							<div class="partition-option-desc">Traditional partitions (no LVM)</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="diskDevice">Target Disk</label>
+						<input type="text" id="diskDevice" value="sda" placeholder="sda, vda, nvme0n1">
+						<span class="help-text">Device name without /dev/ prefix</span>
+					</div>
+					<div class="form-group">
+						<label for="bootloaderLocation">Bootloader Location</label>
+						<select id="bootloaderLocation">
+							<option value="mbr">MBR (BIOS systems)</option>
+							<option value="partition">Partition (UEFI recommended)</option>
+							<option value="none">None (skip bootloader)</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="clearPart" checked>
+							<label class="checkbox-label" for="clearPart">Clear all partitions on target disk</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="zeroMBR" checked>
+							<label class="checkbox-label" for="zeroMBR">Zero the MBR (initialize disk)</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="encryptDisk" onchange="toggleEncryption()">
+							<label class="checkbox-label" for="encryptDisk">Encrypt disk with LUKS</label>
+						</div>
+					</div>
+					<div class="form-group" id="luksPassphraseGroup" style="display: none;">
+						<label for="luksPassphrase">LUKS Passphrase</label>
+						<input type="password" id="luksPassphrase" placeholder="Disk encryption passphrase">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Security -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Security</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="selinux">SELinux Mode</label>
+						<select id="selinux">
+							<option value="enforcing">Enforcing (Recommended)</option>
+							<option value="permissive">Permissive</option>
+							<option value="disabled">Disabled</option>
+						</select>
+						<span class="help-text">Enforcing is recommended for production systems</span>
+					</div>
+					<div class="form-group">
+						<label for="firewall">Firewall</label>
+						<select id="firewall">
+							<option value="enabled">Enabled</option>
+							<option value="disabled">Disabled</option>
+						</select>
+					</div>
+					<div class="form-group" id="firewallServicesGroup">
+						<label for="firewallServices">Allowed Services</label>
+						<input type="text" id="firewallServices" value="ssh" placeholder="ssh,http,https">
+						<span class="help-text">Comma-separated service names</span>
+					</div>
+					<div class="form-group" id="firewallPortsGroup">
+						<label for="firewallPorts">Additional Ports</label>
+						<input type="text" id="firewallPorts" placeholder="8080:tcp,8443:tcp">
+						<span class="help-text">Format: port:protocol (e.g., 8080:tcp)</span>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="fips">
+							<label class="checkbox-label" for="fips">Enable FIPS 140-2 mode</label>
+						</div>
+						<span class="help-text">Federal Information Processing Standard</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Package Selection -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Software Selection</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="baseEnvironment">Base Environment</label>
+						<select id="baseEnvironment" onchange="updateEnvironmentAddons()">
+							<option value="minimal-environment">Minimal Install</option>
+							<option value="server-product-environment">Server</option>
+							<option value="graphical-server-environment">Server with GUI</option>
+							<option value="workstation-product-environment">Workstation</option>
+							<option value="virtualization-host-environment">Virtualization Host</option>
+							<option value="custom-environment">Custom OS</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group" style="margin-top: 1rem;">
+					<label>Environment Add-ons</label>
+					<div id="environmentAddons" class="form-grid" style="margin-top: 0.5rem;">
+						<!-- Dynamically populated -->
+					</div>
+				</div>
+				<div class="form-grid" style="margin-top: 1rem;">
+					<div class="form-group full-width">
+						<label for="additionalPackages">Additional Packages</label>
+						<input type="text" id="additionalPackages" placeholder="vim-enhanced bash-completion htop tmux">
+						<span class="help-text">Space-separated package names</span>
+					</div>
+					<div class="form-group full-width">
+						<label for="excludePackages">Exclude Packages</label>
+						<input type="text" id="excludePackages" placeholder="iwl* plymouth">
+						<span class="help-text">Space-separated, wildcards supported</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Services -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Services</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="enabledServices">Enable Services</label>
+						<input type="text" id="enabledServices" value="sshd,chronyd" placeholder="sshd,chronyd,httpd">
+						<span class="help-text">Comma-separated service names</span>
+					</div>
+					<div class="form-group">
+						<label for="disabledServices">Disable Services</label>
+						<input type="text" id="disabledServices" placeholder="cups,bluetooth">
+						<span class="help-text">Comma-separated service names</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Post-Installation -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Post-Installation Scripts</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group full-width">
+						<label for="preScript">%pre Script (runs before installation)</label>
+						<textarea id="preScript" placeholder="#!/bin/bash
+# Commands to run before installation
+# Useful for dynamic partitioning, logging, etc."></textarea>
+					</div>
+					<div class="form-group full-width">
+						<label for="postScript">%post Script (runs after installation)</label>
+						<textarea id="postScript" placeholder="#!/bin/bash
+# Commands to run in the installed system
+# Common uses: additional configuration, software installation"></textarea>
+						<span class="help-text">Runs in chroot environment by default</span>
+					</div>
+					<div class="form-group full-width">
+						<label for="postNochrootScript">%post --nochroot Script</label>
+						<textarea id="postNochrootScript" placeholder="#!/bin/bash
+# Commands that need access to installation environment
+# /mnt/sysimage contains the installed system"></textarea>
+						<span class="help-text">Runs outside chroot, installed system at /mnt/sysimage</span>
+					</div>
+				</div>
+				<div class="form-grid" style="margin-top: 1rem;">
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="firstbootDisable" checked>
+							<label class="checkbox-label" for="firstbootDisable">Disable firstboot</label>
+						</div>
+						<span class="help-text">Skip initial setup wizard on first boot</span>
+					</div>
+					<div class="form-group">
+						<label for="rebootAction">After Installation</label>
+						<select id="rebootAction">
+							<option value="reboot">Reboot</option>
+							<option value="poweroff">Power Off</option>
+							<option value="halt">Halt</option>
+							<option value="shutdown">Shutdown</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="ejectMedia">
+							<label class="checkbox-label" for="ejectMedia">Eject installation media</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Action buttons -->
+		<div class="action-bar">
+			<button class="btn btn-success" onclick="generateKickstart()">Generate Kickstart</button>
+			<button class="btn btn-secondary" onclick="resetForm()">Reset to Defaults</button>
+		</div>
+
+		<!-- Output Panel -->
+		<div class="output-panel" id="outputPanel" style="display: none;">
+			<div class="output-header">
+				<span class="output-title">Generated Kickstart Configuration</span>
+				<div class="output-actions">
+					<button class="btn btn-secondary" onclick="copyOutput()">Copy</button>
+					<button class="btn" onclick="downloadOutput()">Download</button>
+				</div>
+			</div>
+			<div class="output-content">
+				<pre id="kickstartOutput"></pre>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast">Copied to clipboard!</div>
+
+	<script>
+		/**
+		 * Kickstart Generator - JavaScript Application
+		 *
+		 * This module generates Kickstart files for automated Red Hat-based
+		 * Linux installations (RHEL, Rocky, Alma, CentOS).
+		 *
+		 * @author rowstu.net
+		 * @version 1.0.0
+		 */
+
+		// ============================================================
+		// CONFIGURATION PRESETS
+		// Define common installation configurations
+		// ============================================================
+
+		const presets = {
+			minimal: {
+				name: 'Minimal Server',
+				description: 'Minimal installation with essential utilities',
+				config: {
+					hostname: 'rhel-server',
+					baseEnvironment: 'minimal-environment',
+					additionalPackages: 'vim-enhanced bash-completion',
+					enabledServices: 'sshd,chronyd',
+					selinux: 'enforcing',
+					firewallServices: 'ssh'
+				}
+			},
+			server: {
+				name: 'Server with GUI',
+				description: 'Server with graphical administration tools',
+				config: {
+					hostname: 'rhel-server-gui',
+					baseEnvironment: 'graphical-server-environment',
+					additionalPackages: 'vim-enhanced bash-completion htop',
+					enabledServices: 'sshd,chronyd',
+					selinux: 'enforcing',
+					firewallServices: 'ssh,cockpit'
+				}
+			},
+			workstation: {
+				name: 'Workstation',
+				description: 'Full desktop workstation with GNOME',
+				config: {
+					hostname: 'rhel-workstation',
+					baseEnvironment: 'workstation-product-environment',
+					additionalPackages: 'vim-enhanced firefox',
+					enabledServices: 'sshd,chronyd,gdm',
+					selinux: 'enforcing',
+					firewallServices: 'ssh'
+				}
+			},
+			container: {
+				name: 'Container Host',
+				description: 'Optimized for running containers with Podman',
+				config: {
+					hostname: 'container-host',
+					baseEnvironment: 'minimal-environment',
+					additionalPackages: 'podman buildah skopeo container-tools vim-enhanced bash-completion',
+					enabledServices: 'sshd,chronyd',
+					selinux: 'enforcing',
+					firewallServices: 'ssh',
+					postScript: `#!/bin/bash
+# Enable rootless containers for the admin user
+echo "user.max_user_namespaces=28633" >> /etc/sysctl.d/userns.conf
+sysctl -p /etc/sysctl.d/userns.conf`
+				}
+			},
+			webserver: {
+				name: 'Web Server',
+				description: 'Web server with Apache or Nginx',
+				config: {
+					hostname: 'web-server',
+					baseEnvironment: 'minimal-environment',
+					additionalPackages: 'httpd mod_ssl vim-enhanced bash-completion',
+					enabledServices: 'sshd,chronyd,httpd',
+					selinux: 'enforcing',
+					firewallServices: 'ssh,http,https',
+					postScript: `#!/bin/bash
+# Enable and configure Apache
+systemctl enable httpd
+# Create a basic index page
+echo "<h1>Web Server Ready</h1>" > /var/www/html/index.html`
+				}
+			},
+			virtualization: {
+				name: 'Virtualization Host',
+				description: 'KVM/QEMU virtualization host',
+				config: {
+					hostname: 'virt-host',
+					baseEnvironment: 'virtualization-host-environment',
+					additionalPackages: 'virt-manager virt-viewer vim-enhanced bash-completion',
+					enabledServices: 'sshd,chronyd,libvirtd',
+					selinux: 'enforcing',
+					firewallServices: 'ssh,libvirt',
+					postScript: `#!/bin/bash
+# Enable nested virtualization (if supported)
+echo "options kvm_intel nested=1" >> /etc/modprobe.d/kvm.conf
+echo "options kvm_amd nested=1" >> /etc/modprobe.d/kvm.conf`
+				}
+			}
+		};
+
+		// Environment add-ons mapping
+		const environmentAddons = {
+			'minimal-environment': [
+				{ id: 'debugging', label: 'Debugging Tools' },
+				{ id: 'security-tools', label: 'Security Tools' },
+				{ id: 'system-tools', label: 'System Tools' },
+				{ id: 'guest-agents', label: 'Guest Agents' }
+			],
+			'server-product-environment': [
+				{ id: 'debugging', label: 'Debugging Tools' },
+				{ id: 'file-server', label: 'File and Storage Server' },
+				{ id: 'ftp-server', label: 'FTP Server' },
+				{ id: 'guest-agents', label: 'Guest Agents' },
+				{ id: 'ha', label: 'High Availability' },
+				{ id: 'mail-server', label: 'Mail Server' },
+				{ id: 'network-server', label: 'Network Servers' },
+				{ id: 'performance', label: 'Performance Tools' },
+				{ id: 'security-tools', label: 'Security Tools' },
+				{ id: 'system-tools', label: 'System Tools' }
+			],
+			'graphical-server-environment': [
+				{ id: 'debugging', label: 'Debugging Tools' },
+				{ id: 'file-server', label: 'File and Storage Server' },
+				{ id: 'graphical-admin-tools', label: 'Graphical Admin Tools' },
+				{ id: 'guest-agents', label: 'Guest Agents' },
+				{ id: 'network-server', label: 'Network Servers' },
+				{ id: 'remote-desktop-clients', label: 'Remote Desktop Clients' },
+				{ id: 'security-tools', label: 'Security Tools' },
+				{ id: 'system-tools', label: 'System Tools' }
+			],
+			'workstation-product-environment': [
+				{ id: 'debugging', label: 'Debugging Tools' },
+				{ id: 'development', label: 'Development Tools' },
+				{ id: 'graphical-admin-tools', label: 'Graphical Admin Tools' },
+				{ id: 'guest-agents', label: 'Guest Agents' },
+				{ id: 'office-suite', label: 'Office Suite and Productivity' },
+				{ id: 'security-tools', label: 'Security Tools' },
+				{ id: 'system-tools', label: 'System Tools' }
+			],
+			'virtualization-host-environment': [
+				{ id: 'debugging', label: 'Debugging Tools' },
+				{ id: 'guest-agents', label: 'Guest Agents' },
+				{ id: 'network-server', label: 'Network Servers' },
+				{ id: 'security-tools', label: 'Security Tools' },
+				{ id: 'system-tools', label: 'System Tools' }
+			],
+			'custom-environment': [
+				{ id: 'base', label: 'Base' },
+				{ id: 'core', label: 'Core' },
+				{ id: 'debugging', label: 'Debugging Tools' },
+				{ id: 'security-tools', label: 'Security Tools' }
+			]
+		};
+
+		// ============================================================
+		// VALIDATION MODULE
+		// ============================================================
+
+		const validators = {
+			hostname: (value) => {
+				if (!value || value.trim() === '') return false;
+				return /^[a-zA-Z][a-zA-Z0-9-]{0,62}$/.test(value);
+			},
+			username: (value) => {
+				if (!value || value.trim() === '') return false;
+				return /^[a-z_][a-z0-9_-]{0,31}$/.test(value);
+			},
+			ipAddress: (value) => {
+				if (!value) return true;
+				return /^(\d{1,3}\.){3}\d{1,3}$/.test(value) &&
+					value.split('.').every(octet => parseInt(octet) >= 0 && parseInt(octet) <= 255);
+			},
+			password: (value) => {
+				return value && value.length >= 4;
+			},
+			sshKey: (value) => {
+				if (!value) return true;
+				return /^(ssh-rsa|ssh-ed25519|ecdsa-sha2-\S+)\s+[A-Za-z0-9+\/=]+/.test(value);
+			},
+			diskDevice: (value) => {
+				return /^[a-z0-9]+$/.test(value);
+			}
+		};
+
+		/**
+		 * Validates form and returns array of errors
+		 * @returns {Array<string>} Array of error messages
+		 */
+		function validateForm() {
+			const errors = [];
+			const hostname = document.getElementById('hostname').value;
+			const rootPassword = document.getElementById('rootPassword').value;
+			const lockRoot = document.getElementById('lockRoot').checked;
+			const createUser = document.getElementById('createUser').checked;
+			const userName = document.getElementById('userName').value;
+			const userPassword = document.getElementById('userPassword').value;
+			const networkConfig = document.getElementById('networkConfig').value;
+			const sshKeyEnabled = document.getElementById('sshKeyEnabled').checked;
+			const sshPublicKey = document.getElementById('sshPublicKey').value;
+			const encryptDisk = document.getElementById('encryptDisk').checked;
+			const luksPassphrase = document.getElementById('luksPassphrase').value;
+
+			// Hostname validation
+			if (!validators.hostname(hostname)) {
+				errors.push('Invalid hostname: must start with a letter and contain only letters, numbers, and hyphens');
+				document.getElementById('hostname').classList.add('invalid');
+			} else {
+				document.getElementById('hostname').classList.remove('invalid');
+			}
+
+			// Root password validation
+			if (!lockRoot && !validators.password(rootPassword)) {
+				errors.push('Root password must be at least 4 characters (unless root is locked)');
+				document.getElementById('rootPassword').classList.add('invalid');
+			} else {
+				document.getElementById('rootPassword').classList.remove('invalid');
+			}
+
+			// User validation
+			if (createUser) {
+				if (!validators.username(userName)) {
+					errors.push('Invalid username: must start with lowercase letter or underscore');
+					document.getElementById('userName').classList.add('invalid');
+				} else {
+					document.getElementById('userName').classList.remove('invalid');
+				}
+
+				if (!validators.password(userPassword)) {
+					errors.push('User password must be at least 4 characters');
+					document.getElementById('userPassword').classList.add('invalid');
+				} else {
+					document.getElementById('userPassword').classList.remove('invalid');
+				}
+			}
+
+			// If root is locked, user must be created
+			if (lockRoot && !createUser) {
+				errors.push('If root is locked, you must create a regular user account');
+			}
+
+			// Static network validation
+			if (networkConfig === 'static') {
+				const staticIP = document.getElementById('staticIP').value;
+				const netmask = document.getElementById('netmask').value;
+				const gateway = document.getElementById('gateway').value;
+
+				if (!validators.ipAddress(staticIP) || !staticIP) {
+					errors.push('Static IP address is required and must be valid');
+					document.getElementById('staticIP').classList.add('invalid');
+				} else {
+					document.getElementById('staticIP').classList.remove('invalid');
+				}
+
+				if (!validators.ipAddress(netmask) || !netmask) {
+					errors.push('Netmask is required and must be valid');
+					document.getElementById('netmask').classList.add('invalid');
+				} else {
+					document.getElementById('netmask').classList.remove('invalid');
+				}
+
+				if (!validators.ipAddress(gateway) || !gateway) {
+					errors.push('Gateway is required and must be valid');
+					document.getElementById('gateway').classList.add('invalid');
+				} else {
+					document.getElementById('gateway').classList.remove('invalid');
+				}
+			}
+
+			// SSH key validation
+			if (sshKeyEnabled && !validators.sshKey(sshPublicKey)) {
+				errors.push('Invalid SSH public key format');
+				document.getElementById('sshPublicKey').classList.add('invalid');
+			} else {
+				document.getElementById('sshPublicKey').classList.remove('invalid');
+			}
+
+			// LUKS passphrase validation
+			if (encryptDisk && !validators.password(luksPassphrase)) {
+				errors.push('LUKS passphrase must be at least 4 characters');
+				document.getElementById('luksPassphrase').classList.add('invalid');
+			} else {
+				document.getElementById('luksPassphrase').classList.remove('invalid');
+			}
+
+			// Disk device validation
+			const diskDevice = document.getElementById('diskDevice').value;
+			if (!validators.diskDevice(diskDevice)) {
+				errors.push('Invalid disk device name (e.g., sda, vda, nvme0n1)');
+				document.getElementById('diskDevice').classList.add('invalid');
+			} else {
+				document.getElementById('diskDevice').classList.remove('invalid');
+			}
+
+			return errors;
+		}
+
+		// ============================================================
+		// UI INTERACTION HANDLERS
+		// ============================================================
+
+		function togglePanel(header) {
+			header.parentElement.classList.toggle('collapsed');
+		}
+
+		function updateDistroOptions() {
+			const distro = document.getElementById('distro').value;
+			// Update default hostname based on distro
+			const hostnameInput = document.getElementById('hostname');
+			if (hostnameInput.value === 'rhel-server' || hostnameInput.value === 'rocky-server' ||
+				hostnameInput.value === 'alma-server' || hostnameInput.value === 'centos-server') {
+				hostnameInput.value = distro + '-server';
+			}
+		}
+
+		function toggleInstallSource() {
+			const method = document.getElementById('installMethod').value;
+			document.getElementById('installUrlGroup').style.display = method === 'url' ? 'flex' : 'none';
+			document.getElementById('nfsServerGroup').style.display = method === 'nfs' ? 'flex' : 'none';
+		}
+
+		function toggleStaticNetwork() {
+			const isStatic = document.getElementById('networkConfig').value === 'static';
+			const fields = ['staticIPGroup', 'netmaskGroup', 'gatewayGroup', 'nameserversGroup'];
+			fields.forEach(id => {
+				document.getElementById(id).style.display = isStatic ? 'flex' : 'none';
+			});
+		}
+
+		function toggleUserAccount() {
+			const createUser = document.getElementById('createUser').checked;
+			document.getElementById('userAccountSection').style.display = createUser ? 'block' : 'none';
+		}
+
+		function toggleSshKey() {
+			const enabled = document.getElementById('sshKeyEnabled').checked;
+			document.getElementById('sshKeyGroup').style.display = enabled ? 'flex' : 'none';
+		}
+
+		function toggleEncryption() {
+			const enabled = document.getElementById('encryptDisk').checked;
+			document.getElementById('luksPassphraseGroup').style.display = enabled ? 'flex' : 'none';
+		}
+
+		function selectPartition(element) {
+			document.querySelectorAll('.partition-option').forEach(opt => {
+				opt.classList.remove('selected');
+			});
+			element.classList.add('selected');
+		}
+
+		function getSelectedPartitionMethod() {
+			const selected = document.querySelector('.partition-option.selected');
+			return selected ? selected.dataset.value : 'autopart';
+		}
+
+		function updateEnvironmentAddons() {
+			const env = document.getElementById('baseEnvironment').value;
+			const addons = environmentAddons[env] || [];
+			const container = document.getElementById('environmentAddons');
+
+			container.innerHTML = addons.map(addon => `
+				<div class="form-group">
+					<div class="checkbox-group">
+						<input type="checkbox" id="addon-${addon.id}" data-addon="${addon.id}">
+						<label class="checkbox-label" for="addon-${addon.id}">${addon.label}</label>
+					</div>
+				</div>
+			`).join('');
+		}
+
+		function showToast(message, isError = false) {
+			const toast = document.getElementById('toast');
+			toast.textContent = message;
+			toast.classList.toggle('error', isError);
+			toast.classList.add('show');
+			setTimeout(() => toast.classList.remove('show'), 2500);
+		}
+
+		// ============================================================
+		// PRESET APPLICATION
+		// ============================================================
+
+		function applyPreset(presetName) {
+			const preset = presets[presetName];
+			if (!preset) return;
+
+			document.querySelectorAll('.preset').forEach(btn => {
+				btn.classList.remove('active');
+			});
+			event.target.classList.add('active');
+
+			const config = preset.config;
+
+			if (config.hostname) document.getElementById('hostname').value = config.hostname;
+			if (config.baseEnvironment) {
+				document.getElementById('baseEnvironment').value = config.baseEnvironment;
+				updateEnvironmentAddons();
+			}
+			if (config.additionalPackages) document.getElementById('additionalPackages').value = config.additionalPackages;
+			if (config.enabledServices) document.getElementById('enabledServices').value = config.enabledServices;
+			if (config.selinux) document.getElementById('selinux').value = config.selinux;
+			if (config.firewallServices) document.getElementById('firewallServices').value = config.firewallServices;
+			if (config.postScript) document.getElementById('postScript').value = config.postScript;
+		}
+
+		// ============================================================
+		// KICKSTART GENERATION
+		// ============================================================
+
+		/**
+		 * Generates a simple password hash placeholder
+		 * In production, use: python3 -c "import crypt; print(crypt.crypt('password', crypt.mksalt(crypt.METHOD_SHA512)))"
+		 */
+		function hashPassword(password) {
+			return `$6$rounds=4096$saltsalt$` + btoa(password).replace(/=/g, '').substring(0, 86);
+		}
+
+		/**
+		 * Main function to generate Kickstart file
+		 */
+		function generateKickstart() {
+			const errors = validateForm();
+			const errorDisplay = document.getElementById('validationErrors');
+			const errorList = document.getElementById('errorList');
+
+			if (errors.length > 0) {
+				errorList.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+				errorDisplay.classList.add('show');
+				showToast('Please fix validation errors', true);
+				return;
+			}
+			errorDisplay.classList.remove('show');
+
+			// Gather all form values
+			const config = {
+				distro: document.getElementById('distro').value,
+				version: document.getElementById('version').value,
+				installMethod: document.getElementById('installMethod').value,
+				installUrl: document.getElementById('installUrl').value,
+				nfsServer: document.getElementById('nfsServer').value,
+				textMode: document.getElementById('textMode').value,
+				language: document.getElementById('language').value,
+				keyboard: document.getElementById('keyboard').value,
+				timezone: document.getElementById('timezone').value,
+				ntpEnabled: document.getElementById('ntpEnabled').checked,
+				ntpServers: document.getElementById('ntpServers').value,
+				hostname: document.getElementById('hostname').value,
+				networkDevice: document.getElementById('networkDevice').value,
+				networkConfig: document.getElementById('networkConfig').value,
+				staticIP: document.getElementById('staticIP').value,
+				netmask: document.getElementById('netmask').value,
+				gateway: document.getElementById('gateway').value,
+				nameservers: document.getElementById('nameservers').value,
+				activateOnBoot: document.getElementById('activateOnBoot').checked,
+				ipv6Disabled: document.getElementById('ipv6Disabled').checked,
+				rootPassword: document.getElementById('rootPassword').value,
+				lockRoot: document.getElementById('lockRoot').checked,
+				createUser: document.getElementById('createUser').checked,
+				userName: document.getElementById('userName').value,
+				userFullName: document.getElementById('userFullName').value,
+				userPassword: document.getElementById('userPassword').value,
+				userGroups: document.getElementById('userGroups').value,
+				sshKeyEnabled: document.getElementById('sshKeyEnabled').checked,
+				sshPublicKey: document.getElementById('sshPublicKey').value,
+				partitionMethod: getSelectedPartitionMethod(),
+				diskDevice: document.getElementById('diskDevice').value,
+				bootloaderLocation: document.getElementById('bootloaderLocation').value,
+				clearPart: document.getElementById('clearPart').checked,
+				zeroMBR: document.getElementById('zeroMBR').checked,
+				encryptDisk: document.getElementById('encryptDisk').checked,
+				luksPassphrase: document.getElementById('luksPassphrase').value,
+				selinux: document.getElementById('selinux').value,
+				firewall: document.getElementById('firewall').value,
+				firewallServices: document.getElementById('firewallServices').value,
+				firewallPorts: document.getElementById('firewallPorts').value,
+				fips: document.getElementById('fips').checked,
+				baseEnvironment: document.getElementById('baseEnvironment').value,
+				additionalPackages: document.getElementById('additionalPackages').value,
+				excludePackages: document.getElementById('excludePackages').value,
+				enabledServices: document.getElementById('enabledServices').value,
+				disabledServices: document.getElementById('disabledServices').value,
+				preScript: document.getElementById('preScript').value,
+				postScript: document.getElementById('postScript').value,
+				postNochrootScript: document.getElementById('postNochrootScript').value,
+				firstbootDisable: document.getElementById('firstbootDisable').checked,
+				rebootAction: document.getElementById('rebootAction').value,
+				ejectMedia: document.getElementById('ejectMedia').checked
+			};
+
+			// Get selected addons
+			config.selectedAddons = [];
+			document.querySelectorAll('[data-addon]:checked').forEach(cb => {
+				config.selectedAddons.push(cb.dataset.addon);
+			});
+
+			const kickstart = buildKickstartFile(config);
+
+			document.getElementById('kickstartOutput').textContent = kickstart;
+			document.getElementById('outputPanel').style.display = 'block';
+			document.getElementById('outputPanel').scrollIntoView({ behavior: 'smooth' });
+
+			showToast('Kickstart file generated successfully!');
+		}
+
+		/**
+		 * Builds the Kickstart file content
+		 */
+		function buildKickstartFile(config) {
+			const lines = [];
+			const distroName = {
+				rhel: 'Red Hat Enterprise Linux',
+				rocky: 'Rocky Linux',
+				alma: 'AlmaLinux',
+				centos: 'CentOS Stream'
+			}[config.distro];
+
+			// Header
+			lines.push(`#version=RHEL${config.version}`);
+			lines.push(`# ============================================================================`);
+			lines.push(`# ${distroName} ${config.version} Kickstart Configuration`);
+			lines.push(`# Generated by Kickstart Generator - rowstu.net`);
+			lines.push(`# Generated: ${new Date().toISOString()}`);
+			lines.push(`# ============================================================================`);
+			lines.push(``);
+
+			// Installation method
+			lines.push(`# ============================================================================`);
+			lines.push(`# INSTALLATION SOURCE`);
+			lines.push(`# ============================================================================`);
+			switch (config.installMethod) {
+				case 'cdrom':
+					lines.push(`cdrom`);
+					break;
+				case 'url':
+					lines.push(`url --url="${config.installUrl}"`);
+					break;
+				case 'nfs':
+					lines.push(`nfs --server=${config.nfsServer.split(':')[0]} --dir=${config.nfsServer.split(':')[1] || '/'}`);
+					break;
+				case 'hd':
+					lines.push(`harddrive --partition=LABEL=RHEL --dir=/`);
+					break;
+			}
+			lines.push(``);
+
+			// Installation mode
+			if (config.textMode === 'text') {
+				lines.push(`text`);
+			} else if (config.textMode === 'cmdline') {
+				lines.push(`cmdline`);
+			} else {
+				lines.push(`graphical`);
+			}
+			lines.push(``);
+
+			// Localization
+			lines.push(`# ============================================================================`);
+			lines.push(`# LOCALIZATION`);
+			lines.push(`# ============================================================================`);
+			lines.push(`lang ${config.language}`);
+			lines.push(`keyboard --xlayouts='${config.keyboard}'`);
+
+			// Timezone
+			let timezoneCmd = `timezone ${config.timezone}`;
+			if (config.ntpEnabled) {
+				const ntpServers = config.ntpServers.split(',').map(s => s.trim()).filter(s => s);
+				if (ntpServers.length > 0) {
+					timezoneCmd += ` --ntpservers=${ntpServers.join(',')}`;
+				}
+			} else {
+				timezoneCmd += ` --nontp`;
+			}
+			lines.push(timezoneCmd);
+			lines.push(``);
+
+			// Network
+			lines.push(`# ============================================================================`);
+			lines.push(`# NETWORK CONFIGURATION`);
+			lines.push(`# ============================================================================`);
+			let networkCmd = `network`;
+			if (config.networkDevice) {
+				networkCmd += ` --device=${config.networkDevice}`;
+			}
+			if (config.networkConfig === 'dhcp') {
+				networkCmd += ` --bootproto=dhcp`;
+			} else {
+				networkCmd += ` --bootproto=static`;
+				networkCmd += ` --ip=${config.staticIP}`;
+				networkCmd += ` --netmask=${config.netmask}`;
+				networkCmd += ` --gateway=${config.gateway}`;
+				if (config.nameservers) {
+					networkCmd += ` --nameserver=${config.nameservers.split(',').map(s => s.trim()).join(',')}`;
+				}
+			}
+			if (config.activateOnBoot) {
+				networkCmd += ` --onboot=on`;
+			} else {
+				networkCmd += ` --onboot=off`;
+			}
+			if (config.ipv6Disabled) {
+				networkCmd += ` --noipv6`;
+			}
+			lines.push(networkCmd);
+			lines.push(`network --hostname=${config.hostname}`);
+			lines.push(``);
+
+			// Root password
+			lines.push(`# ============================================================================`);
+			lines.push(`# USER ACCOUNTS`);
+			lines.push(`# ============================================================================`);
+			if (config.lockRoot) {
+				lines.push(`rootpw --lock`);
+			} else {
+				lines.push(`# NOTE: Replace this hash with output from:`);
+				lines.push(`# python3 -c "import crypt; print(crypt.crypt('password', crypt.mksalt(crypt.METHOD_SHA512)))"`);
+				lines.push(`rootpw --iscrypted ${hashPassword(config.rootPassword)}`);
+			}
+
+			// User account
+			if (config.createUser) {
+				let userCmd = `user --name=${config.userName}`;
+				if (config.userFullName) {
+					userCmd += ` --gecos="${config.userFullName}"`;
+				}
+				userCmd += ` --iscrypted --password=${hashPassword(config.userPassword)}`;
+				if (config.userGroups) {
+					userCmd += ` --groups=${config.userGroups}`;
+				}
+				lines.push(userCmd);
+			}
+			lines.push(``);
+
+			// Security
+			lines.push(`# ============================================================================`);
+			lines.push(`# SECURITY`);
+			lines.push(`# ============================================================================`);
+			lines.push(`selinux --${config.selinux}`);
+
+			// Firewall
+			if (config.firewall === 'enabled') {
+				let firewallCmd = `firewall --enabled`;
+				if (config.firewallServices) {
+					config.firewallServices.split(',').forEach(svc => {
+						firewallCmd += ` --service=${svc.trim()}`;
+					});
+				}
+				if (config.firewallPorts) {
+					config.firewallPorts.split(',').forEach(port => {
+						firewallCmd += ` --port=${port.trim()}`;
+					});
+				}
+				lines.push(firewallCmd);
+			} else {
+				lines.push(`firewall --disabled`);
+			}
+
+			if (config.fips) {
+				lines.push(`fips --enable`);
+			}
+			lines.push(``);
+
+			// Partitioning
+			lines.push(`# ============================================================================`);
+			lines.push(`# DISK PARTITIONING`);
+			lines.push(`# ============================================================================`);
+
+			if (config.zeroMBR) {
+				lines.push(`zerombr`);
+			}
+
+			if (config.clearPart) {
+				lines.push(`clearpart --all --initlabel --drives=${config.diskDevice}`);
+			}
+
+			// Bootloader
+			let bootloaderCmd = `bootloader`;
+			switch (config.bootloaderLocation) {
+				case 'mbr':
+					bootloaderCmd += ` --location=mbr --boot-drive=${config.diskDevice}`;
+					break;
+				case 'partition':
+					bootloaderCmd += ` --location=partition --boot-drive=${config.diskDevice}`;
+					break;
+				case 'none':
+					bootloaderCmd += ` --location=none`;
+					break;
+			}
+			lines.push(bootloaderCmd);
+
+			// Partition scheme
+			let autopartCmd = `autopart`;
+			switch (config.partitionMethod) {
+				case 'lvm':
+					autopartCmd += ` --type=lvm`;
+					break;
+				case 'btrfs':
+					autopartCmd += ` --type=btrfs`;
+					break;
+				case 'plain':
+					autopartCmd += ` --type=plain`;
+					break;
+				default:
+					// autopart with default
+					break;
+			}
+
+			if (config.encryptDisk) {
+				autopartCmd += ` --encrypted --luks-version=luks2 --passphrase=${config.luksPassphrase}`;
+			}
+
+			lines.push(autopartCmd);
+			lines.push(``);
+
+			// Services
+			lines.push(`# ============================================================================`);
+			lines.push(`# SERVICES`);
+			lines.push(`# ============================================================================`);
+			if (config.enabledServices) {
+				lines.push(`services --enabled="${config.enabledServices}"`);
+			}
+			if (config.disabledServices) {
+				lines.push(`services --disabled="${config.disabledServices}"`);
+			}
+			lines.push(``);
+
+			// Firstboot
+			if (config.firstbootDisable) {
+				lines.push(`firstboot --disable`);
+			} else {
+				lines.push(`firstboot --enable`);
+			}
+			lines.push(``);
+
+			// Reboot action
+			let rebootCmd = config.rebootAction;
+			if (config.ejectMedia && config.rebootAction === 'reboot') {
+				rebootCmd += ' --eject';
+			}
+			lines.push(rebootCmd);
+			lines.push(``);
+
+			// Package selection
+			lines.push(`# ============================================================================`);
+			lines.push(`# PACKAGE SELECTION`);
+			lines.push(`# ============================================================================`);
+			lines.push(`%packages`);
+			lines.push(`@^${config.baseEnvironment}`);
+
+			// Add-ons
+			if (config.selectedAddons && config.selectedAddons.length > 0) {
+				config.selectedAddons.forEach(addon => {
+					lines.push(`@${addon}`);
+				});
+			}
+
+			// Additional packages
+			if (config.additionalPackages) {
+				config.additionalPackages.split(/\s+/).filter(p => p).forEach(pkg => {
+					lines.push(pkg);
+				});
+			}
+
+			// Excluded packages
+			if (config.excludePackages) {
+				config.excludePackages.split(/\s+/).filter(p => p).forEach(pkg => {
+					lines.push(`-${pkg}`);
+				});
+			}
+
+			lines.push(`%end`);
+			lines.push(``);
+
+			// Pre script
+			if (config.preScript && config.preScript.trim()) {
+				lines.push(`# ============================================================================`);
+				lines.push(`# PRE-INSTALLATION SCRIPT`);
+				lines.push(`# ============================================================================`);
+				lines.push(`%pre --interpreter=/bin/bash --log=/tmp/ks-pre.log`);
+				lines.push(config.preScript.trim());
+				lines.push(`%end`);
+				lines.push(``);
+			}
+
+			// Post script (chroot)
+			if (config.postScript && config.postScript.trim()) {
+				lines.push(`# ============================================================================`);
+				lines.push(`# POST-INSTALLATION SCRIPT (chroot)`);
+				lines.push(`# ============================================================================`);
+				lines.push(`%post --interpreter=/bin/bash --log=/root/ks-post.log`);
+				lines.push(config.postScript.trim());
+
+				// SSH key setup if enabled
+				if (config.sshKeyEnabled && config.sshPublicKey && config.createUser) {
+					lines.push(``);
+					lines.push(`# Configure SSH key for ${config.userName}`);
+					lines.push(`mkdir -p /home/${config.userName}/.ssh`);
+					lines.push(`chmod 700 /home/${config.userName}/.ssh`);
+					lines.push(`echo '${config.sshPublicKey.replace(/'/g, "'\\''")}' >> /home/${config.userName}/.ssh/authorized_keys`);
+					lines.push(`chmod 600 /home/${config.userName}/.ssh/authorized_keys`);
+					lines.push(`chown -R ${config.userName}:${config.userName} /home/${config.userName}/.ssh`);
+					lines.push(`restorecon -R /home/${config.userName}/.ssh`);
+				}
+
+				lines.push(`%end`);
+				lines.push(``);
+			} else if (config.sshKeyEnabled && config.sshPublicKey && config.createUser) {
+				// Just SSH key setup
+				lines.push(`# ============================================================================`);
+				lines.push(`# POST-INSTALLATION SCRIPT (SSH key setup)`);
+				lines.push(`# ============================================================================`);
+				lines.push(`%post --interpreter=/bin/bash --log=/root/ks-post.log`);
+				lines.push(`# Configure SSH key for ${config.userName}`);
+				lines.push(`mkdir -p /home/${config.userName}/.ssh`);
+				lines.push(`chmod 700 /home/${config.userName}/.ssh`);
+				lines.push(`echo '${config.sshPublicKey.replace(/'/g, "'\\''")}' >> /home/${config.userName}/.ssh/authorized_keys`);
+				lines.push(`chmod 600 /home/${config.userName}/.ssh/authorized_keys`);
+				lines.push(`chown -R ${config.userName}:${config.userName} /home/${config.userName}/.ssh`);
+				lines.push(`restorecon -R /home/${config.userName}/.ssh`);
+				lines.push(`%end`);
+				lines.push(``);
+			}
+
+			// Post script (nochroot)
+			if (config.postNochrootScript && config.postNochrootScript.trim()) {
+				lines.push(`# ============================================================================`);
+				lines.push(`# POST-INSTALLATION SCRIPT (nochroot)`);
+				lines.push(`# ============================================================================`);
+				lines.push(`%post --nochroot --interpreter=/bin/bash --log=/mnt/sysimage/root/ks-post-nochroot.log`);
+				lines.push(config.postNochrootScript.trim());
+				lines.push(`%end`);
+				lines.push(``);
+			}
+
+			// Footer with usage instructions
+			lines.push(`# ============================================================================`);
+			lines.push(`# USAGE INSTRUCTIONS`);
+			lines.push(`# ============================================================================`);
+			lines.push(`# 1. Save this file as ks.cfg`);
+			lines.push(`# 2. Host it on an HTTP/FTP server or include on installation media`);
+			lines.push(`# 3. Boot from ${distroName} installation media`);
+			lines.push(`# 4. At boot menu, press Tab (BIOS) or 'e' (UEFI) to edit boot options`);
+			lines.push(`# 5. Append: inst.ks=http://yourserver/ks.cfg`);
+			lines.push(`# 6. Press Enter or Ctrl+X to boot`);
+			lines.push(`#`);
+			lines.push(`# IMPORTANT SECURITY NOTES:`);
+			lines.push(`# - Replace password hashes with proper SHA-512 hashes using:`);
+			lines.push(`#   python3 -c "import crypt; print(crypt.crypt('password', crypt.mksalt(crypt.METHOD_SHA512)))"`);
+			lines.push(`# - Never use plaintext passwords in production Kickstart files`);
+			lines.push(`# - Store this file securely as it may contain sensitive information`);
+			lines.push(`#`);
+			lines.push(`# Validate this Kickstart file with:`);
+			lines.push(`#   ksvalidator ks.cfg`);
+			lines.push(`# ============================================================================`);
+
+			return lines.join('\n');
+		}
+
+		// ============================================================
+		// OUTPUT HANDLING
+		// ============================================================
+
+		function copyOutput() {
+			const output = document.getElementById('kickstartOutput').textContent;
+			navigator.clipboard.writeText(output).then(() => {
+				showToast('Copied to clipboard!');
+			}).catch(() => {
+				showToast('Failed to copy', true);
+			});
+		}
+
+		function downloadOutput() {
+			const output = document.getElementById('kickstartOutput').textContent;
+			const blob = new Blob([output], { type: 'text/plain' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'ks.cfg';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+			showToast('File downloaded!');
+		}
+
+		function resetForm() {
+			// Reset to default values
+			document.getElementById('distro').value = 'rhel';
+			document.getElementById('version').value = '9';
+			document.getElementById('installMethod').value = 'cdrom';
+			toggleInstallSource();
+			document.getElementById('textMode').value = 'graphical';
+			document.getElementById('language').value = 'en_US.UTF-8';
+			document.getElementById('keyboard').value = 'us';
+			document.getElementById('timezone').value = 'UTC';
+			document.getElementById('ntpEnabled').checked = true;
+			document.getElementById('ntpServers').value = 'pool.ntp.org';
+			document.getElementById('hostname').value = 'rhel-server';
+			document.getElementById('networkDevice').value = 'ens192';
+			document.getElementById('networkConfig').value = 'dhcp';
+			toggleStaticNetwork();
+			document.getElementById('activateOnBoot').checked = true;
+			document.getElementById('ipv6Disabled').checked = false;
+			document.getElementById('rootPassword').value = '';
+			document.getElementById('lockRoot').checked = false;
+			document.getElementById('createUser').checked = true;
+			toggleUserAccount();
+			document.getElementById('userName').value = 'admin';
+			document.getElementById('userFullName').value = 'System Administrator';
+			document.getElementById('userPassword').value = '';
+			document.getElementById('userGroups').value = 'wheel';
+			document.getElementById('sshKeyEnabled').checked = false;
+			toggleSshKey();
+			document.getElementById('sshPublicKey').value = '';
+
+			// Reset partition selection
+			document.querySelectorAll('.partition-option').forEach(opt => {
+				opt.classList.toggle('selected', opt.dataset.value === 'autopart');
+			});
+			document.getElementById('diskDevice').value = 'sda';
+			document.getElementById('bootloaderLocation').value = 'mbr';
+			document.getElementById('clearPart').checked = true;
+			document.getElementById('zeroMBR').checked = true;
+			document.getElementById('encryptDisk').checked = false;
+			toggleEncryption();
+
+			document.getElementById('selinux').value = 'enforcing';
+			document.getElementById('firewall').value = 'enabled';
+			document.getElementById('firewallServices').value = 'ssh';
+			document.getElementById('firewallPorts').value = '';
+			document.getElementById('fips').checked = false;
+
+			document.getElementById('baseEnvironment').value = 'minimal-environment';
+			updateEnvironmentAddons();
+			document.getElementById('additionalPackages').value = '';
+			document.getElementById('excludePackages').value = '';
+
+			document.getElementById('enabledServices').value = 'sshd,chronyd';
+			document.getElementById('disabledServices').value = '';
+
+			document.getElementById('preScript').value = '';
+			document.getElementById('postScript').value = '';
+			document.getElementById('postNochrootScript').value = '';
+			document.getElementById('firstbootDisable').checked = true;
+			document.getElementById('rebootAction').value = 'reboot';
+			document.getElementById('ejectMedia').checked = false;
+
+			// Reset preset buttons
+			document.querySelectorAll('.preset').forEach(btn => {
+				btn.classList.remove('active');
+			});
+			document.querySelector('.preset[onclick*="minimal"]').classList.add('active');
+
+			// Hide output and validation errors
+			document.getElementById('outputPanel').style.display = 'none';
+			document.getElementById('validationErrors').classList.remove('show');
+
+			// Remove validation error styling
+			document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+
+			showToast('Form reset to defaults');
+		}
+
+		// ============================================================
+		// INITIALIZATION
+		// ============================================================
+
+		document.addEventListener('DOMContentLoaded', function() {
+			updateDistroOptions();
+			toggleInstallSource();
+			toggleStaticNetwork();
+			toggleUserAccount();
+			toggleSshKey();
+			toggleEncryption();
+			updateEnvironmentAddons();
+
+			// NTP servers visibility
+			document.getElementById('ntpEnabled').addEventListener('change', function() {
+				document.getElementById('ntpServersGroup').style.display = this.checked ? 'flex' : 'none';
+			});
+
+			// Firewall options visibility
+			document.getElementById('firewall').addEventListener('change', function() {
+				const enabled = this.value === 'enabled';
+				document.getElementById('firewallServicesGroup').style.display = enabled ? 'flex' : 'none';
+				document.getElementById('firewallPortsGroup').style.display = enabled ? 'flex' : 'none';
+			});
+		});
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

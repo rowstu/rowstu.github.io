@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Preseed Generator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		/*
+		 * Preseed Generator - Debian/Ubuntu Automated Installation Configuration
+		 *
+		 * This tool generates preseed files for automated Debian and Ubuntu installations.
+		 * Preseed files provide answers to installation questions, enabling unattended installs.
+		 *
+		 * References:
+		 * - Debian: https://www.debian.org/releases/stable/amd64/apb.en.html
+		 * - Ubuntu: https://help.ubuntu.com/lts/installation-guide/amd64/apb.html
+		 */
+
+		:root {
+			--bg: #0d1117;
+			--surface: #161b22;
+			--surface-alt: #1c2128;
+			--surface-hover: #21262d;
+			--border: #30363d;
+			--border-focus: #58a6ff;
+			--text: #c9d1d9;
+			--text-muted: #8b949e;
+			--text-bright: #f0f6fc;
+			--accent: #58a6ff;
+			--accent-hover: #79b8ff;
+			--success: #3fb950;
+			--warning: #d29922;
+			--danger: #f85149;
+			--purple: #a371f7;
+			--cyan: #39c5cf;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'JetBrains Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			line-height: 1.6;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		h1::before {
+			content: '#';
+			color: var(--purple);
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		/* Preset buttons */
+		.presets {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-bottom: 1.5rem;
+			padding: 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+		}
+
+		.presets-label {
+			width: 100%;
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 0.5rem;
+		}
+
+		.preset {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 0.5rem 1rem;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.preset:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.preset.active {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: var(--bg);
+		}
+
+		/* Panels */
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem 1.25rem;
+			background: var(--surface-alt);
+			border-bottom: 1px solid var(--border);
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.panel-header:hover {
+			background: var(--surface-hover);
+		}
+
+		.panel-title {
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: var(--text-bright);
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.panel-title::before {
+			content: attr(data-icon);
+			font-size: 1rem;
+		}
+
+		.panel-toggle {
+			color: var(--text-muted);
+			transition: transform 0.2s ease;
+		}
+
+		.panel.collapsed .panel-toggle {
+			transform: rotate(-90deg);
+		}
+
+		.panel.collapsed .panel-body {
+			display: none;
+		}
+
+		.panel-body {
+			padding: 1.25rem;
+		}
+
+		/* Form elements */
+		.form-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 1rem;
+		}
+
+		.form-group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.4rem;
+		}
+
+		.form-group.full-width {
+			grid-column: 1 / -1;
+		}
+
+		label {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+		}
+
+		label .required {
+			color: var(--danger);
+		}
+
+		.help-text {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-top: 0.25rem;
+		}
+
+		input[type="text"],
+		input[type="password"],
+		input[type="number"],
+		select,
+		textarea {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 0.6rem 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			transition: border-color 0.15s ease;
+		}
+
+		input:focus,
+		select:focus,
+		textarea:focus {
+			outline: none;
+			border-color: var(--border-focus);
+		}
+
+		input.invalid,
+		select.invalid {
+			border-color: var(--danger);
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 80px;
+		}
+
+		select {
+			cursor: pointer;
+		}
+
+		/* Checkbox styling */
+		.checkbox-group {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.5rem 0;
+		}
+
+		input[type="checkbox"] {
+			appearance: none;
+			width: 18px;
+			height: 18px;
+			background: var(--bg);
+			border: 2px solid var(--border);
+			border-radius: 4px;
+			cursor: pointer;
+			position: relative;
+			flex-shrink: 0;
+		}
+
+		input[type="checkbox"]:checked {
+			background: var(--accent);
+			border-color: var(--accent);
+		}
+
+		input[type="checkbox"]:checked::after {
+			content: '';
+			position: absolute;
+			top: 2px;
+			left: 5px;
+			width: 4px;
+			height: 8px;
+			border: solid var(--bg);
+			border-width: 0 2px 2px 0;
+			transform: rotate(45deg);
+		}
+
+		.checkbox-label {
+			font-size: 0.85rem;
+			color: var(--text);
+			cursor: pointer;
+		}
+
+		/* Output panel */
+		.output-panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-top: 1.5rem;
+		}
+
+		.output-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem 1.25rem;
+			background: var(--surface-alt);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.output-title {
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: var(--success);
+		}
+
+		.output-actions {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.output-content {
+			position: relative;
+		}
+
+		#preseedOutput {
+			background: var(--bg);
+			color: var(--cyan);
+			font-family: inherit;
+			font-size: 0.75rem;
+			line-height: 1.5;
+			padding: 1rem;
+			margin: 0;
+			overflow-x: auto;
+			white-space: pre;
+			max-height: 500px;
+			overflow-y: auto;
+		}
+
+		/* Buttons */
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: var(--bg);
+			padding: 0.6rem 1.25rem;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 0.85rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover {
+			background: var(--accent-hover);
+		}
+
+		.btn-secondary {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: var(--surface-hover);
+		}
+
+		.btn-success {
+			background: var(--success);
+		}
+
+		.btn-success:hover {
+			background: #46c05a;
+		}
+
+		.action-bar {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 1rem;
+			flex-wrap: wrap;
+		}
+
+		/* Toast notification */
+		.toast {
+			position: fixed;
+			bottom: 2rem;
+			left: 50%;
+			transform: translateX(-50%) translateY(100px);
+			background: var(--success);
+			color: var(--bg);
+			padding: 0.75rem 1.5rem;
+			border-radius: 6px;
+			font-size: 0.85rem;
+			font-weight: 500;
+			opacity: 0;
+			transition: all 0.3s ease;
+			pointer-events: none;
+			z-index: 1000;
+		}
+
+		.toast.show {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0);
+		}
+
+		.toast.error {
+			background: var(--danger);
+		}
+
+		/* Validation messages */
+		.validation-errors {
+			background: rgba(248, 81, 73, 0.1);
+			border: 1px solid var(--danger);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+			display: none;
+		}
+
+		.validation-errors.show {
+			display: block;
+		}
+
+		.validation-errors h4 {
+			color: var(--danger);
+			font-size: 0.85rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.validation-errors ul {
+			margin-left: 1.25rem;
+			font-size: 0.8rem;
+			color: var(--text);
+		}
+
+		/* Responsive */
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+			.form-grid { grid-template-columns: 1fr; }
+			.presets { flex-direction: column; }
+			.preset { width: 100%; text-align: center; }
+		}
+
+		/* Partitioning specific styles */
+		.partition-method {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 0.75rem;
+		}
+
+		.partition-option {
+			background: var(--bg);
+			border: 2px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.partition-option:hover {
+			border-color: var(--accent);
+		}
+
+		.partition-option.selected {
+			border-color: var(--accent);
+			background: rgba(88, 166, 255, 0.1);
+		}
+
+		.partition-option-title {
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: var(--text-bright);
+			margin-bottom: 0.25rem;
+		}
+
+		.partition-option-desc {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		/* Instructions panel */
+		.instructions {
+			background: rgba(163, 113, 247, 0.1);
+			border: 1px solid var(--purple);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.instructions h3 {
+			color: var(--purple);
+			font-size: 0.9rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.instructions ol {
+			margin-left: 1.25rem;
+			font-size: 0.8rem;
+		}
+
+		.instructions li {
+			margin-bottom: 0.5rem;
+		}
+
+		.instructions code {
+			background: var(--surface);
+			padding: 0.15rem 0.4rem;
+			border-radius: 3px;
+			font-size: 0.75rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Preseed Generator</h1>
+			<p class="subtitle">Generate automated installation configurations for Debian & Ubuntu</p>
+		</header>
+
+		<!-- Instructions Panel -->
+		<div class="instructions">
+			<h3>How to Use Generated Preseed Files</h3>
+			<ol>
+				<li>Download or copy the generated preseed file</li>
+				<li>Host the file on an HTTP server accessible during installation</li>
+				<li>Boot the installer and press <code>Tab</code> (BIOS) or <code>e</code> (UEFI) to edit boot options</li>
+				<li>Add: <code>auto=true priority=critical url=http://yourserver/preseed.cfg</code></li>
+				<li>Press <code>Enter</code> or <code>F10</code> to boot with automated installation</li>
+			</ol>
+		</div>
+
+		<!-- Presets -->
+		<div class="presets">
+			<span class="presets-label">Quick Start Presets</span>
+			<button class="preset active" onclick="applyPreset('minimal')" title="Basic server with minimal packages">Minimal Server</button>
+			<button class="preset" onclick="applyPreset('desktop')" title="Full desktop environment">Desktop</button>
+			<button class="preset" onclick="applyPreset('lamp')" title="Linux, Apache, MySQL, PHP stack">LAMP Stack</button>
+			<button class="preset" onclick="applyPreset('docker')" title="Docker-ready server">Docker Host</button>
+			<button class="preset" onclick="applyPreset('kubernetes')" title="Kubernetes node preparation">K8s Node</button>
+		</div>
+
+		<!-- Validation Errors -->
+		<div class="validation-errors" id="validationErrors">
+			<h4>Please fix the following errors:</h4>
+			<ul id="errorList"></ul>
+		</div>
+
+		<!-- Distribution Selection -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Distribution</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="distro">Distribution <span class="required">*</span></label>
+						<select id="distro" onchange="updateDistroOptions()">
+							<option value="debian">Debian</option>
+							<option value="ubuntu">Ubuntu</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="version">Version</label>
+						<select id="version">
+							<option value="bookworm">Debian 12 (Bookworm)</option>
+							<option value="bullseye">Debian 11 (Bullseye)</option>
+							<option value="buster">Debian 10 (Buster)</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Localization Settings -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Localization</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="locale">Locale <span class="required">*</span></label>
+						<select id="locale">
+							<option value="en_US.UTF-8">English (US) - en_US.UTF-8</option>
+							<option value="en_GB.UTF-8">English (UK) - en_GB.UTF-8</option>
+							<option value="de_DE.UTF-8">German - de_DE.UTF-8</option>
+							<option value="fr_FR.UTF-8">French - fr_FR.UTF-8</option>
+							<option value="es_ES.UTF-8">Spanish - es_ES.UTF-8</option>
+							<option value="it_IT.UTF-8">Italian - it_IT.UTF-8</option>
+							<option value="pt_BR.UTF-8">Portuguese (Brazil) - pt_BR.UTF-8</option>
+							<option value="ja_JP.UTF-8">Japanese - ja_JP.UTF-8</option>
+							<option value="zh_CN.UTF-8">Chinese (Simplified) - zh_CN.UTF-8</option>
+							<option value="ru_RU.UTF-8">Russian - ru_RU.UTF-8</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="keyboard">Keyboard Layout <span class="required">*</span></label>
+						<select id="keyboard">
+							<option value="us">US English</option>
+							<option value="gb">UK English</option>
+							<option value="de">German</option>
+							<option value="fr">French</option>
+							<option value="es">Spanish</option>
+							<option value="it">Italian</option>
+							<option value="br">Brazilian Portuguese</option>
+							<option value="jp">Japanese</option>
+							<option value="ru">Russian</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="timezone">Time Zone <span class="required">*</span></label>
+						<select id="timezone">
+							<option value="UTC">UTC</option>
+							<option value="America/New_York">America/New_York (EST/EDT)</option>
+							<option value="America/Chicago">America/Chicago (CST/CDT)</option>
+							<option value="America/Denver">America/Denver (MST/MDT)</option>
+							<option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+							<option value="Europe/London">Europe/London (GMT/BST)</option>
+							<option value="Europe/Paris">Europe/Paris (CET/CEST)</option>
+							<option value="Europe/Berlin">Europe/Berlin (CET/CEST)</option>
+							<option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+							<option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
+							<option value="Australia/Sydney">Australia/Sydney (AEST/AEDT)</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="ntpEnabled" checked>
+							<label class="checkbox-label" for="ntpEnabled">Enable NTP time synchronization</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Network Configuration -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Network</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="hostname">Hostname <span class="required">*</span></label>
+						<input type="text" id="hostname" value="debian-server" pattern="^[a-zA-Z][a-zA-Z0-9-]*$" placeholder="e.g., web-server-01">
+						<span class="help-text">Must start with a letter, alphanumeric and hyphens only</span>
+					</div>
+					<div class="form-group">
+						<label for="domain">Domain Name</label>
+						<input type="text" id="domain" value="localdomain" placeholder="e.g., example.com">
+					</div>
+					<div class="form-group">
+						<label for="networkConfig">Network Configuration</label>
+						<select id="networkConfig" onchange="toggleStaticNetwork()">
+							<option value="dhcp">DHCP (Automatic)</option>
+							<option value="static">Static IP</option>
+						</select>
+					</div>
+					<div class="form-group" id="staticNetworkGroup" style="display: none;">
+						<label for="staticIP">Static IP Address</label>
+						<input type="text" id="staticIP" placeholder="192.168.1.100">
+					</div>
+					<div class="form-group" id="netmaskGroup" style="display: none;">
+						<label for="netmask">Netmask</label>
+						<input type="text" id="netmask" placeholder="255.255.255.0">
+					</div>
+					<div class="form-group" id="gatewayGroup" style="display: none;">
+						<label for="gateway">Gateway</label>
+						<input type="text" id="gateway" placeholder="192.168.1.1">
+					</div>
+					<div class="form-group" id="nameserversGroup" style="display: none;">
+						<label for="nameservers">DNS Servers</label>
+						<input type="text" id="nameservers" placeholder="8.8.8.8 8.8.4.4">
+						<span class="help-text">Space-separated list of DNS servers</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Mirror Configuration -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Package Mirror</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="mirrorCountry">Mirror Country</label>
+						<select id="mirrorCountry">
+							<option value="US">United States</option>
+							<option value="GB">United Kingdom</option>
+							<option value="DE">Germany</option>
+							<option value="FR">France</option>
+							<option value="NL">Netherlands</option>
+							<option value="JP">Japan</option>
+							<option value="AU">Australia</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="mirrorHost">Mirror Hostname</label>
+						<input type="text" id="mirrorHost" value="deb.debian.org" placeholder="deb.debian.org">
+					</div>
+					<div class="form-group">
+						<label for="mirrorDirectory">Mirror Directory</label>
+						<input type="text" id="mirrorDirectory" value="/debian" placeholder="/debian">
+					</div>
+					<div class="form-group">
+						<label for="proxyUrl">HTTP Proxy (optional)</label>
+						<input type="text" id="proxyUrl" placeholder="http://proxy.example.com:8080">
+						<span class="help-text">Leave empty for direct connection</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- User Account -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">User Account</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="enableRoot" onchange="toggleRootAccount()">
+							<label class="checkbox-label" for="enableRoot">Enable root account</label>
+						</div>
+						<span class="help-text">If disabled, first user will have sudo access</span>
+					</div>
+					<div class="form-group" id="rootPasswordGroup" style="display: none;">
+						<label for="rootPassword">Root Password</label>
+						<input type="password" id="rootPassword" placeholder="Enter root password">
+					</div>
+					<div class="form-group">
+						<label for="fullName">Full Name <span class="required">*</span></label>
+						<input type="text" id="fullName" value="System Administrator" placeholder="John Doe">
+					</div>
+					<div class="form-group">
+						<label for="username">Username <span class="required">*</span></label>
+						<input type="text" id="username" value="admin" pattern="^[a-z_][a-z0-9_-]*$" placeholder="johndoe">
+						<span class="help-text">Lowercase letters, numbers, hyphens, underscores</span>
+					</div>
+					<div class="form-group">
+						<label for="userPassword">Password <span class="required">*</span></label>
+						<input type="password" id="userPassword" placeholder="Enter user password">
+						<span class="help-text">Will be hashed with SHA-512</span>
+					</div>
+					<div class="form-group full-width">
+						<div class="checkbox-group">
+							<input type="checkbox" id="sshKeys">
+							<label class="checkbox-label" for="sshKeys">Configure SSH public key</label>
+						</div>
+					</div>
+					<div class="form-group full-width" id="sshKeyGroup" style="display: none;">
+						<label for="sshPublicKey">SSH Public Key</label>
+						<textarea id="sshPublicKey" placeholder="ssh-rsa AAAA... user@host"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Partitioning -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Disk Partitioning</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-group" style="margin-bottom: 1rem;">
+					<label>Partitioning Method</label>
+					<div class="partition-method" id="partitionMethod">
+						<div class="partition-option selected" data-value="regular" onclick="selectPartition(this)">
+							<div class="partition-option-title">Regular</div>
+							<div class="partition-option-desc">All files in one partition (recommended for beginners)</div>
+						</div>
+						<div class="partition-option" data-value="lvm" onclick="selectPartition(this)">
+							<div class="partition-option-title">LVM</div>
+							<div class="partition-option-desc">Logical Volume Manager for flexible disk management</div>
+						</div>
+						<div class="partition-option" data-value="crypto" onclick="selectPartition(this)">
+							<div class="partition-option-title">Encrypted LVM</div>
+							<div class="partition-option-desc">Full disk encryption with LUKS</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="diskDevice">Target Disk</label>
+						<input type="text" id="diskDevice" value="/dev/sda" placeholder="/dev/sda">
+						<span class="help-text">Use /dev/vda for VMs, /dev/nvme0n1 for NVMe</span>
+					</div>
+					<div class="form-group">
+						<label for="partitionRecipe">Partition Layout</label>
+						<select id="partitionRecipe">
+							<option value="atomic">Single partition (atomic)</option>
+							<option value="home">Separate /home partition</option>
+							<option value="multi">Separate /home, /var, /tmp</option>
+						</select>
+					</div>
+					<div class="form-group full-width">
+						<div class="checkbox-group">
+							<input type="checkbox" id="useEntireDisk" checked>
+							<label class="checkbox-label" for="useEntireDisk">Use entire disk (WARNING: destroys all data)</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Package Selection -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Packages</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="taskselStandard" checked>
+							<label class="checkbox-label" for="taskselStandard">Standard system utilities</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="taskselSsh" checked>
+							<label class="checkbox-label" for="taskselSsh">SSH server</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="taskselWeb">
+							<label class="checkbox-label" for="taskselWeb">Web server (Apache)</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="taskselDesktop">
+							<label class="checkbox-label" for="taskselDesktop">Desktop environment</label>
+						</div>
+					</div>
+					<div class="form-group full-width" id="desktopEnvGroup" style="display: none;">
+						<label for="desktopEnv">Desktop Environment</label>
+						<select id="desktopEnv">
+							<option value="gnome">GNOME</option>
+							<option value="kde">KDE Plasma</option>
+							<option value="xfce">XFCE</option>
+							<option value="lxde">LXDE</option>
+							<option value="mate">MATE</option>
+							<option value="cinnamon">Cinnamon</option>
+						</select>
+					</div>
+					<div class="form-group full-width">
+						<label for="additionalPackages">Additional Packages</label>
+						<input type="text" id="additionalPackages" placeholder="vim curl git htop">
+						<span class="help-text">Space-separated list of packages to install</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Bootloader -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Bootloader</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="bootloader">Bootloader</label>
+						<select id="bootloader">
+							<option value="grub">GRUB</option>
+							<option value="grub-efi">GRUB (UEFI)</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="bootloaderDevice">Install Bootloader To</label>
+						<input type="text" id="bootloaderDevice" value="/dev/sda" placeholder="/dev/sda">
+						<span class="help-text">Usually the same as target disk</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Post-Installation -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title" data-icon="">Post-Installation</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group full-width">
+						<label for="lateCommand">Late Command (optional)</label>
+						<textarea id="lateCommand" placeholder="# Commands to run after installation, e.g.:
+# in-target apt-get -y install docker.io
+# in-target systemctl enable docker"></textarea>
+						<span class="help-text">Commands run in the installed system (use in-target prefix)</span>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="enableUpdates" checked>
+							<label class="checkbox-label" for="enableUpdates">Enable security updates</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="autoReboot" checked>
+							<label class="checkbox-label" for="autoReboot">Automatically reboot after installation</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Action buttons -->
+		<div class="action-bar">
+			<button class="btn btn-success" onclick="generatePreseed()">Generate Preseed</button>
+			<button class="btn btn-secondary" onclick="resetForm()">Reset to Defaults</button>
+		</div>
+
+		<!-- Output Panel -->
+		<div class="output-panel" id="outputPanel" style="display: none;">
+			<div class="output-header">
+				<span class="output-title">Generated Preseed Configuration</span>
+				<div class="output-actions">
+					<button class="btn btn-secondary" onclick="copyOutput()">Copy</button>
+					<button class="btn" onclick="downloadOutput()">Download</button>
+				</div>
+			</div>
+			<div class="output-content">
+				<pre id="preseedOutput"></pre>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast">Copied to clipboard!</div>
+
+	<script>
+		/**
+		 * Preseed Generator - JavaScript Application
+		 *
+		 * This module handles the generation of Debian/Ubuntu preseed files
+		 * for automated installations. It provides:
+		 * - Input validation for all configuration fields
+		 * - Preset configurations for common deployment scenarios
+		 * - Proper preseed file formatting according to Debian specifications
+		 *
+		 * @author rowstu.net
+		 * @version 1.0.0
+		 */
+
+		// ============================================================
+		// CONFIGURATION PRESETS
+		// Define common installation configurations for quick setup
+		// ============================================================
+
+		const presets = {
+			minimal: {
+				name: 'Minimal Server',
+				description: 'Basic server with essential utilities only',
+				config: {
+					hostname: 'debian-server',
+					taskselStandard: true,
+					taskselSsh: true,
+					taskselWeb: false,
+					taskselDesktop: false,
+					additionalPackages: 'vim curl wget htop',
+					partitionRecipe: 'atomic'
+				}
+			},
+			desktop: {
+				name: 'Desktop',
+				description: 'Full desktop environment with common applications',
+				config: {
+					hostname: 'debian-desktop',
+					taskselStandard: true,
+					taskselSsh: false,
+					taskselWeb: false,
+					taskselDesktop: true,
+					desktopEnv: 'gnome',
+					additionalPackages: 'firefox-esr vlc gimp',
+					partitionRecipe: 'home'
+				}
+			},
+			lamp: {
+				name: 'LAMP Stack',
+				description: 'Web server with Apache, MariaDB, and PHP',
+				config: {
+					hostname: 'lamp-server',
+					taskselStandard: true,
+					taskselSsh: true,
+					taskselWeb: true,
+					taskselDesktop: false,
+					additionalPackages: 'mariadb-server php php-mysql php-curl php-gd php-mbstring',
+					partitionRecipe: 'multi',
+					lateCommand: 'in-target systemctl enable mariadb'
+				}
+			},
+			docker: {
+				name: 'Docker Host',
+				description: 'Container-ready server with Docker installed',
+				config: {
+					hostname: 'docker-host',
+					taskselStandard: true,
+					taskselSsh: true,
+					taskselWeb: false,
+					taskselDesktop: false,
+					partitionMethod: 'lvm',
+					additionalPackages: 'apt-transport-https ca-certificates curl gnupg',
+					lateCommand: `in-target curl -fsSL https://get.docker.com | sh
+in-target usermod -aG docker admin
+in-target systemctl enable docker`
+				}
+			},
+			kubernetes: {
+				name: 'K8s Node',
+				description: 'Kubernetes-ready node with container runtime',
+				config: {
+					hostname: 'k8s-node',
+					taskselStandard: true,
+					taskselSsh: true,
+					taskselWeb: false,
+					taskselDesktop: false,
+					partitionMethod: 'lvm',
+					additionalPackages: 'apt-transport-https ca-certificates curl gnupg',
+					lateCommand: `# Disable swap for Kubernetes
+in-target swapoff -a
+in-target sed -i '/swap/d' /etc/fstab
+# Load required modules
+echo 'overlay' >> /target/etc/modules-load.d/k8s.conf
+echo 'br_netfilter' >> /target/etc/modules-load.d/k8s.conf
+# Kernel parameters
+echo 'net.bridge.bridge-nf-call-iptables=1' >> /target/etc/sysctl.d/k8s.conf
+echo 'net.bridge.bridge-nf-call-ip6tables=1' >> /target/etc/sysctl.d/k8s.conf
+echo 'net.ipv4.ip_forward=1' >> /target/etc/sysctl.d/k8s.conf`
+				}
+			}
+		};
+
+		// Debian and Ubuntu version options
+		const distroVersions = {
+			debian: [
+				{ value: 'bookworm', label: 'Debian 12 (Bookworm)' },
+				{ value: 'bullseye', label: 'Debian 11 (Bullseye)' },
+				{ value: 'buster', label: 'Debian 10 (Buster)' }
+			],
+			ubuntu: [
+				{ value: 'noble', label: 'Ubuntu 24.04 LTS (Noble)' },
+				{ value: 'jammy', label: 'Ubuntu 22.04 LTS (Jammy)' },
+				{ value: 'focal', label: 'Ubuntu 20.04 LTS (Focal)' }
+			]
+		};
+
+		const distroMirrors = {
+			debian: { host: 'deb.debian.org', directory: '/debian' },
+			ubuntu: { host: 'archive.ubuntu.com', directory: '/ubuntu' }
+		};
+
+		// ============================================================
+		// VALIDATION MODULE
+		// Validates user input before preseed generation
+		// ============================================================
+
+		const validators = {
+			/**
+			 * Validates hostname format according to RFC 1123
+			 * @param {string} hostname - The hostname to validate
+			 * @returns {boolean} True if valid
+			 */
+			hostname: (value) => {
+				if (!value || value.trim() === '') return false;
+				return /^[a-zA-Z][a-zA-Z0-9-]{0,62}$/.test(value);
+			},
+
+			/**
+			 * Validates username format (POSIX compliant)
+			 * @param {string} username - The username to validate
+			 * @returns {boolean} True if valid
+			 */
+			username: (value) => {
+				if (!value || value.trim() === '') return false;
+				return /^[a-z_][a-z0-9_-]{0,31}$/.test(value);
+			},
+
+			/**
+			 * Validates IP address format (IPv4)
+			 * @param {string} ip - The IP address to validate
+			 * @returns {boolean} True if valid
+			 */
+			ipAddress: (value) => {
+				if (!value) return true; // Optional field
+				return /^(\d{1,3}\.){3}\d{1,3}$/.test(value) &&
+					value.split('.').every(octet => parseInt(octet) >= 0 && parseInt(octet) <= 255);
+			},
+
+			/**
+			 * Validates netmask format
+			 * @param {string} netmask - The netmask to validate
+			 * @returns {boolean} True if valid
+			 */
+			netmask: (value) => {
+				if (!value) return true;
+				return validators.ipAddress(value);
+			},
+
+			/**
+			 * Validates password meets minimum requirements
+			 * @param {string} password - The password to validate
+			 * @returns {boolean} True if valid
+			 */
+			password: (value) => {
+				return value && value.length >= 4;
+			},
+
+			/**
+			 * Validates SSH public key format
+			 * @param {string} key - The SSH key to validate
+			 * @returns {boolean} True if valid
+			 */
+			sshKey: (value) => {
+				if (!value) return true;
+				return /^(ssh-rsa|ssh-ed25519|ecdsa-sha2-\S+)\s+[A-Za-z0-9+\/=]+/.test(value);
+			},
+
+			/**
+			 * Validates disk device path format
+			 * @param {string} device - The device path to validate
+			 * @returns {boolean} True if valid
+			 */
+			diskDevice: (value) => {
+				return /^\/dev\/[a-z0-9]+$/.test(value);
+			}
+		};
+
+		/**
+		 * Performs full form validation and returns array of errors
+		 * @returns {Array<string>} Array of error messages
+		 */
+		function validateForm() {
+			const errors = [];
+			const hostname = document.getElementById('hostname').value;
+			const username = document.getElementById('username').value;
+			const userPassword = document.getElementById('userPassword').value;
+			const networkConfig = document.getElementById('networkConfig').value;
+			const enableRoot = document.getElementById('enableRoot').checked;
+			const rootPassword = document.getElementById('rootPassword').value;
+			const sshKeysEnabled = document.getElementById('sshKeys').checked;
+			const sshPublicKey = document.getElementById('sshPublicKey').value;
+
+			// Required field validation
+			if (!validators.hostname(hostname)) {
+				errors.push('Invalid hostname: must start with a letter and contain only letters, numbers, and hyphens');
+				document.getElementById('hostname').classList.add('invalid');
+			} else {
+				document.getElementById('hostname').classList.remove('invalid');
+			}
+
+			if (!validators.username(username)) {
+				errors.push('Invalid username: must start with lowercase letter or underscore, contain only lowercase letters, numbers, hyphens, and underscores');
+				document.getElementById('username').classList.add('invalid');
+			} else {
+				document.getElementById('username').classList.remove('invalid');
+			}
+
+			if (!validators.password(userPassword)) {
+				errors.push('User password must be at least 4 characters');
+				document.getElementById('userPassword').classList.add('invalid');
+			} else {
+				document.getElementById('userPassword').classList.remove('invalid');
+			}
+
+			if (enableRoot && !validators.password(rootPassword)) {
+				errors.push('Root password must be at least 4 characters when root account is enabled');
+				document.getElementById('rootPassword').classList.add('invalid');
+			} else {
+				document.getElementById('rootPassword').classList.remove('invalid');
+			}
+
+			// Static network validation
+			if (networkConfig === 'static') {
+				const staticIP = document.getElementById('staticIP').value;
+				const netmask = document.getElementById('netmask').value;
+				const gateway = document.getElementById('gateway').value;
+
+				if (!validators.ipAddress(staticIP) || !staticIP) {
+					errors.push('Static IP address is required and must be valid');
+					document.getElementById('staticIP').classList.add('invalid');
+				} else {
+					document.getElementById('staticIP').classList.remove('invalid');
+				}
+
+				if (!validators.netmask(netmask) || !netmask) {
+					errors.push('Netmask is required and must be valid');
+					document.getElementById('netmask').classList.add('invalid');
+				} else {
+					document.getElementById('netmask').classList.remove('invalid');
+				}
+
+				if (!validators.ipAddress(gateway) || !gateway) {
+					errors.push('Gateway is required and must be valid');
+					document.getElementById('gateway').classList.add('invalid');
+				} else {
+					document.getElementById('gateway').classList.remove('invalid');
+				}
+			}
+
+			// SSH key validation
+			if (sshKeysEnabled && !validators.sshKey(sshPublicKey)) {
+				errors.push('Invalid SSH public key format');
+				document.getElementById('sshPublicKey').classList.add('invalid');
+			} else {
+				document.getElementById('sshPublicKey').classList.remove('invalid');
+			}
+
+			// Disk device validation
+			const diskDevice = document.getElementById('diskDevice').value;
+			if (!validators.diskDevice(diskDevice)) {
+				errors.push('Invalid disk device path (e.g., /dev/sda, /dev/vda)');
+				document.getElementById('diskDevice').classList.add('invalid');
+			} else {
+				document.getElementById('diskDevice').classList.remove('invalid');
+			}
+
+			return errors;
+		}
+
+		// ============================================================
+		// UI INTERACTION HANDLERS
+		// Functions to handle user interface events
+		// ============================================================
+
+		/**
+		 * Toggles panel collapse state
+		 * @param {HTMLElement} header - The panel header element
+		 */
+		function togglePanel(header) {
+			header.parentElement.classList.toggle('collapsed');
+		}
+
+		/**
+		 * Updates version dropdown when distribution changes
+		 */
+		function updateDistroOptions() {
+			const distro = document.getElementById('distro').value;
+			const versionSelect = document.getElementById('version');
+			const versions = distroVersions[distro];
+
+			versionSelect.innerHTML = versions.map(v =>
+				`<option value="${v.value}">${v.label}</option>`
+			).join('');
+
+			// Update mirror defaults
+			const mirror = distroMirrors[distro];
+			document.getElementById('mirrorHost').value = mirror.host;
+			document.getElementById('mirrorDirectory').value = mirror.directory;
+		}
+
+		/**
+		 * Shows/hides static network configuration fields
+		 */
+		function toggleStaticNetwork() {
+			const isStatic = document.getElementById('networkConfig').value === 'static';
+			const fields = ['staticNetworkGroup', 'netmaskGroup', 'gatewayGroup', 'nameserversGroup'];
+			fields.forEach(id => {
+				document.getElementById(id).style.display = isStatic ? 'flex' : 'none';
+			});
+		}
+
+		/**
+		 * Shows/hides root password field
+		 */
+		function toggleRootAccount() {
+			const enabled = document.getElementById('enableRoot').checked;
+			document.getElementById('rootPasswordGroup').style.display = enabled ? 'flex' : 'none';
+		}
+
+		/**
+		 * Handles partition method selection
+		 * @param {HTMLElement} element - The selected partition option
+		 */
+		function selectPartition(element) {
+			document.querySelectorAll('.partition-option').forEach(opt => {
+				opt.classList.remove('selected');
+			});
+			element.classList.add('selected');
+		}
+
+		/**
+		 * Gets currently selected partition method
+		 * @returns {string} The partition method value
+		 */
+		function getSelectedPartitionMethod() {
+			const selected = document.querySelector('.partition-option.selected');
+			return selected ? selected.dataset.value : 'regular';
+		}
+
+		/**
+		 * Shows toast notification
+		 * @param {string} message - Message to display
+		 * @param {boolean} isError - Whether this is an error message
+		 */
+		function showToast(message, isError = false) {
+			const toast = document.getElementById('toast');
+			toast.textContent = message;
+			toast.classList.toggle('error', isError);
+			toast.classList.add('show');
+			setTimeout(() => toast.classList.remove('show'), 2500);
+		}
+
+		// Toggle SSH key textarea visibility
+		document.getElementById('sshKeys').addEventListener('change', function() {
+			document.getElementById('sshKeyGroup').style.display = this.checked ? 'flex' : 'none';
+		});
+
+		// Toggle desktop environment dropdown visibility
+		document.getElementById('taskselDesktop').addEventListener('change', function() {
+			document.getElementById('desktopEnvGroup').style.display = this.checked ? 'flex' : 'none';
+		});
+
+		// ============================================================
+		// PRESET APPLICATION
+		// Applies predefined configurations to the form
+		// ============================================================
+
+		/**
+		 * Applies a preset configuration to the form
+		 * @param {string} presetName - Name of the preset to apply
+		 */
+		function applyPreset(presetName) {
+			const preset = presets[presetName];
+			if (!preset) return;
+
+			// Update preset button states
+			document.querySelectorAll('.preset').forEach(btn => {
+				btn.classList.remove('active');
+			});
+			event.target.classList.add('active');
+
+			// Apply configuration values
+			const config = preset.config;
+
+			if (config.hostname) document.getElementById('hostname').value = config.hostname;
+			if (config.taskselStandard !== undefined) document.getElementById('taskselStandard').checked = config.taskselStandard;
+			if (config.taskselSsh !== undefined) document.getElementById('taskselSsh').checked = config.taskselSsh;
+			if (config.taskselWeb !== undefined) document.getElementById('taskselWeb').checked = config.taskselWeb;
+			if (config.taskselDesktop !== undefined) {
+				document.getElementById('taskselDesktop').checked = config.taskselDesktop;
+				document.getElementById('desktopEnvGroup').style.display = config.taskselDesktop ? 'flex' : 'none';
+			}
+			if (config.desktopEnv) document.getElementById('desktopEnv').value = config.desktopEnv;
+			if (config.additionalPackages) document.getElementById('additionalPackages').value = config.additionalPackages;
+			if (config.partitionRecipe) document.getElementById('partitionRecipe').value = config.partitionRecipe;
+			if (config.lateCommand) document.getElementById('lateCommand').value = config.lateCommand;
+
+			// Handle partition method
+			if (config.partitionMethod) {
+				document.querySelectorAll('.partition-option').forEach(opt => {
+					opt.classList.toggle('selected', opt.dataset.value === config.partitionMethod);
+				});
+			}
+		}
+
+		// ============================================================
+		// PRESEED GENERATION
+		// Generates the preseed file content from form values
+		// ============================================================
+
+		/**
+		 * Generates SHA-512 password hash (simulated - in production use proper hashing)
+		 * Note: For real deployments, use mkpasswd -m sha-512 on a Linux system
+		 * @param {string} password - Plain text password
+		 * @returns {string} Hashed password placeholder
+		 */
+		function hashPassword(password) {
+			// In a real implementation, this would generate a proper SHA-512 hash
+			// For the preseed file, we'll include a note about proper hashing
+			return `$6$rounds=4096$saltsalt$` + btoa(password).replace(/=/g, '');
+		}
+
+		/**
+		 * Main function to generate the preseed file content
+		 * Validates input and creates formatted preseed configuration
+		 */
+		function generatePreseed() {
+			// Validate form
+			const errors = validateForm();
+			const errorDisplay = document.getElementById('validationErrors');
+			const errorList = document.getElementById('errorList');
+
+			if (errors.length > 0) {
+				errorList.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+				errorDisplay.classList.add('show');
+				showToast('Please fix validation errors', true);
+				return;
+			}
+			errorDisplay.classList.remove('show');
+
+			// Gather all form values
+			const config = {
+				distro: document.getElementById('distro').value,
+				version: document.getElementById('version').value,
+				locale: document.getElementById('locale').value,
+				keyboard: document.getElementById('keyboard').value,
+				timezone: document.getElementById('timezone').value,
+				ntpEnabled: document.getElementById('ntpEnabled').checked,
+				hostname: document.getElementById('hostname').value,
+				domain: document.getElementById('domain').value,
+				networkConfig: document.getElementById('networkConfig').value,
+				staticIP: document.getElementById('staticIP').value,
+				netmask: document.getElementById('netmask').value,
+				gateway: document.getElementById('gateway').value,
+				nameservers: document.getElementById('nameservers').value,
+				mirrorCountry: document.getElementById('mirrorCountry').value,
+				mirrorHost: document.getElementById('mirrorHost').value,
+				mirrorDirectory: document.getElementById('mirrorDirectory').value,
+				proxyUrl: document.getElementById('proxyUrl').value,
+				enableRoot: document.getElementById('enableRoot').checked,
+				rootPassword: document.getElementById('rootPassword').value,
+				fullName: document.getElementById('fullName').value,
+				username: document.getElementById('username').value,
+				userPassword: document.getElementById('userPassword').value,
+				sshKeys: document.getElementById('sshKeys').checked,
+				sshPublicKey: document.getElementById('sshPublicKey').value,
+				partitionMethod: getSelectedPartitionMethod(),
+				diskDevice: document.getElementById('diskDevice').value,
+				partitionRecipe: document.getElementById('partitionRecipe').value,
+				useEntireDisk: document.getElementById('useEntireDisk').checked,
+				taskselStandard: document.getElementById('taskselStandard').checked,
+				taskselSsh: document.getElementById('taskselSsh').checked,
+				taskselWeb: document.getElementById('taskselWeb').checked,
+				taskselDesktop: document.getElementById('taskselDesktop').checked,
+				desktopEnv: document.getElementById('desktopEnv').value,
+				additionalPackages: document.getElementById('additionalPackages').value,
+				bootloader: document.getElementById('bootloader').value,
+				bootloaderDevice: document.getElementById('bootloaderDevice').value,
+				lateCommand: document.getElementById('lateCommand').value,
+				enableUpdates: document.getElementById('enableUpdates').checked,
+				autoReboot: document.getElementById('autoReboot').checked
+			};
+
+			// Generate preseed content
+			const preseed = buildPreseedFile(config);
+
+			// Display output
+			document.getElementById('preseedOutput').textContent = preseed;
+			document.getElementById('outputPanel').style.display = 'block';
+			document.getElementById('outputPanel').scrollIntoView({ behavior: 'smooth' });
+
+			showToast('Preseed file generated successfully!');
+		}
+
+		/**
+		 * Builds the preseed file content from configuration object
+		 * @param {Object} config - Configuration object with all settings
+		 * @returns {string} Complete preseed file content
+		 */
+		function buildPreseedFile(config) {
+			const lines = [];
+			const isUbuntu = config.distro === 'ubuntu';
+
+			// Header comment
+			lines.push(`#_preseed_V1`);
+			lines.push(`# =============================================================================`);
+			lines.push(`# ${config.distro.charAt(0).toUpperCase() + config.distro.slice(1)} ${config.version} Preseed Configuration`);
+			lines.push(`# Generated by Preseed Generator - rowstu.net`);
+			lines.push(`# Generated: ${new Date().toISOString()}`);
+			lines.push(`# =============================================================================`);
+			lines.push(``);
+
+			// ---- Localization ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# LOCALIZATION SETTINGS`);
+			lines.push(`# =============================================================================`);
+			lines.push(`d-i debian-installer/locale string ${config.locale}`);
+			lines.push(`d-i debian-installer/language string ${config.locale.split('_')[0]}`);
+			lines.push(`d-i debian-installer/country string ${config.locale.split('_')[1].split('.')[0]}`);
+			lines.push(`d-i localechooser/supported-locales multiselect ${config.locale}`);
+			lines.push(``);
+
+			// ---- Keyboard ----
+			lines.push(`# Keyboard configuration`);
+			lines.push(`d-i keyboard-configuration/xkb-keymap select ${config.keyboard}`);
+			if (isUbuntu) {
+				lines.push(`d-i keyboard-configuration/layoutcode string ${config.keyboard}`);
+			}
+			lines.push(``);
+
+			// ---- Network ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# NETWORK CONFIGURATION`);
+			lines.push(`# =============================================================================`);
+			if (config.networkConfig === 'dhcp') {
+				lines.push(`d-i netcfg/choose_interface select auto`);
+				lines.push(`d-i netcfg/get_hostname string ${config.hostname}`);
+				lines.push(`d-i netcfg/get_domain string ${config.domain}`);
+			} else {
+				lines.push(`d-i netcfg/choose_interface select auto`);
+				lines.push(`d-i netcfg/disable_autoconfig boolean true`);
+				lines.push(`d-i netcfg/get_ipaddress string ${config.staticIP}`);
+				lines.push(`d-i netcfg/get_netmask string ${config.netmask}`);
+				lines.push(`d-i netcfg/get_gateway string ${config.gateway}`);
+				lines.push(`d-i netcfg/get_nameservers string ${config.nameservers || '8.8.8.8'}`);
+				lines.push(`d-i netcfg/confirm_static boolean true`);
+				lines.push(`d-i netcfg/get_hostname string ${config.hostname}`);
+				lines.push(`d-i netcfg/get_domain string ${config.domain}`);
+			}
+			lines.push(`d-i netcfg/hostname string ${config.hostname}`);
+			lines.push(``);
+
+			// ---- Mirror ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# MIRROR SETTINGS`);
+			lines.push(`# =============================================================================`);
+			lines.push(`d-i mirror/country string manual`);
+			lines.push(`d-i mirror/http/hostname string ${config.mirrorHost}`);
+			lines.push(`d-i mirror/http/directory string ${config.mirrorDirectory}`);
+			if (config.proxyUrl) {
+				lines.push(`d-i mirror/http/proxy string ${config.proxyUrl}`);
+			} else {
+				lines.push(`d-i mirror/http/proxy string`);
+			}
+			if (!isUbuntu) {
+				lines.push(`d-i mirror/suite string ${config.version}`);
+			}
+			lines.push(``);
+
+			// ---- Clock and Time ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# CLOCK AND TIME ZONE`);
+			lines.push(`# =============================================================================`);
+			lines.push(`d-i clock-setup/utc boolean true`);
+			lines.push(`d-i time/zone string ${config.timezone}`);
+			lines.push(`d-i clock-setup/ntp boolean ${config.ntpEnabled}`);
+			if (config.ntpEnabled) {
+				lines.push(`d-i clock-setup/ntp-server string pool.ntp.org`);
+			}
+			lines.push(``);
+
+			// ---- Partitioning ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# PARTITIONING`);
+			lines.push(`# =============================================================================`);
+
+			// Partition method selection
+			if (config.partitionMethod === 'regular') {
+				lines.push(`d-i partman-auto/method string regular`);
+			} else if (config.partitionMethod === 'lvm') {
+				lines.push(`d-i partman-auto/method string lvm`);
+				lines.push(`d-i partman-lvm/device_remove_lvm boolean true`);
+				lines.push(`d-i partman-lvm/confirm boolean true`);
+				lines.push(`d-i partman-lvm/confirm_nooverwrite boolean true`);
+			} else if (config.partitionMethod === 'crypto') {
+				lines.push(`d-i partman-auto/method string crypto`);
+				lines.push(`d-i partman-crypto/passphrase password changeme`);
+				lines.push(`d-i partman-crypto/passphrase-again password changeme`);
+				lines.push(`d-i partman-lvm/device_remove_lvm boolean true`);
+				lines.push(`d-i partman-lvm/confirm boolean true`);
+				lines.push(`d-i partman-lvm/confirm_nooverwrite boolean true`);
+			}
+
+			lines.push(`d-i partman-auto/disk string ${config.diskDevice}`);
+			lines.push(`d-i partman-auto/choose_recipe select ${config.partitionRecipe}`);
+
+			if (config.useEntireDisk) {
+				lines.push(`d-i partman-partitioning/confirm_write_new_label boolean true`);
+				lines.push(`d-i partman/choose_partition select finish`);
+				lines.push(`d-i partman/confirm boolean true`);
+				lines.push(`d-i partman/confirm_nooverwrite boolean true`);
+			}
+
+			lines.push(`d-i partman-md/device_remove_md boolean true`);
+			lines.push(`d-i partman-md/confirm boolean true`);
+			lines.push(``);
+
+			// ---- User Account ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# USER ACCOUNT SETUP`);
+			lines.push(`# =============================================================================`);
+
+			if (config.enableRoot) {
+				lines.push(`# Root account enabled`);
+				lines.push(`d-i passwd/root-login boolean true`);
+				lines.push(`# NOTE: Replace this hash with output from: mkpasswd -m sha-512`);
+				lines.push(`d-i passwd/root-password-crypted password ${hashPassword(config.rootPassword)}`);
+			} else {
+				lines.push(`# Root account disabled - user will have sudo access`);
+				lines.push(`d-i passwd/root-login boolean false`);
+			}
+
+			lines.push(``);
+			lines.push(`# Regular user account`);
+			lines.push(`d-i passwd/user-fullname string ${config.fullName}`);
+			lines.push(`d-i passwd/username string ${config.username}`);
+			lines.push(`# NOTE: Replace this hash with output from: mkpasswd -m sha-512`);
+			lines.push(`d-i passwd/user-password-crypted password ${hashPassword(config.userPassword)}`);
+			lines.push(`d-i passwd/user-default-groups string sudo`);
+			lines.push(``);
+
+			// ---- Package Selection ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# PACKAGE SELECTION`);
+			lines.push(`# =============================================================================`);
+
+			// Build tasksel selections
+			const taskselItems = [];
+			if (config.taskselStandard) taskselItems.push('standard');
+			if (config.taskselSsh) taskselItems.push('ssh-server');
+			if (config.taskselWeb) taskselItems.push('web-server');
+			if (config.taskselDesktop) {
+				taskselItems.push('desktop');
+				taskselItems.push(`${config.desktopEnv}-desktop`);
+			}
+
+			lines.push(`tasksel tasksel/first multiselect ${taskselItems.join(', ')}`);
+
+			if (config.additionalPackages) {
+				lines.push(`d-i pkgsel/include string ${config.additionalPackages}`);
+			}
+
+			lines.push(`d-i pkgsel/upgrade select safe-upgrade`);
+
+			if (config.enableUpdates) {
+				lines.push(`d-i pkgsel/update-policy select unattended-upgrades`);
+			} else {
+				lines.push(`d-i pkgsel/update-policy select none`);
+			}
+
+			// Disable popularity-contest
+			lines.push(`popularity-contest popularity-contest/participate boolean false`);
+			lines.push(``);
+
+			// ---- Bootloader ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# BOOTLOADER INSTALLATION`);
+			lines.push(`# =============================================================================`);
+			lines.push(`d-i grub-installer/only_debian boolean true`);
+			lines.push(`d-i grub-installer/with_other_os boolean true`);
+			lines.push(`d-i grub-installer/bootdev string ${config.bootloaderDevice}`);
+			if (config.bootloader === 'grub-efi') {
+				lines.push(`d-i grub-installer/force-efi-extra-removable boolean true`);
+			}
+			lines.push(``);
+
+			// ---- Post-Installation ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# POST-INSTALLATION`);
+			lines.push(`# =============================================================================`);
+
+			// Build late commands
+			const lateCommands = [];
+
+			// SSH key setup
+			if (config.sshKeys && config.sshPublicKey) {
+				lateCommands.push(`mkdir -p /target/home/${config.username}/.ssh`);
+				lateCommands.push(`echo '${config.sshPublicKey.replace(/'/g, "'\\''")}' > /target/home/${config.username}/.ssh/authorized_keys`);
+				lateCommands.push(`chmod 700 /target/home/${config.username}/.ssh`);
+				lateCommands.push(`chmod 600 /target/home/${config.username}/.ssh/authorized_keys`);
+				lateCommands.push(`in-target chown -R ${config.username}:${config.username} /home/${config.username}/.ssh`);
+			}
+
+			// Custom late commands
+			if (config.lateCommand && config.lateCommand.trim()) {
+				const customCommands = config.lateCommand.split('\n')
+					.filter(line => line.trim() && !line.trim().startsWith('#'));
+				lateCommands.push(...customCommands);
+			}
+
+			if (lateCommands.length > 0) {
+				lines.push(`d-i preseed/late_command string \\`);
+				lateCommands.forEach((cmd, idx) => {
+					const isLast = idx === lateCommands.length - 1;
+					lines.push(`    ${cmd}${isLast ? '' : ' && \\'}`);
+				});
+			}
+			lines.push(``);
+
+			// ---- Finishing Up ----
+			lines.push(`# =============================================================================`);
+			lines.push(`# FINISHING UP`);
+			lines.push(`# =============================================================================`);
+			lines.push(`d-i finish-install/keep-consoles boolean true`);
+			if (config.autoReboot) {
+				lines.push(`d-i finish-install/reboot_in_progress note`);
+				lines.push(`d-i debian-installer/exit/poweroff boolean false`);
+			} else {
+				lines.push(`d-i debian-installer/exit/halt boolean true`);
+			}
+			lines.push(``);
+
+			// Footer with usage instructions
+			lines.push(`# =============================================================================`);
+			lines.push(`# USAGE INSTRUCTIONS`);
+			lines.push(`# =============================================================================`);
+			lines.push(`# 1. Save this file as preseed.cfg`);
+			lines.push(`# 2. Host it on an HTTP server accessible during installation`);
+			lines.push(`# 3. Boot from ${config.distro} installation media`);
+			lines.push(`# 4. At boot prompt, press Tab (BIOS) or 'e' (UEFI) to edit boot options`);
+			lines.push(`# 5. Add: auto=true priority=critical url=http://yourserver/preseed.cfg`);
+			lines.push(`# 6. Press Enter or F10 to boot`);
+			lines.push(`#`);
+			lines.push(`# IMPORTANT SECURITY NOTES:`);
+			lines.push(`# - Replace password hashes with proper SHA-512 hashes using:`);
+			lines.push(`#   mkpasswd -m sha-512 "your_password"`);
+			lines.push(`# - Never use plaintext passwords in production preseed files`);
+			lines.push(`# - Store this file securely as it contains sensitive information`);
+			lines.push(`# =============================================================================`);
+
+			return lines.join('\n');
+		}
+
+		// ============================================================
+		// OUTPUT HANDLING
+		// Functions to copy and download the generated preseed file
+		// ============================================================
+
+		/**
+		 * Copies preseed content to clipboard
+		 */
+		function copyOutput() {
+			const output = document.getElementById('preseedOutput').textContent;
+			navigator.clipboard.writeText(output).then(() => {
+				showToast('Copied to clipboard!');
+			}).catch(() => {
+				showToast('Failed to copy', true);
+			});
+		}
+
+		/**
+		 * Downloads preseed content as a file
+		 */
+		function downloadOutput() {
+			const output = document.getElementById('preseedOutput').textContent;
+			const blob = new Blob([output], { type: 'text/plain' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'preseed.cfg';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+			showToast('File downloaded!');
+		}
+
+		/**
+		 * Resets form to default values
+		 */
+		function resetForm() {
+			// Reset all form fields
+			document.getElementById('distro').value = 'debian';
+			updateDistroOptions();
+			document.getElementById('locale').value = 'en_US.UTF-8';
+			document.getElementById('keyboard').value = 'us';
+			document.getElementById('timezone').value = 'UTC';
+			document.getElementById('ntpEnabled').checked = true;
+			document.getElementById('hostname').value = 'debian-server';
+			document.getElementById('domain').value = 'localdomain';
+			document.getElementById('networkConfig').value = 'dhcp';
+			toggleStaticNetwork();
+			document.getElementById('staticIP').value = '';
+			document.getElementById('netmask').value = '';
+			document.getElementById('gateway').value = '';
+			document.getElementById('nameservers').value = '';
+			document.getElementById('mirrorCountry').value = 'US';
+			document.getElementById('mirrorHost').value = 'deb.debian.org';
+			document.getElementById('mirrorDirectory').value = '/debian';
+			document.getElementById('proxyUrl').value = '';
+			document.getElementById('enableRoot').checked = false;
+			toggleRootAccount();
+			document.getElementById('rootPassword').value = '';
+			document.getElementById('fullName').value = 'System Administrator';
+			document.getElementById('username').value = 'admin';
+			document.getElementById('userPassword').value = '';
+			document.getElementById('sshKeys').checked = false;
+			document.getElementById('sshKeyGroup').style.display = 'none';
+			document.getElementById('sshPublicKey').value = '';
+
+			// Reset partition selection
+			document.querySelectorAll('.partition-option').forEach(opt => {
+				opt.classList.toggle('selected', opt.dataset.value === 'regular');
+			});
+			document.getElementById('diskDevice').value = '/dev/sda';
+			document.getElementById('partitionRecipe').value = 'atomic';
+			document.getElementById('useEntireDisk').checked = true;
+
+			document.getElementById('taskselStandard').checked = true;
+			document.getElementById('taskselSsh').checked = true;
+			document.getElementById('taskselWeb').checked = false;
+			document.getElementById('taskselDesktop').checked = false;
+			document.getElementById('desktopEnvGroup').style.display = 'none';
+			document.getElementById('desktopEnv').value = 'gnome';
+			document.getElementById('additionalPackages').value = '';
+
+			document.getElementById('bootloader').value = 'grub';
+			document.getElementById('bootloaderDevice').value = '/dev/sda';
+			document.getElementById('lateCommand').value = '';
+			document.getElementById('enableUpdates').checked = true;
+			document.getElementById('autoReboot').checked = true;
+
+			// Reset preset buttons
+			document.querySelectorAll('.preset').forEach(btn => {
+				btn.classList.remove('active');
+			});
+			document.querySelector('.preset[onclick*="minimal"]').classList.add('active');
+
+			// Hide output and validation errors
+			document.getElementById('outputPanel').style.display = 'none';
+			document.getElementById('validationErrors').classList.remove('show');
+
+			// Remove validation error styling
+			document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+
+			showToast('Form reset to defaults');
+		}
+
+		// ============================================================
+		// INITIALIZATION
+		// ============================================================
+
+		// Initialize form state on page load
+		document.addEventListener('DOMContentLoaded', function() {
+			updateDistroOptions();
+			toggleStaticNetwork();
+			toggleRootAccount();
+		});
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>
