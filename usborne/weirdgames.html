@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weird Computer Games - Learn Programming</title>
+    <link rel="stylesheet" href="weirdgames.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="back-link">← All Books</a>
+        <div class="header-content">
+            <h1>🔮 Weird Computer Games</h1>
+            <p class="subtitle">Learn programming through bizarre 1984 adventures</p>
+            <p class="tagline">Original BASIC → Modern JavaScript & Python</p>
+        </div>
+    </header>
+
+    <nav id="main-nav">
+        <ul>
+            <li><a href="#basics">BASIC Fundamentals</a></li>
+            <li><a href="#tower-terror">Tower of Terror</a></li>
+            <li><a href="#skulls">Skulls of the Pyramid</a></li>
+            <li><a href="#monster-wrestling">Monster Wrestling</a></li>
+            <li><a href="#jaws">Jaws</a></li>
+            <li><a href="#flying-witches">Flying Witches</a></li>
+            <li><a href="#micropuzzle">Micropuzzle</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="intro" class="section">
+            <h2>Welcome to the Weird...</h2>
+            <p>Based on <strong>"Usborne Weird Computer Games"</strong> (1984), this collection features the strangest games imaginable - from wrestling monsters to flying with witches!</p>
+
+            <div class="info-box">
+                <h3>Weird Concepts You'll Learn</h3>
+                <ul>
+                    <li><strong>State management</strong> - Track pulse rates, resources, and health</li>
+                    <li><strong>Grid movement</strong> - Navigate as predator or prey</li>
+                    <li><strong>Text adventures</strong> - Parse commands and explore worlds</li>
+                    <li><strong>Mental math</strong> - Quick calculations under pressure</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="basics" class="section">
+            <h2>Weird BASIC Techniques</h2>
+
+            <div class="concept">
+                <h3>READ/DATA for Game Content</h3>
+                <p>Store text adventure rooms, monster names, and game content.</p>
+                <div class="code-comparison">
+                    <div class="code-block basic">
+                        <h4>BASIC</h4>
+                        <pre><code>10 REM STORE MONSTER NAMES
+20 DIM M$(5)
+30 FOR I = 1 TO 5
+40 READ M$(I)
+50 NEXT I
+60 DATA "BLOB","GREMLIN","TROLL"
+70 DATA "VAMPIRE","WEREWOLF"
+80 REM Random monster
+90 R = INT(RND(1)*5) + 1
+100 PRINT "A "; M$(R); " APPEARS!"</code></pre>
+                    </div>
+                    <div class="code-block javascript">
+                        <h4>JavaScript</h4>
+                        <pre><code>// Store game content in arrays
+const monsters = [
+    "BLOB", "GREMLIN", "TROLL",
+    "VAMPIRE", "WEREWOLF"
+];
+
+// Random monster
+const index = Math.floor(Math.random() * monsters.length);
+console.log(`A ${monsters[index]} APPEARS!`);
+
+// Or use objects for more data
+const monsterData = {
+    blob: { name: "BLOB", strength: 3 },
+    gremlin: { name: "GREMLIN", strength: 5 }
+};</code></pre>
+                    </div>
+                    <div class="code-block python">
+                        <h4>Python</h4>
+                        <pre><code>import random
+
+# Store game content
+monsters = [
+    "BLOB", "GREMLIN", "TROLL",
+    "VAMPIRE", "WEREWOLF"
+]
+
+# Random monster
+monster = random.choice(monsters)
+print(f"A {monster} APPEARS!")
+
+# Or use dictionaries
+monster_data = {
+    "blob": {"name": "BLOB", "strength": 3},
+    "gremlin": {"name": "GREMLIN", "strength": 5}
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tower of Terror -->
+        <section id="tower-terror" class="section">
+            <h2>Game 1: Tower of Terror</h2>
+            <p class="game-desc">Climb the haunted tower before midnight! But watch your pulse rate...</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Navigate through a haunted tower, encountering increasingly scary creatures. Each scare raises your pulse. If it goes over 150, you die of fright! Reach the top before midnight.</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM TOWER OF TERROR
+20 P = 70: F = 1: T = 9
+30 DIM M$(3)
+40 M$(1) = "SKELETON": M$(2) = "GHOST"
+50 M$(3) = "HEADLESS AXEMAN"
+60 PRINT "FLOOR "; F; " - PULSE: "; P
+70 PRINT "TIME: "; T; ":00"
+80 IF P > 150 THEN PRINT "HEART ATTACK!": END
+90 IF T >= 12 THEN PRINT "MIDNIGHT! TRAPPED!": END
+100 PRINT "YOU SEE A "; M$(F); "!"
+110 P = P + F * 10 + INT(RND(1)*20)
+120 INPUT "(G)O UP OR (R)ETREAT"; A$
+130 IF A$ = "G" THEN F = F + 1: T = T + 1
+140 IF A$ = "R" THEN P = P - 10: T = T + 1
+150 IF F > 3 THEN PRINT "TREASURE FOUND!": END
+160 GOTO 60</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class TowerOfTerror {
+    constructor() {
+        this.pulse = 70;
+        this.floor = 1;
+        this.time = 9; // 9:00 PM
+        this.monsters = ["SKELETON", "GHOST", "HEADLESS AXEMAN"];
+    }
+
+    encounter() {
+        const monster = this.monsters[this.floor - 1];
+        const scare = this.floor * 10 + Math.floor(Math.random() * 20);
+        this.pulse += scare;
+        return { monster, scare };
+    }
+
+    goUp() {
+        this.floor++;
+        this.time++;
+        return this.checkState();
+    }
+
+    retreat() {
+        this.pulse -= 10;
+        this.time++;
+        return this.checkState();
+    }
+
+    checkState() {
+        if (this.pulse > 150) return { status: 'dead', message: 'Heart attack!' };
+        if (this.time >= 12) return { status: 'trapped', message: 'Midnight! Trapped forever!' };
+        if (this.floor > 3) return { status: 'won', message: 'Treasure found!' };
+        return { status: 'playing' };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class TowerOfTerror:
+    def __init__(self):
+        self.pulse = 70
+        self.floor = 1
+        self.time = 9
+        self.monsters = ["SKELETON", "GHOST", "HEADLESS AXEMAN"]
+
+    def encounter(self):
+        monster = self.monsters[self.floor - 1]
+        scare = self.floor * 10 + random.randint(0, 20)
+        self.pulse += scare
+        return monster, scare
+
+    def go_up(self):
+        self.floor += 1
+        self.time += 1
+        return self.check_state()
+
+    def retreat(self):
+        self.pulse -= 10
+        self.time += 1
+        return self.check_state()
+
+    def check_state(self):
+        if self.pulse > 150:
+            return "dead"
+        if self.time >= 12:
+            return "trapped"
+        if self.floor > 3:
+            return "won"
+        return "playing"</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="tower-game" class="game-area">
+                    <div class="tower-display">
+                        <div class="tower-stats">
+                            <span>Floor: <span id="tower-floor">1</span>/3</span>
+                            <span>Pulse: <span id="tower-pulse">70</span> ❤️</span>
+                            <span>Time: <span id="tower-time">9</span>:00 PM</span>
+                        </div>
+                        <div id="tower-monster" class="monster-display">👻</div>
+                        <div id="tower-message"></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="tower-start-btn">Enter Tower</button>
+                        <button id="tower-up-btn" disabled>Go Up (Brave!)</button>
+                        <button id="tower-retreat-btn" disabled>Retreat (Calm down)</button>
+                    </div>
+                    <div id="tower-pulse-bar" class="pulse-bar"><div id="tower-pulse-fill"></div></div>
+                    <p id="tower-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skulls of the Pyramid -->
+        <section id="skulls" class="section">
+            <h2>Game 2: Skulls of the Pyramid</h2>
+            <p class="game-desc">Drop skulls onto numbered stones to match the Spirit Master's target!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>The Spirit Master gives you a target number. Drop exactly 5 skulls onto numbered columns (1-9). The sum must equal the target to break the curse!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM SKULLS OF THE PYRAMID
+20 T = INT(RND(1)*30) + 10
+30 PRINT "TARGET: "; T
+40 S = 0
+50 FOR K = 1 TO 5
+60 PRINT "SKULL "; K; " OF 5"
+70 INPUT "DROP ON COLUMN (1-9)"; C
+80 IF C < 1 OR C > 9 THEN GOTO 70
+90 S = S + C
+100 PRINT "TOTAL SO FAR: "; S
+110 NEXT K
+120 IF S = T THEN PRINT "CURSE BROKEN!"
+130 IF S <> T THEN PRINT "FAILED! TARGET WAS "; T</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class SkullsGame {
+    constructor() {
+        this.target = Math.floor(Math.random() * 30) + 10;
+        this.skulls = 5;
+        this.total = 0;
+        this.drops = [];
+    }
+
+    dropSkull(column) {
+        if (column < 1 || column > 9) return { error: 'Invalid column!' };
+        if (this.skulls <= 0) return { error: 'No skulls left!' };
+
+        this.skulls--;
+        this.total += column;
+        this.drops.push(column);
+
+        if (this.skulls === 0) {
+            return this.checkResult();
+        }
+
+        return {
+            skulls: this.skulls,
+            total: this.total,
+            target: this.target
+        };
+    }
+
+    checkResult() {
+        if (this.total === this.target) {
+            return { won: true, message: 'CURSE BROKEN!' };
+        }
+        return { won: false, message: `Failed! Got ${this.total}, needed ${this.target}` };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class SkullsGame:
+    def __init__(self):
+        self.target = random.randint(10, 40)
+        self.skulls = 5
+        self.total = 0
+
+    def drop_skull(self, column):
+        if not 1 <= column <= 9:
+            return {"error": "Invalid column!"}
+        if self.skulls <= 0:
+            return {"error": "No skulls left!"}
+
+        self.skulls -= 1
+        self.total += column
+
+        if self.skulls == 0:
+            return self.check_result()
+
+        return {"skulls": self.skulls, "total": self.total}
+
+    def check_result(self):
+        if self.total == self.target:
+            return {"won": True}
+        return {"won": False, "diff": self.total - self.target}</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="skulls-game" class="game-area">
+                    <div class="skulls-display">
+                        <div id="skulls-target">Target: <span>??</span></div>
+                        <div id="skulls-remaining">💀💀💀💀💀</div>
+                        <div id="skulls-columns" class="column-grid">
+                            <div class="column" data-val="1">1</div>
+                            <div class="column" data-val="2">2</div>
+                            <div class="column" data-val="3">3</div>
+                            <div class="column" data-val="4">4</div>
+                            <div class="column" data-val="5">5</div>
+                            <div class="column" data-val="6">6</div>
+                            <div class="column" data-val="7">7</div>
+                            <div class="column" data-val="8">8</div>
+                            <div class="column" data-val="9">9</div>
+                        </div>
+                        <div id="skulls-total">Total: <span>0</span></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="skulls-start-btn">Start Ritual</button>
+                    </div>
+                    <p id="skulls-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monster Wrestling -->
+        <section id="monster-wrestling" class="section">
+            <h2>Game 3: Monster Wrestling</h2>
+            <p class="game-desc">Fight monsters using mental math! Calculate if you can overpower them!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Each round, a monster appears with a SIZE and DISTANCE. Calculate SIZE × DISTANCE mentally. If your EFFORT (guess) exceeds this number, you win the round. Survive 12 rounds!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM MONSTER WRESTLING
+20 O = 100: A = 50
+30 FOR R = 1 TO 12
+40 S = INT(RND(1)*10) + R
+50 D = INT(RND(1)*5) + 1
+60 P = S * D
+70 PRINT "ROUND "; R
+80 PRINT "MONSTER SIZE: "; S; " DISTANCE: "; D
+90 INPUT "YOUR EFFORT"; E
+100 IF E >= P THEN PRINT "YOU PUSH BACK!": A = A + 5
+110 IF E < P THEN PRINT "OVERWHELMED!": O = O - 10
+120 IF O <= 0 THEN PRINT "YOU COLLAPSED!": END
+130 NEXT R
+140 PRINT "YOU SURVIVED THE ARENA!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class MonsterWrestling {
+    constructor() {
+        this.oxygen = 100;
+        this.adrenalin = 50;
+        this.round = 0;
+        this.maxRounds = 12;
+    }
+
+    nextRound() {
+        this.round++;
+        const size = Math.floor(Math.random() * 10) + this.round;
+        const distance = Math.floor(Math.random() * 5) + 1;
+        const power = size * distance;
+        return { size, distance, power };
+    }
+
+    fight(effort, actualPower) {
+        if (effort >= actualPower) {
+            this.adrenalin += 5;
+            return { success: true, message: 'You push the monster back!' };
+        }
+        this.oxygen -= 10;
+        return { success: false, message: 'Overwhelmed!' };
+    }
+
+    checkState() {
+        if (this.oxygen <= 0) return { status: 'lost', message: 'You collapsed!' };
+        if (this.round >= this.maxRounds) return { status: 'won', message: 'Survived!' };
+        return { status: 'playing' };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class MonsterWrestling:
+    def __init__(self):
+        self.oxygen = 100
+        self.adrenalin = 50
+        self.round = 0
+        self.max_rounds = 12
+
+    def next_round(self):
+        self.round += 1
+        size = random.randint(1, 10) + self.round
+        distance = random.randint(1, 5)
+        power = size * distance
+        return size, distance, power
+
+    def fight(self, effort, actual_power):
+        if effort >= actual_power:
+            self.adrenalin += 5
+            return True
+        self.oxygen -= 10
+        return False</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="wrestling-game" class="game-area">
+                    <div class="wrestling-display">
+                        <div class="wrestling-stats">
+                            <span>Round: <span id="wrestling-round">0</span>/12</span>
+                            <span>Oxygen: <span id="wrestling-oxygen">100</span>%</span>
+                            <span>Adrenalin: <span id="wrestling-adrenalin">50</span></span>
+                        </div>
+                        <div id="wrestling-monster" class="monster-info">
+                            <span>Size: <span id="wrestling-size">?</span></span>
+                            <span>Distance: <span id="wrestling-distance">?</span></span>
+                        </div>
+                        <div id="wrestling-hint">Calculate: SIZE × DISTANCE</div>
+                    </div>
+                    <div class="game-controls">
+                        <input type="number" id="wrestling-effort" placeholder="Your effort">
+                        <button id="wrestling-fight-btn" disabled>Fight!</button>
+                        <button id="wrestling-start-btn">Enter Arena</button>
+                    </div>
+                    <p id="wrestling-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Jaws -->
+        <section id="jaws" class="section">
+            <h2>Game 4: Jaws</h2>
+            <p class="game-desc">You ARE the predator! Hunt people while avoiding the hunter!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>You play as Jaws (J) on a grid. Hunt people (P) by moving onto them. But a Hunter (H) is after you! Move with A/Z/N/M keys. Eat as many as you can before being caught!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM JAWS
+20 DIM G(10,10)
+30 JX = 5: JY = 5: HX = 1: HY = 1
+40 S = 0: M = 0
+50 REM Place people randomly
+60 FOR I = 1 TO 5
+70 G(INT(RND(1)*10)+1, INT(RND(1)*10)+1) = 1
+80 NEXT I
+90 REM Display and move
+100 K$ = INKEY$
+110 IF K$ = "A" THEN JX = JX - 1
+120 IF K$ = "Z" THEN JX = JX + 1
+130 IF K$ = "N" THEN JY = JY - 1
+140 IF K$ = "M" THEN JY = JY + 1
+150 REM Check for eating
+160 IF G(JX,JY) = 1 THEN S = S + 1: G(JX,JY) = 0
+170 REM Move hunter toward jaws
+180 IF HX < JX THEN HX = HX + 1
+190 IF HX > JX THEN HX = HX - 1
+200 IF HY < JY THEN HY = HY + 1
+210 IF HY > JY THEN HY = HY - 1
+220 IF HX = JX AND HY = JY THEN PRINT "CAUGHT!": END
+230 GOTO 100</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class JawsGame {
+    constructor(size = 10) {
+        this.size = size;
+        this.jaws = { x: 5, y: 5 };
+        this.hunter = { x: 0, y: 0 };
+        this.people = [];
+        this.score = 0;
+        this.moves = 0;
+
+        // Spawn people
+        for (let i = 0; i < 5; i++) {
+            this.people.push({
+                x: Math.floor(Math.random() * size),
+                y: Math.floor(Math.random() * size)
+            });
+        }
+    }
+
+    moveJaws(dx, dy) {
+        const newX = Math.max(0, Math.min(this.size-1, this.jaws.x + dx));
+        const newY = Math.max(0, Math.min(this.size-1, this.jaws.y + dy));
+        this.jaws.x = newX;
+        this.jaws.y = newY;
+        this.moves++;
+
+        this.checkEat();
+        this.moveHunter();
+        return this.checkCaught();
+    }
+
+    checkEat() {
+        this.people = this.people.filter(p => {
+            if (p.x === this.jaws.x && p.y === this.jaws.y) {
+                this.score++;
+                return false;
+            }
+            return true;
+        });
+    }
+
+    moveHunter() {
+        if (this.hunter.x < this.jaws.x) this.hunter.x++;
+        else if (this.hunter.x > this.jaws.x) this.hunter.x--;
+        if (this.hunter.y < this.jaws.y) this.hunter.y++;
+        else if (this.hunter.y > this.jaws.y) this.hunter.y--;
+    }
+
+    checkCaught() {
+        return this.hunter.x === this.jaws.x && this.hunter.y === this.jaws.y;
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class JawsGame:
+    def __init__(self, size=10):
+        self.size = size
+        self.jaws = [5, 5]
+        self.hunter = [0, 0]
+        self.people = [
+            [random.randint(0, size-1), random.randint(0, size-1)]
+            for _ in range(5)
+        ]
+        self.score = 0
+
+    def move_jaws(self, dx, dy):
+        self.jaws[0] = max(0, min(self.size-1, self.jaws[0] + dx))
+        self.jaws[1] = max(0, min(self.size-1, self.jaws[1] + dy))
+        self.check_eat()
+        self.move_hunter()
+        return self.check_caught()
+
+    def check_eat(self):
+        self.people = [p for p in self.people if p != self.jaws]
+        # Score increases when people are eaten
+
+    def move_hunter(self):
+        if self.hunter[0] < self.jaws[0]: self.hunter[0] += 1
+        elif self.hunter[0] > self.jaws[0]: self.hunter[0] -= 1
+        if self.hunter[1] < self.jaws[1]: self.hunter[1] += 1
+        elif self.hunter[1] > self.jaws[1]: self.hunter[1] -= 1</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="jaws-game" class="game-area">
+                    <div id="jaws-grid" class="jaws-grid"></div>
+                    <div class="game-controls">
+                        <button id="jaws-start-btn">Start Hunt</button>
+                        <span>Use WASD or Arrow Keys to move</span>
+                    </div>
+                    <p>Score: <span id="jaws-score">0</span> | 🦈 = You | 🏃 = People | 🔫 = Hunter</p>
+                    <p id="jaws-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flying Witches -->
+        <section id="flying-witches" class="section">
+            <h2>Game 5: Flying Witches</h2>
+            <p class="game-desc">Fly your broomstick collecting potion ingredients!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>You're a witch's assistant flying across the sky. Press SPACE to swoop down and collect ingredients (T=Toe, B=Brain, etc.). Avoid the Broomstick Snatcher! Collect all recipe items to win.</p>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="witch-game" class="game-area">
+                    <canvas id="witch-canvas" width="400" height="200"></canvas>
+                    <div class="witch-stats">
+                        <span>Broomsticks: <span id="witch-brooms">3</span></span>
+                        <span>Collected: <span id="witch-collected">0</span>/5</span>
+                    </div>
+                    <div class="game-controls">
+                        <button id="witch-start-btn">Start Flying</button>
+                        <span>Press SPACE to swoop down!</span>
+                    </div>
+                    <p id="witch-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Micropuzzle -->
+        <section id="micropuzzle" class="section">
+            <h2>Game 6: Micropuzzle</h2>
+            <p class="game-desc">A text adventure! Wake up in a strange place and figure out what's happening...</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Type two-word commands like "GO NORTH", "EXAMINE DOOR", "TAKE KEY". Explore rooms, collect items, and solve the mystery. This is the most complex game in the book - a full text parser!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM MICROPUZZLE - TEXT ADVENTURE
+20 DIM R$(10): DIM O$(5)
+30 R = 1: REM Current room
+40 REM Room descriptions
+50 R$(1) = "A DARK CELL"
+60 R$(2) = "A CORRIDOR"
+70 R$(3) = "THE EXIT"
+80 PRINT "YOU ARE IN "; R$(R)
+90 INPUT "WHAT DO YOU DO"; A$
+100 REM Parse command
+110 V$ = LEFT$(A$, 2)
+120 IF V$ = "GO" AND R = 1 THEN R = 2
+130 IF V$ = "GO" AND R = 2 THEN R = 3
+140 IF R = 3 THEN PRINT "YOU ESCAPED!": END
+150 GOTO 80</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class Micropuzzle {
+    constructor() {
+        this.currentRoom = 0;
+        this.inventory = [];
+        this.rooms = [
+            { name: "Dark Cell", description: "You wake up in a dark cell. There's a door to the NORTH.", exits: { north: 1 } },
+            { name: "Corridor", description: "A long corridor. Doors SOUTH and EAST.", exits: { south: 0, east: 2 } },
+            { name: "Exit", description: "Freedom! Bright light floods in.", exits: {} }
+        ];
+    }
+
+    parseCommand(input) {
+        const parts = input.toLowerCase().split(' ');
+        const verb = parts[0];
+        const noun = parts.slice(1).join(' ');
+
+        switch(verb) {
+            case 'go': return this.go(noun);
+            case 'look': return this.look();
+            case 'take': return this.take(noun);
+            case 'examine': return this.examine(noun);
+            default: return "I don't understand.";
+        }
+    }
+
+    go(direction) {
+        const room = this.rooms[this.currentRoom];
+        if (room.exits[direction] !== undefined) {
+            this.currentRoom = room.exits[direction];
+            return this.look();
+        }
+        return "You can't go that way.";
+    }
+
+    look() {
+        return this.rooms[this.currentRoom].description;
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>class Micropuzzle:
+    def __init__(self):
+        self.current_room = 0
+        self.inventory = []
+        self.rooms = [
+            {"name": "Dark Cell", "desc": "A dark cell. Door NORTH.", "exits": {"north": 1}},
+            {"name": "Corridor", "desc": "A corridor. SOUTH or EAST.", "exits": {"south": 0, "east": 2}},
+            {"name": "Exit", "desc": "Freedom!", "exits": {}}
+        ]
+
+    def parse_command(self, input_str):
+        parts = input_str.lower().split()
+        verb = parts[0] if parts else ""
+        noun = " ".join(parts[1:])
+
+        if verb == "go":
+            return self.go(noun)
+        elif verb == "look":
+            return self.look()
+        return "I don't understand."
+
+    def go(self, direction):
+        room = self.rooms[self.current_room]
+        if direction in room["exits"]:
+            self.current_room = room["exits"][direction]
+            return self.look()
+        return "You can't go that way."
+
+    def look(self):
+        return self.rooms[self.current_room]["desc"]</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="micro-game" class="game-area">
+                    <div id="micro-output" class="terminal-output"></div>
+                    <div class="game-controls">
+                        <input type="text" id="micro-input" placeholder="Type command (e.g., GO NORTH, LOOK, TAKE KEY)">
+                        <button id="micro-submit-btn">Enter</button>
+                        <button id="micro-restart-btn">Restart</button>
+                    </div>
+                    <p class="hint">Commands: GO [direction], LOOK, TAKE [item], EXAMINE [thing], INVENTORY</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="index.html">← Back to All Books</a></p>
+        <p>Based on "Usborne Weird Computer Games" (1984) by Jenny Tyler and Chris Oxlade</p>
+    </footer>
+
+    <script src="weirdgames.js"></script>
+</body>
+</html>

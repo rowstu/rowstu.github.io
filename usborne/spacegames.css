@@ -1,0 +1,356 @@
+/* Computer Spacegames - Stylesheet */
+/* Space theme with blue/cyan accents */
+
+:root {
+    --bg-dark: #050510;
+    --bg-section: #0a0a1a;
+    --bg-card: #101025;
+    --text-primary: #33ccff;
+    --text-secondary: #66ddff;
+    --text-dim: #446;
+    --accent-yellow: #ffcc00;
+    --accent-cyan: #00ffff;
+    --accent-purple: #9966ff;
+    --basic-color: #ff6600;
+    --js-color: #f7df1e;
+    --python-color: #3776ab;
+    --border-color: #223;
+    --font-mono: 'Courier New', 'Monaco', 'Consolas', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-mono);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    background-image: radial-gradient(white 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+header {
+    background: linear-gradient(135deg, #050520 0%, #0a0a30 100%);
+    border-bottom: 3px solid var(--accent-cyan);
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.back-link {
+    position: absolute;
+    left: 2rem;
+    top: 2rem;
+    color: var(--text-dim);
+    text-decoration: none;
+}
+
+.back-link:hover { color: var(--text-primary); }
+
+header h1 {
+    font-size: 2.5rem;
+    color: var(--accent-yellow);
+    text-shadow: 0 0 20px var(--accent-cyan);
+}
+
+.subtitle { font-size: 1.2rem; color: var(--text-primary); }
+.tagline { font-size: 0.9rem; color: var(--text-dim); }
+
+nav {
+    background-color: var(--bg-section);
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+nav ul { list-style: none; display: flex; gap: 0.5rem; min-width: max-content; }
+
+nav a {
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--text-primary);
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+nav a:hover {
+    background-color: var(--text-primary);
+    color: var(--bg-dark);
+}
+
+main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+.section {
+    background-color: var(--bg-section);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+}
+
+.section h2 {
+    color: var(--accent-yellow);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--accent-cyan);
+    padding-bottom: 0.5rem;
+}
+
+.game-desc {
+    font-size: 1.1rem;
+    color: var(--accent-purple);
+    font-style: italic;
+}
+
+.game-info {
+    background-color: var(--bg-card);
+    border-left: 4px solid var(--accent-cyan);
+    padding: 1rem;
+    margin: 1.5rem 0;
+}
+
+.game-info h3 { color: var(--accent-cyan); margin-bottom: 0.5rem; }
+
+.info-box {
+    background-color: var(--bg-card);
+    border: 1px solid var(--accent-yellow);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 4px;
+}
+
+.info-box h3 { color: var(--accent-yellow); margin-bottom: 0.5rem; }
+.info-box ul { margin-left: 1.5rem; }
+
+.concept {
+    margin: 2rem 0;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border-color);
+}
+
+.concept:first-of-type { border-top: none; }
+.concept h3 { color: var(--text-primary); margin-bottom: 0.5rem; }
+.concept p { color: var(--text-dim); margin-bottom: 1rem; }
+
+.code-comparison {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.code-block {
+    background-color: var(--bg-dark);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.code-block h4 { padding: 0.5rem 1rem; font-size: 0.9rem; }
+.code-block.basic h4 { background-color: var(--basic-color); color: #000; }
+.code-block.javascript h4 { background-color: var(--js-color); color: #000; }
+.code-block.python h4 { background-color: var(--python-color); color: #fff; }
+.code-block pre { padding: 1rem; overflow-x: auto; font-size: 0.85rem; }
+.code-block code { color: #ddd; }
+
+.demo-container {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--accent-cyan);
+}
+
+.demo-container h3 { color: var(--accent-yellow); margin-bottom: 1rem; }
+
+.game-area {
+    background-color: var(--bg-dark);
+    border: 2px solid var(--text-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.game-controls {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+button {
+    font-family: var(--font-mono);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+button:hover:not(:disabled) {
+    background-color: var(--text-primary);
+    color: var(--bg-dark);
+}
+
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input[type="number"], input[type="text"] {
+    font-family: var(--font-mono);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--text-primary);
+    padding: 0.5rem;
+    width: 80px;
+}
+
+input[type="range"] {
+    width: 150px;
+    accent-color: var(--accent-cyan);
+}
+
+/* Starship specific */
+.starship-display {
+    text-align: center;
+    padding: 2rem;
+}
+
+#starship-visual {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+/* Moonlander specific */
+#moonlander-canvas {
+    display: block;
+    margin: 0 auto;
+    background: linear-gradient(to bottom, #000 0%, #001 80%, #332 100%);
+    border: 1px solid var(--border-color);
+}
+
+.moonlander-stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Evil Alien specific */
+.alien-grid { text-align: center; margin-bottom: 1rem; }
+
+#alien-canvas {
+    background-color: #000;
+    border: 1px solid var(--border-color);
+}
+
+.alien-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+/* Asteroid Belt specific */
+.asteroid-field {
+    background-color: #000;
+    border: 2px solid var(--text-primary);
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+#asteroid-stars {
+    color: var(--accent-yellow);
+    letter-spacing: 10px;
+}
+
+/* Space Mines specific */
+.mines-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-card);
+    border-radius: 4px;
+}
+
+#mines-market {
+    padding: 1rem;
+    background-color: rgba(0, 255, 255, 0.1);
+    border-left: 4px solid var(--accent-cyan);
+    margin-bottom: 1rem;
+}
+
+.mines-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Space Rescue specific */
+.rescue-display {
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-card);
+}
+
+.rescue-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.rescue-controls label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.energy-slider { flex: 1; }
+
+/* More games cards */
+.more-games {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.game-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.game-card h3 { color: var(--accent-yellow); margin-bottom: 0.5rem; font-size: 1rem; }
+.game-card p { color: #888; font-size: 0.85rem; }
+
+/* Results */
+.success { color: #00ff00 !important; }
+.failure { color: #ff3333 !important; }
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-dim);
+}
+
+footer a { color: var(--text-primary); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+    header h1 { font-size: 1.8rem; }
+    .back-link { position: static; display: block; margin-bottom: 1rem; }
+    .section { padding: 1rem; }
+    .code-comparison { grid-template-columns: 1fr; }
+}

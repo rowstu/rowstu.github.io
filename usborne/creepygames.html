@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creepy Computer Games - Learn Programming</title>
+    <link rel="stylesheet" href="creepygames.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="back-link">← All Books</a>
+        <div class="header-content">
+            <h1>👻 Creepy Computer Games</h1>
+            <p class="subtitle">Learn programming through spooky 1983 games</p>
+            <p class="tagline">Original BASIC → Modern JavaScript & Python</p>
+        </div>
+    </header>
+
+    <nav id="main-nav">
+        <ul>
+            <li><a href="#basics">BASIC Fundamentals</a></li>
+            <li><a href="#nightmare">Computer Nightmare</a></li>
+            <li><a href="#number-wizard">Number Wizard</a></li>
+            <li><a href="#ghost-guzzler">Ghost Guzzler</a></li>
+            <li><a href="#spiderwoman">Spiderwoman</a></li>
+            <li><a href="#grave-digger">Grave Digger</a></li>
+            <li><a href="#ghost-maze">Ghost Maze</a></li>
+            <li><a href="#seance">Séance</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="intro" class="section">
+            <h2>Enter If You Dare...</h2>
+            <p>Based on <strong>"Usborne Creepy Computer Games"</strong> (1983), this collection teaches programming through spine-tingling challenges. Face ghosts, escape graveyards, and survive haunted mazes!</p>
+
+            <div class="info-box">
+                <h3>Spooky Concepts You'll Learn</h3>
+                <ul>
+                    <li><strong>Reaction games</strong> - Quick reflexes to catch ghosts</li>
+                    <li><strong>Pattern memory</strong> - Remember sequences in the séance</li>
+                    <li><strong>Maze navigation</strong> - First-person perspective exploration</li>
+                    <li><strong>Word games</strong> - Letter guessing with Spiderwoman</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="basics" class="section">
+            <h2>Creepy BASIC Techniques</h2>
+
+            <div class="concept">
+                <h3>Delay Loops for Suspense</h3>
+                <p>Create tension with timed delays before scary events!</p>
+                <div class="code-comparison">
+                    <div class="code-block basic">
+                        <h4>BASIC</h4>
+                        <pre><code>10 REM BUILD SUSPENSE
+20 PRINT "THE GHOST APPROACHES..."
+30 FOR T = 1 TO 2000: NEXT T
+40 PRINT "BOO!"
+50 REM Variable delay for randomness
+60 D = INT(RND(1)*1000) + 500
+70 FOR T = 1 TO D: NEXT T</code></pre>
+                    </div>
+                    <div class="code-block javascript">
+                        <h4>JavaScript</h4>
+                        <pre><code>// Build suspense with delays
+async function spookySequence() {
+    console.log("THE GHOST APPROACHES...");
+    await delay(2000);
+    console.log("BOO!");
+
+    // Random delay for unpredictability
+    const d = Math.random() * 1000 + 500;
+    await delay(d);
+}
+
+function delay(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}</code></pre>
+                    </div>
+                    <div class="code-block python">
+                        <h4>Python</h4>
+                        <pre><code>import time
+import random
+
+def spooky_sequence():
+    print("THE GHOST APPROACHES...")
+    time.sleep(2)
+    print("BOO!")
+
+    # Random delay
+    d = random.uniform(0.5, 1.5)
+    time.sleep(d)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Computer Nightmare -->
+        <section id="nightmare" class="section">
+            <h2>Game 1: Computer Nightmare</h2>
+            <p class="game-desc">Numbers attack from everywhere! Hit them before they overwhelm you!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Random numbers flash on screen. Press the matching number key as fast as you can. Miss too many and the nightmare consumes you!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM COMPUTER NIGHTMARE
+20 S = 0: M = 0
+30 FOR R = 1 TO 20
+40 N = INT(RND(1)*9) + 1
+50 PRINT "NUMBER: "; N
+60 FOR T = 1 TO 500
+70 K$ = INKEY$
+80 IF K$ = "" THEN NEXT T: M = M + 1: GOTO 100
+90 IF VAL(K$) = N THEN S = S + 1
+100 NEXT R
+110 PRINT "SCORE: "; S; " MISSED: "; M</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class ComputerNightmare {
+    constructor() {
+        this.score = 0;
+        this.missed = 0;
+        this.round = 0;
+        this.currentNumber = 0;
+        this.waiting = false;
+    }
+
+    nextNumber() {
+        this.round++;
+        this.currentNumber = Math.floor(Math.random() * 9) + 1;
+        this.waiting = true;
+        return this.currentNumber;
+    }
+
+    pressKey(key) {
+        if (!this.waiting) return;
+        this.waiting = false;
+        if (parseInt(key) === this.currentNumber) {
+            this.score++;
+            return true;
+        }
+        return false;
+    }
+
+    timeout() {
+        if (this.waiting) {
+            this.missed++;
+            this.waiting = false;
+        }
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class ComputerNightmare:
+    def __init__(self):
+        self.score = 0
+        self.missed = 0
+        self.round = 0
+        self.current_number = 0
+
+    def next_number(self):
+        self.round += 1
+        self.current_number = random.randint(1, 9)
+        return self.current_number
+
+    def check_key(self, key):
+        try:
+            if int(key) == self.current_number:
+                self.score += 1
+                return True
+        except ValueError:
+            pass
+        return False</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="nightmare-game" class="game-area">
+                    <div class="nightmare-display">
+                        <div id="nightmare-number" class="spooky-number">?</div>
+                        <div id="nightmare-timer" class="timer-bar"></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="nightmare-start-btn">Enter the Nightmare</button>
+                    </div>
+                    <p>Score: <span id="nightmare-score">0</span> | Missed: <span id="nightmare-missed">0</span> | Round: <span id="nightmare-round">0</span>/20</p>
+                    <p id="nightmare-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Number Wizard -->
+        <section id="number-wizard" class="section">
+            <h2>Game 2: The Number Wizard</h2>
+            <p class="game-desc">The wizard rolls dice. Match his total with two numbers!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>The wizard rolls two dice (2-12 total). You must provide two numbers from 1-9 that add up to the same total!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM THE NUMBER WIZARD
+20 D1 = INT(RND(1)*6) + 1
+30 D2 = INT(RND(1)*6) + 1
+40 T = D1 + D2
+50 PRINT "WIZARD ROLLS: "; D1; " + "; D2; " = "; T
+60 INPUT "YOUR FIRST NUMBER (1-9)"; N1
+70 INPUT "YOUR SECOND NUMBER (1-9)"; N2
+80 IF N1 + N2 = T THEN PRINT "CORRECT! WIZARD IMPRESSED!"
+90 IF N1 + N2 <> T THEN PRINT "WRONG! WIZARD CASTS SPELL!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class NumberWizard {
+    constructor() {
+        this.die1 = 0;
+        this.die2 = 0;
+        this.target = 0;
+    }
+
+    rollDice() {
+        this.die1 = Math.floor(Math.random() * 6) + 1;
+        this.die2 = Math.floor(Math.random() * 6) + 1;
+        this.target = this.die1 + this.die2;
+        return { die1: this.die1, die2: this.die2, target: this.target };
+    }
+
+    checkAnswer(num1, num2) {
+        if (num1 < 1 || num1 > 9 || num2 < 1 || num2 > 9) {
+            return { valid: false, message: 'Numbers must be 1-9!' };
+        }
+        if (num1 + num2 === this.target) {
+            return { correct: true, message: 'The wizard is impressed!' };
+        }
+        return { correct: false, message: 'The wizard casts a spell on you!' };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class NumberWizard:
+    def __init__(self):
+        self.die1 = 0
+        self.die2 = 0
+        self.target = 0
+
+    def roll_dice(self):
+        self.die1 = random.randint(1, 6)
+        self.die2 = random.randint(1, 6)
+        self.target = self.die1 + self.die2
+        return self.die1, self.die2, self.target
+
+    def check_answer(self, num1, num2):
+        if num1 + num2 == self.target:
+            return True, "The wizard is impressed!"
+        return False, "The wizard casts a spell!"</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="wizard-game" class="game-area">
+                    <div class="wizard-display">
+                        <div class="dice-container">
+                            <span id="wizard-die1" class="die">?</span>
+                            <span class="plus">+</span>
+                            <span id="wizard-die2" class="die">?</span>
+                            <span class="equals">=</span>
+                            <span id="wizard-target" class="target">?</span>
+                        </div>
+                    </div>
+                    <div class="game-controls">
+                        <input type="number" id="wizard-num1" min="1" max="9" placeholder="1-9">
+                        <span class="plus">+</span>
+                        <input type="number" id="wizard-num2" min="1" max="9" placeholder="1-9">
+                        <button id="wizard-check-btn">Check</button>
+                        <button id="wizard-roll-btn">Roll Again</button>
+                    </div>
+                    <p id="wizard-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ghost Guzzler -->
+        <section id="ghost-guzzler" class="section">
+            <h2>Game 3: Ghost Guzzler</h2>
+            <p class="game-desc">Ghosts float by! Match their number and press X to guzzle them!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Numbered ghosts (1-9) drift across the screen. Change your guzzler's number to match, then press X to capture them. Miss too many and you lose!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM GHOST GUZZLER
+20 G = 1: S = 0: L = 3
+30 FOR R = 1 TO 15
+40 N = INT(RND(1)*9) + 1
+50 PRINT "GHOST: "; N; " YOUR NUMBER: "; G
+60 FOR T = 1 TO 800
+70 K$ = INKEY$
+80 IF K$ >= "1" AND K$ <= "9" THEN G = VAL(K$)
+90 IF K$ = "X" AND G = N THEN S = S + 1: GOTO 120
+100 NEXT T
+110 L = L - 1: PRINT "MISSED!"
+120 IF L = 0 THEN PRINT "GAME OVER!": END
+130 NEXT R
+140 PRINT "SCORE: "; S</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class GhostGuzzler {
+    constructor() {
+        this.guzzlerNumber = 1;
+        this.score = 0;
+        this.lives = 3;
+        this.currentGhost = 0;
+        this.waiting = false;
+    }
+
+    spawnGhost() {
+        this.currentGhost = Math.floor(Math.random() * 9) + 1;
+        this.waiting = true;
+        return this.currentGhost;
+    }
+
+    setNumber(num) {
+        if (num >= 1 && num <= 9) {
+            this.guzzlerNumber = num;
+        }
+    }
+
+    guzzle() {
+        if (!this.waiting) return null;
+        this.waiting = false;
+
+        if (this.guzzlerNumber === this.currentGhost) {
+            this.score++;
+            return { caught: true };
+        }
+        return { caught: false, correct: this.currentGhost };
+    }
+
+    miss() {
+        this.waiting = false;
+        this.lives--;
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class GhostGuzzler:
+    def __init__(self):
+        self.guzzler_number = 1
+        self.score = 0
+        self.lives = 3
+        self.current_ghost = 0
+
+    def spawn_ghost(self):
+        self.current_ghost = random.randint(1, 9)
+        return self.current_ghost
+
+    def set_number(self, num):
+        if 1 <= num <= 9:
+            self.guzzler_number = num
+
+    def guzzle(self):
+        if self.guzzler_number == self.current_ghost:
+            self.score += 1
+            return True
+        return False</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="guzzler-game" class="game-area">
+                    <div class="guzzler-display">
+                        <div id="ghost-sprite" class="ghost">👻<span id="ghost-number">?</span></div>
+                        <div id="guzzler-sprite" class="guzzler">🟢<span id="guzzler-number">1</span></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="guzzler-start-btn">Start Guzzling</button>
+                        <span>Press 1-9 to set number, X to guzzle!</span>
+                    </div>
+                    <p>Score: <span id="guzzler-score">0</span> | Lives: <span id="guzzler-lives">3</span></p>
+                    <p id="guzzler-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spiderwoman -->
+        <section id="spiderwoman" class="section">
+            <h2>Game 4: Spiderwoman</h2>
+            <p class="game-desc">Guess the Spiderwoman's secret letter before she turns you into a fly!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>The Spiderwoman thinks of a letter A-Z. Give her words - she'll tell you if they contain her secret letter. Guess the letter to escape!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM SPIDERWOMAN
+20 S$ = CHR$(INT(RND(1)*26) + 65)
+30 PRINT "SPIDERWOMAN THINKS OF A LETTER..."
+40 FOR G = 1 TO 10
+50 INPUT "GIVE ME A WORD"; W$
+60 F = 0
+70 FOR I = 1 TO LEN(W$)
+80 IF MID$(W$, I, 1) = S$ THEN F = 1
+90 NEXT I
+100 IF F = 1 THEN PRINT "YES, IT CONTAINS MY LETTER"
+110 IF F = 0 THEN PRINT "NO, IT DOESN'T"
+120 INPUT "GUESS THE LETTER"; L$
+130 IF L$ = S$ THEN PRINT "YOU ESCAPE!": END
+140 NEXT G
+150 PRINT "YOU'RE A FLY! LETTER WAS "; S$</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class Spiderwoman {
+    constructor() {
+        this.secretLetter = String.fromCharCode(
+            Math.floor(Math.random() * 26) + 65
+        );
+        this.guesses = 10;
+    }
+
+    checkWord(word) {
+        word = word.toUpperCase();
+        return word.includes(this.secretLetter);
+    }
+
+    guessLetter(letter) {
+        this.guesses--;
+        letter = letter.toUpperCase();
+
+        if (letter === this.secretLetter) {
+            return { correct: true, message: 'You escape!' };
+        }
+
+        if (this.guesses <= 0) {
+            return {
+                correct: false,
+                gameOver: true,
+                message: `You're a fly! Letter was ${this.secretLetter}`
+            };
+        }
+
+        return { correct: false, guessesLeft: this.guesses };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class Spiderwoman:
+    def __init__(self):
+        self.secret_letter = chr(random.randint(65, 90))
+        self.guesses = 10
+
+    def check_word(self, word):
+        return self.secret_letter in word.upper()
+
+    def guess_letter(self, letter):
+        self.guesses -= 1
+        letter = letter.upper()
+
+        if letter == self.secret_letter:
+            return {"correct": True}
+
+        if self.guesses <= 0:
+            return {"game_over": True, "letter": self.secret_letter}
+
+        return {"correct": False, "guesses": self.guesses}</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="spider-game" class="game-area">
+                    <div class="spider-display">
+                        <div id="spider-sprite">🕷️</div>
+                        <p id="spider-speech">"I'm thinking of a letter..."</p>
+                    </div>
+                    <div class="game-controls">
+                        <input type="text" id="spider-word" placeholder="Enter a word">
+                        <button id="spider-check-btn">Check Word</button>
+                    </div>
+                    <div class="game-controls">
+                        <input type="text" id="spider-guess" maxlength="1" placeholder="A-Z">
+                        <button id="spider-guess-btn">Guess Letter</button>
+                        <button id="spider-new-btn">New Game</button>
+                    </div>
+                    <p>Guesses: <span id="spider-guesses">10</span></p>
+                    <p id="spider-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grave Digger -->
+        <section id="grave-digger" class="section">
+            <h2>Game 5: Grave Digger</h2>
+            <p class="game-desc">Lost in a graveyard! Dig holes to trap skeletons and escape!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Navigate a graveyard grid. Skeletons pursue you! Dig holes (D) to trap them, then move (W/A/S/D) toward the exit. Don't get caught!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM GRAVE DIGGER
+20 DIM G(10,10)
+30 PX = 1: PY = 1: SX = 10: SY = 10
+40 EX = 10: EY = 1
+50 REM Draw grid
+60 FOR Y = 1 TO 10
+70 FOR X = 1 TO 10
+80 IF X = PX AND Y = PY THEN PRINT "@";
+90 IF X = SX AND Y = SY THEN PRINT "S";
+100 IF X = EX AND Y = EY THEN PRINT "E";
+110 IF G(X,Y) = 1 THEN PRINT "O";
+120 PRINT ".";
+130 NEXT X: PRINT: NEXT Y
+140 INPUT "MOVE (WASD) OR DIG (D)"; M$
+150 REM Handle movement and game logic</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class GraveDigger {
+    constructor(size = 10) {
+        this.size = size;
+        this.player = { x: 0, y: 0 };
+        this.skeleton = { x: size-1, y: size-1 };
+        this.exit = { x: size-1, y: 0 };
+        this.holes = new Set();
+        this.gameOver = false;
+    }
+
+    move(direction) {
+        const moves = {
+            'w': { x: 0, y: -1 }, 'a': { x: -1, y: 0 },
+            's': { x: 0, y: 1 },  'd': { x: 1, y: 0 }
+        };
+        const m = moves[direction.toLowerCase()];
+        if (!m) return;
+
+        const newX = this.player.x + m.x;
+        const newY = this.player.y + m.y;
+
+        if (newX >= 0 && newX < this.size && newY >= 0 && newY < this.size) {
+            this.player.x = newX;
+            this.player.y = newY;
+        }
+
+        this.moveSkeleton();
+        this.checkState();
+    }
+
+    dig() {
+        this.holes.add(`${this.player.x},${this.player.y}`);
+        this.moveSkeleton();
+        this.checkState();
+    }
+
+    moveSkeleton() {
+        // Move toward player
+        if (this.skeleton.x < this.player.x) this.skeleton.x++;
+        else if (this.skeleton.x > this.player.x) this.skeleton.x--;
+        if (this.skeleton.y < this.player.y) this.skeleton.y++;
+        else if (this.skeleton.y > this.player.y) this.skeleton.y--;
+    }
+
+    checkState() {
+        // Check if skeleton in hole
+        if (this.holes.has(`${this.skeleton.x},${this.skeleton.y}`)) {
+            this.skeleton = { x: -10, y: -10 }; // Trapped!
+        }
+        // Check win/lose
+        if (this.player.x === this.exit.x && this.player.y === this.exit.y) {
+            this.gameOver = true;
+            return 'escaped';
+        }
+        if (this.player.x === this.skeleton.x && this.player.y === this.skeleton.y) {
+            this.gameOver = true;
+            return 'caught';
+        }
+        return 'playing';
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>class GraveDigger:
+    def __init__(self, size=10):
+        self.size = size
+        self.player = [0, 0]
+        self.skeleton = [size-1, size-1]
+        self.exit = [size-1, 0]
+        self.holes = set()
+
+    def move(self, direction):
+        moves = {'w': (0,-1), 'a': (-1,0), 's': (0,1), 'd': (1,0)}
+        if direction.lower() not in moves:
+            return
+        dx, dy = moves[direction.lower()]
+        new_x = self.player[0] + dx
+        new_y = self.player[1] + dy
+        if 0 <= new_x < self.size and 0 <= new_y < self.size:
+            self.player = [new_x, new_y]
+        self.move_skeleton()
+
+    def dig(self):
+        self.holes.add(tuple(self.player))
+        self.move_skeleton()</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="grave-game" class="game-area">
+                    <div id="grave-grid" class="graveyard"></div>
+                    <div class="game-controls">
+                        <button id="grave-start-btn">Enter Graveyard</button>
+                        <button id="grave-dig-btn" disabled>Dig Hole (Space)</button>
+                    </div>
+                    <p>Use WASD to move, Space to dig | 💀 Skeleton | 🚪 Exit | ⚫ Holes</p>
+                    <p id="grave-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ghost Maze -->
+        <section id="ghost-maze" class="section">
+            <h2>Game 6: Ghost Maze</h2>
+            <p class="game-desc">First-person maze exploration. Find the exit before ghosts find you!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>You can only see what's directly in front of you. Move forward, turn left, or turn right. If a ghost catches you, you're teleported elsewhere in the maze!</p>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="maze-game" class="game-area">
+                    <div id="maze-view" class="first-person-view">
+                        <div id="maze-perspective"></div>
+                    </div>
+                    <div id="maze-minimap"></div>
+                    <div class="game-controls">
+                        <button id="maze-start-btn">Enter Maze</button>
+                        <button id="maze-forward" class="control-btn" disabled>↑ Forward</button>
+                        <button id="maze-left" class="control-btn" disabled>← Turn Left</button>
+                        <button id="maze-right" class="control-btn" disabled>Turn Right →</button>
+                    </div>
+                    <p id="maze-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Séance -->
+        <section id="seance" class="section">
+            <h2>Game 7: Séance</h2>
+            <p class="game-desc">A spirit contacts you! Remember the letters it points to!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Letters appear on a grid. The spirit points to a sequence of letters. Memorize the sequence and type it back correctly, or anger the spirit!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM SEANCE
+20 L = 4: REM Starting sequence length
+30 DIM S$(10)
+40 PRINT "THE SPIRIT SPEAKS..."
+50 FOR I = 1 TO L
+60 S$(I) = CHR$(INT(RND(1)*26) + 65)
+70 PRINT S$(I); " ";
+80 FOR T = 1 TO 500: NEXT T
+90 NEXT I
+100 CLS
+110 PRINT "REPEAT THE SEQUENCE:"
+120 FOR I = 1 TO L
+130 INPUT A$
+140 IF A$ <> S$(I) THEN PRINT "SPIRIT ANGERED!": END
+150 NEXT I
+160 PRINT "THE SPIRIT IS PLEASED!"
+170 L = L + 1: GOTO 40</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class Seance {
+    constructor() {
+        this.sequence = [];
+        this.level = 4;
+        this.currentIndex = 0;
+    }
+
+    generateSequence() {
+        this.sequence = [];
+        for (let i = 0; i < this.level; i++) {
+            this.sequence.push(
+                String.fromCharCode(Math.floor(Math.random() * 26) + 65)
+            );
+        }
+        this.currentIndex = 0;
+        return this.sequence;
+    }
+
+    checkLetter(letter) {
+        if (letter.toUpperCase() !== this.sequence[this.currentIndex]) {
+            return { correct: false, message: 'Spirit angered!' };
+        }
+
+        this.currentIndex++;
+        if (this.currentIndex >= this.sequence.length) {
+            this.level++;
+            return { correct: true, complete: true };
+        }
+        return { correct: true, complete: false };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class Seance:
+    def __init__(self):
+        self.sequence = []
+        self.level = 4
+        self.current_index = 0
+
+    def generate_sequence(self):
+        self.sequence = [
+            chr(random.randint(65, 90))
+            for _ in range(self.level)
+        ]
+        self.current_index = 0
+        return self.sequence
+
+    def check_letter(self, letter):
+        if letter.upper() != self.sequence[self.current_index]:
+            return {"correct": False}
+
+        self.current_index += 1
+        if self.current_index >= len(self.sequence):
+            self.level += 1
+            return {"correct": True, "complete": True}
+        return {"correct": True, "complete": False}</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="seance-game" class="game-area">
+                    <div class="seance-display">
+                        <div id="seance-board" class="ouija-board"></div>
+                        <div id="seance-pointer" class="pointer">👆</div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="seance-start-btn">Begin Séance</button>
+                        <input type="text" id="seance-input" placeholder="Type the sequence..." disabled>
+                    </div>
+                    <p>Level: <span id="seance-level">4</span></p>
+                    <p id="seance-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="more" class="section">
+            <h2>Also in the Book</h2>
+            <div class="more-games">
+                <div class="game-card">
+                    <h3>Mad House</h3>
+                    <p>Match three doorways to escape - but you only control two of them!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="index.html">← Back to All Books</a></p>
+        <p>Based on "Usborne Creepy Computer Games" (1983) by Jenny Tyler and Chris Oxlade</p>
+    </footer>
+
+    <script src="creepygames.js"></script>
+</body>
+</html>

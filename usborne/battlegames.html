@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Battlegames - Learn Programming</title>
+    <link rel="stylesheet" href="battlegames.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="back-link">← All Books</a>
+        <div class="header-content">
+            <h1>⚔️ Computer Battlegames</h1>
+            <p class="subtitle">Learn programming through classic 1982 combat games</p>
+            <p class="tagline">Original BASIC → Modern JavaScript & Python</p>
+        </div>
+    </header>
+
+    <nav id="main-nav">
+        <ul>
+            <li><a href="#basics">BASIC Fundamentals</a></li>
+            <li><a href="#robot-missile">Robot Missile</a></li>
+            <li><a href="#vital-message">Vital Message</a></li>
+            <li><a href="#shootout">Shootout</a></li>
+            <li><a href="#desert-tank">Desert Tank</a></li>
+            <li><a href="#traitors-castle">Traitor's Castle</a></li>
+            <li><a href="#robot-invaders">Robot Invaders</a></li>
+            <li><a href="#secret-weapon">Secret Weapon</a></li>
+            <li><a href="#escape">Escape!</a></li>
+            <li><a href="#pirate-dogfight">Pirate Dogfight</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Introduction -->
+        <section id="intro" class="section">
+            <h2>Welcome, Commander!</h2>
+            <p>This site is based on <strong>"Usborne Computer Battlegames"</strong> (1982), which taught programming through exciting combat simulations. We've translated the original BASIC code into modern JavaScript and Python.</p>
+
+            <div class="info-box">
+                <h3>Featured Concepts</h3>
+                <ul>
+                    <li><strong>Trigonometry</strong> - Trajectory calculations for missiles and tanks</li>
+                    <li><strong>Grid-based games</strong> - 2D array navigation and collision</li>
+                    <li><strong>Reaction timing</strong> - INKEY$ for real-time input</li>
+                    <li><strong>Mathematical physics</strong> - SIN, COS, TAN for angles</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- BASIC Fundamentals for Battle Games -->
+        <section id="basics" class="section">
+            <h2>Key BASIC Concepts</h2>
+
+            <div class="concept">
+                <h3>Trigonometry Functions</h3>
+                <p>Essential for trajectory calculations in tank and missile games.</p>
+                <div class="code-comparison">
+                    <div class="code-block basic">
+                        <h4>BASIC</h4>
+                        <pre><code>10 REM Convert degrees to radians
+20 R = D * 3.14159 / 180
+30 REM Calculate trajectory
+40 X = V * COS(R) * T
+50 Y = V * SIN(R) * T - 0.5 * G * T * T
+60 REM Tangent for angle
+70 A = ATN(Y / X)</code></pre>
+                    </div>
+                    <div class="code-block javascript">
+                        <h4>JavaScript</h4>
+                        <pre><code>// Convert degrees to radians
+const r = d * Math.PI / 180;
+// Calculate trajectory
+const x = v * Math.cos(r) * t;
+const y = v * Math.sin(r) * t - 0.5 * g * t * t;
+// Tangent for angle
+const a = Math.atan(y / x);</code></pre>
+                    </div>
+                    <div class="code-block python">
+                        <h4>Python</h4>
+                        <pre><code>import math
+
+# Convert degrees to radians
+r = d * math.pi / 180
+# Or use: r = math.radians(d)
+# Calculate trajectory
+x = v * math.cos(r) * t
+y = v * math.sin(r) * t - 0.5 * g * t * t
+# Tangent for angle
+a = math.atan(y / x)</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept">
+                <h3>2D Arrays for Game Grids</h3>
+                <p>Used in Iceberg and other grid-based games.</p>
+                <div class="code-comparison">
+                    <div class="code-block basic">
+                        <h4>BASIC</h4>
+                        <pre><code>10 DIM B(8,8)
+20 REM Fill grid with spaces
+30 FOR X = 1 TO 8
+40 FOR Y = 1 TO 8
+50 B(X,Y) = 0
+60 NEXT Y
+70 NEXT X
+80 REM Place player at 1,1
+90 B(1,1) = 1</code></pre>
+                    </div>
+                    <div class="code-block javascript">
+                        <h4>JavaScript</h4>
+                        <pre><code>// Create 8x8 grid
+const grid = Array(8).fill(null)
+    .map(() => Array(8).fill(0));
+// Place player at 0,0 (JS is 0-indexed)
+grid[0][0] = 1;
+
+// Or using nested loops:
+for (let x = 0; x < 8; x++) {
+    for (let y = 0; y < 8; y++) {
+        grid[x][y] = 0;
+    }
+}</code></pre>
+                    </div>
+                    <div class="code-block python">
+                        <h4>Python</h4>
+                        <pre><code># Create 8x8 grid
+grid = [[0 for _ in range(8)] for _ in range(8)]
+# Place player at 0,0
+grid[0][0] = 1
+
+# Or using numpy:
+import numpy as np
+grid = np.zeros((8, 8), dtype=int)
+grid[0, 0] = 1</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept">
+                <h3>Real-time Keyboard Input</h3>
+                <p>INKEY$ checks for keypresses without waiting - crucial for action games.</p>
+                <div class="code-comparison">
+                    <div class="code-block basic">
+                        <h4>BASIC</h4>
+                        <pre><code>10 REM Check for keypress
+20 A$ = INKEY$
+30 IF A$ = "" THEN GOTO 20
+40 IF A$ = "F" THEN GOSUB 500
+50 REM Timed input
+60 FOR T = 1 TO 1000
+70 A$ = INKEY$
+80 IF A$ <> "" THEN GOTO 100
+90 NEXT T
+100 REM Time expired or key pressed</code></pre>
+                    </div>
+                    <div class="code-block javascript">
+                        <h4>JavaScript</h4>
+                        <pre><code>// Event-based keyboard input
+let lastKey = null;
+
+document.addEventListener('keydown', (e) => {
+    lastKey = e.key;
+    if (e.key === 'f') {
+        fireWeapon();
+    }
+});
+
+// Check with timeout
+function waitForKey(timeout) {
+    return new Promise((resolve) => {
+        const handler = (e) => {
+            document.removeEventListener('keydown', handler);
+            resolve(e.key);
+        };
+        document.addEventListener('keydown', handler);
+        setTimeout(() => resolve(null), timeout);
+    });
+}</code></pre>
+                    </div>
+                    <div class="code-block python">
+                        <h4>Python</h4>
+                        <pre><code>import keyboard  # pip install keyboard
+import time
+
+# Check for keypress (non-blocking)
+if keyboard.is_pressed('f'):
+    fire_weapon()
+
+# Wait for key with timeout
+def wait_for_key(timeout):
+    start = time.time()
+    while time.time() - start < timeout:
+        event = keyboard.read_event(suppress=True)
+        if event.event_type == 'down':
+            return event.name
+    return None</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Robot Missile -->
+        <section id="robot-missile" class="section">
+            <h2>Game 1: Robot Missile</h2>
+            <p class="game-desc">The year is 2582. Find the secret code letter before the robot missile launches!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>The computer picks a secret letter A-Z. You have 4 guesses. After each guess, you're told if the secret letter comes before or after yours in the alphabet. Use binary search strategy!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM ROBOT MISSILE
+20 S = INT(RND(1)*26) + 65
+30 S$ = CHR$(S)
+40 PRINT "ROBOT MISSILE ARMED!"
+50 PRINT "FIND THE CODE LETTER (A-Z)"
+60 FOR G = 1 TO 4
+70 INPUT "YOUR GUESS"; A$
+80 IF A$ = S$ THEN GOTO 150
+90 IF ASC(A$) < S THEN PRINT "LATER IN ALPHABET"
+100 IF ASC(A$) > S THEN PRINT "EARLIER IN ALPHABET"
+110 NEXT G
+120 PRINT "MISSILE LAUNCHED!"
+130 PRINT "CODE WAS: "; S$
+140 END
+150 PRINT "MISSILE DISARMED!"
+160 PRINT "YOU SAVED THE CITY!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class RobotMissile {
+    constructor() {
+        this.secretCode = String.fromCharCode(
+            Math.floor(Math.random() * 26) + 65
+        );
+        this.guessesLeft = 4;
+        this.gameOver = false;
+    }
+
+    guess(letter) {
+        letter = letter.toUpperCase();
+        this.guessesLeft--;
+
+        if (letter === this.secretCode) {
+            this.gameOver = true;
+            return { result: 'win', message: 'MISSILE DISARMED!' };
+        }
+
+        if (this.guessesLeft === 0) {
+            this.gameOver = true;
+            return {
+                result: 'lose',
+                message: `MISSILE LAUNCHED! Code was: ${this.secretCode}`
+            };
+        }
+
+        const hint = letter < this.secretCode
+            ? 'Later in alphabet'
+            : 'Earlier in alphabet';
+
+        return { result: 'continue', hint, guessesLeft: this.guessesLeft };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class RobotMissile:
+    def __init__(self):
+        self.secret_code = chr(random.randint(65, 90))
+        self.guesses_left = 4
+        self.game_over = False
+
+    def guess(self, letter):
+        letter = letter.upper()
+        self.guesses_left -= 1
+
+        if letter == self.secret_code:
+            self.game_over = True
+            return "MISSILE DISARMED!"
+
+        if self.guesses_left == 0:
+            self.game_over = True
+            return f"LAUNCHED! Code was: {self.secret_code}"
+
+        if letter < self.secret_code:
+            return f"Later in alphabet. {self.guesses_left} left"
+        else:
+            return f"Earlier in alphabet. {self.guesses_left} left"</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="robot-missile-game" class="game-area">
+                    <div class="missile-display" id="missile-display">
+                        <div class="missile-status">MISSILE STATUS: <span id="missile-status">ARMED</span></div>
+                        <div class="guesses-left">Guesses remaining: <span id="missile-guesses">4</span></div>
+                    </div>
+                    <div class="game-controls">
+                        <input type="text" id="missile-input" maxlength="1" placeholder="A-Z" class="letter-input">
+                        <button id="missile-guess-btn">Guess</button>
+                        <button id="missile-start-btn">New Game</button>
+                    </div>
+                    <p id="missile-hint" class="hint-text"></p>
+                    <p id="missile-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vital Message -->
+        <section id="vital-message" class="section">
+            <h2>Game 2: The Vital Message</h2>
+            <p class="game-desc">You're a laser communications operator. Memorize the intercepted robot message!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>A secret message of random letters flashes briefly on screen. Memorize it and type it back! Difficulty levels 4-10 control the message length.</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM VITAL MESSAGE
+20 INPUT "DIFFICULTY (4-10)"; D
+30 M$ = ""
+40 FOR I = 1 TO D
+50 M$ = M$ + CHR$(INT(RND(1)*26) + 65)
+60 NEXT I
+70 CLS
+80 PRINT "INCOMING MESSAGE:"
+90 PRINT M$
+100 FOR T = 1 TO 1000: NEXT T
+110 CLS
+120 INPUT "REPEAT MESSAGE"; A$
+130 IF A$ = M$ THEN PRINT "CORRECT!"
+140 IF A$ <> M$ THEN PRINT "WRONG! IT WAS: "; M$</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class VitalMessage {
+    constructor(difficulty = 4) {
+        this.difficulty = Math.min(10, Math.max(4, difficulty));
+        this.message = '';
+        this.generateMessage();
+    }
+
+    generateMessage() {
+        this.message = '';
+        for (let i = 0; i < this.difficulty; i++) {
+            this.message += String.fromCharCode(
+                Math.floor(Math.random() * 26) + 65
+            );
+        }
+    }
+
+    async showMessage(displayElement, duration = 2000) {
+        displayElement.textContent = this.message;
+        await new Promise(r => setTimeout(r, duration));
+        displayElement.textContent = '???';
+    }
+
+    checkAnswer(answer) {
+        return answer.toUpperCase() === this.message;
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+import time
+import os
+
+class VitalMessage:
+    def __init__(self, difficulty=4):
+        self.difficulty = max(4, min(10, difficulty))
+        self.message = self.generate_message()
+
+    def generate_message(self):
+        return ''.join(
+            chr(random.randint(65, 90))
+            for _ in range(self.difficulty)
+        )
+
+    def show_message(self, duration=2):
+        os.system('clear')  # or 'cls' on Windows
+        print("INCOMING MESSAGE:")
+        print(self.message)
+        time.sleep(duration)
+        os.system('clear')
+
+    def check_answer(self, answer):
+        return answer.upper() == self.message</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="vital-message-game" class="game-area">
+                    <div class="message-display" id="message-display">
+                        <span id="vital-message-text">Press Start to receive message</span>
+                    </div>
+                    <div class="game-controls">
+                        <label>Difficulty: <input type="number" id="vital-difficulty" min="4" max="10" value="4"></label>
+                        <button id="vital-start-btn">Start</button>
+                    </div>
+                    <div id="vital-input-area" style="display:none;">
+                        <input type="text" id="vital-answer" placeholder="Type the message...">
+                        <button id="vital-submit-btn">Submit</button>
+                    </div>
+                    <p id="vital-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Shootout -->
+        <section id="shootout" class="section">
+            <h2>Game 3: Shootout</h2>
+            <p class="game-desc">A classic duel! Ten paces, turn, and draw. Can you shoot before the computer?</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Watch the countdown from 10 to 1, then "HE DRAWS..." appears. Press any key the moment you see it - but not before! Shoot too early and you're disqualified.</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM SHOOTOUT
+20 PRINT "TEN PACES..."
+30 FOR I = 10 TO 1 STEP -1
+40 PRINT I
+50 FOR T = 1 TO 500: NEXT T
+60 A$ = INKEY$
+70 IF A$ <> "" THEN GOTO 150
+80 NEXT I
+90 REM Random delay before draw
+100 FOR T = 1 TO INT(RND(1)*1000)+500
+110 A$ = INKEY$
+120 IF A$ <> "" THEN GOTO 150
+130 NEXT T
+140 PRINT "HE DRAWS..."
+145 REM Now player can shoot
+150 IF A$ <> "" THEN PRINT "TOO EARLY!": END
+160 FOR T = 1 TO 300
+170 A$ = INKEY$
+180 IF A$ <> "" THEN PRINT "YOU WIN!": END
+190 NEXT T
+200 PRINT "TOO SLOW - YOU LOSE!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class Shootout {
+    constructor() {
+        this.phase = 'waiting'; // waiting, countdown, delay, draw, ended
+        this.canShoot = false;
+        this.result = null;
+    }
+
+    async play(onUpdate) {
+        this.phase = 'countdown';
+
+        // Countdown from 10
+        for (let i = 10; i >= 1; i--) {
+            onUpdate({ phase: 'countdown', count: i });
+            await this.delay(500);
+            if (this.result) return; // Early shot
+        }
+
+        // Random delay before draw
+        this.phase = 'delay';
+        const delayTime = Math.random() * 2000 + 1000;
+        await this.delay(delayTime);
+        if (this.result) return;
+
+        // DRAW!
+        this.phase = 'draw';
+        this.canShoot = true;
+        onUpdate({ phase: 'draw' });
+
+        // Window to shoot
+        await this.delay(500);
+        if (!this.result) {
+            this.result = 'lose';
+            onUpdate({ phase: 'ended', result: 'Too slow!' });
+        }
+    }
+
+    shoot() {
+        if (this.phase === 'draw' && this.canShoot) {
+            this.result = 'win';
+            return 'You win!';
+        } else if (this.phase !== 'ended') {
+            this.result = 'early';
+            return 'Too early! Disqualified!';
+        }
+    }
+
+    delay(ms) {
+        return new Promise(r => setTimeout(r, ms));
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import time
+import random
+import keyboard
+
+class Shootout:
+    def __init__(self):
+        self.can_shoot = False
+        self.result = None
+
+    def play(self):
+        print("TEN PACES...")
+
+        # Countdown
+        for i in range(10, 0, -1):
+            print(i)
+            time.sleep(0.5)
+            if keyboard.is_pressed('space'):
+                print("TOO EARLY! Disqualified!")
+                return
+
+        # Random delay
+        delay = random.uniform(1, 3)
+        start = time.time()
+        while time.time() - start < delay:
+            if keyboard.is_pressed('space'):
+                print("TOO EARLY! Disqualified!")
+                return
+
+        # DRAW!
+        print("HE DRAWS...")
+        self.can_shoot = True
+        draw_time = time.time()
+
+        # Wait for shot or timeout
+        while time.time() - draw_time < 0.5:
+            if keyboard.is_pressed('space'):
+                print("YOU WIN!")
+                return
+
+        print("TOO SLOW - YOU LOSE!")</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="shootout-game" class="game-area">
+                    <div class="shootout-display">
+                        <div id="shootout-count" class="big-count">10</div>
+                        <div id="shootout-status">Press Start, then SPACE to shoot when you see "DRAW!"</div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="shootout-start-btn">Start Duel</button>
+                    </div>
+                    <p id="shootout-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Desert Tank Battle -->
+        <section id="desert-tank" class="section">
+            <h2>Game 4: Desert Tank Battle</h2>
+            <p class="game-desc">Command your tank and destroy the robot stronghold using trajectory physics!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Fire missiles at a hidden target. Enter direction (-90° to +90°) and elevation (0° to 90°). The computer calculates where your shot lands using trigonometry. You have 5 missiles!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM DESERT TANK BATTLE
+20 TX = INT(RND(1)*100) - 50
+30 TY = INT(RND(1)*100)
+40 PRINT "TARGET HIDDEN IN RUINS"
+50 FOR M = 1 TO 5
+60 PRINT "MISSILE "; M; " OF 5"
+70 INPUT "DIRECTION (-90 TO 90)"; D
+80 INPUT "ELEVATION (0 TO 90)"; E
+90 REM Convert to radians
+100 DR = D * 3.14159 / 180
+110 ER = E * 3.14159 / 180
+120 REM Calculate landing position
+130 DIST = 100 * TAN(ER)
+140 LX = DIST * SIN(DR)
+150 LY = DIST * COS(DR)
+160 REM Check hit
+170 IF ABS(LX-TX)<5 AND ABS(LY-TY)<5 THEN 220
+180 IF LX < TX THEN PRINT "MORE RIGHT"
+190 IF LX > TX THEN PRINT "MORE LEFT"
+200 IF LY < TY THEN PRINT "SHORT": IF LY > TY THEN PRINT "LONG"
+210 NEXT M
+215 PRINT "OUT OF MISSILES!": END
+220 PRINT "DIRECT HIT! ENEMY DESTROYED!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class DesertTank {
+    constructor() {
+        // Target at random position
+        this.targetX = Math.floor(Math.random() * 100) - 50;
+        this.targetY = Math.floor(Math.random() * 100);
+        this.missiles = 5;
+    }
+
+    fire(direction, elevation) {
+        this.missiles--;
+
+        // Convert to radians
+        const dirRad = direction * Math.PI / 180;
+        const elvRad = elevation * Math.PI / 180;
+
+        // Calculate landing position
+        const dist = 100 * Math.tan(elvRad);
+        const landX = dist * Math.sin(dirRad);
+        const landY = dist * Math.cos(dirRad);
+
+        // Check hit (within 5 units)
+        const hitX = Math.abs(landX - this.targetX) < 5;
+        const hitY = Math.abs(landY - this.targetY) < 5;
+
+        if (hitX && hitY) {
+            return { hit: true, message: 'DIRECT HIT!' };
+        }
+
+        const hints = [];
+        if (landX < this.targetX) hints.push('Aim more RIGHT');
+        if (landX > this.targetX) hints.push('Aim more LEFT');
+        if (landY < this.targetY) hints.push('Shot SHORT');
+        if (landY > this.targetY) hints.push('Shot LONG');
+
+        return {
+            hit: false,
+            hints,
+            missilesLeft: this.missiles,
+            landX: Math.round(landX),
+            landY: Math.round(landY)
+        };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import math
+import random
+
+class DesertTank:
+    def __init__(self):
+        self.target_x = random.randint(-50, 50)
+        self.target_y = random.randint(0, 100)
+        self.missiles = 5
+
+    def fire(self, direction, elevation):
+        self.missiles -= 1
+
+        # Convert to radians
+        dir_rad = math.radians(direction)
+        elv_rad = math.radians(elevation)
+
+        # Calculate landing
+        dist = 100 * math.tan(elv_rad)
+        land_x = dist * math.sin(dir_rad)
+        land_y = dist * math.cos(dir_rad)
+
+        # Check hit
+        hit_x = abs(land_x - self.target_x) < 5
+        hit_y = abs(land_y - self.target_y) < 5
+
+        if hit_x and hit_y:
+            return {"hit": True, "message": "DIRECT HIT!"}
+
+        hints = []
+        if land_x < self.target_x: hints.append("More RIGHT")
+        if land_x > self.target_x: hints.append("More LEFT")
+        if land_y < self.target_y: hints.append("SHORT")
+        if land_y > self.target_y: hints.append("LONG")
+
+        return {"hit": False, "hints": hints}</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="desert-tank-game" class="game-area">
+                    <canvas id="tank-canvas" width="400" height="300"></canvas>
+                    <div class="tank-controls">
+                        <div class="control-group">
+                            <label>Direction: <input type="number" id="tank-direction" min="-90" max="90" value="0">°</label>
+                            <label>Elevation: <input type="number" id="tank-elevation" min="0" max="90" value="45">°</label>
+                        </div>
+                        <button id="tank-fire-btn">Fire!</button>
+                        <button id="tank-new-btn">New Game</button>
+                    </div>
+                    <p>Missiles: <span id="tank-missiles">5</span></p>
+                    <p id="tank-hint"></p>
+                    <p id="tank-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Traitor's Castle -->
+        <section id="traitors-castle" class="section">
+            <h2>Game 5: Battle at Traitor's Castle</h2>
+            <p class="game-desc">Soldiers appear at random positions. Press the right key before they vanish!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Eight positions (1-8) display soldiers (O) briefly. Press the matching number key quickly to score a hit. Fast reflexes required!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM TRAITOR'S CASTLE
+20 S = 0: REM Score
+30 FOR G = 1 TO 10
+40 CLS
+50 P = INT(RND(1)*8) + 1
+60 REM Display soldiers at position P
+70 PRINT TAB(P*4); "O"
+80 REM Wait for keypress with timeout
+90 FOR T = 1 TO 500
+100 A$ = INKEY$
+110 IF A$ <> "" THEN GOTO 140
+120 NEXT T
+130 PRINT "MISSED!": GOTO 160
+140 IF VAL(A$) = P THEN S = S + 1: PRINT "HIT!"
+150 IF VAL(A$) <> P THEN PRINT "WRONG POSITION!"
+160 FOR T = 1 TO 300: NEXT T
+170 NEXT G
+180 PRINT "FINAL SCORE: "; S; " OUT OF 10"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class TraitorsCastle {
+    constructor() {
+        this.score = 0;
+        this.round = 0;
+        this.maxRounds = 10;
+        this.currentPosition = 0;
+        this.waitingForInput = false;
+    }
+
+    nextRound() {
+        this.round++;
+        this.currentPosition = Math.floor(Math.random() * 8) + 1;
+        this.waitingForInput = true;
+        return this.currentPosition;
+    }
+
+    shoot(position) {
+        if (!this.waitingForInput) return null;
+        this.waitingForInput = false;
+
+        if (position === this.currentPosition) {
+            this.score++;
+            return { hit: true };
+        }
+        return { hit: false, correct: this.currentPosition };
+    }
+
+    timeout() {
+        this.waitingForInput = false;
+        return { timeout: true };
+    }
+
+    isGameOver() {
+        return this.round >= this.maxRounds;
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class TraitorsCastle:
+    def __init__(self):
+        self.score = 0
+        self.round = 0
+        self.max_rounds = 10
+        self.current_position = 0
+
+    def next_round(self):
+        self.round += 1
+        self.current_position = random.randint(1, 8)
+        return self.current_position
+
+    def shoot(self, position):
+        if position == self.current_position:
+            self.score += 1
+            return True
+        return False
+
+    def is_game_over(self):
+        return self.round >= self.max_rounds
+
+    def get_score(self):
+        return f"{self.score} out of {self.max_rounds}"</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="castle-game" class="game-area">
+                    <div id="castle-positions" class="positions-row">
+                        <div class="position" data-pos="1"><span class="pos-num">1</span><span class="soldier"></span></div>
+                        <div class="position" data-pos="2"><span class="pos-num">2</span><span class="soldier"></span></div>
+                        <div class="position" data-pos="3"><span class="pos-num">3</span><span class="soldier"></span></div>
+                        <div class="position" data-pos="4"><span class="pos-num">4</span><span class="soldier"></span></div>
+                        <div class="position" data-pos="5"><span class="pos-num">5</span><span class="soldier"></span></div>
+                        <div class="position" data-pos="6"><span class="pos-num">6</span><span class="soldier"></span></div>
+                        <div class="position" data-pos="7"><span class="pos-num">7</span><span class="soldier"></span></div>
+                        <div class="position" data-pos="8"><span class="pos-num">8</span><span class="soldier"></span></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="castle-start-btn">Start Battle</button>
+                    </div>
+                    <p>Score: <span id="castle-score">0</span> | Round: <span id="castle-round">0</span>/10</p>
+                    <p id="castle-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Robot Invaders -->
+        <section id="robot-invaders" class="section">
+            <h2>Game 6: Robot Invaders</h2>
+            <p class="game-desc">25 robot invaders attack! Match their symbols to destroy them!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Each robot displays a random character symbol. Press the matching key on your keyboard to destroy it. 25 invaders, how many can you hit?</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM ROBOT INVADERS
+20 S = 0
+30 FOR I = 1 TO 25
+40 REM Random printable character
+50 C = INT(RND(1)*26) + 65
+60 C$ = CHR$(C)
+70 PRINT "INVADER: "; C$
+80 FOR T = 1 TO 300
+90 A$ = INKEY$
+100 IF A$ = "" THEN NEXT T: GOTO 130
+110 IF A$ = C$ THEN S = S + 1: PRINT "HIT!": GOTO 140
+120 PRINT "MISS!"
+130 REM Invader escapes
+140 NEXT I
+150 PRINT "SCORE: "; S; " / 25"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class RobotInvaders {
+    constructor() {
+        this.score = 0;
+        this.invader = 0;
+        this.totalInvaders = 25;
+        this.currentSymbol = '';
+    }
+
+    nextInvader() {
+        this.invader++;
+        // Random letter A-Z
+        this.currentSymbol = String.fromCharCode(
+            Math.floor(Math.random() * 26) + 65
+        );
+        return this.currentSymbol;
+    }
+
+    shoot(key) {
+        if (key.toUpperCase() === this.currentSymbol) {
+            this.score++;
+            return true;
+        }
+        return false;
+    }
+
+    isGameOver() {
+        return this.invader >= this.totalInvaders;
+    }
+
+    getScore() {
+        return `${this.score} / ${this.totalInvaders}`;
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class RobotInvaders:
+    def __init__(self):
+        self.score = 0
+        self.invader = 0
+        self.total_invaders = 25
+        self.current_symbol = ''
+
+    def next_invader(self):
+        self.invader += 1
+        self.current_symbol = chr(random.randint(65, 90))
+        return self.current_symbol
+
+    def shoot(self, key):
+        if key.upper() == self.current_symbol:
+            self.score += 1
+            return True
+        return False
+
+    def is_game_over(self):
+        return self.invader >= self.total_invaders</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="invaders-game" class="game-area">
+                    <div class="invader-display">
+                        <div id="invader-symbol" class="big-symbol">?</div>
+                        <div id="invader-timer" class="timer-bar"></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="invaders-start-btn">Start Invasion</button>
+                    </div>
+                    <p>Score: <span id="invaders-score">0</span> | Invader: <span id="invaders-count">0</span>/25</p>
+                    <p id="invaders-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Secret Weapon -->
+        <section id="secret-weapon" class="section">
+            <h2>Game 7: Secret Weapon</h2>
+            <p class="game-desc">Use your underground-cutting weapon to destroy the Robot Spare Parts Store!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Guess X,Y coordinates of the hidden target. The computer tells you how close you are using the Pythagorean theorem (distance formula). Get within 5 units to win!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM SECRET WEAPON
+20 TX = INT(RND(1)*100)
+30 TY = INT(RND(1)*100)
+40 INPUT "DIFFICULTY (4-10)"; D
+50 FOR G = 1 TO D
+60 INPUT "X COORDINATE (0-100)"; X
+70 INPUT "Y COORDINATE (0-100)"; Y
+80 REM Calculate distance
+90 DI = SQR((X-TX)^2 + (Y-TY)^2)
+100 IF DI < 5 THEN PRINT "TARGET DESTROYED!": END
+110 PRINT "DISTANCE TO TARGET: "; INT(DI)
+120 NEXT G
+130 PRINT "OUT OF ATTEMPTS!"
+140 PRINT "TARGET WAS AT "; TX; ","; TY</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class SecretWeapon {
+    constructor(difficulty = 5) {
+        this.targetX = Math.floor(Math.random() * 100);
+        this.targetY = Math.floor(Math.random() * 100);
+        this.attempts = difficulty;
+        this.maxAttempts = difficulty;
+    }
+
+    fire(x, y) {
+        this.attempts--;
+
+        // Pythagorean distance
+        const distance = Math.sqrt(
+            Math.pow(x - this.targetX, 2) +
+            Math.pow(y - this.targetY, 2)
+        );
+
+        if (distance < 5) {
+            return { hit: true, message: 'TARGET DESTROYED!' };
+        }
+
+        return {
+            hit: false,
+            distance: Math.round(distance),
+            attemptsLeft: this.attempts
+        };
+    }
+
+    isGameOver() {
+        return this.attempts <= 0;
+    }
+
+    getTarget() {
+        return { x: this.targetX, y: this.targetY };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import math
+import random
+
+class SecretWeapon:
+    def __init__(self, difficulty=5):
+        self.target_x = random.randint(0, 100)
+        self.target_y = random.randint(0, 100)
+        self.attempts = difficulty
+
+    def fire(self, x, y):
+        self.attempts -= 1
+
+        # Pythagorean distance
+        distance = math.sqrt(
+            (x - self.target_x) ** 2 +
+            (y - self.target_y) ** 2
+        )
+
+        if distance < 5:
+            return {"hit": True}
+
+        return {
+            "hit": False,
+            "distance": round(distance),
+            "attempts_left": self.attempts
+        }
+
+    def is_game_over(self):
+        return self.attempts <= 0</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="secret-weapon-game" class="game-area">
+                    <canvas id="weapon-canvas" width="300" height="300"></canvas>
+                    <div class="weapon-controls">
+                        <label>X: <input type="number" id="weapon-x" min="0" max="100" value="50"></label>
+                        <label>Y: <input type="number" id="weapon-y" min="0" max="100" value="50"></label>
+                        <button id="weapon-fire-btn">Fire!</button>
+                        <button id="weapon-new-btn">New Game</button>
+                    </div>
+                    <p>Attempts: <span id="weapon-attempts">5</span></p>
+                    <p id="weapon-distance"></p>
+                    <p id="weapon-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Escape -->
+        <section id="escape" class="section">
+            <h2>Game 8: Escape!</h2>
+            <p class="game-desc">You're trapped in a robot prison. Find the resonant frequency to escape!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Your sonar wristwatch can find the resonant frequency of robot guards (1-100). Guess the number - but too far off causes the building to collapse (low) or gives you headaches (high)!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM ESCAPE!
+20 F = INT(RND(1)*100) + 1
+30 FOR G = 1 TO 5
+40 INPUT "FREQUENCY (1-100)"; A
+50 D = ABS(A - F)
+60 IF D = 0 THEN PRINT "GUARDS DISABLED! ESCAPE!": END
+70 IF D < 5 THEN PRINT "VERY CLOSE!"
+80 IF D >= 5 AND D < 15 THEN PRINT "GETTING WARMER"
+90 IF D >= 15 AND A < F THEN PRINT "TOO LOW - BUILDING SHAKING!"
+100 IF D >= 15 AND A > F THEN PRINT "TOO HIGH - HEADACHE!"
+110 NEXT G
+120 PRINT "CAPTURED! FREQUENCY WAS: "; F</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class EscapeGame {
+    constructor() {
+        this.frequency = Math.floor(Math.random() * 100) + 1;
+        this.attempts = 5;
+    }
+
+    guess(freq) {
+        this.attempts--;
+        const diff = Math.abs(freq - this.frequency);
+
+        if (diff === 0) {
+            return { escaped: true, message: 'GUARDS DISABLED! ESCAPE!' };
+        }
+
+        let hint;
+        if (diff < 5) {
+            hint = 'VERY CLOSE!';
+        } else if (diff < 15) {
+            hint = 'Getting warmer...';
+        } else if (freq < this.frequency) {
+            hint = 'TOO LOW - Building shaking!';
+        } else {
+            hint = 'TOO HIGH - Headache!';
+        }
+
+        return {
+            escaped: false,
+            hint,
+            attemptsLeft: this.attempts
+        };
+    }
+
+    isGameOver() {
+        return this.attempts <= 0;
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class EscapeGame:
+    def __init__(self):
+        self.frequency = random.randint(1, 100)
+        self.attempts = 5
+
+    def guess(self, freq):
+        self.attempts -= 1
+        diff = abs(freq - self.frequency)
+
+        if diff == 0:
+            return {"escaped": True}
+
+        if diff < 5:
+            hint = "VERY CLOSE!"
+        elif diff < 15:
+            hint = "Getting warmer..."
+        elif freq < self.frequency:
+            hint = "TOO LOW - Building shaking!"
+        else:
+            hint = "TOO HIGH - Headache!"
+
+        return {
+            "escaped": False,
+            "hint": hint,
+            "attempts_left": self.attempts
+        }
+
+    def is_game_over(self):
+        return self.attempts <= 0</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="escape-game" class="game-area">
+                    <div class="escape-display">
+                        <div class="sonar-watch">
+                            <span id="escape-freq-display">???</span>
+                        </div>
+                    </div>
+                    <div class="game-controls">
+                        <input type="number" id="escape-freq" min="1" max="100" placeholder="1-100">
+                        <button id="escape-guess-btn">Transmit</button>
+                        <button id="escape-new-btn">New Game</button>
+                    </div>
+                    <p>Attempts: <span id="escape-attempts">5</span></p>
+                    <p id="escape-hint"></p>
+                    <p id="escape-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pirate Dogfight -->
+        <section id="pirate-dogfight" class="section">
+            <h2>Game 9: Pirate Dogfight</h2>
+            <p class="game-desc">Aerial combat against the Sky Pirate! Match speed and position to fire!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>You must match the pirate's altitude and speed to get a clean shot. Use A to accelerate, D to decelerate, U for up, N for down. Fire (F) when you're level!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM PIRATE DOGFIGHT
+20 PH = 50: PS = 5: REM Pirate height/speed
+30 YH = 30: YS = 3: REM Your height/speed
+40 PRINT "PIRATE: H=";PH;" S=";PS
+50 PRINT "YOU:    H=";YH;" S=";YS
+60 A$ = INKEY$: IF A$ = "" THEN 60
+70 IF A$ = "A" THEN YS = YS + 1
+80 IF A$ = "D" THEN YS = YS - 1
+90 IF A$ = "U" THEN YH = YH + YS
+100 IF A$ = "N" THEN YH = YH - YS
+110 IF A$ = "F" THEN GOTO 150
+120 REM Pirate moves randomly
+130 PH = PH + INT(RND(1)*5) - 2
+140 GOTO 40
+150 IF ABS(YH-PH)<5 AND ABS(YS-PS)<2 THEN 180
+160 PRINT "MISSED! NOT ALIGNED!"
+170 GOTO 40
+180 PRINT "DIRECT HIT! PIRATE DOWN!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class PirateDogfight {
+    constructor() {
+        this.pirate = { height: 50, speed: 5 };
+        this.player = { height: 30, speed: 3 };
+        this.gameOver = false;
+    }
+
+    accelerate() { this.player.speed++; }
+    decelerate() { this.player.speed = Math.max(1, this.player.speed - 1); }
+    climbUp() { this.player.height += this.player.speed; }
+    diveDown() { this.player.height -= this.player.speed; }
+
+    fire() {
+        const heightDiff = Math.abs(this.player.height - this.pirate.height);
+        const speedDiff = Math.abs(this.player.speed - this.pirate.speed);
+
+        if (heightDiff < 5 && speedDiff < 2) {
+            this.gameOver = true;
+            return { hit: true, message: 'DIRECT HIT! Pirate down!' };
+        }
+        return { hit: false, message: 'MISSED! Not aligned!' };
+    }
+
+    updatePirate() {
+        // Pirate moves randomly
+        this.pirate.height += Math.floor(Math.random() * 5) - 2;
+        this.pirate.speed += Math.floor(Math.random() * 3) - 1;
+        this.pirate.speed = Math.max(1, this.pirate.speed);
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class PirateDogfight:
+    def __init__(self):
+        self.pirate = {"height": 50, "speed": 5}
+        self.player = {"height": 30, "speed": 3}
+
+    def accelerate(self):
+        self.player["speed"] += 1
+
+    def decelerate(self):
+        self.player["speed"] = max(1, self.player["speed"] - 1)
+
+    def climb(self):
+        self.player["height"] += self.player["speed"]
+
+    def dive(self):
+        self.player["height"] -= self.player["speed"]
+
+    def fire(self):
+        h_diff = abs(self.player["height"] - self.pirate["height"])
+        s_diff = abs(self.player["speed"] - self.pirate["speed"])
+        return h_diff < 5 and s_diff < 2
+
+    def update_pirate(self):
+        self.pirate["height"] += random.randint(-2, 2)
+        self.pirate["speed"] += random.randint(-1, 1)
+        self.pirate["speed"] = max(1, self.pirate["speed"])</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="dogfight-game" class="game-area">
+                    <canvas id="dogfight-canvas" width="400" height="200"></canvas>
+                    <div class="dogfight-stats">
+                        <div>Pirate - Height: <span id="pirate-h">50</span> Speed: <span id="pirate-s">5</span></div>
+                        <div>You - Height: <span id="player-h">30</span> Speed: <span id="player-s">3</span></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="dogfight-start-btn">Start</button>
+                        <button id="df-up" class="control-btn">↑ Up</button>
+                        <button id="df-down" class="control-btn">↓ Down</button>
+                        <button id="df-accel" class="control-btn">A+ Speed</button>
+                        <button id="df-decel" class="control-btn">D- Speed</button>
+                        <button id="df-fire" class="control-btn fire-btn">F Fire!</button>
+                    </div>
+                    <p id="dogfight-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section id="summary" class="section">
+            <h2>More Games in the Book</h2>
+            <p>The full book includes these additional games:</p>
+
+            <div class="more-games">
+                <div class="game-card">
+                    <h3>Supersonic Bomber</h3>
+                    <p>Analyze 5 graphs showing robot population distributions. Pick the highest concentration for maximum damage!</p>
+                    <p class="concepts">Concepts: Arrays, MAX/MIN, graph analysis</p>
+                </div>
+
+                <div class="game-card">
+                    <h3>Iceberg</h3>
+                    <p>Navigate a damaged ship through icebergs on an 8x8 grid while an enemy pursues you. Classic chase game!</p>
+                    <p class="concepts">Concepts: 2D arrays, pathfinding, collision detection</p>
+                </div>
+
+                <div class="game-card">
+                    <h3>The Wizard's Wall</h3>
+                    <p>Destroy a wizard's wall using catapults. Complex physics with wind and elevation calculations!</p>
+                    <p class="concepts">Concepts: Advanced trigonometry, SIN/COS/TAN</p>
+                </div>
+
+                <div class="game-card">
+                    <h3>Missile!</h3>
+                    <p>Graphics-based game with three missile bases. Judge aircraft speed and fire missiles to intercept!</p>
+                    <p class="concepts">Concepts: Graphics programming, collision detection</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What You Learned -->
+        <section id="learned" class="section">
+            <h2>What You've Learned</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Mathematical Functions</h3>
+                    <ul>
+                        <li>SIN, COS, TAN - Trigonometry</li>
+                        <li>SQR - Square root</li>
+                        <li>ABS - Absolute value</li>
+                        <li>ATN - Arctangent</li>
+                        <li>INT - Integer conversion</li>
+                    </ul>
+                </div>
+                <div class="summary-card">
+                    <h3>Game Mechanics</h3>
+                    <ul>
+                        <li>Real-time input (INKEY$)</li>
+                        <li>Trajectory calculations</li>
+                        <li>Distance formulas</li>
+                        <li>Grid-based movement</li>
+                        <li>Timing and delays</li>
+                    </ul>
+                </div>
+                <div class="summary-card">
+                    <h3>Data Structures</h3>
+                    <ul>
+                        <li>2D arrays (DIM)</li>
+                        <li>Character codes (CHR$, ASC)</li>
+                        <li>Score tracking</li>
+                        <li>Game state variables</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="index.html">← Back to All Books</a></p>
+        <p>Based on "Usborne Computer Battlegames" (1982) by Daniel Isaaman and Jenny Tyler</p>
+        <p>Educational adaptation for modern programming languages</p>
+    </footer>
+
+    <script src="battlegames.js"></script>
+</body>
+</html>

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Spacegames - Learn Programming</title>
+    <link rel="stylesheet" href="spacegames.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="back-link">← All Books</a>
+        <div class="header-content">
+            <h1>🚀 Computer Spacegames</h1>
+            <p class="subtitle">Learn programming through classic 1982 space adventures</p>
+            <p class="tagline">Original BASIC → Modern JavaScript & Python</p>
+        </div>
+    </header>
+
+    <nav id="main-nav">
+        <ul>
+            <li><a href="#basics">BASIC Fundamentals</a></li>
+            <li><a href="#starship">Starship Takeoff</a></li>
+            <li><a href="#moonlander">Moonlander</a></li>
+            <li><a href="#evil-alien">Evil Alien</a></li>
+            <li><a href="#asteroid-belt">Asteroid Belt</a></li>
+            <li><a href="#space-mines">Space Mines</a></li>
+            <li><a href="#space-rescue">Space Rescue</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="intro" class="section">
+            <h2>Welcome, Space Cadet!</h2>
+            <p>This site is based on <strong>"Usborne Computer Spacegames"</strong> (1982), teaching programming through thrilling space adventures. Journey through lunar landings, alien encounters, and interstellar missions!</p>
+
+            <div class="info-box">
+                <h3>Featured Concepts</h3>
+                <ul>
+                    <li><strong>Physics simulations</strong> - Gravity, velocity, fuel management</li>
+                    <li><strong>3D coordinates</strong> - Track aliens in X, Y, Z space</li>
+                    <li><strong>Resource management</strong> - Balance energy, people, and supplies</li>
+                    <li><strong>Real-time reactions</strong> - Quick response games</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="basics" class="section">
+            <h2>Key Space Game Concepts</h2>
+
+            <div class="concept">
+                <h3>Physics Simulation</h3>
+                <p>Moonlander and other games use real physics formulas for gravity and velocity.</p>
+                <div class="code-comparison">
+                    <div class="code-block basic">
+                        <h4>BASIC</h4>
+                        <pre><code>10 REM PHYSICS SIMULATION
+20 H = 500: V = 0: G = 1.6
+30 REM H=height, V=velocity, G=gravity
+40 INPUT "FUEL BURN (0-30)"; F
+50 REM Update velocity and height
+60 V = V + G - F/5
+70 H = H - V
+80 IF H <= 0 THEN GOSUB 200
+90 GOTO 40
+200 REM LANDING CHECK
+210 IF V > 5 THEN PRINT "CRASH!"
+220 IF V <= 5 THEN PRINT "LANDED!"
+230 RETURN</code></pre>
+                    </div>
+                    <div class="code-block javascript">
+                        <h4>JavaScript</h4>
+                        <pre><code>class PhysicsSimulation {
+    constructor() {
+        this.height = 500;
+        this.velocity = 0;
+        this.gravity = 1.6;
+    }
+
+    update(fuelBurn) {
+        // Thrust reduces velocity
+        this.velocity += this.gravity - fuelBurn / 5;
+        this.height -= this.velocity;
+
+        if (this.height <= 0) {
+            return this.checkLanding();
+        }
+        return { landed: false };
+    }
+
+    checkLanding() {
+        if (this.velocity > 5) {
+            return { landed: true, crashed: true };
+        }
+        return { landed: true, crashed: false };
+    }
+}</code></pre>
+                    </div>
+                    <div class="code-block python">
+                        <h4>Python</h4>
+                        <pre><code>class PhysicsSimulation:
+    def __init__(self):
+        self.height = 500
+        self.velocity = 0
+        self.gravity = 1.6
+
+    def update(self, fuel_burn):
+        # Thrust reduces velocity
+        self.velocity += self.gravity - fuel_burn / 5
+        self.height -= self.velocity
+
+        if self.height <= 0:
+            return self.check_landing()
+        return {"landed": False}
+
+    def check_landing(self):
+        if self.velocity > 5:
+            return {"landed": True, "crashed": True}
+        return {"landed": True, "crashed": False}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Starship Takeoff -->
+        <section id="starship" class="section">
+            <h2>Game 1: Starship Takeoff</h2>
+            <p class="game-desc">You've crash-landed on an alien planet. Guess the correct force to escape!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>The planet has random gravity (1-20). You need to guess the exact takeoff force (1-40). Too low won't lift off, too high triggers the fail-safe. You have 10 attempts!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM STARSHIP TAKEOFF
+20 G = INT(RND(1)*20) + 1
+30 F = INT(RND(1)*40) + 1
+40 PRINT "CRASHED ON ALIEN WORLD!"
+50 PRINT "GUESS THE TAKEOFF FORCE"
+60 FOR A = 1 TO 10
+70 INPUT "FORCE (1-40)"; X
+80 IF X = F THEN PRINT "TAKEOFF!": END
+90 IF X < F THEN PRINT "NOT ENOUGH THRUST"
+100 IF X > F THEN PRINT "FAIL-SAFE TRIGGERED"
+110 NEXT A
+120 PRINT "STRANDED FOREVER!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class StarshipTakeoff {
+    constructor() {
+        this.gravity = Math.floor(Math.random() * 20) + 1;
+        this.requiredForce = Math.floor(Math.random() * 40) + 1;
+        this.attempts = 10;
+    }
+
+    tryTakeoff(force) {
+        this.attempts--;
+
+        if (force === this.requiredForce) {
+            return { success: true, message: 'TAKEOFF! You escaped!' };
+        }
+
+        if (this.attempts <= 0) {
+            return { success: false, message: 'Stranded forever!', gameOver: true };
+        }
+
+        const hint = force < this.requiredForce
+            ? 'Not enough thrust!'
+            : 'Fail-safe triggered! Too much force!';
+
+        return { success: false, hint, attemptsLeft: this.attempts };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class StarshipTakeoff:
+    def __init__(self):
+        self.gravity = random.randint(1, 20)
+        self.required_force = random.randint(1, 40)
+        self.attempts = 10
+
+    def try_takeoff(self, force):
+        self.attempts -= 1
+
+        if force == self.required_force:
+            return {"success": True, "message": "TAKEOFF!"}
+
+        if self.attempts <= 0:
+            return {"game_over": True}
+
+        hint = "Not enough thrust!" if force < self.required_force \
+               else "Fail-safe triggered!"
+        return {"success": False, "hint": hint}</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="starship-game" class="game-area">
+                    <div class="starship-display">
+                        <div id="starship-visual">🚀</div>
+                        <div id="starship-status">Stranded on alien world...</div>
+                    </div>
+                    <div class="game-controls">
+                        <input type="number" id="starship-force" min="1" max="40" placeholder="Force 1-40">
+                        <button id="starship-launch-btn">Launch!</button>
+                        <button id="starship-new-btn">New Game</button>
+                    </div>
+                    <p>Attempts: <span id="starship-attempts">10</span></p>
+                    <p id="starship-hint"></p>
+                    <p id="starship-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Moonlander -->
+        <section id="moonlander" class="section">
+            <h2>Game 2: Moonlander</h2>
+            <p class="game-desc">Control your lunar module descent. Land safely before you run out of fuel!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>You start at height 500 with 150 fuel units. Each turn, choose fuel burn (0-30). Gravity pulls you down, fuel thrust slows you. Land with velocity under 5 for a safe landing!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM MOONLANDER
+20 H = 500: V = 0: F = 150
+30 PRINT "HEIGHT:";H;" VELOCITY:";V;" FUEL:";F
+40 IF H <= 0 THEN GOTO 100
+50 INPUT "FUEL BURN (0-30)"; B
+60 IF B > F THEN B = F
+70 F = F - B
+80 V = V + 1.6 - B/5
+90 H = H - V: GOTO 30
+100 REM CHECK LANDING
+110 IF V > 5 THEN PRINT "CRASHED!"
+120 IF V <= 5 AND V > 2 THEN PRINT "OK LANDING"
+130 IF V <= 2 THEN PRINT "PERFECT LANDING!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class Moonlander {
+    constructor() {
+        this.height = 500;
+        this.velocity = 0;
+        this.fuel = 150;
+        this.gravity = 1.6;
+        this.landed = false;
+    }
+
+    burn(amount) {
+        if (this.landed) return null;
+
+        // Cap at available fuel
+        const burn = Math.min(amount, this.fuel);
+        this.fuel -= burn;
+
+        // Update physics
+        this.velocity += this.gravity - burn / 5;
+        this.height -= this.velocity;
+
+        if (this.height <= 0) {
+            this.landed = true;
+            return this.checkLanding();
+        }
+
+        return {
+            height: Math.round(this.height),
+            velocity: this.velocity.toFixed(1),
+            fuel: this.fuel
+        };
+    }
+
+    checkLanding() {
+        if (this.velocity > 5) return { crashed: true };
+        if (this.velocity > 2) return { rating: 'OK LANDING' };
+        return { rating: 'PERFECT LANDING!' };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>class Moonlander:
+    def __init__(self):
+        self.height = 500
+        self.velocity = 0
+        self.fuel = 150
+        self.gravity = 1.6
+
+    def burn(self, amount):
+        burn = min(amount, self.fuel)
+        self.fuel -= burn
+
+        self.velocity += self.gravity - burn / 5
+        self.height -= self.velocity
+
+        if self.height <= 0:
+            return self.check_landing()
+
+        return {
+            "height": round(self.height),
+            "velocity": round(self.velocity, 1),
+            "fuel": self.fuel
+        }
+
+    def check_landing(self):
+        if self.velocity > 5:
+            return {"crashed": True}
+        if self.velocity > 2:
+            return {"rating": "OK LANDING"}
+        return {"rating": "PERFECT LANDING!"}</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="moonlander-game" class="game-area">
+                    <canvas id="moonlander-canvas" width="400" height="300"></canvas>
+                    <div class="moonlander-stats">
+                        <span>Height: <span id="moon-height">500</span></span>
+                        <span>Velocity: <span id="moon-velocity">0</span></span>
+                        <span>Fuel: <span id="moon-fuel">150</span></span>
+                    </div>
+                    <div class="game-controls">
+                        <label>Fuel Burn: <input type="range" id="moon-burn" min="0" max="30" value="0"><span id="moon-burn-val">0</span></label>
+                        <button id="moon-apply-btn">Apply Thrust</button>
+                        <button id="moon-new-btn">New Game</button>
+                    </div>
+                    <p id="moon-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Evil Alien -->
+        <section id="evil-alien" class="section">
+            <h2>Game 3: Evil Alien</h2>
+            <p class="game-desc">Elron the Evil Alien hides in 3D space. Find him with your space bombs!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>The alien hides at random X, Y, Z coordinates (0-10 each). Drop bombs at specific coordinates and get directional hints: NORTH/SOUTH, EAST/WEST, TOO FAR/NOT FAR ENOUGH!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM EVIL ALIEN
+20 AX = INT(RND(1)*10): AY = INT(RND(1)*10)
+30 AZ = INT(RND(1)*10)
+40 FOR B = 1 TO 4
+50 INPUT "X COORDINATE"; X
+60 INPUT "Y COORDINATE"; Y
+70 INPUT "DISTANCE"; Z
+80 IF X=AX AND Y=AY AND Z=AZ THEN 150
+90 IF X < AX THEN PRINT "EAST"
+100 IF X > AX THEN PRINT "WEST"
+110 IF Y < AY THEN PRINT "NORTH"
+120 IF Y > AY THEN PRINT "SOUTH"
+130 IF Z < AZ THEN PRINT "NOT FAR ENOUGH"
+140 IF Z > AZ THEN PRINT "TOO FAR": NEXT B
+145 PRINT "ALIEN ESCAPED!": END
+150 PRINT "ALIEN DESTROYED!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class EvilAlien {
+    constructor() {
+        this.alienX = Math.floor(Math.random() * 10);
+        this.alienY = Math.floor(Math.random() * 10);
+        this.alienZ = Math.floor(Math.random() * 10);
+        this.bombs = 4;
+    }
+
+    dropBomb(x, y, z) {
+        this.bombs--;
+
+        if (x === this.alienX && y === this.alienY && z === this.alienZ) {
+            return { hit: true, message: 'ALIEN DESTROYED!' };
+        }
+
+        const hints = [];
+        if (x < this.alienX) hints.push('EAST');
+        if (x > this.alienX) hints.push('WEST');
+        if (y < this.alienY) hints.push('NORTH');
+        if (y > this.alienY) hints.push('SOUTH');
+        if (z < this.alienZ) hints.push('NOT FAR ENOUGH');
+        if (z > this.alienZ) hints.push('TOO FAR');
+
+        return { hit: false, hints, bombsLeft: this.bombs };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class EvilAlien:
+    def __init__(self):
+        self.alien_x = random.randint(0, 9)
+        self.alien_y = random.randint(0, 9)
+        self.alien_z = random.randint(0, 9)
+        self.bombs = 4
+
+    def drop_bomb(self, x, y, z):
+        self.bombs -= 1
+
+        if x == self.alien_x and y == self.alien_y and z == self.alien_z:
+            return {"hit": True}
+
+        hints = []
+        if x < self.alien_x: hints.append("EAST")
+        if x > self.alien_x: hints.append("WEST")
+        if y < self.alien_y: hints.append("NORTH")
+        if y > self.alien_y: hints.append("SOUTH")
+        if z < self.alien_z: hints.append("NOT FAR ENOUGH")
+        if z > self.alien_z: hints.append("TOO FAR")
+
+        return {"hit": False, "hints": hints}</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="alien-game" class="game-area">
+                    <div class="alien-grid">
+                        <canvas id="alien-canvas" width="300" height="300"></canvas>
+                    </div>
+                    <div class="alien-controls">
+                        <label>X (E-W): <input type="number" id="alien-x" min="0" max="9" value="5"></label>
+                        <label>Y (N-S): <input type="number" id="alien-y" min="0" max="9" value="5"></label>
+                        <label>Z (Dist): <input type="number" id="alien-z" min="0" max="9" value="5"></label>
+                        <button id="alien-bomb-btn">Drop Bomb!</button>
+                        <button id="alien-new-btn">New Game</button>
+                    </div>
+                    <p>Bombs: <span id="alien-bombs">4</span></p>
+                    <p id="alien-hints"></p>
+                    <p id="alien-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Asteroid Belt -->
+        <section id="asteroid-belt" class="section">
+            <h2>Game 4: Asteroid Belt</h2>
+            <p class="game-desc">Navigate through asteroids! Press the matching number to destroy them!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Asteroids appear as groups of 1-9 stars. Quickly press the number key matching how many stars you see to destroy the asteroid. 10 asteroids per game!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM ASTEROID BELT
+20 S = 0
+30 FOR A = 1 TO 10
+40 CLS
+50 N = INT(RND(1)*9) + 1
+60 REM Display N stars
+70 FOR I = 1 TO N: PRINT "*"; : NEXT I
+80 PRINT
+90 FOR T = 1 TO 500
+100 K$ = INKEY$
+110 IF K$ = "" THEN NEXT T: GOTO 140
+120 IF VAL(K$) = N THEN S = S + 1: PRINT "HIT!"
+130 GOTO 150
+140 PRINT "MISSED!"
+150 FOR D = 1 TO 200: NEXT D
+160 NEXT A
+170 PRINT "SCORE: "; S; " / 10"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class AsteroidBelt {
+    constructor() {
+        this.score = 0;
+        this.asteroid = 0;
+        this.totalAsteroids = 10;
+        this.currentCount = 0;
+        this.waiting = false;
+    }
+
+    nextAsteroid() {
+        this.asteroid++;
+        // Random 1-9 stars
+        this.currentCount = Math.floor(Math.random() * 9) + 1;
+        this.waiting = true;
+        return this.currentCount;
+    }
+
+    shoot(number) {
+        if (!this.waiting) return null;
+        this.waiting = false;
+
+        if (number === this.currentCount) {
+            this.score++;
+            return { hit: true };
+        }
+        return { hit: false, correct: this.currentCount };
+    }
+
+    isGameOver() {
+        return this.asteroid >= this.totalAsteroids;
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class AsteroidBelt:
+    def __init__(self):
+        self.score = 0
+        self.asteroid = 0
+        self.total_asteroids = 10
+        self.current_count = 0
+
+    def next_asteroid(self):
+        self.asteroid += 1
+        self.current_count = random.randint(1, 9)
+        return self.current_count
+
+    def shoot(self, number):
+        if number == self.current_count:
+            self.score += 1
+            return True
+        return False
+
+    def is_game_over(self):
+        return self.asteroid >= self.total_asteroids</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="asteroid-game" class="game-area">
+                    <div id="asteroid-display" class="asteroid-field">
+                        <span id="asteroid-stars">Press Start</span>
+                    </div>
+                    <div class="game-controls">
+                        <button id="asteroid-start-btn">Start</button>
+                        <span class="hint">Press 1-9 to match the star count!</span>
+                    </div>
+                    <p>Score: <span id="asteroid-score">0</span> | Asteroid: <span id="asteroid-count">0</span>/10</p>
+                    <p id="asteroid-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Space Mines -->
+        <section id="space-mines" class="section">
+            <h2>Game 5: Space Mines</h2>
+            <p class="game-desc">Lead a mining colony on Planet Astron. Manage resources to survive 10 years!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>Each year: sell ore at fluctuating prices, buy/sell mines, purchase food. Balance money, food, people, and satisfaction. Survive 10 years to win!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM SPACE MINES
+20 M = 1000: P = 100: L = 5: S = 50
+30 REM M=money, P=people, L=mines, S=satisfaction
+40 FOR Y = 1 TO 10
+50 PRINT "YEAR "; Y
+60 PRINT "MONEY: $"; M; " PEOPLE: "; P
+70 PRINT "MINES: "; L; " SATISFACTION: "; S; "%"
+80 C = L * 10: REM Ore produced
+90 PR = INT(RND(1)*20) + 10: REM Price
+100 PRINT "ORE PRODUCED: "; C; " PRICE: $"; PR
+110 INPUT "SELL HOW MUCH ORE"; SO
+120 M = M + SO * PR
+130 INPUT "BUY FOOD (NEED 1/PERSON, COST $5)"; FO
+140 M = M - FO * 5
+150 IF FO < P THEN S = S - 10: P = P - 5
+160 IF S < 20 THEN PRINT "REVOLT!": END
+170 NEXT Y
+180 PRINT "COLONY SURVIVED!"</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class SpaceMines {
+    constructor() {
+        this.money = 1000;
+        this.people = 100;
+        this.mines = 5;
+        this.satisfaction = 50;
+        this.year = 0;
+        this.ore = 0;
+        this.orePrice = 0;
+    }
+
+    startYear() {
+        this.year++;
+        this.ore = this.mines * 10;
+        this.orePrice = Math.floor(Math.random() * 20) + 10;
+        return {
+            year: this.year,
+            ore: this.ore,
+            price: this.orePrice
+        };
+    }
+
+    sellOre(amount) {
+        const sold = Math.min(amount, this.ore);
+        this.money += sold * this.orePrice;
+        this.ore -= sold;
+    }
+
+    buyFood(amount) {
+        const cost = amount * 5;
+        if (cost > this.money) return false;
+        this.money -= cost;
+
+        if (amount < this.people) {
+            this.satisfaction -= 10;
+            this.people -= 5;
+        }
+        return true;
+    }
+
+    endYear() {
+        if (this.satisfaction < 20) {
+            return { revolt: true };
+        }
+        if (this.year >= 10) {
+            return { won: true };
+        }
+        return { continue: true };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class SpaceMines:
+    def __init__(self):
+        self.money = 1000
+        self.people = 100
+        self.mines = 5
+        self.satisfaction = 50
+        self.year = 0
+
+    def start_year(self):
+        self.year += 1
+        self.ore = self.mines * 10
+        self.ore_price = random.randint(10, 30)
+        return {
+            "year": self.year,
+            "ore": self.ore,
+            "price": self.ore_price
+        }
+
+    def sell_ore(self, amount):
+        sold = min(amount, self.ore)
+        self.money += sold * self.ore_price
+
+    def buy_food(self, amount):
+        cost = amount * 5
+        if cost > self.money:
+            return False
+        self.money -= cost
+        if amount < self.people:
+            self.satisfaction -= 10
+            self.people -= 5
+        return True</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="mines-game" class="game-area">
+                    <div class="mines-stats">
+                        <div>Year: <span id="mines-year">0</span>/10</div>
+                        <div>Money: $<span id="mines-money">1000</span></div>
+                        <div>People: <span id="mines-people">100</span></div>
+                        <div>Mines: <span id="mines-mines">5</span></div>
+                        <div>Satisfaction: <span id="mines-satisfaction">50</span>%</div>
+                    </div>
+                    <div id="mines-market">
+                        <p>Ore produced: <span id="mines-ore">0</span> | Price: $<span id="mines-price">0</span>/unit</p>
+                    </div>
+                    <div class="mines-controls">
+                        <label>Sell ore: <input type="number" id="mines-sell" min="0" value="0"></label>
+                        <label>Buy food: <input type="number" id="mines-food" min="0" value="100"></label>
+                        <button id="mines-endyear-btn">End Year</button>
+                        <button id="mines-new-btn">New Game</button>
+                    </div>
+                    <p id="mines-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Space Rescue -->
+        <section id="space-rescue" class="section">
+            <h2>Game 6: Space Rescue</h2>
+            <p class="game-desc">Urgent rescue mission! Allocate energy to engines, life support, and shields!</p>
+
+            <div class="game-info">
+                <h3>How It Works</h3>
+                <p>You have 100 energy units total. Distribute between engines (speed), life support (survival), and shields (protection). Random events test your choices!</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="code-block basic">
+                    <h4>BASIC</h4>
+                    <pre><code>10 REM SPACE RESCUE
+20 PRINT "ALLOCATE 100 ENERGY UNITS"
+30 INPUT "ENGINES"; E
+40 INPUT "LIFE SUPPORT"; L
+50 INPUT "SHIELDS"; S
+60 IF E+L+S > 100 THEN PRINT "OVER 100!": GOTO 20
+70 REM RANDOM EVENTS
+80 R = INT(RND(1)*3) + 1
+90 ON R GOSUB 200, 300, 400
+100 PRINT "MISSION ";
+110 IF OK = 1 THEN PRINT "SUCCESS!"
+120 IF OK = 0 THEN PRINT "FAILED!"
+130 END
+200 REM ASTEROID STORM
+210 IF S > 30 THEN OK = 1: RETURN
+220 OK = 0: PRINT "SHIELDS FAILED!": RETURN
+300 REM ENGINE TROUBLE
+310 IF E > 40 THEN OK = 1: RETURN
+320 OK = 0: PRINT "TOO SLOW!": RETURN
+400 REM LIFE SUPPORT FAILURE
+410 IF L > 25 THEN OK = 1: RETURN
+420 OK = 0: PRINT "CREW PERISHED!": RETURN</code></pre>
+                </div>
+                <div class="code-block javascript">
+                    <h4>JavaScript</h4>
+                    <pre><code>class SpaceRescue {
+    constructor() {
+        this.totalEnergy = 100;
+        this.engines = 0;
+        this.lifeSupport = 0;
+        this.shields = 0;
+    }
+
+    allocate(engines, lifeSupport, shields) {
+        if (engines + lifeSupport + shields > this.totalEnergy) {
+            return { error: 'Over 100 units!' };
+        }
+        this.engines = engines;
+        this.lifeSupport = lifeSupport;
+        this.shields = shields;
+        return { success: true };
+    }
+
+    runMission() {
+        const events = [
+            { name: 'Asteroid Storm', check: () => this.shields > 30, fail: 'Shields failed!' },
+            { name: 'Engine Trouble', check: () => this.engines > 40, fail: 'Too slow!' },
+            { name: 'Life Support Failure', check: () => this.lifeSupport > 25, fail: 'Crew perished!' }
+        ];
+
+        const event = events[Math.floor(Math.random() * events.length)];
+
+        if (event.check()) {
+            return { success: true, event: event.name };
+        }
+        return { success: false, event: event.name, message: event.fail };
+    }
+}</code></pre>
+                </div>
+                <div class="code-block python">
+                    <h4>Python</h4>
+                    <pre><code>import random
+
+class SpaceRescue:
+    def __init__(self):
+        self.total_energy = 100
+        self.engines = 0
+        self.life_support = 0
+        self.shields = 0
+
+    def allocate(self, engines, life_support, shields):
+        total = engines + life_support + shields
+        if total > self.total_energy:
+            return {"error": "Over 100 units!"}
+        self.engines = engines
+        self.life_support = life_support
+        self.shields = shields
+        return {"success": True}
+
+    def run_mission(self):
+        events = [
+            ("Asteroid Storm", self.shields > 30),
+            ("Engine Trouble", self.engines > 40),
+            ("Life Support Failure", self.life_support > 25)
+        ]
+        event = random.choice(events)
+        return {"event": event[0], "survived": event[1]}</code></pre>
+                </div>
+            </div>
+
+            <div class="demo-container">
+                <h3>Try It!</h3>
+                <div id="rescue-game" class="game-area">
+                    <div class="rescue-display">
+                        <p>Total Energy: 100 units</p>
+                        <p>Remaining: <span id="rescue-remaining">100</span></p>
+                    </div>
+                    <div class="rescue-controls">
+                        <label>Engines: <input type="range" id="rescue-engines" min="0" max="100" value="33" class="energy-slider"><span id="rescue-e-val">33</span></label>
+                        <label>Life Support: <input type="range" id="rescue-life" min="0" max="100" value="33" class="energy-slider"><span id="rescue-l-val">33</span></label>
+                        <label>Shields: <input type="range" id="rescue-shields" min="0" max="100" value="34" class="energy-slider"><span id="rescue-s-val">34</span></label>
+                        <button id="rescue-launch-btn">Launch Mission!</button>
+                        <button id="rescue-new-btn">New Game</button>
+                    </div>
+                    <p id="rescue-event"></p>
+                    <p id="rescue-result"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- More Games -->
+        <section id="more" class="section">
+            <h2>More Games in the Book</h2>
+            <div class="more-games">
+                <div class="game-card">
+                    <h3>Intergalactic Games</h3>
+                    <p>Launch satellites into precise orbits using angle and speed calculations!</p>
+                </div>
+                <div class="game-card">
+                    <h3>Beat the Bug Eyes</h3>
+                    <p>Aliens appear in 4 positions - press the matching key before they vanish!</p>
+                </div>
+                <div class="game-card">
+                    <h3>Monsters of Galacticon</h3>
+                    <p>Choose weapons to defeat alien monsters across 10 years of combat!</p>
+                </div>
+                <div class="game-card">
+                    <h3>Death Valley</h3>
+                    <p>Pilot your Speed Dart through a narrow valley without hitting the walls!</p>
+                </div>
+                <div class="game-card">
+                    <h3>Trip into the Future</h3>
+                    <p>Calculate relativistic time dilation to arrive at the right future date!</p>
+                </div>
+                <div class="game-card">
+                    <h3>Touchdown</h3>
+                    <p>Graphics-based lunar landing with real-time thrust control!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="index.html">← Back to All Books</a></p>
+        <p>Based on "Usborne Computer Spacegames" (1982) by Daniel Isaaman and Jenny Tyler</p>
+    </footer>
+
+    <script src="spacegames.js"></script>
+</body>
+</html>

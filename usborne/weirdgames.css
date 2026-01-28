@@ -1,0 +1,140 @@
+/* Weird Computer Games - Stylesheet */
+/* Orange/amber bizarre theme */
+
+:root {
+    --bg-dark: #0a0805;
+    --bg-section: #12100a;
+    --bg-card: #1a1510;
+    --text-primary: #ff6600;
+    --text-secondary: #ff9933;
+    --text-dim: #665;
+    --accent-yellow: #ffcc00;
+    --accent-green: #66ff00;
+    --accent-red: #ff3300;
+    --basic-color: #ff6600;
+    --js-color: #f7df1e;
+    --python-color: #3776ab;
+    --border-color: #332;
+    --font-mono: 'Courier New', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-mono);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+header {
+    background: linear-gradient(135deg, #1a1005 0%, #0a0500 100%);
+    border-bottom: 3px solid var(--text-primary);
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.back-link { position: absolute; left: 2rem; top: 2rem; color: var(--text-dim); text-decoration: none; }
+.back-link:hover { color: var(--text-primary); }
+
+header h1 { font-size: 2.5rem; color: var(--accent-yellow); text-shadow: 0 0 20px var(--text-primary); }
+.subtitle { font-size: 1.2rem; color: var(--text-primary); }
+.tagline { font-size: 0.9rem; color: var(--text-dim); }
+
+nav { background-color: var(--bg-section); padding: 1rem; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-color); overflow-x: auto; }
+nav ul { list-style: none; display: flex; gap: 0.5rem; min-width: max-content; }
+nav a { color: var(--text-primary); text-decoration: none; padding: 0.5rem 0.75rem; border: 1px solid var(--text-primary); font-size: 0.85rem; transition: all 0.3s; }
+nav a:hover { background-color: var(--text-primary); color: var(--bg-dark); }
+
+main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+.section { background-color: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 2rem; margin-bottom: 3rem; }
+.section h2 { color: var(--accent-yellow); font-size: 1.8rem; margin-bottom: 1rem; border-bottom: 2px solid var(--text-primary); padding-bottom: 0.5rem; }
+
+.game-desc { font-size: 1.1rem; color: var(--accent-green); font-style: italic; }
+.game-info { background-color: var(--bg-card); border-left: 4px solid var(--text-primary); padding: 1rem; margin: 1.5rem 0; }
+.game-info h3 { color: var(--text-primary); margin-bottom: 0.5rem; }
+
+.info-box { background-color: var(--bg-card); border: 1px solid var(--accent-yellow); padding: 1.5rem; margin: 1.5rem 0; border-radius: 4px; }
+.info-box h3 { color: var(--accent-yellow); }
+.info-box ul { margin-left: 1.5rem; }
+
+.concept { margin: 2rem 0; padding-top: 1rem; border-top: 1px dashed var(--border-color); }
+.concept:first-of-type { border-top: none; }
+.concept h3 { color: var(--text-primary); margin-bottom: 0.5rem; }
+.concept p { color: var(--text-dim); margin-bottom: 1rem; }
+
+.code-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+.code-block { background-color: var(--bg-dark); border-radius: 4px; overflow: hidden; }
+.code-block h4 { padding: 0.5rem 1rem; font-size: 0.9rem; }
+.code-block.basic h4 { background-color: var(--basic-color); color: #000; }
+.code-block.javascript h4 { background-color: var(--js-color); color: #000; }
+.code-block.python h4 { background-color: var(--python-color); color: #fff; }
+.code-block pre { padding: 1rem; overflow-x: auto; font-size: 0.85rem; }
+.code-block code { color: #ddd; }
+
+.demo-container { margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid var(--text-primary); }
+.demo-container h3 { color: var(--accent-yellow); margin-bottom: 1rem; }
+
+.game-area { background-color: var(--bg-dark); border: 2px solid var(--text-primary); border-radius: 8px; padding: 1.5rem; }
+.game-controls { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+button { font-family: var(--font-mono); background-color: var(--bg-card); color: var(--text-primary); border: 2px solid var(--text-primary); padding: 0.5rem 1rem; cursor: pointer; transition: all 0.3s; }
+button:hover:not(:disabled) { background-color: var(--text-primary); color: var(--bg-dark); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input[type="number"], input[type="text"] { font-family: var(--font-mono); background-color: var(--bg-dark); color: var(--text-primary); border: 1px solid var(--text-primary); padding: 0.5rem; width: 120px; }
+
+/* Tower of Terror */
+.tower-display { text-align: center; padding: 1rem; }
+.tower-stats { display: flex; justify-content: space-around; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+.monster-display { font-size: 4rem; margin: 1rem 0; }
+.pulse-bar { height: 20px; background: #333; border-radius: 10px; overflow: hidden; margin: 1rem 0; }
+#tower-pulse-fill { height: 100%; background: linear-gradient(90deg, var(--accent-green), var(--accent-yellow), var(--accent-red)); width: 50%; transition: width 0.3s; }
+
+/* Skulls */
+.skulls-display { text-align: center; padding: 1rem; }
+#skulls-target { font-size: 1.5rem; margin-bottom: 1rem; }
+#skulls-remaining { font-size: 2rem; margin: 1rem 0; }
+.column-grid { display: flex; justify-content: center; gap: 5px; margin: 1rem 0; }
+.column { width: 35px; height: 60px; background: #332; border: 2px solid var(--text-primary); display: flex; align-items: flex-end; justify-content: center; cursor: pointer; transition: all 0.3s; padding-bottom: 5px; }
+.column:hover { background: var(--text-primary); color: #000; }
+.column.dropped { background: #553; }
+#skulls-total { font-size: 1.2rem; margin-top: 1rem; }
+
+/* Monster Wrestling */
+.wrestling-display { text-align: center; padding: 1rem; }
+.wrestling-stats { display: flex; justify-content: space-around; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+.monster-info { font-size: 1.5rem; background: var(--bg-card); padding: 1rem; margin: 1rem 0; display: flex; justify-content: space-around; }
+
+/* Jaws */
+.jaws-grid { display: grid; grid-template-columns: repeat(10, 35px); gap: 2px; justify-content: center; margin-bottom: 1rem; }
+.jaws-cell { width: 35px; height: 35px; background: #112; border: 1px solid #334; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.jaws-cell.jaws { background: #300; }
+.jaws-cell.hunter { background: #030; }
+.jaws-cell.person { background: #003; }
+
+/* Flying Witches */
+#witch-canvas { display: block; margin: 0 auto; background: linear-gradient(to bottom, #001 0%, #113 50%, #220 100%); border: 1px solid var(--border-color); }
+.witch-stats { display: flex; justify-content: space-around; margin: 1rem 0; }
+
+/* Micropuzzle */
+.terminal-output { background: #000; border: 2px solid var(--text-primary); padding: 1rem; height: 200px; overflow-y: auto; font-size: 0.9rem; margin-bottom: 1rem; white-space: pre-wrap; }
+#micro-input { flex: 1; min-width: 200px; }
+.hint { color: var(--text-dim); font-size: 0.85rem; }
+
+.success { color: var(--accent-green) !important; }
+.failure { color: var(--accent-red) !important; }
+
+footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-color); color: var(--text-dim); }
+footer a { color: var(--text-primary); text-decoration: none; }
+
+@media (max-width: 768px) {
+    header h1 { font-size: 1.8rem; }
+    .back-link { position: static; display: block; margin-bottom: 1rem; }
+    .section { padding: 1rem; }
+    .code-comparison { grid-template-columns: 1fr; }
+    .jaws-grid { grid-template-columns: repeat(10, 30px); }
+    .jaws-cell { width: 30px; height: 30px; }
+}

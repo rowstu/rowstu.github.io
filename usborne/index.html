@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usborne Computer Games - Learn Programming</title>
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-primary: #00ff00;
+            --text-dim: #666;
+            --accent-yellow: #ffcc00;
+            --accent-red: #ff3333;
+            --accent-blue: #33ccff;
+            --accent-purple: #cc66ff;
+            --accent-orange: #ff6600;
+            --border-color: #333;
+            --font-mono: 'Courier New', 'Monaco', 'Consolas', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem;
+            border-bottom: 3px solid var(--text-primary);
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 20px var(--accent-yellow);
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .book-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
+        }
+
+        .book-card.spy { border-color: var(--text-primary); }
+        .book-card.spy:hover { border-color: var(--text-primary); box-shadow: 0 10px 30px rgba(0, 255, 0, 0.3); }
+        .book-card.spy .book-icon { color: var(--text-primary); }
+
+        .book-card.battle { border-color: var(--accent-red); }
+        .book-card.battle:hover { border-color: var(--accent-red); box-shadow: 0 10px 30px rgba(255, 51, 51, 0.3); }
+        .book-card.battle .book-icon { color: var(--accent-red); }
+
+        .book-card.space { border-color: var(--accent-blue); }
+        .book-card.space:hover { border-color: var(--accent-blue); box-shadow: 0 10px 30px rgba(51, 204, 255, 0.3); }
+        .book-card.space .book-icon { color: var(--accent-blue); }
+
+        .book-card.creepy { border-color: var(--accent-purple); }
+        .book-card.creepy:hover { border-color: var(--accent-purple); box-shadow: 0 10px 30px rgba(204, 102, 255, 0.3); }
+        .book-card.creepy .book-icon { color: var(--accent-purple); }
+
+        .book-card.weird { border-color: var(--accent-orange); }
+        .book-card.weird:hover { border-color: var(--accent-orange); box-shadow: 0 10px 30px rgba(255, 102, 0, 0.3); }
+        .book-card.weird .book-icon { color: var(--accent-orange); }
+
+        .book-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .book-title {
+            font-size: 1.4rem;
+            color: var(--accent-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .book-year {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .book-desc {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .book-games {
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .game-list {
+            margin-top: 1rem;
+            padding-left: 1rem;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        .game-list li {
+            margin: 0.3rem 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        footer p {
+            margin: 0.3rem 0;
+        }
+
+        .intro {
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            text-align: center;
+        }
+
+        .intro p {
+            margin-bottom: 1rem;
+            color: #aaa;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature span {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .books-grid { grid-template-columns: 1fr; }
+            body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Usborne Computer Games</h1>
+        <p class="subtitle">Learn Programming Through Classic 1980s Games</p>
+        <p class="tagline">Original BASIC → Modern JavaScript & Python</p>
+    </header>
+
+    <section class="intro">
+        <p>Welcome to a collection of educational programming resources based on the classic <strong>Usborne Computer Games</strong> books from the 1980s. These books taught a generation how to program through fun, interactive games.</p>
+        <p>Each book has been converted to show the original BASIC code alongside modern JavaScript and Python equivalents, with playable demos!</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📖</div>
+                <span>5 Classic Books</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎮</div>
+                <span>47 Games</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💻</div>
+                <span>3 Languages</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🕹️</div>
+                <span>Playable Demos</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="books-grid">
+        <a href="spygames.html" class="book-card spy">
+            <span class="book-icon">🕵️</span>
+            <h2 class="book-title">Computer Spy Games</h2>
+            <p class="book-year">1984 • Jenny Tyler & Chris Oxlade</p>
+            <p class="book-desc">Master espionage skills with observation tests, cipher codes, and Morse code challenges.</p>
+            <p class="book-games">7 games including:</p>
+            <ul class="game-list">
+                <li>Spy Eyes - Observation test</li>
+                <li>Searchlight - Stealth navigation</li>
+                <li>Secret Message Maker - Caesar cipher</li>
+                <li>Morse Coder - Learn Morse code</li>
+            </ul>
+        </a>
+
+        <a href="battlegames.html" class="book-card battle">
+            <span class="book-icon">⚔️</span>
+            <h2 class="book-title">Computer Battlegames</h2>
+            <p class="book-year">1982 • Daniel Isaaman & Jenny Tyler</p>
+            <p class="book-desc">Engage in tactical combat with missiles, tanks, and strategic warfare simulations.</p>
+            <p class="book-games">13 games including:</p>
+            <ul class="game-list">
+                <li>Robot Missile - Code guessing</li>
+                <li>Desert Tank Battle - Trajectory physics</li>
+                <li>Shootout - Quick draw duel</li>
+                <li>Iceberg - Grid navigation</li>
+            </ul>
+        </a>
+
+        <a href="spacegames.html" class="book-card space">
+            <span class="book-icon">🚀</span>
+            <h2 class="book-title">Computer Spacegames</h2>
+            <p class="book-year">1982 • Daniel Isaaman & Jenny Tyler</p>
+            <p class="book-desc">Explore the cosmos with lunar landings, alien encounters, and space missions.</p>
+            <p class="book-games">13 games including:</p>
+            <ul class="game-list">
+                <li>Moonlander - Lunar descent</li>
+                <li>Asteroid Belt - Quick reactions</li>
+                <li>Space Rescue - Resource management</li>
+                <li>Evil Alien - 3D coordinate hunt</li>
+            </ul>
+        </a>
+
+        <a href="creepygames.html" class="book-card creepy">
+            <span class="book-icon">👻</span>
+            <h2 class="book-title">Creepy Computer Games</h2>
+            <p class="book-year">1983 • Jenny Tyler & Chris Oxlade</p>
+            <p class="book-desc">Face your fears with ghosts, spiders, and haunted mazes in spooky challenges.</p>
+            <p class="book-games">8 games including:</p>
+            <ul class="game-list">
+                <li>Ghost Maze - First-person maze</li>
+                <li>Grave Digger - Escape skeletons</li>
+                <li>Spiderwoman - Letter guessing</li>
+                <li>Séance - Pattern memory</li>
+            </ul>
+        </a>
+
+        <a href="weirdgames.html" class="book-card weird">
+            <span class="book-icon">🔮</span>
+            <h2 class="book-title">Weird Computer Games</h2>
+            <p class="book-year">1984 • Jenny Tyler & Chris Oxlade</p>
+            <p class="book-desc">Experience the bizarre with monster wrestling, flying witches, and mysterious puzzles.</p>
+            <p class="book-games">6 games including:</p>
+            <ul class="game-list">
+                <li>Monster Wrestling - Math combat</li>
+                <li>Jaws - Grid predator game</li>
+                <li>Flying Witches - Collection game</li>
+                <li>Micropuzzle - Text adventure</li>
+            </ul>
+        </a>
+    </div>
+
+    <footer>
+        <p>Based on the classic Usborne Computer Games series (1982-1984)</p>
+        <p>Educational adaptation for modern programming languages</p>
+        <p>Original books by Jenny Tyler, Chris Oxlade & Daniel Isaaman</p>
+    </footer>
+</body>
+</html>

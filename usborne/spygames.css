@@ -1,0 +1,699 @@
+/* Computer Spy Games - Stylesheet */
+/* Retro-modern design inspired by 1980s computing */
+
+:root {
+    --bg-dark: #0a0a0a;
+    --bg-section: #111;
+    --bg-card: #1a1a1a;
+    --text-primary: #00ff00;
+    --text-secondary: #0f0;
+    --text-dim: #666;
+    --accent-yellow: #ffcc00;
+    --accent-red: #ff3333;
+    --accent-blue: #33ccff;
+    --basic-color: #ff6600;
+    --js-color: #f7df1e;
+    --python-color: #3776ab;
+    --border-color: #333;
+    --font-mono: 'Courier New', 'Monaco', 'Consolas', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-mono);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #1a0a00 0%, #0a1a0a 100%);
+    border-bottom: 3px solid var(--text-primary);
+    padding: 2rem;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: var(--accent-yellow);
+    text-shadow: 0 0 20px var(--accent-yellow);
+    margin-bottom: 0.5rem;
+    letter-spacing: 3px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+.tagline {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+
+/* Navigation */
+nav {
+    background-color: var(--bg-section);
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border-color);
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+nav a {
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--text-primary);
+    transition: all 0.3s;
+}
+
+nav a:hover {
+    background-color: var(--text-primary);
+    color: var(--bg-dark);
+}
+
+/* Main content */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Sections */
+.section {
+    background-color: var(--bg-section);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+}
+
+.section h2 {
+    color: var(--accent-yellow);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-yellow);
+}
+
+.section p {
+    margin-bottom: 1rem;
+}
+
+/* Game description */
+.game-desc {
+    font-size: 1.1rem;
+    color: var(--accent-blue);
+    font-style: italic;
+}
+
+.game-info {
+    background-color: var(--bg-card);
+    border-left: 4px solid var(--accent-blue);
+    padding: 1rem;
+    margin: 1.5rem 0;
+}
+
+.game-info h3 {
+    color: var(--accent-blue);
+    margin-bottom: 0.5rem;
+}
+
+/* Info box */
+.info-box {
+    background-color: var(--bg-card);
+    border: 1px solid var(--accent-yellow);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 4px;
+}
+
+.info-box h3 {
+    color: var(--accent-yellow);
+    margin-bottom: 0.5rem;
+}
+
+.info-box ul {
+    margin-left: 1.5rem;
+}
+
+.info-box li {
+    margin: 0.5rem 0;
+}
+
+/* Highlighting */
+.basic-highlight {
+    color: var(--basic-color);
+    font-weight: bold;
+}
+
+.js-highlight {
+    color: var(--js-color);
+    font-weight: bold;
+}
+
+.python-highlight {
+    color: var(--python-color);
+    font-weight: bold;
+}
+
+/* Concepts */
+.concept {
+    margin: 2rem 0;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border-color);
+}
+
+.concept:first-of-type {
+    border-top: none;
+}
+
+.concept h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.concept p {
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+}
+
+/* Code comparison grid */
+.code-comparison {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.code-block {
+    background-color: var(--bg-dark);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.code-block h4 {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.code-block.basic h4 {
+    background-color: var(--basic-color);
+    color: #000;
+}
+
+.code-block.javascript h4 {
+    background-color: var(--js-color);
+    color: #000;
+}
+
+.code-block.python h4 {
+    background-color: var(--python-color);
+    color: #fff;
+}
+
+.code-block pre {
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.code-block code {
+    color: #ddd;
+}
+
+/* Game demo containers */
+.demo-container {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--accent-yellow);
+}
+
+.demo-container h3 {
+    color: var(--accent-yellow);
+    margin-bottom: 1rem;
+}
+
+.game-area {
+    background-color: var(--bg-dark);
+    border: 2px solid var(--text-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    min-height: 200px;
+}
+
+.game-controls {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+button {
+    font-family: var(--font-mono);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+button:hover:not(:disabled) {
+    background-color: var(--text-primary);
+    color: var(--bg-dark);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.move-btn {
+    min-width: 120px;
+}
+
+input[type="number"],
+input[type="text"] {
+    font-family: var(--font-mono);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--text-primary);
+    padding: 0.5rem;
+    width: 120px;
+}
+
+textarea {
+    font-family: var(--font-mono);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--text-primary);
+    padding: 0.75rem;
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    margin: 0.5rem 0;
+}
+
+.key-hint {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+/* Spy Eyes specific */
+#spy-eyes-display {
+    position: relative;
+    height: 250px;
+    background-color: #000;
+    border: 1px solid var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.spy-number {
+    position: absolute;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    transition: all 0.3s;
+}
+
+/* Searchlight specific */
+#searchlight-canvas {
+    display: block;
+    margin: 0 auto 1rem;
+    border: 1px solid var(--text-primary);
+}
+
+/* Robospy specific */
+#robospy-display {
+    background-color: #000;
+    border: 1px solid var(--text-primary);
+    height: 150px;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+#robospy-track {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: var(--accent-yellow);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 0.3s;
+}
+
+/* Spy Q Test specific */
+#spyq-current {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--accent-yellow);
+}
+
+#spyq-number {
+    font-size: 2rem;
+    color: var(--accent-red);
+}
+
+#spyq-slots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.slot {
+    width: 60px;
+    height: 70px;
+    background-color: var(--bg-card);
+    border: 2px solid var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.slot:hover:not(.filled) {
+    background-color: var(--text-primary);
+    color: var(--bg-dark);
+}
+
+.slot.filled {
+    border-color: var(--accent-blue);
+    cursor: default;
+}
+
+.slot-num {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+.slot-val {
+    font-size: 1.2rem;
+}
+
+#spyq-info {
+    text-align: center;
+    color: var(--text-dim);
+}
+
+/* Cipher specific */
+.cipher-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.mode-select {
+    display: flex;
+    gap: 1rem;
+}
+
+.mode-select label {
+    cursor: pointer;
+}
+
+.shift-control input {
+    width: 60px;
+}
+
+#cipher-output {
+    background-color: var(--bg-card);
+    border: 1px solid var(--accent-yellow);
+    padding: 1rem;
+    margin: 1rem 0;
+    min-height: 50px;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+#cipher-visual {
+    margin-top: 1.5rem;
+}
+
+.alphabet-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.alphabet-row span {
+    width: 24px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+#plain-alphabet span {
+    color: var(--text-primary);
+}
+
+#cipher-alphabet span {
+    color: var(--accent-yellow);
+}
+
+/* Morse specific */
+#morse-lamp {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    background-color: #333;
+    border-radius: 50%;
+    border: 3px solid var(--text-dim);
+    transition: all 0.1s;
+}
+
+#morse-lamp.on {
+    background-color: var(--accent-yellow);
+    box-shadow: 0 0 30px var(--accent-yellow);
+}
+
+.morse-controls {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+#morse-output {
+    background-color: var(--bg-card);
+    border: 1px solid var(--text-primary);
+    padding: 1rem;
+    margin: 1rem 0;
+    min-height: 50px;
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    text-align: center;
+}
+
+#morse-reference {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+#morse-reference h4 {
+    text-align: center;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+}
+
+#morse-chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+}
+
+.morse-item {
+    background-color: var(--bg-card);
+    padding: 0.5rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.morse-letter {
+    font-size: 1.2rem;
+    color: var(--accent-yellow);
+}
+
+.morse-code {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+}
+
+/* Summary section */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.summary-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    border-radius: 4px;
+}
+
+.summary-card h3 {
+    color: var(--accent-blue);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.summary-card ul {
+    list-style: none;
+}
+
+.summary-card li {
+    padding: 0.3rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.summary-card li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: var(--text-primary);
+}
+
+.next-steps {
+    background-color: var(--bg-card);
+    border-left: 4px solid var(--accent-yellow);
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.next-steps h3 {
+    color: var(--accent-yellow);
+    margin-bottom: 1rem;
+}
+
+.next-steps ul {
+    margin-left: 1.5rem;
+}
+
+.next-steps li {
+    margin: 0.5rem 0;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+footer p {
+    margin: 0.3rem 0;
+}
+
+/* Results */
+#spy-eyes-result,
+#searchlight-result,
+#robospy-result,
+#spyq-result {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    min-height: 1.5rem;
+}
+
+.success {
+    color: var(--text-primary);
+}
+
+.failure {
+    color: var(--accent-red);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    .section {
+        padding: 1rem;
+    }
+
+    .code-comparison {
+        grid-template-columns: 1fr;
+    }
+
+    nav ul {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    nav a {
+        text-align: center;
+    }
+
+    .slot {
+        width: 50px;
+        height: 60px;
+    }
+
+    .alphabet-row span {
+        width: 20px;
+        height: 26px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Animations */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.blinking {
+    animation: blink 1s infinite;
+}
+
+.pulsing {
+    animation: pulse 0.5s infinite;
+}
