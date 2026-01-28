@@ -4352,7 +4352,17 @@ print(&amp;#34;Non-greedy:&amp;#34;, nongreedy_match.group()) # Output: &amp;lt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo unshare --net --fork --mount-proc /bin/bash
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This command will open a new shell inside a new network namespace.&lt;/p&gt;</description></item><item><title>Network Emulation</title><link>https://rowstu.net/networking/network-emulation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/networking/network-emulation/</guid><description>&lt;h1 id="learning-resources"&gt;Learning resources&lt;/h1&gt;
 &lt;h2 id="web-links"&gt;Web links&lt;/h2&gt;
-&lt;p&gt;&lt;a href="https://www.brianlinkletter.com/2023/02/network-emulators-and-network-simulators-2023/"&gt;https://www.brianlinkletter.com/2023/02/network-emulators-and-network-simulators-2023/&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Ocsp Stapling</title><link>https://rowstu.net/sec/ocsp-stapling/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/sec/ocsp-stapling/</guid><description>&lt;h1 id="ocsp-stapling"&gt;OCSP Stapling&lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://www.brianlinkletter.com/2023/02/network-emulators-and-network-simulators-2023/"&gt;https://www.brianlinkletter.com/2023/02/network-emulators-and-network-simulators-2023/&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Nextcloud autostart</title><link>https://rowstu.net/til/nextcloud/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/til/nextcloud/</guid><description>&lt;p&gt;The Linux Nextcloud client now autostarts as part of the D-BUS Service. So even if you exit the client or kill the processes it restarts. To prevent this do the following:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;mkdir -p ~/.local/share/dbus-1/services/
+cat &amp;lt;&amp;lt;EOF &amp;gt; ~/.local/share/dbus-1/services/com.nextcloudgmbh.Nextcloud.service
+[D-BUS Service]
+Name=com.nextcloudgmbh.Nextcloud
+Exec=/bin/false
+EOF
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This creates a D-BUS override. Remember to remove it when you want to have the client autostart through D-BUS.&lt;/p&gt;
+&lt;p&gt;Then kill the nextcloud processes with:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;killall nextcloud
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;You can see for yourself here:&lt;/p&gt;</description></item><item><title>Ocsp Stapling</title><link>https://rowstu.net/sec/ocsp-stapling/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/sec/ocsp-stapling/</guid><description>&lt;h1 id="ocsp-stapling"&gt;OCSP Stapling&lt;/h1&gt;
 &lt;p&gt;OCSP stapling, also known as TLS Certificate Status Request extension or the Online Certificate Status Protocol (OCSP) Stapling, is a security feature in the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is designed to enhance the security and performance of SSL/TLS connections, particularly in web servers.&lt;/p&gt;
 &lt;p&gt;When you visit a website secured with SSL/TLS, your browser typically checks the validity of the SSL/TLS certificate presented by the web server. One way to do this is by using OCSP (Online Certificate Status Protocol), which allows the browser to ask the certificate authority (CA) whether the certificate is still valid.&lt;/p&gt;</description></item><item><title>Open Parens</title><link>https://rowstu.net/hackattic/open-parens/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/open-parens/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
 
