@@ -1,4 +1,4 @@
-<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Docker // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Docker</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/linuxdocker/>Linuxdocker</a></div><div class="card markdown-content"><h1 id=docker-container-platform>Docker Container Platform</h1><p>Docker is a platform for developing, shipping, and running applications in containers. Containers package applications with their dependencies, ensuring consistent behaviour across environments.</p><hr><h2 id=installation>Installation</h2><h3 id=debianubuntu>Debian/Ubuntu</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Remove old versions</span>
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Docker // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Docker</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/linuxdocker/>Linuxdocker</a></div><div class="card markdown-content"><h1 id=docker-container-platform>Docker Container Platform</h1><p>Docker is a platform for developing, shipping, and running applications in containers. Containers package applications with their dependencies, ensuring consistent behaviour across environments.</p><hr><h2 id=installation>Installation</h2><h3 id=debianubuntu>Debian/Ubuntu</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Remove old versions</span>
 </span></span><span style=display:flex><span>sudo apt remove docker docker-engine docker.io containerd runc
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Install dependencies</span>
@@ -16,7 +16,7 @@
 </span></span><span style=display:flex><span><span style=color:#75715e># Install Docker</span>
 </span></span><span style=display:flex><span>sudo apt update
 </span></span><span style=display:flex><span>sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-</span></span></code></pre></div><h3 id=rhelcentosrockyalma>RHEL/CentOS/Rocky/Alma</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Remove old versions</span>
+</span></span></code></pre></div><h3 id=rhelcentosrockyalma>RHEL/CentOS/Rocky/Alma</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Remove old versions</span>
 </span></span><span style=display:flex><span>sudo dnf remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Add repository</span>
@@ -28,13 +28,13 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Start service</span>
 </span></span><span style=display:flex><span>sudo systemctl enable --now docker
-</span></span></code></pre></div><h3 id=post-installation>Post-Installation</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Add user to docker group (avoid sudo)</span>
+</span></span></code></pre></div><h3 id=post-installation>Post-Installation</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Add user to docker group (avoid sudo)</span>
 </span></span><span style=display:flex><span>sudo usermod -aG docker $USER
 </span></span><span style=display:flex><span>newgrp docker
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Verify installation</span>
 </span></span><span style=display:flex><span>docker run hello-world
-</span></span></code></pre></div><hr><h2 id=basic-concepts>Basic Concepts</h2><table><thead><tr><th>Term</th><th>Description</th></tr></thead><tbody><tr><td><strong>Image</strong></td><td>Read-only template for creating containers</td></tr><tr><td><strong>Container</strong></td><td>Running instance of an image</td></tr><tr><td><strong>Dockerfile</strong></td><td>Script to build an image</td></tr><tr><td><strong>Registry</strong></td><td>Storage for Docker images (e.g., Docker Hub)</td></tr><tr><td><strong>Volume</strong></td><td>Persistent data storage</td></tr><tr><td><strong>Network</strong></td><td>Communication between containers</td></tr><tr><td><strong>Compose</strong></td><td>Multi-container application definition</td></tr></tbody></table><hr><h2 id=running-containers>Running Containers</h2><h3 id=basic-commands>Basic Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Run a container</span>
+</span></span></code></pre></div><hr><h2 id=basic-concepts>Basic Concepts</h2><table><thead><tr><th>Term</th><th>Description</th></tr></thead><tbody><tr><td><strong>Image</strong></td><td>Read-only template for creating containers</td></tr><tr><td><strong>Container</strong></td><td>Running instance of an image</td></tr><tr><td><strong>Dockerfile</strong></td><td>Script to build an image</td></tr><tr><td><strong>Registry</strong></td><td>Storage for Docker images (e.g., Docker Hub)</td></tr><tr><td><strong>Volume</strong></td><td>Persistent data storage</td></tr><tr><td><strong>Network</strong></td><td>Communication between containers</td></tr><tr><td><strong>Compose</strong></td><td>Multi-container application definition</td></tr></tbody></table><hr><h2 id=running-containers>Running Containers</h2><h3 id=basic-commands>Basic Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Run a container</span>
 </span></span><span style=display:flex><span>docker run nginx
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Run in background (detached)</span>
@@ -60,7 +60,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Run with resource limits</span>
 </span></span><span style=display:flex><span>docker run -d --memory<span style=color:#f92672>=</span>512m --cpus<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span> nginx
-</span></span></code></pre></div><h3 id=container-management>Container Management</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># List running containers</span>
+</span></span></code></pre></div><h3 id=container-management>Container Management</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># List running containers</span>
 </span></span><span style=display:flex><span>docker ps
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># List all containers</span>
@@ -108,7 +108,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># View container processes</span>
 </span></span><span style=display:flex><span>docker top webserver
-</span></span></code></pre></div><hr><h2 id=images>Images</h2><h3 id=working-with-images>Working with Images</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># List images</span>
+</span></span></code></pre></div><hr><h2 id=images>Images</h2><h3 id=working-with-images>Working with Images</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># List images</span>
 </span></span><span style=display:flex><span>docker images
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Pull an image</span>
@@ -146,7 +146,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Inspect image</span>
 </span></span><span style=display:flex><span>docker inspect nginx
-</span></span></code></pre></div><hr><h2 id=dockerfile>Dockerfile</h2><h3 id=basic-structure>Basic Structure</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#75715e># Base image</span><span style=color:#960050;background-color:#1e0010>
+</span></span></code></pre></div><hr><h2 id=dockerfile>Dockerfile</h2><h3 id=basic-structure>Basic Structure</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#75715e># Base image</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>FROM</span> <span style=color:#e6db74>python:3.11-slim</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#75715e># Metadata</span><span style=color:#960050;background-color:#1e0010>
@@ -184,7 +184,7 @@
 </span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#75715e># Default command</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>CMD</span> [<span style=color:#e6db74>&#34;python&#34;</span>, <span style=color:#e6db74>&#34;app.py&#34;</span>]<span style=color:#960050;background-color:#1e0010>
-</span></span></span></code></pre></div><h3 id=multi-stage-build>Multi-Stage Build</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#75715e># Build stage</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span></code></pre></div><h3 id=multi-stage-build>Multi-Stage Build</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#75715e># Build stage</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>FROM</span> <span style=color:#e6db74>golang:1.21</span> <span style=color:#66d9ef>AS</span> <span style=color:#e6db74>builder</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>WORKDIR</span> <span style=color:#e6db74>/app</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>COPY</span> go.mod go.sum ./<span style=color:#960050;background-color:#1e0010>
@@ -198,7 +198,7 @@
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>WORKDIR</span> <span style=color:#e6db74>/root</span>/<span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>COPY</span> --from<span style=color:#f92672>=</span>builder /app/main .<span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>CMD</span> [<span style=color:#e6db74>&#34;./main&#34;</span>]<span style=color:#960050;background-color:#1e0010>
-</span></span></span></code></pre></div><h3 id=build-commands>Build Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Build image</span>
+</span></span></span></code></pre></div><h3 id=build-commands>Build Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Build image</span>
 </span></span><span style=display:flex><span>docker build -t myapp:latest .
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Build with different Dockerfile</span>
@@ -215,7 +215,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Build multi-platform</span>
 </span></span><span style=display:flex><span>docker buildx build --platform linux/amd64,linux/arm64 -t myapp .
-</span></span></code></pre></div><h3 id=dockerfile-best-practices>Dockerfile Best Practices</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#75715e># Use specific versions</span><span style=color:#960050;background-color:#1e0010>
+</span></span></code></pre></div><h3 id=dockerfile-best-practices>Dockerfile Best Practices</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#75715e># Use specific versions</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>FROM</span> <span style=color:#e6db74>python:3.11.4-slim-bookworm</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#75715e># Combine RUN commands to reduce layers</span><span style=color:#960050;background-color:#1e0010>
@@ -243,7 +243,7 @@
 </span></span></span><span style=display:flex><span><span style=color:#75715e># Prefer exec form for CMD/ENTRYPOINT</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>CMD</span> [<span style=color:#e6db74>&#34;python&#34;</span>, <span style=color:#e6db74>&#34;app.py&#34;</span>]<span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#75715e># Not: CMD python app.py</span><span style=color:#960050;background-color:#1e0010>
-</span></span></span></code></pre></div><hr><h2 id=volumes>Volumes</h2><h3 id=volume-types>Volume Types</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Named volume</span>
+</span></span></span></code></pre></div><hr><h2 id=volumes>Volumes</h2><h3 id=volume-types>Volume Types</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Named volume</span>
 </span></span><span style=display:flex><span>docker run -d -v mydata:/data nginx
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Bind mount</span>
@@ -254,7 +254,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># tmpfs mount (memory)</span>
 </span></span><span style=display:flex><span>docker run -d --tmpfs /tmp nginx
-</span></span></code></pre></div><h3 id=volume-management>Volume Management</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Create volume</span>
+</span></span></code></pre></div><h3 id=volume-management>Volume Management</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Create volume</span>
 </span></span><span style=display:flex><span>docker volume create mydata
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># List volumes</span>
@@ -274,7 +274,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Restore volume</span>
 </span></span><span style=display:flex><span>docker run --rm -v mydata:/data -v <span style=color:#66d9ef>$(</span>pwd<span style=color:#66d9ef>)</span>:/backup alpine tar xvf /backup/backup.tar -C /
-</span></span></code></pre></div><hr><h2 id=networking>Networking</h2><h3 id=network-types>Network Types</h3><table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>bridge</td><td>Default network for containers</td></tr><tr><td>host</td><td>Share host&rsquo;s network stack</td></tr><tr><td>none</td><td>No networking</td></tr><tr><td>overlay</td><td>Multi-host networking (Swarm)</td></tr><tr><td>macvlan</td><td>Assign MAC address to container</td></tr></tbody></table><h3 id=network-commands>Network Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># List networks</span>
+</span></span></code></pre></div><hr><h2 id=networking>Networking</h2><h3 id=network-types>Network Types</h3><table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>bridge</td><td>Default network for containers</td></tr><tr><td>host</td><td>Share host&rsquo;s network stack</td></tr><tr><td>none</td><td>No networking</td></tr><tr><td>overlay</td><td>Multi-host networking (Swarm)</td></tr><tr><td>macvlan</td><td>Assign MAC address to container</td></tr></tbody></table><h3 id=network-commands>Network Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># List networks</span>
 </span></span><span style=display:flex><span>docker network ls
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Create network</span>
@@ -300,12 +300,12 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Remove unused networks</span>
 </span></span><span style=display:flex><span>docker network prune
-</span></span></code></pre></div><h3 id=container-communication>Container Communication</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Containers on same network can communicate by name</span>
+</span></span></code></pre></div><h3 id=container-communication>Container Communication</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Containers on same network can communicate by name</span>
 </span></span><span style=display:flex><span>docker network create app-network
 </span></span><span style=display:flex><span>docker run -d --network app-network --name db postgres
 </span></span><span style=display:flex><span>docker run -d --network app-network --name web myapp
 </span></span><span style=display:flex><span><span style=color:#75715e># web can reach db at hostname &#34;db&#34;</span>
-</span></span></code></pre></div><hr><h2 id=docker-compose>Docker Compose</h2><h3 id=basic-docker-composeyml>Basic docker-compose.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>version</span>: <span style=color:#e6db74>&#39;3.8&#39;</span>
+</span></span></code></pre></div><hr><h2 id=docker-compose>Docker Compose</h2><h3 id=basic-docker-composeyml>Basic docker-compose.yml</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>version</span>: <span style=color:#e6db74>&#39;3.8&#39;</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#f92672>services</span>:
 </span></span><span style=display:flex><span>  <span style=color:#f92672>web</span>:
@@ -343,7 +343,7 @@
 </span></span><span style=display:flex><span><span style=color:#f92672>networks</span>:
 </span></span><span style=display:flex><span>  <span style=color:#f92672>app-network</span>:
 </span></span><span style=display:flex><span>    <span style=color:#f92672>driver</span>: <span style=color:#ae81ff>bridge</span>
-</span></span></code></pre></div><h3 id=compose-commands>Compose Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Start services</span>
+</span></span></code></pre></div><h3 id=compose-commands>Compose Commands</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Start services</span>
 </span></span><span style=display:flex><span>docker compose up
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Start in background</span>
@@ -387,7 +387,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Restart service</span>
 </span></span><span style=display:flex><span>docker compose restart web
-</span></span></code></pre></div><h3 id=advanced-compose-features>Advanced Compose Features</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>version</span>: <span style=color:#e6db74>&#39;3.8&#39;</span>
+</span></span></code></pre></div><h3 id=advanced-compose-features>Advanced Compose Features</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>version</span>: <span style=color:#e6db74>&#39;3.8&#39;</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#f92672>services</span>:
 </span></span><span style=display:flex><span>  <span style=color:#f92672>web</span>:
@@ -424,7 +424,7 @@
 </span></span><span style=display:flex><span>      <span style=color:#f92672>options</span>:
 </span></span><span style=display:flex><span>        <span style=color:#f92672>max-size</span>: <span style=color:#e6db74>&#34;10m&#34;</span>
 </span></span><span style=display:flex><span>        <span style=color:#f92672>max-file</span>: <span style=color:#e6db74>&#34;3&#34;</span>
-</span></span></code></pre></div><hr><h2 id=registry-operations>Registry Operations</h2><h3 id=docker-hub>Docker Hub</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Login</span>
+</span></span></code></pre></div><hr><h2 id=registry-operations>Registry Operations</h2><h3 id=docker-hub>Docker Hub</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Login</span>
 </span></span><span style=display:flex><span>docker login
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Logout</span>
@@ -435,7 +435,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Pull image</span>
 </span></span><span style=display:flex><span>docker pull username/myapp:latest
-</span></span></code></pre></div><h3 id=private-registry>Private Registry</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Run local registry</span>
+</span></span></code></pre></div><h3 id=private-registry>Private Registry</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Run local registry</span>
 </span></span><span style=display:flex><span>docker run -d -p 5000:5000 --name registry registry:2
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Tag for local registry</span>
@@ -446,7 +446,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Pull from local registry</span>
 </span></span><span style=display:flex><span>docker pull localhost:5000/myapp
-</span></span></code></pre></div><h3 id=login-to-other-registries>Login to Other Registries</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># GitHub Container Registry</span>
+</span></span></code></pre></div><h3 id=login-to-other-registries>Login to Other Registries</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># GitHub Container Registry</span>
 </span></span><span style=display:flex><span>docker login ghcr.io
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># AWS ECR</span>
@@ -457,7 +457,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Azure Container Registry</span>
 </span></span><span style=display:flex><span>az acr login --name myregistry
-</span></span></code></pre></div><hr><h2 id=system-management>System Management</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># View disk usage</span>
+</span></span></code></pre></div><hr><h2 id=system-management>System Management</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># View disk usage</span>
 </span></span><span style=display:flex><span>docker system df
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Detailed disk usage</span>
@@ -483,14 +483,14 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Import as image</span>
 </span></span><span style=display:flex><span>docker import container.tar myimage:latest
-</span></span></code></pre></div><hr><h2 id=security-best-practices>Security Best Practices</h2><h3 id=run-as-non-root>Run as Non-Root</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#66d9ef>FROM</span> <span style=color:#e6db74>python:3.11-slim</span><span style=color:#960050;background-color:#1e0010>
+</span></span></code></pre></div><hr><h2 id=security-best-practices>Security Best Practices</h2><h3 id=run-as-non-root>Run as Non-Root</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#66d9ef>FROM</span> <span style=color:#e6db74>python:3.11-slim</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>RUN</span> useradd -m -u <span style=color:#ae81ff>1000</span> appuser<span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>USER</span> <span style=color:#e6db74>appuser</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>WORKDIR</span> <span style=color:#e6db74>/home/appuser/app</span><span style=color:#960050;background-color:#1e0010>
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>COPY</span> --chown<span style=color:#f92672>=</span>appuser:appuser . .<span style=color:#960050;background-color:#1e0010>
-</span></span></span></code></pre></div><h3 id=read-only-filesystem>Read-Only Filesystem</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker run --read-only --tmpfs /tmp myapp
-</span></span></code></pre></div><h3 id=drop-capabilities>Drop Capabilities</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker run --cap-drop ALL --cap-add NET_BIND_SERVICE myapp
-</span></span></code></pre></div><h3 id=security-options>Security Options</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># No new privileges</span>
+</span></span></span></code></pre></div><h3 id=read-only-filesystem>Read-Only Filesystem</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>docker run --read-only --tmpfs /tmp myapp
+</span></span></code></pre></div><h3 id=drop-capabilities>Drop Capabilities</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>docker run --cap-drop ALL --cap-add NET_BIND_SERVICE myapp
+</span></span></code></pre></div><h3 id=security-options>Security Options</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># No new privileges</span>
 </span></span><span style=display:flex><span>docker run --security-opt no-new-privileges myapp
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># AppArmor profile</span>
@@ -498,22 +498,22 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Seccomp profile</span>
 </span></span><span style=display:flex><span>docker run --security-opt seccomp<span style=color:#f92672>=</span>profile.json myapp
-</span></span></code></pre></div><h3 id=scan-for-vulnerabilities>Scan for Vulnerabilities</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker scout cves myimage:latest
+</span></span></code></pre></div><h3 id=scan-for-vulnerabilities>Scan for Vulnerabilities</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>docker scout cves myimage:latest
 </span></span><span style=display:flex><span>docker scout recommendations myimage:latest
-</span></span></code></pre></div><hr><h2 id=troubleshooting>Troubleshooting</h2><h3 id=common-issues>Common Issues</h3><p><strong>Container won&rsquo;t start:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Check logs</span>
+</span></span></code></pre></div><hr><h2 id=troubleshooting>Troubleshooting</h2><h3 id=common-issues>Common Issues</h3><p><strong>Container won&rsquo;t start:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Check logs</span>
 </span></span><span style=display:flex><span>docker logs container_name
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Check events</span>
 </span></span><span style=display:flex><span>docker events --filter container<span style=color:#f92672>=</span>container_name
-</span></span></code></pre></div><p><strong>Out of disk space:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker system prune -a --volumes
-</span></span></code></pre></div><p><strong>Network issues:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Inspect network</span>
+</span></span></code></pre></div><p><strong>Out of disk space:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>docker system prune -a --volumes
+</span></span></code></pre></div><p><strong>Network issues:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Inspect network</span>
 </span></span><span style=display:flex><span>docker network inspect bridge
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Check container IP</span>
 </span></span><span style=display:flex><span>docker inspect -f <span style=color:#e6db74>&#39;{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}&#39;</span> container_name
-</span></span></code></pre></div><p><strong>Permission denied:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Add user to docker group</span>
+</span></span></code></pre></div><p><strong>Permission denied:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Add user to docker group</span>
 </span></span><span style=display:flex><span>sudo usermod -aG docker $USER
-</span></span></code></pre></div><h3 id=debugging>Debugging</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Interactive shell in running container</span>
+</span></span></code></pre></div><h3 id=debugging>Debugging</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Interactive shell in running container</span>
 </span></span><span style=display:flex><span>docker exec -it container_name sh
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Run with shell override</span>
@@ -527,7 +527,7 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># View processes</span>
 </span></span><span style=display:flex><span>docker top container_name
-</span></span></code></pre></div><hr><h2 id=quick-reference>Quick Reference</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Containers</span>
+</span></span></code></pre></div><hr><h2 id=quick-reference>Quick Reference</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Containers</span>
 </span></span><span style=display:flex><span>docker run -d -p 8080:80 --name web nginx   <span style=color:#75715e># Run container</span>
 </span></span><span style=display:flex><span>docker ps                                    <span style=color:#75715e># List running</span>
 </span></span><span style=display:flex><span>docker ps -a                                 <span style=color:#75715e># List all</span>

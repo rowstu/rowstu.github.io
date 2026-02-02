@@ -22,7 +22,7 @@
 │   │   ├── deploy.yml
 │   │   ├── lint.yml
 └── .gitignore
-</code></pre><hr><h1 id=core-automation-scripts>Core Automation Scripts</h1><h2 id=scriptscommonaws-envsh><code>scripts/common/aws-env.sh</code></h2><p>This loads AWS profile, region, and output format.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</code></pre><hr><h1 id=core-automation-scripts>Core Automation Scripts</h1><h2 id=scriptscommonaws-envsh><code>scripts/common/aws-env.sh</code></h2><p>This loads AWS profile, region, and output format.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># Set AWS profile and region</span>
@@ -30,7 +30,7 @@
 </span></span><span style=display:flex><span>AWS_REGION<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>AWS_REGION<span style=color:#66d9ef>:-</span>us-east-1<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>export AWS_PROFILE AWS_REGION
-</span></span></code></pre></div><hr><h2 id=scriptscommonutilssh><code>scripts/common/utils.sh</code></h2><p>Reusable helpers.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h2 id=scriptscommonutilssh><code>scripts/common/utils.sh</code></h2><p>Reusable helpers.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> log<span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
@@ -41,7 +41,7 @@
 </span></span><span style=display:flex><span>  log <span style=color:#e6db74>&#34;ERROR: </span>$*<span style=color:#e6db74>&#34;</span>
 </span></span><span style=display:flex><span>  exit <span style=color:#ae81ff>1</span>
 </span></span><span style=display:flex><span><span style=color:#f92672>}</span>
-</span></span></code></pre></div><hr><h2 id=ec2-scripts>EC2 Scripts</h2><h3 id=scriptsec2launch-ec2sh><code>scripts/ec2/launch-ec2.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h2 id=ec2-scripts>EC2 Scripts</h2><h3 id=scriptsec2launch-ec2sh><code>scripts/ec2/launch-ec2.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>source ../common/aws-env.sh
 </span></span><span style=display:flex><span>source ../common/utils.sh
@@ -63,7 +63,7 @@
 </span></span></span><span style=display:flex><span>  --tag-specifications <span style=color:#e6db74>&#39;ResourceType=instance,Tags=[{Key=Name,Value=automation-instance}]&#39;</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;EC2 instance launched.&#34;</span>
-</span></span></code></pre></div><hr><h3 id=scriptsec2terminate-ec2sh><code>scripts/ec2/terminate-ec2.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h3 id=scriptsec2terminate-ec2sh><code>scripts/ec2/terminate-ec2.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>source ../common/aws-env.sh
 </span></span><span style=display:flex><span>source ../common/utils.sh
@@ -73,7 +73,7 @@
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Terminating EC2 instance </span>$INSTANCE_ID<span style=color:#e6db74>...&#34;</span>
 </span></span><span style=display:flex><span>aws ec2 terminate-instances --instance-ids <span style=color:#e6db74>&#34;</span>$INSTANCE_ID<span style=color:#e6db74>&#34;</span>
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Termination requested.&#34;</span>
-</span></span></code></pre></div><hr><h2 id=s3-scripts>S3 Scripts</h2><h3 id=scriptss3sync-to-s3sh><code>scripts/s3/sync-to-s3.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h2 id=s3-scripts>S3 Scripts</h2><h3 id=scriptss3sync-to-s3sh><code>scripts/s3/sync-to-s3.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>source ../common/aws-env.sh
 </span></span><span style=display:flex><span>source ../common/utils.sh
@@ -84,7 +84,7 @@
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Syncing </span>$LOCAL_DIR<span style=color:#e6db74> to s3://</span>$BUCKET<span style=color:#e6db74> ...&#34;</span>
 </span></span><span style=display:flex><span>aws s3 sync <span style=color:#e6db74>&#34;</span>$LOCAL_DIR<span style=color:#e6db74>&#34;</span> <span style=color:#e6db74>&#34;s3://</span>$BUCKET<span style=color:#e6db74>&#34;</span>
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Sync complete.&#34;</span>
-</span></span></code></pre></div><hr><h3 id=scriptss3delete-old-objectssh><code>scripts/s3/delete-old-objects.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h3 id=scriptss3delete-old-objectssh><code>scripts/s3/delete-old-objects.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>source ../common/aws-env.sh
 </span></span><span style=display:flex><span>source ../common/utils.sh
@@ -100,7 +100,7 @@
 </span></span><span style=display:flex><span><span style=color:#66d9ef>done</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Old objects deleted.&#34;</span>
-</span></span></code></pre></div><hr><h2 id=iam-scripts>IAM Scripts</h2><h3 id=scriptsiamcreate-rolesh><code>scripts/iam/create-role.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h2 id=iam-scripts>IAM Scripts</h2><h3 id=scriptsiamcreate-rolesh><code>scripts/iam/create-role.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>source ../common/aws-env.sh
 </span></span><span style=display:flex><span>source ../common/utils.sh
@@ -114,7 +114,7 @@
 </span></span></span><span style=display:flex><span>  --assume-role-policy-document file://<span style=color:#e6db74>&#34;</span>$TRUST_POLICY_FILE<span style=color:#e6db74>&#34;</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Role created.&#34;</span>
-</span></span></code></pre></div><hr><h3 id=scriptsiamattach-policysh><code>scripts/iam/attach-policy.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h3 id=scriptsiamattach-policysh><code>scripts/iam/attach-policy.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>source ../common/aws-env.sh
 </span></span><span style=display:flex><span>source ../common/utils.sh
@@ -126,7 +126,7 @@
 </span></span><span style=display:flex><span>aws iam attach-role-policy --role-name <span style=color:#e6db74>&#34;</span>$ROLE_NAME<span style=color:#e6db74>&#34;</span> --policy-arn <span style=color:#e6db74>&#34;</span>$POLICY_ARN<span style=color:#e6db74>&#34;</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Policy attached.&#34;</span>
-</span></span></code></pre></div><hr><h2 id=lambda-scripts>Lambda Scripts</h2><h3 id=scriptslambdadeploy-lambdash><code>scripts/lambda/deploy-lambda.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h2 id=lambda-scripts>Lambda Scripts</h2><h3 id=scriptslambdadeploy-lambdash><code>scripts/lambda/deploy-lambda.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>source ../common/aws-env.sh
 </span></span><span style=display:flex><span>source ../common/utils.sh
@@ -148,7 +148,7 @@
 </span></span></span><span style=display:flex><span>  --publish
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>log <span style=color:#e6db74>&#34;Lambda deployed.&#34;</span>
-</span></span></code></pre></div><hr><h3 id=scriptslambdainvoke-lambdash><code>scripts/lambda/invoke-lambda.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></code></pre></div><hr><h3 id=scriptslambdainvoke-lambdash><code>scripts/lambda/invoke-lambda.sh</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
 </span></span></span><span style=display:flex><span>set -euo pipefail
 </span></span><span style=display:flex><span>source ../common/aws-env.sh
 </span></span><span style=display:flex><span>source ../common/utils.sh

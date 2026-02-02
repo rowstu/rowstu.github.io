@@ -2,7 +2,7 @@
 │  Detect  │ → │ Respond  │ → │ Resolve  │ → │  Review  │ → │  Improve │
 └──────────┘   └──────────┘   └──────────┘   └──────────┘   └──────────┘
 </code></pre><hr><h2 id=incident-severity-levels>Incident Severity Levels</h2><table><thead><tr><th>Severity</th><th>Impact</th><th>Response Time</th><th>Example</th></tr></thead><tbody><tr><td><strong>SEV1</strong></td><td>Critical - Major outage</td><td>Immediate (page)</td><td>Complete service down</td></tr><tr><td><strong>SEV2</strong></td><td>High - Significant degradation</td><td>&lt; 30 min</td><td>Partial outage, major feature broken</td></tr><tr><td><strong>SEV3</strong></td><td>Medium - Minor degradation</td><td>&lt; 4 hours</td><td>Non-critical feature affected</td></tr><tr><td><strong>SEV4</strong></td><td>Low - Minimal impact</td><td>Next business day</td><td>Cosmetic issues</td></tr></tbody></table><h3 id=severity-criteria>Severity Criteria</h3><p><strong>SEV1 - Critical</strong></p><ul><li>Complete service unavailable</li><li>Data loss or corruption</li><li>Security breach</li><li>Revenue impact > £X/hour</li></ul><p><strong>SEV2 - High</strong></p><ul><li>Major feature unavailable</li><li>Significant performance degradation</li><li>Affecting large % of users</li><li>Workaround difficult or impossible</li></ul><p><strong>SEV3 - Medium</strong></p><ul><li>Minor feature unavailable</li><li>Performance degradation</li><li>Affecting small % of users</li><li>Workaround available</li></ul><p><strong>SEV4 - Low</strong></p><ul><li>Cosmetic issues</li><li>Minor inconvenience</li><li>Single user affected</li><li>Easy workaround</li></ul><hr><h2 id=incident-roles>Incident Roles</h2><h3 id=incident-commander-ic>Incident Commander (IC)</h3><p>The single point of coordination.</p><p><strong>Responsibilities:</strong></p><ul><li>Declare and close incidents</li><li>Coordinate response efforts</li><li>Make decisions</li><li>Communicate status</li><li>Escalate when needed</li><li>Ensure documentation</li></ul><p><strong>Not responsible for:</strong></p><ul><li>Fixing the problem directly</li><li>Deep technical investigation</li></ul><h3 id=technical-lead>Technical Lead</h3><p>Leads the technical investigation.</p><p><strong>Responsibilities:</strong></p><ul><li>Investigate root cause</li><li>Coordinate technical response</li><li>Implement fixes</li><li>Advise IC on technical decisions</li></ul><h3 id=communications-lead>Communications Lead</h3><p>Manages all communications.</p><p><strong>Responsibilities:</strong></p><ul><li>Update status page</li><li>Communicate with stakeholders</li><li>Draft customer communications</li><li>Manage internal updates</li></ul><h3 id=scribe>Scribe</h3><p>Documents everything.</p><p><strong>Responsibilities:</strong></p><ul><li>Record timeline of events</li><li>Document decisions made</li><li>Capture actions taken</li><li>Note who did what</li></ul><hr><h2 id=incident-response-process>Incident Response Process</h2><h3 id=1-detection>1. Detection</h3><pre tabindex=0><code>Alert fired → Acknowledge → Assess severity → Declare incident
-</code></pre><ul><li>Acknowledge alert within SLA</li><li>Initial assessment of impact</li><li>Declare incident if criteria met</li><li>Page appropriate responders</li></ul><h3 id=2-triage>2. Triage</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Quick Assessment
+</code></pre><ul><li>Acknowledge alert within SLA</li><li>Initial assessment of impact</li><li>Declare incident if criteria met</li><li>Page appropriate responders</li></ul><h3 id=2-triage>2. Triage</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Quick Assessment
 </span></span></span><span style=display:flex><span><span style=color:#66d9ef>-</span> What is broken?
 </span></span><span style=display:flex><span><span style=color:#66d9ef>-</span> Who is affected?
 </span></span><span style=display:flex><span><span style=color:#66d9ef>-</span> What is the business impact?
@@ -15,27 +15,27 @@ Scribe:      @diana
 
 War Room:    #incident-123
 Bridge:      https://meet.example.com/incident-123
-</code></pre><h3 id=4-investigate-and-resolve>4. Investigate and Resolve</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Investigation Checklist
+</code></pre><h3 id=4-investigate-and-resolve>4. Investigate and Resolve</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Investigation Checklist
 </span></span></span><span style=display:flex><span>□ Check monitoring dashboards
 </span></span><span style=display:flex><span>□ Review recent deployments
 </span></span><span style=display:flex><span>□ Check dependent services
 </span></span><span style=display:flex><span>□ Review error logs
 </span></span><span style=display:flex><span>□ Check infrastructure health
 </span></span><span style=display:flex><span>□ Compare to previous incidents
-</span></span></code></pre></div><h3 id=5-communicate>5. Communicate</h3><p><strong>Status Update Template:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Incident Update - [TIME]
+</span></span></code></pre></div><h3 id=5-communicate>5. Communicate</h3><p><strong>Status Update Template:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Incident Update - [TIME]
 </span></span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=font-weight:700>**Status**</span>: Investigating / Identified / Monitoring / Resolved
 </span></span><span style=display:flex><span><span style=font-weight:700>**Impact**</span>: [Who/what is affected]
 </span></span><span style=display:flex><span><span style=font-weight:700>**Summary**</span>: [What we know]
 </span></span><span style=display:flex><span><span style=font-weight:700>**Next update**</span>: [Time]
-</span></span></code></pre></div><h3 id=6-resolve-and-close>6. Resolve and Close</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Incident Closure Checklist
+</span></span></code></pre></div><h3 id=6-resolve-and-close>6. Resolve and Close</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Incident Closure Checklist
 </span></span></span><span style=display:flex><span>□ Service restored
 </span></span><span style=display:flex><span>□ Monitoring confirms recovery
 </span></span><span style=display:flex><span>□ Customer communication sent
 </span></span><span style=display:flex><span>□ Status page updated
 </span></span><span style=display:flex><span>□ Timeline documented
 </span></span><span style=display:flex><span>□ Post-incident review scheduled
-</span></span></code></pre></div><hr><h2 id=communication-templates>Communication Templates</h2><h3 id=initial-notification>Initial Notification</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span>🚨 INCIDENT DECLARED - SEV[X]
+</span></span></code></pre></div><hr><h2 id=communication-templates>Communication Templates</h2><h3 id=initial-notification>Initial Notification</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span>🚨 INCIDENT DECLARED - SEV[X]
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=font-weight:700>**Title**</span>: [Brief description]
 </span></span><span style=display:flex><span><span style=font-weight:700>**Impact**</span>: [Who/what is affected]
@@ -45,7 +45,7 @@ Bridge:      https://meet.example.com/incident-123
 </span></span><span style=display:flex><span><span style=font-weight:700>**War Room**</span>: #incident-XXX
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>Updates will follow every [15/30/60] minutes.
-</span></span></code></pre></div><h3 id=status-update>Status Update</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span>📊 INCIDENT UPDATE - [TIME]
+</span></span></code></pre></div><h3 id=status-update>Status Update</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span>📊 INCIDENT UPDATE - [TIME]
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=font-weight:700>**Status**</span>: [Investigating/Identified/Monitoring]
 </span></span><span style=display:flex><span><span style=font-weight:700>**Impact**</span>: [Current impact]
@@ -55,7 +55,7 @@ Bridge:      https://meet.example.com/incident-123
 </span></span><span style=display:flex><span><span style=font-weight:700>**Next steps**</span>: [What we&#39;re doing next]
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=font-weight:700>**Next update**</span>: [Time]
-</span></span></code></pre></div><h3 id=resolution>Resolution</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span>✅ INCIDENT RESOLVED
+</span></span></code></pre></div><h3 id=resolution>Resolution</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span>✅ INCIDENT RESOLVED
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=font-weight:700>**Title**</span>: [Brief description]
 </span></span><span style=display:flex><span><span style=font-weight:700>**Duration**</span>: [Start time] - [End time]
@@ -64,7 +64,7 @@ Bridge:      https://meet.example.com/incident-123
 </span></span><span style=display:flex><span><span style=font-weight:700>**Resolution**</span>: [How it was fixed]
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=font-weight:700>**Follow-up**</span>: Post-incident review scheduled for [date]
-</span></span></code></pre></div><hr><h2 id=post-incident-review-blameless>Post-Incident Review (Blameless)</h2><h3 id=timeline>Timeline</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Timeline
+</span></span></code></pre></div><hr><h2 id=post-incident-review-blameless>Post-Incident Review (Blameless)</h2><h3 id=timeline>Timeline</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Timeline
 </span></span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>| Time | Event | Actor |
 </span></span><span style=display:flex><span>|------|-------|-------|
@@ -76,7 +76,7 @@ Bridge:      https://meet.example.com/incident-123
 </span></span><span style=display:flex><span>| 14:52 | Rollback complete | @bob |
 </span></span><span style=display:flex><span>| 14:55 | Service recovering | Automated |
 </span></span><span style=display:flex><span>| 15:05 | Incident resolved | @alice |
-</span></span></code></pre></div><h3 id=five-whys>Five Whys</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Root Cause Analysis
+</span></span></code></pre></div><h3 id=five-whys>Five Whys</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Root Cause Analysis
 </span></span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=font-weight:700>**Problem**</span>: Users unable to complete checkout
 </span></span><span style=display:flex><span>
@@ -87,13 +87,13 @@ Bridge:      https://meet.example.com/incident-123
 </span></span><span style=display:flex><span><span style=color:#66d9ef>5.</span> Why? → Code review didn&#39;t catch the leak
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=font-weight:700>**Root Cause**</span>: Missing test coverage for error handling paths
-</span></span></code></pre></div><h3 id=contributing-factors>Contributing Factors</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Contributing Factors
+</span></span></code></pre></div><h3 id=contributing-factors>Contributing Factors</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Contributing Factors
 </span></span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#66d9ef>-</span> **Detection**: Alert threshold too high (10 min delay)
 </span></span><span style=display:flex><span><span style=color:#66d9ef>-</span> **Response**: On-call engineer unfamiliar with payment service
 </span></span><span style=display:flex><span><span style=color:#66d9ef>-</span> **Resolution**: No runbook for database connection issues
 </span></span><span style=display:flex><span><span style=color:#66d9ef>-</span> **Prevention**: Missing static analysis for resource leaks
-</span></span></code></pre></div><h3 id=action-items>Action Items</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Action Items
+</span></span></code></pre></div><h3 id=action-items>Action Items</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Action Items
 </span></span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>| Priority | Action | Owner | Due Date |
 </span></span><span style=display:flex><span>|----------|--------|-------|----------|
@@ -102,11 +102,11 @@ Bridge:      https://meet.example.com/incident-123
 </span></span><span style=display:flex><span>| P2 | Lower alert threshold | @alice | 2024-01-18 |
 </span></span><span style=display:flex><span>| P3 | Add static analysis rule | @diana | 2024-01-25 |
 </span></span><span style=display:flex><span>| P3 | Create database runbook | @bob | 2024-01-22 |
-</span></span></code></pre></div><hr><h2 id=blameless-culture>Blameless Culture</h2><h3 id=focus-on-systems-not-people>Focus on Systems, Not People</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span>❌ &#34;Bob broke production by deploying bad code&#34;
+</span></span></code></pre></div><hr><h2 id=blameless-culture>Blameless Culture</h2><h3 id=focus-on-systems-not-people>Focus on Systems, Not People</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span>❌ &#34;Bob broke production by deploying bad code&#34;
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>✅ &#34;A code change introduced a connection leak that wasn&#39;t
 </span></span><span style=display:flex><span>    caught by our test suite or code review process&#34;
-</span></span></code></pre></div><h3 id=questions-to-ask>Questions to Ask</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span>✓ How can we make it easier to do the right thing?
+</span></span></code></pre></div><h3 id=questions-to-ask>Questions to Ask</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span>✓ How can we make it easier to do the right thing?
 </span></span><span style=display:flex><span>✓ What information was missing?
 </span></span><span style=display:flex><span>✓ What could we automate?
 </span></span><span style=display:flex><span>✓ How can we detect this earlier?
@@ -117,7 +117,7 @@ Bridge:      https://meet.example.com/incident-123
 </span></span><span style=display:flex><span>✗ Whose fault was it?
 </span></span></code></pre></div><h3 id=psychological-safety>Psychological Safety</h3><ul><li>Assume good intentions</li><li>Encourage reporting</li><li>Celebrate learning</li><li>Share findings widely</li></ul><hr><h2 id=on-call-best-practices>On-Call Best Practices</h2><h3 id=rotation-design>Rotation Design</h3><pre tabindex=0><code>Primary:    @alice (week 1) → @bob (week 2) → @charlie (week 3)
 Secondary:  @bob (week 1) → @charlie (week 2) → @alice (week 3)
-</code></pre><ul><li>Overlap between shifts</li><li>Reasonable rotation length (1-2 weeks)</li><li>Clear escalation path</li><li>Fair distribution</li></ul><h3 id=on-call-checklist>On-Call Checklist</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Start of On-Call
+</code></pre><ul><li>Overlap between shifts</li><li>Reasonable rotation length (1-2 weeks)</li><li>Clear escalation path</li><li>Fair distribution</li></ul><h3 id=on-call-checklist>On-Call Checklist</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span><span style=color:#75715e>## Start of On-Call
 </span></span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>□ Check pending alerts
 </span></span><span style=display:flex><span>□ Review recent incidents
@@ -132,7 +132,7 @@ Secondary:  @bob (week 1) → @charlie (week 2) → @alice (week 3)
 </span></span><span style=display:flex><span>□ Update documentation
 </span></span><span style=display:flex><span>□ Share learnings
 </span></span><span style=display:flex><span>□ Log on-call experience
-</span></span></code></pre></div><h3 id=reducing-toil>Reducing Toil</h3><ul><li>Automate common responses</li><li>Improve runbooks</li><li>Fix noisy alerts</li><li>Address recurring issues</li><li>Track on-call load</li></ul><hr><h2 id=runbooks>Runbooks</h2><h3 id=runbook-template>Runbook Template</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span># [Alert Name] Runbook
+</span></span></code></pre></div><h3 id=reducing-toil>Reducing Toil</h3><ul><li>Automate common responses</li><li>Improve runbooks</li><li>Fix noisy alerts</li><li>Address recurring issues</li><li>Track on-call load</li></ul><hr><h2 id=runbooks>Runbooks</h2><h3 id=runbook-template>Runbook Template</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-markdown data-lang=markdown><span style=display:flex><span># [Alert Name] Runbook
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e>## Overview
 </span></span></span><span style=display:flex><span>Brief description of what this alert means.

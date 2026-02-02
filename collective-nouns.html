@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Collective Nouns</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #10b981;
+			--accent-alt: #8b5cf6;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--cat-mammals: #10b981;
+			--cat-reptiles: #3b82f6;
+			--cat-people: #f59e0b;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 700px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.panel-header .label { font-weight: 500; color: var(--text); }
+
+		.panel-content { padding: 1.5rem; }
+
+		.search-box {
+			position: relative;
+			margin-bottom: 0.75rem;
+		}
+
+		.search-box input {
+			width: 100%;
+			padding: 0.85rem 1rem 0.85rem 2.5rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 1rem;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+
+		.search-box input:focus {
+			border-color: var(--accent);
+		}
+
+		.search-box input::placeholder {
+			color: var(--text-muted);
+		}
+
+		.search-icon {
+			position: absolute;
+			left: 0.85rem;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			pointer-events: none;
+		}
+
+		.filter-row {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+		}
+
+		.filter-btn {
+			padding: 0.4rem 0.75rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.filter-btn:hover {
+			background: var(--surface-hover);
+			color: var(--text);
+		}
+
+		.filter-btn.active {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: rgba(16, 185, 129, 0.1);
+		}
+
+		.filter-btn[data-cat="mammals"].active {
+			border-color: var(--cat-mammals);
+			color: var(--cat-mammals);
+			background: rgba(16, 185, 129, 0.1);
+		}
+
+		.filter-btn[data-cat="reptiles"].active {
+			border-color: var(--cat-reptiles);
+			color: var(--cat-reptiles);
+			background: rgba(59, 130, 246, 0.1);
+		}
+
+		.filter-btn[data-cat="people"].active {
+			border-color: var(--cat-people);
+			color: var(--cat-people);
+			background: rgba(245, 158, 11, 0.1);
+		}
+
+		.results-panel {
+			max-height: 500px;
+			overflow-y: auto;
+		}
+
+		.result-item {
+			padding: 1rem;
+			border-bottom: 1px solid var(--border);
+			transition: background 0.2s;
+			cursor: default;
+		}
+
+		.result-item:last-child { border-bottom: none; }
+
+		.result-item:hover { background: var(--surface-hover); }
+
+		.result-group {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			margin-bottom: 0.5rem;
+		}
+
+		.result-name {
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		.result-category {
+			display: inline-block;
+			padding: 0.15rem 0.5rem;
+			border-radius: 3px;
+			font-size: 0.65rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			flex-shrink: 0;
+			margin-left: 0.5rem;
+		}
+
+		.cat-mammals {
+			background: rgba(16, 185, 129, 0.15);
+			color: var(--cat-mammals);
+		}
+
+		.cat-reptiles {
+			background: rgba(59, 130, 246, 0.15);
+			color: var(--cat-reptiles);
+		}
+
+		.cat-people {
+			background: rgba(245, 158, 11, 0.15);
+			color: var(--cat-people);
+		}
+
+		.result-nouns {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.4rem;
+		}
+
+		.noun-tag {
+			padding: 0.25rem 0.6rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			font-size: 0.8rem;
+			color: var(--warning);
+			transition: all 0.2s;
+		}
+
+		.noun-tag:hover {
+			border-color: var(--warning);
+			background: rgba(245, 158, 11, 0.1);
+		}
+
+		.result-example {
+			margin-top: 0.5rem;
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			font-style: italic;
+		}
+
+		.empty-state {
+			padding: 2rem;
+			text-align: center;
+			color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+
+		.stats {
+			display: flex;
+			gap: 1.5rem;
+			justify-content: center;
+			padding: 1rem;
+			background: var(--bg);
+			border-radius: 6px;
+			font-size: 0.8rem;
+		}
+
+		.stat-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.25rem;
+		}
+
+		.stat-value {
+			font-size: 1.2rem;
+			font-weight: 600;
+			color: var(--accent);
+		}
+
+		.stat-label { color: var(--text-muted); }
+
+		.random-section {
+			text-align: center;
+			padding: 1.5rem;
+		}
+
+		.random-display {
+			min-height: 120px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.random-group {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+		}
+
+		.random-phrase {
+			font-size: 1.4rem;
+			line-height: 1.6;
+			color: var(--text);
+		}
+
+		.random-phrase .noun-highlight {
+			color: var(--warning);
+			font-weight: 600;
+		}
+
+		.random-phrase .group-highlight {
+			color: var(--accent);
+			font-weight: 500;
+		}
+
+		button {
+			padding: 0.75rem 1.5rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			cursor: pointer;
+			transition: all 0.2s;
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		button:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		button.primary {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #000;
+			font-weight: 500;
+		}
+
+		button.primary:hover {
+			background: #0ea572;
+			border-color: #0ea572;
+		}
+
+		.keyboard-hint {
+			margin-top: 1rem;
+			font-size: 0.75rem;
+			color: var(--text-muted);
+		}
+
+		kbd {
+			padding: 0.15rem 0.4rem;
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			border-radius: 3px;
+			font-family: inherit;
+			font-size: 0.7rem;
+		}
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+
+		.highlight {
+			background: rgba(245, 158, 11, 0.25);
+			border-radius: 2px;
+			padding: 0 1px;
+		}
+
+		@keyframes bounce {
+			0%, 100% { transform: translateY(0); }
+			50% { transform: translateY(-5px); }
+		}
+
+		.bounce { animation: bounce 0.5s ease; }
+
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translateY(8px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		.fade-in { animation: fadeIn 0.3s ease; }
+
+		.loading {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			padding: 2rem;
+			text-align: center;
+		}
+
+		.error-message {
+			color: var(--danger);
+			font-size: 0.9rem;
+			padding: 1rem;
+			background: rgba(239, 68, 68, 0.1);
+			border-radius: 6px;
+		}
+
+		.results-panel::-webkit-scrollbar {
+			width: 6px;
+		}
+
+		.results-panel::-webkit-scrollbar-track {
+			background: var(--surface);
+		}
+
+		.results-panel::-webkit-scrollbar-thumb {
+			background: var(--border);
+			border-radius: 3px;
+		}
+
+		.results-panel::-webkit-scrollbar-thumb:hover {
+			background: var(--text-muted);
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Collective Nouns</h1>
+			<p class="subtitle">Discover the peculiar group names for animals and people</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Search</span>
+				<span id="resultCount">-</span>
+			</div>
+			<div class="panel-content">
+				<div class="search-box">
+					<span class="search-icon">&#8981;</span>
+					<input type="text" id="searchInput" placeholder="Search by group or collective noun..." autofocus>
+				</div>
+				<div class="filter-row">
+					<button class="filter-btn active" data-cat="all">All</button>
+					<button class="filter-btn" data-cat="mammals">Mammals</button>
+					<button class="filter-btn" data-cat="reptiles">Reptiles &amp; Fish</button>
+					<button class="filter-btn" data-cat="people">People</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Results</span>
+			</div>
+			<div class="results-panel" id="resultsPanel">
+				<div class="loading">Loading collective nouns...</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Random Discovery</span>
+			</div>
+			<div class="random-section">
+				<div class="random-display" id="randomDisplay">
+					<div class="random-group" id="randomCategory">-</div>
+					<div class="random-phrase" id="randomPhrase">Loading...</div>
+				</div>
+				<button class="primary" onclick="showRandom()">
+					<span>Surprise Me</span>
+				</button>
+				<button onclick="copyRandom()">
+					<span>Copy</span>
+				</button>
+				<div class="keyboard-hint">
+					Press <kbd>Space</kbd> for random, <kbd>/</kbd> to focus search
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="label">Statistics</span>
+			</div>
+			<div class="panel-content" style="padding: 1rem;">
+				<div class="stats">
+					<div class="stat-item">
+						<span class="stat-value" id="totalGroups">0</span>
+						<span class="stat-label">Groups</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-value" id="totalNouns">0</span>
+						<span class="stat-label">Collective Nouns</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-value" id="totalCategories">3</span>
+						<span class="stat-label">Categories</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<script>
+		let allEntries = [];
+		let activeFilter = 'all';
+
+		const categoryMap = {
+			'MammalsandMarsupials': { label: 'Mammals', key: 'mammals', css: 'cat-mammals' },
+			'ReptilesAmphibiansandFish': { label: 'Reptiles & Fish', key: 'reptiles', css: 'cat-reptiles' },
+			'People': { label: 'People', key: 'people', css: 'cat-people' }
+		};
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+
+		function highlightMatch(text, query) {
+			if (!query) return escapeHtml(text);
+			const escaped = escapeHtml(text);
+			const regex = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+			return escaped.replace(regex, '<span class="highlight">$1</span>');
+		}
+
+		async function loadData() {
+			try {
+				const response = await fetch('collective-nouns.json');
+				const data = await response.json();
+				const categories = data.CollectiveNouns;
+
+				allEntries = [];
+				let totalNouns = 0;
+
+				for (const [catKey, groups] of Object.entries(categories)) {
+					const catInfo = categoryMap[catKey];
+					for (const [group, nouns] of Object.entries(groups)) {
+						allEntries.push({
+							group: group,
+							nouns: nouns,
+							category: catInfo.key,
+							categoryLabel: catInfo.label,
+							categoryCss: catInfo.css
+						});
+						totalNouns += nouns.length;
+					}
+				}
+
+				document.getElementById('totalGroups').textContent = allEntries.length;
+				document.getElementById('totalNouns').textContent = totalNouns;
+
+				renderResults(allEntries);
+				showRandom();
+			} catch (error) {
+				document.getElementById('resultsPanel').innerHTML =
+					'<div class="error-message">Failed to load collective nouns. Please refresh the page.</div>';
+			}
+		}
+
+		function renderResults(entries) {
+			const panel = document.getElementById('resultsPanel');
+			const query = document.getElementById('searchInput').value.trim();
+
+			if (entries.length === 0) {
+				panel.innerHTML = '<div class="empty-state">No matches found</div>';
+				document.getElementById('resultCount').textContent = '0 results';
+				return;
+			}
+
+			document.getElementById('resultCount').textContent = entries.length + ' result' + (entries.length !== 1 ? 's' : '');
+
+			panel.innerHTML = entries.map(entry => {
+				const displayGroup = formatGroupName(entry.group);
+				const firstNoun = entry.nouns[0];
+				const article = startsWithVowel(firstNoun) ? 'An' : 'A';
+				const example = article + ' ' + firstNoun + ' of ' + displayGroup;
+
+				return `
+					<div class="result-item fade-in">
+						<div class="result-group">
+							<span class="result-name">${highlightMatch(displayGroup, query)}</span>
+							<span class="result-category ${entry.categoryCss}">${entry.categoryLabel}</span>
+						</div>
+						<div class="result-nouns">
+							${entry.nouns.map(n => `<span class="noun-tag">${highlightMatch(n, query)}</span>`).join('')}
+						</div>
+						<div class="result-example">${escapeHtml(example)}</div>
+					</div>
+				`;
+			}).join('');
+		}
+
+		function formatGroupName(name) {
+			return name.replace(/([a-z])([A-Z])/g, '$1 $2')
+			           .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+		}
+
+		function startsWithVowel(word) {
+			return /^[aeiou]/i.test(word);
+		}
+
+		function filterAndSearch() {
+			const query = document.getElementById('searchInput').value.trim().toLowerCase();
+
+			let filtered = allEntries;
+
+			if (activeFilter !== 'all') {
+				filtered = filtered.filter(e => e.category === activeFilter);
+			}
+
+			if (query) {
+				filtered = filtered.filter(entry => {
+					const groupMatch = formatGroupName(entry.group).toLowerCase().includes(query);
+					const nounMatch = entry.nouns.some(n => n.toLowerCase().includes(query));
+					return groupMatch || nounMatch;
+				});
+			}
+
+			renderResults(filtered);
+		}
+
+		function showRandom() {
+			if (allEntries.length === 0) return;
+
+			const entry = allEntries[Math.floor(Math.random() * allEntries.length)];
+			const noun = entry.nouns[Math.floor(Math.random() * entry.nouns.length)];
+			const displayGroup = formatGroupName(entry.group);
+			const article = startsWithVowel(noun) ? 'an' : 'a';
+
+			const catEl = document.getElementById('randomCategory');
+			const phraseEl = document.getElementById('randomPhrase');
+
+			catEl.textContent = entry.categoryLabel;
+			phraseEl.innerHTML = `${escapeHtml(article)} <span class="noun-highlight">${escapeHtml(noun)}</span> of <span class="group-highlight">${escapeHtml(displayGroup)}</span>`;
+			phraseEl.classList.remove('bounce');
+			void phraseEl.offsetWidth;
+			phraseEl.classList.add('bounce');
+		}
+
+		function copyRandom() {
+			const phrase = document.getElementById('randomPhrase').textContent;
+			navigator.clipboard.writeText(phrase).then(() => {
+				const btn = event.target.closest('button');
+				const span = btn.querySelector('span');
+				const original = span.textContent;
+				span.textContent = 'Copied!';
+				setTimeout(() => span.textContent = original, 1500);
+			});
+		}
+
+		// Filter buttons
+		document.querySelectorAll('.filter-btn').forEach(btn => {
+			btn.addEventListener('click', () => {
+				document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+				activeFilter = btn.dataset.cat;
+				filterAndSearch();
+			});
+		});
+
+		// Search input
+		document.getElementById('searchInput').addEventListener('input', filterAndSearch);
+
+		// Keyboard shortcuts
+		document.addEventListener('keydown', (e) => {
+			if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+				if (e.code === 'Escape') {
+					e.target.blur();
+					e.target.value = '';
+					filterAndSearch();
+				}
+				return;
+			}
+
+			if (e.code === 'Space') {
+				e.preventDefault();
+				showRandom();
+			} else if (e.key === '/') {
+				e.preventDefault();
+				document.getElementById('searchInput').focus();
+			}
+		});
+
+		// Initialize
+		loadData();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>
