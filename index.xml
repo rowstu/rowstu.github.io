@@ -624,7 +624,199 @@ From: nvidia/cuda:12.2.0-runtime-ubuntu22.04
 &lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
 &lt;h2 id="bind-mounts-and-file-access"&gt;Bind Mounts and File Access&lt;/h2&gt;
 &lt;h3 id="automatic-bind-mounts"&gt;Automatic Bind Mounts&lt;/h3&gt;
-&lt;p&gt;By default, Apptainer binds:&lt;/p&gt;</description></item><item><title>AWS CI/CD Pipeline Examples</title><link>https://rowstu.net/aws/cicd-aws-github/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/aws/cicd-aws-github/</guid><description>&lt;h2 id="github-actions-example"&gt;GitHub Actions Example&lt;/h2&gt;
+&lt;p&gt;By default, Apptainer binds:&lt;/p&gt;</description></item><item><title>ArchLinux - Does your system need a reboot?</title><link>https://rowstu.net/linux/arch-needs-reboot/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/arch-needs-reboot/</guid><description>&lt;p&gt;Under RHEL, there&amp;rsquo;s an application called &lt;strong&gt;needs-restarting&lt;/strong&gt;. It checks if the system needs a reboot after installing packages, ensuring the latest kernel, systemd, and libraries are in use.&lt;/p&gt;
+&lt;p&gt;In ArchLinux, there&amp;rsquo;s no built-in equivalent, but you can use an AUR application called &lt;strong&gt;reboot-arch-btw&lt;/strong&gt; or you can roll your own with the following BASH script:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;#!/bin/bash
+#
+# arch-needs-reboot.sh
+# Check if Arch Linux system needs a reboot after updates
+#
+
+set -euo pipefail
+
+# Color codes
+RED=&amp;#39;\033[0;31m&amp;#39;
+YELLOW=&amp;#39;\033[1;33m&amp;#39;
+GREEN=&amp;#39;\033[0;32m&amp;#39;
+BLUE=&amp;#39;\033[0;34m&amp;#39;
+NC=&amp;#39;\033[0m&amp;#39; # No Color
+
+REBOOT_NEEDED=0
+VERBOSE=${VERBOSE:-0}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+ case $1 in
+ -v|--verbose)
+ VERBOSE=1
+ shift
+ ;;
+ -h|--help)
+ echo &amp;#34;Usage: $0 [-v|--verbose] [-h|--help]&amp;#34;
+ echo &amp;#34;&amp;#34;
+ echo &amp;#34;Check if system needs a reboot after package updates&amp;#34;
+ echo &amp;#34;&amp;#34;
+ echo &amp;#34;Options:&amp;#34;
+ echo &amp;#34; -v, --verbose Show detailed information&amp;#34;
+ echo &amp;#34; -h, --help Show this help message&amp;#34;
+ echo &amp;#34;&amp;#34;
+ echo &amp;#34;Exit codes:&amp;#34;
+ echo &amp;#34; 0 - No reboot needed&amp;#34;
+ echo &amp;#34; 1 - Reboot needed&amp;#34;
+ exit 0
+ ;;
+ *)
+ echo &amp;#34;Unknown option: $1&amp;#34;
+ exit 1
+ ;;
+ esac
+done
+
+echo -e &amp;#34;${BLUE}=== Arch Linux Reboot Check ===${NC}\n&amp;#34;
+
+# Check 1: Kernel version
+echo -e &amp;#34;${BLUE}Checking kernel version...${NC}&amp;#34;
+INSTALLED_KERNEL=$(pacman -Q linux 2&amp;gt;/dev/null | awk &amp;#39;{print $2}&amp;#39; || echo &amp;#34;&amp;#34;)
+RUNNING_KERNEL=$(uname -r)
+
+if [ -z &amp;#34;$INSTALLED_KERNEL&amp;#34; ]; then
+ # Try linux-lts or other kernel packages
+ for kernel_pkg in linux-lts linux-zen linux-hardened; do
+ INSTALLED_KERNEL=$(pacman -Q &amp;#34;$kernel_pkg&amp;#34; 2&amp;gt;/dev/null | awk &amp;#39;{print $2}&amp;#39; || echo &amp;#34;&amp;#34;)
+ if [ -n &amp;#34;$INSTALLED_KERNEL&amp;#34; ]; then
+ break
+ fi
+ done
+fi
+
+if [ -n &amp;#34;$INSTALLED_KERNEL&amp;#34; ]; then
+ # Remove -ARCH suffix from running kernel for comparison
+ RUNNING_KERNEL_CLEAN=$(echo &amp;#34;$RUNNING_KERNEL&amp;#34; | sed &amp;#39;s/-ARCH$//&amp;#39; | sed &amp;#39;s/-lts$//&amp;#39; | sed &amp;#39;s/-zen$//&amp;#39; | sed &amp;#39;s/-hardened$//&amp;#39;)
+ INSTALLED_KERNEL_CLEAN=$(echo &amp;#34;$INSTALLED_KERNEL&amp;#34; | sed &amp;#39;s/\.arch.*$//&amp;#39;)
+ 
+ if [ &amp;#34;$VERBOSE&amp;#34; -eq 1 ]; then
+ echo &amp;#34; Installed: $INSTALLED_KERNEL&amp;#34;
+ echo &amp;#34; Running: $RUNNING_KERNEL&amp;#34;
+ fi
+ 
+ if [[ ! &amp;#34;$RUNNING_KERNEL&amp;#34; =~ &amp;#34;$INSTALLED_KERNEL_CLEAN&amp;#34; ]]; then
+ echo -e &amp;#34; ${RED}✗ Kernel mismatch detected${NC}&amp;#34;
+ echo -e &amp;#34; Installed: ${YELLOW}$INSTALLED_KERNEL${NC}&amp;#34;
+ echo -e &amp;#34; Running: ${YELLOW}$RUNNING_KERNEL${NC}&amp;#34;
+ REBOOT_NEEDED=1
+ else
+ echo -e &amp;#34; ${GREEN}✓ Kernel versions match${NC}&amp;#34;
+ fi
+else
+ echo -e &amp;#34; ${YELLOW}⚠ Could not determine installed kernel package${NC}&amp;#34;
+fi
+
+echo &amp;#34;&amp;#34;
+
+# Check 2: Critical system packages
+echo -e &amp;#34;${BLUE}Checking critical system packages...${NC}&amp;#34;
+
+CRITICAL_PACKAGES=(
+ &amp;#34;systemd&amp;#34;
+ &amp;#34;glibc&amp;#34;
+ &amp;#34;linux-firmware&amp;#34;
+ &amp;#34;amd-ucode&amp;#34;
+ &amp;#34;intel-ucode&amp;#34;
+ &amp;#34;dbus&amp;#34;
+)
+
+UPDATED_CRITICAL=&amp;#34;&amp;#34;
+PACMAN_LOG=&amp;#34;/var/log/pacman.log&amp;#34;
+
+if [ -f &amp;#34;$PACMAN_LOG&amp;#34; ]; then
+ # Check packages updated in the last 24 hours
+ SINCE_TIME=$(date -d &amp;#39;24 hours ago&amp;#39; &amp;#39;+%Y-%m-%d %H:%M&amp;#39; 2&amp;gt;/dev/null || date -v-24H &amp;#39;+%Y-%m-%d %H:%M&amp;#39; 2&amp;gt;/dev/null || echo &amp;#34;&amp;#34;)
+ 
+ for pkg in &amp;#34;${CRITICAL_PACKAGES[@]}&amp;#34;; do
+ # Check if package is installed
+ if pacman -Q &amp;#34;$pkg&amp;#34; &amp;amp;&amp;gt;/dev/null; then
+ # Check if it was recently upgraded
+ if [ -n &amp;#34;$SINCE_TIME&amp;#34; ]; then
+ RECENT_UPDATE=$(grep -E &amp;#34;^\[$SINCE_TIME&amp;#34; &amp;#34;$PACMAN_LOG&amp;#34; | grep -E &amp;#34;upgraded $pkg &amp;#34; | tail -n 1)
+ else
+ # Fallback: check last 100 lines
+ RECENT_UPDATE=$(tail -n 100 &amp;#34;$PACMAN_LOG&amp;#34; | grep -E &amp;#34;upgraded $pkg &amp;#34; | tail -n 1)
+ fi
+ 
+ if [ -n &amp;#34;$RECENT_UPDATE&amp;#34; ]; then
+ UPDATED_CRITICAL=&amp;#34;$UPDATED_CRITICAL $pkg&amp;#34;
+ if [ &amp;#34;$VERBOSE&amp;#34; -eq 1 ]; then
+ echo -e &amp;#34; ${YELLOW}⚠ $pkg was recently updated${NC}&amp;#34;
+ fi
+ REBOOT_NEEDED=1
+ fi
+ fi
+ done
+ 
+ if [ -n &amp;#34;$UPDATED_CRITICAL&amp;#34; ]; then
+ echo -e &amp;#34; ${RED}✗ Critical packages updated:${YELLOW}$UPDATED_CRITICAL${NC}&amp;#34;
+ else
+ echo -e &amp;#34; ${GREEN}✓ No critical package updates detected${NC}&amp;#34;
+ fi
+else
+ echo -e &amp;#34; ${YELLOW}⚠ Cannot read pacman log${NC}&amp;#34;
+fi
+
+echo &amp;#34;&amp;#34;
+
+# Check 3: Processes using deleted libraries/executables
+echo -e &amp;#34;${BLUE}Checking for processes using deleted files...${NC}&amp;#34;
+
+if [ &amp;#34;$(id -u)&amp;#34; -eq 0 ]; then
+ DELETED_COUNT=0
+ PROCESSES_AFFECTED=&amp;#34;&amp;#34;
+ 
+ # Find processes with deleted files
+ for pid in /proc/[0-9]*; do
+ pid_num=$(basename &amp;#34;$pid&amp;#34;)
+ 
+ # Check if process maps contain deleted files
+ if [ -f &amp;#34;$pid/maps&amp;#34; ]; then
+ deleted_libs=$(grep -E &amp;#39;\.so.*\(deleted\)|\/usr\/bin.*\(deleted\)&amp;#39; &amp;#34;$pid/maps&amp;#34; 2&amp;gt;/dev/null | wc -l || echo &amp;#34;0&amp;#34;)
+ 
+ if [ &amp;#34;$deleted_libs&amp;#34; -gt 0 ]; then
+ DELETED_COUNT=$((DELETED_COUNT + 1))
+ 
+ if [ &amp;#34;$VERBOSE&amp;#34; -eq 1 ]; then
+ proc_name=$(cat &amp;#34;$pid/comm&amp;#34; 2&amp;gt;/dev/null || echo &amp;#34;unknown&amp;#34;)
+ echo -e &amp;#34; ${YELLOW}⚠ PID $pid_num ($proc_name) using deleted files${NC}&amp;#34;
+ fi
+ fi
+ fi
+ done
+ 
+ if [ &amp;#34;$DELETED_COUNT&amp;#34; -gt 0 ]; then
+ echo -e &amp;#34; ${YELLOW}⚠ Found $DELETED_COUNT processes using deleted/updated files${NC}&amp;#34;
+ echo -e &amp;#34; ${YELLOW} Consider restarting services or rebooting${NC}&amp;#34;
+ else
+ echo -e &amp;#34; ${GREEN}✓ No processes using deleted files${NC}&amp;#34;
+ fi
+else
+ echo -e &amp;#34; ${YELLOW}⚠ Run as root to check for processes using deleted files${NC}&amp;#34;
+ if [ &amp;#34;$VERBOSE&amp;#34; -eq 1 ]; then
+ echo &amp;#34; (sudo $0)&amp;#34;
+ fi
+fi
+
+echo &amp;#34;&amp;#34;
+
+# Final verdict
+echo -e &amp;#34;${BLUE}=== Summary ===${NC}&amp;#34;
+if [ &amp;#34;$REBOOT_NEEDED&amp;#34; -eq 1 ]; then
+ echo -e &amp;#34;${RED}✗ Reboot is recommended${NC}&amp;#34;
+ echo &amp;#34;&amp;#34;
+ echo &amp;#34;Run &amp;#39;systemctl reboot&amp;#39; or &amp;#39;reboot&amp;#39; to restart the system&amp;#34;
+ exit 1
+else
+ echo -e &amp;#34;${GREEN}✓ No reboot needed${NC}&amp;#34;
+ exit 0
+fi
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>AWS CI/CD Pipeline Examples</title><link>https://rowstu.net/aws/cicd-aws-github/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/aws/cicd-aws-github/</guid><description>&lt;h2 id="github-actions-example"&gt;GitHub Actions Example&lt;/h2&gt;
 &lt;h3 id="cigithub-actionsdeployyml"&gt;&lt;code&gt;ci/github-actions/deploy.yml&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;This pipeline:&lt;/p&gt;
 &lt;ul&gt;
@@ -1556,7 +1748,42 @@ if __name__ == &amp;#34;__main__&amp;#34;:
 &lt;li&gt;&lt;a href="https://www.digitalocean.com/community/tutorials/read-stdin-python"&gt;https://www.digitalocean.com/community/tutorials/read-stdin-python&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://www.geeksforgeeks.org/encoding-and-decoding-base64-strings-in-python/"&gt;https://www.geeksforgeeks.org/encoding-and-decoding-base64-strings-in-python/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://docs.python.org/3/library/base64.html#base64.b64decode"&gt;https://docs.python.org/3/library/base64.html#base64.b64decode&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</description></item><item><title>DevOps Principles</title><link>https://rowstu.net/devops/principles/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/principles/</guid><description>&lt;h1 id="core-devops-principles"&gt;Core DevOps Principles&lt;/h1&gt;
+&lt;/ul&gt;</description></item><item><title>Deploying Terraform with GitHub Actions</title><link>https://rowstu.net/github/terraform-deployment/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/github/terraform-deployment/</guid><description>&lt;h1 id="deploying-terraform-with-github-actions"&gt;Deploying Terraform with GitHub Actions&lt;/h1&gt;
+&lt;p&gt;Using GitHub Actions to plan, validate, and apply Terraform infrastructure changes. This is a push-based deployment model where the workflow authenticates to your cloud provider and executes Terraform commands directly.&lt;/p&gt;
+&lt;p&gt;The workflow triggers on pull requests (plan only) and merges to main (apply). This gives reviewers visibility into what will change before anything is deployed.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="terminology"&gt;Terminology&lt;/h2&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Term&lt;/th&gt;
+ &lt;th&gt;Description&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Workflow&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;The pipeline defined in a YAML file under &lt;code&gt;.github/workflows/&lt;/code&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Job&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;A unit of work within a workflow, runs on a single runner&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Step&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;An individual command or action within a job&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Runner&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;The server environment that executes jobs&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;strong&gt;Action&lt;/strong&gt;&lt;/td&gt;
+ &lt;td&gt;A reusable application that runs as a step (from the marketplace or your own repo)&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Jobs run in separate compute environments. Steps within a job share the same environment. Data passed between jobs must go through outputs explicitly.&lt;/p&gt;</description></item><item><title>DevOps Principles</title><link>https://rowstu.net/devops/principles/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/devops/principles/</guid><description>&lt;h1 id="core-devops-principles"&gt;Core DevOps Principles&lt;/h1&gt;
 &lt;p&gt;DevOps is a set of practices that combines software development (Dev) and IT operations (Ops) to shorten the development lifecycle while delivering features, fixes, and updates frequently and reliably.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2 id="the-three-ways"&gt;The Three Ways&lt;/h2&gt;
@@ -4020,7 +4247,38 @@ Use &lt;code&gt;fdisk&lt;/code&gt; or &lt;code&gt;parted&lt;/code&gt; to create:
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Format the Partitions:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Lockdown Firefox</title><link>https://rowstu.net/linux/lockdown-firefox/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/lockdown-firefox/</guid><description>&lt;h1 id="aboutconfig-settings-to-make-firefox-more-secure"&gt;about:config settings to make Firefox more secure&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Format the Partitions:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Live USB Recovery Drive</title><link>https://rowstu.net/linux/live-usb-recovery/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/live-usb-recovery/</guid><description>&lt;p&gt;Build your own bootable Linux USB with recovery and disk repair tools. This covers two approaches: a minimal hand-built system using BusyBox, and a more practical method using debootstrap for a full Debian-based environment.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="what-you-need"&gt;What You Need&lt;/h2&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Item&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;USB drive&lt;/td&gt;
+ &lt;td&gt;2 GB minimum (8 GB+ recommended for debootstrap method)&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Linux host&lt;/td&gt;
+ &lt;td&gt;Any running Linux system to build from&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Root access&lt;/td&gt;
+ &lt;td&gt;Partitioning and mounting require root&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;Internet&lt;/td&gt;
+ &lt;td&gt;For downloading packages and kernels&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id="approach-1-minimal-busybox-recovery-usb"&gt;Approach 1: Minimal BusyBox Recovery USB&lt;/h2&gt;
+&lt;p&gt;A hand-rolled system with a tiny footprint. Good for learning how Linux boots and for carrying a lightweight rescue environment.&lt;/p&gt;</description></item><item><title>Lockdown Firefox</title><link>https://rowstu.net/linux/lockdown-firefox/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/lockdown-firefox/</guid><description>&lt;h1 id="aboutconfig-settings-to-make-firefox-more-secure"&gt;about:config settings to make Firefox more secure&lt;/h1&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;geo.enabled: FALSE: This disables Firefox from sharing your location. 
 browser.safebrowsing.malware.enabled: FALSE: This disables Google’s malware monitoring. 
 dom.battery.enabled: FALSE: This setting blocks sending battery level information. 
@@ -5697,7 +5955,10 @@ sudo sssctl user-checks username
 &lt;/ul&gt;
 &lt;hr&gt;
 &lt;h1 id="what-to-teach-them-about-fear"&gt;What to teach them about fear&lt;/h1&gt;
-&lt;p&gt;Right now, your main job in life is to handle your fears and learn from the challenges you face every day. These challenges are things like school, gymnastics, and relationships with your friends and family.&lt;/p&gt;</description></item><item><title>The Four Agreements</title><link>https://rowstu.net/books/the-four-agreements/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/the-four-agreements/</guid><description>&lt;p&gt;Notes on the book The Four Agreements by Don Miguel Ruiz&lt;/p&gt;
+&lt;p&gt;Right now, your main job in life is to handle your fears and learn from the challenges you face every day. These challenges are things like school, gymnastics, and relationships with your friends and family.&lt;/p&gt;</description></item><item><title>Test a Linux ISO file</title><link>https://rowstu.net/linux/test-iso/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/test-iso/</guid><description>&lt;p&gt;If you&amp;rsquo;ve downloaded a Linux ISO, such as the installer for Ubuntu, Debian, or ArchLinux, and want to test it before writing it to a USB stick, you can use QEMU with VNC to quickly check that it boots.&lt;/p&gt;
+&lt;p&gt;Run the following command in your terminal:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;qemu-system-x86_64 -boot d -cdrom /path/to/your/live.iso -m 2048 -enable-kvm
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, use a VNC viewer like TigerVNC to connect to display port :5900. If the ISO is good, you&amp;rsquo;ll see the live disk OS booting.&lt;/p&gt;</description></item><item><title>The Four Agreements</title><link>https://rowstu.net/books/the-four-agreements/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/the-four-agreements/</guid><description>&lt;p&gt;Notes on the book The Four Agreements by Don Miguel Ruiz&lt;/p&gt;
 &lt;p&gt;The presents a code of conduct based on ancient Toltec wisdom. The agreements are principles aimed at achieving personal freedom and living a more fulfilling life.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;

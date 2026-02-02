@@ -1,0 +1,346 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Deploying Terraform with GitHub Actions // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Deploying Terraform with GitHub Actions</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/githubterraform-deployment/>Githubterraform Deployment</a></div><div class="card markdown-content"><h1 id=deploying-terraform-with-github-actions>Deploying Terraform with GitHub Actions</h1><p>Using GitHub Actions to plan, validate, and apply Terraform infrastructure changes. This is a push-based deployment model where the workflow authenticates to your cloud provider and executes Terraform commands directly.</p><p>The workflow triggers on pull requests (plan only) and merges to main (apply). This gives reviewers visibility into what will change before anything is deployed.</p><hr><h2 id=terminology>Terminology</h2><table><thead><tr><th>Term</th><th>Description</th></tr></thead><tbody><tr><td><strong>Workflow</strong></td><td>The pipeline defined in a YAML file under <code>.github/workflows/</code></td></tr><tr><td><strong>Job</strong></td><td>A unit of work within a workflow, runs on a single runner</td></tr><tr><td><strong>Step</strong></td><td>An individual command or action within a job</td></tr><tr><td><strong>Runner</strong></td><td>The server environment that executes jobs</td></tr><tr><td><strong>Action</strong></td><td>A reusable application that runs as a step (from the marketplace or your own repo)</td></tr></tbody></table><p>Jobs run in separate compute environments. Steps within a job share the same environment. Data passed between jobs must go through outputs explicitly.</p><hr><h2 id=repository-structure>Repository Structure</h2><p>A typical layout for Terraform managed through GitHub Actions:</p><pre tabindex=0><code>.
+├── .github/
+│   └── workflows/
+│       └── terraform.yml
+├── environments/
+│   ├── staging/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── backend.tf
+│   └── production/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── backend.tf
+└── modules/
+    └── vpc/
+        ├── main.tf
+        ├── variables.tf
+        └── outputs.tf
+</code></pre><p>Separating environments into directories means each has its own state file and backend configuration. Modules live alongside and are referenced from environment configs.</p><hr><h2 id=authentication-with-oidc>Authentication with OIDC</h2><p>There are two ways to authenticate a workflow to a cloud provider like AWS. Static credentials (access key + secret key) stored as GitHub secrets will work, but they are long-lived and a security risk if leaked.</p><p>The better approach is OIDC (OpenID Connect). This uses short-lived tokens generated at runtime. If a token were to leak after the fact, it would already be expired and useless.</p><h3 id=setting-up-oidc-in-aws>Setting Up OIDC in AWS</h3><ol><li><p>Add the GitHub OIDC provider under IAM > Identity Providers:</p><ul><li>Provider URL: <code>https://token.actions.githubusercontent.com</code></li><li>Audience: <code>sts.amazonaws.com</code></li></ul></li><li><p>Create an IAM role with a trust policy that federates access via the OIDC provider:</p></li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;Version&#34;</span>: <span style=color:#e6db74>&#34;2012-10-17&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;Statement&#34;</span>: [
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Principal&#34;</span>: {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;Federated&#34;</span>: <span style=color:#e6db74>&#34;arn:aws:iam::ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com&#34;</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: <span style=color:#e6db74>&#34;sts:AssumeRoleWithWebIdentity&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Condition&#34;</span>: {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;StringEquals&#34;</span>: {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;token.actions.githubusercontent.com:aud&#34;</span>: <span style=color:#e6db74>&#34;sts.amazonaws.com&#34;</span>
+</span></span><span style=display:flex><span>        },
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;StringLike&#34;</span>: {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;token.actions.githubusercontent.com:sub&#34;</span>: <span style=color:#e6db74>&#34;repo:YOUR_ORG/YOUR_REPO:*&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The <code>sub</code> condition locks access to a specific repository. You can narrow this further to specific branches or environments.</p><ol start=3><li>Attach a policy to the role granting the permissions Terraform needs (S3 for state, DynamoDB for locks, plus whatever resources you are managing).</li></ol><h3 id=using-oidc-in-the-workflow>Using OIDC in the Workflow</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>permissions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>id-token</span>: <span style=color:#ae81ff>write</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>contents</span>: <span style=color:#ae81ff>read</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS Credentials</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502</span> <span style=color:#75715e># v4.0.2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>arn:aws:iam::ACCOUNT_ID:role/GitHubActionsRole</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>eu-west-2</span>
+</span></span></code></pre></div><p>The <code>id-token: write</code> permission is required for the runner to request a JWT from GitHub&rsquo;s OIDC provider. Without it, authentication will fail silently.</p><hr><h2 id=secrets-and-variables>Secrets and Variables</h2><p>Sensitive values (state bucket names, account IDs, role ARNs) should be stored in GitHub rather than hardcoded in workflow files.</p><ul><li><strong>Secrets</strong> are for sensitive values. You can only set them, never read them back from the UI. GitHub masks them in logs automatically.</li><li><strong>Variables</strong> are for non-sensitive configuration you want to be able to view and edit.</li></ul><p>Both can be scoped to the repository level or to a specific environment (staging, production). Environment-scoped values override repository-scoped ones when a job specifies that environment.</p><p>Set them under Settings > Secrets and variables > Actions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>TF_VAR_region</span>: <span style=color:#ae81ff>${{ vars.AWS_REGION }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS Credentials</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502</span> <span style=color:#75715e># v4.0.2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>${{ secrets.AWS_ROLE_ARN }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>${{ vars.AWS_REGION }}</span>
+</span></span></code></pre></div><hr><h2 id=basic-terraform-workflow>Basic Terraform Workflow</h2><p>This workflow runs <code>terraform plan</code> on pull requests and <code>terraform apply</code> on pushes to main. It uses OIDC to authenticate and pins all actions to commit hashes for security.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>push</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>paths</span>: [<span style=color:#e6db74>&#39;environments/**&#39;</span>, <span style=color:#e6db74>&#39;modules/**&#39;</span>]
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull_request</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>paths</span>: [<span style=color:#e6db74>&#39;environments/**&#39;</span>, <span style=color:#e6db74>&#39;modules/**&#39;</span>]
+</span></span><span style=display:flex><span>  <span style=color:#f92672>workflow_dispatch</span>:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>permissions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>id-token</span>: <span style=color:#ae81ff>write</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>contents</span>: <span style=color:#ae81ff>read</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull-requests</span>: <span style=color:#ae81ff>write</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>TF_VERSION</span>: <span style=color:#e6db74>&#34;1.9.0&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>terraform</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-24.04</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>defaults</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>run</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>environments/staging</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Checkout</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683</span> <span style=color:#75715e># v4.2.2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS Credentials</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502</span> <span style=color:#75715e># v4.0.2</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>${{ secrets.AWS_ROLE_ARN }}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>${{ vars.AWS_REGION }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup Terraform</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555b616811f2ccb203</span> <span style=color:#75715e># v3.1.2</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>terraform_version</span>: <span style=color:#ae81ff>${{ env.TF_VERSION }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Init</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform init</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Format Check</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform fmt -check -recursive</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Validate</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform validate</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform plan -no-color -out=tfplan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>continue-on-error</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Comment Plan on PR</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.event_name == &#39;pull_request&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea</span> <span style=color:#75715e># v7.0.1</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            const fs = require(&#39;fs&#39;);
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            const { execSync } = require(&#39;child_process&#39;);
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            const plan = execSync(&#39;terraform show -no-color tfplan&#39;, {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              cwd: &#39;environments/staging&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            }).toString();
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            const output = `#### Terraform Plan
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            \`\`\`
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            ${plan.substring(0, 60000)}
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            \`\`\`
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            *Triggered by @${{ github.actor }}*`;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            github.rest.issues.createComment({
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              issue_number: context.issue.number,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              owner: context.repo.owner,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              repo: context.repo.repo,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              body: output
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            });</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Apply</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.ref == &#39;refs/heads/main&#39; &amp;&amp; github.event_name == &#39;push&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform apply -auto-approve tfplan</span>
+</span></span></code></pre></div><h3 id=what-each-step-does>What Each Step Does</h3><ul><li><strong>Checkout</strong> pulls the repo code onto the runner.</li><li><strong>Configure AWS Credentials</strong> uses OIDC to assume the IAM role. No static keys involved.</li><li><strong>Setup Terraform</strong> installs the specified Terraform version using the official HashiCorp action.</li><li><strong>Init</strong> downloads providers and configures the backend (S3 + DynamoDB for remote state).</li><li><strong>Format Check</strong> catches unformatted files before they reach main.</li><li><strong>Validate</strong> checks HCL syntax without accessing remote state.</li><li><strong>Plan</strong> produces an execution plan and saves it to a file. <code>continue-on-error</code> ensures the PR comment step still runs even if the plan fails.</li><li><strong>Comment Plan on PR</strong> posts the plan output as a PR comment so reviewers can see exactly what will change.</li><li><strong>Apply</strong> only runs on merges to main, using the saved plan file to ensure what was reviewed is what gets applied.</li></ul><hr><h2 id=path-filtering>Path Filtering</h2><p>The <code>paths</code> key in the trigger controls which file changes actually kick off the workflow. This avoids wasted compute when changes are unrelated to infrastructure.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>push</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>paths</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#39;environments/staging/**&#39;</span>
+</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#39;modules/**&#39;</span>
+</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#39;!**/*.md&#39;</span>
+</span></span></code></pre></div><p>The <code>!</code> prefix excludes a pattern. Here, markdown file changes inside those directories will not trigger a run. You can also use branch patterns with wildcards for feature branches.</p><hr><h2 id=multiple-environments-with-matrix>Multiple Environments with Matrix</h2><p>If you manage several environments with the same workflow, a matrix strategy fans out jobs in parallel. Each combination runs as a separate job on its own runner.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>terraform</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform (${{ matrix.environment }})</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-24.04</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>matrix</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>environment</span>: [<span style=color:#ae81ff>staging, production]</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>fail-fast</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ matrix.environment }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>defaults</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>run</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>environments/${{ matrix.environment }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Checkout</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683</span> <span style=color:#75715e># v4.2.2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS Credentials</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502</span> <span style=color:#75715e># v4.0.2</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>${{ secrets.AWS_ROLE_ARN }}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>${{ vars.AWS_REGION }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup Terraform</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555b616811f2ccb203</span> <span style=color:#75715e># v3.1.2</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>terraform_version</span>: <span style=color:#e6db74>&#34;1.9.0&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Init</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform init</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform plan -no-color</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Apply</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.ref == &#39;refs/heads/main&#39; &amp;&amp; github.event_name == &#39;push&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform apply -auto-approve</span>
+</span></span></code></pre></div><p>Because each environment is a GitHub Environment, the secrets and variables (like <code>AWS_ROLE_ARN</code>) resolve to the correct values for staging or production automatically. Use <code>fail-fast: false</code> so a failure in one environment does not cancel the other.</p><hr><h2 id=concurrency-controls>Concurrency Controls</h2><p>Terraform state locks prevent two applies from running simultaneously, but you can also control this at the workflow level. Concurrency groups cancel or queue runs that overlap.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>concurrency</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>group</span>: <span style=color:#ae81ff>terraform-${{ github.workflow }}-${{ matrix.environment }}</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>cancel-in-progress</span>: <span style=color:#66d9ef>false</span>
+</span></span></code></pre></div><p>Setting <code>cancel-in-progress: false</code> means a new run will wait for the current one to finish rather than cancelling it. This is what you want for Terraform because cancelling mid-apply can leave resources in a broken state.</p><p>The group key should include enough context to avoid collisions. Here, the workflow name and environment ensure staging and production runs do not block each other but multiple runs against the same environment are serialised.</p><hr><h2 id=reusable-composite-actions>Reusable Composite Actions</h2><p>If several workflows share the same setup steps (install Terraform, configure credentials, run init), extract those into a composite action to avoid repetition.</p><p>Create <code>.github/actions/terraform-setup/action.yml</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Setup</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>description</span>: <span style=color:#ae81ff>Install Terraform and configure AWS credentials</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>inputs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>terraform_version</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>description</span>: <span style=color:#ae81ff>Terraform version to install</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;1.9.0&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>role_arn</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>description</span>: <span style=color:#ae81ff>AWS IAM role ARN to assume</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>required</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>aws_region</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>description</span>: <span style=color:#ae81ff>AWS region</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>required</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>working_directory</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>description</span>: <span style=color:#ae81ff>Path to the Terraform configuration</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>required</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>runs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>using</span>: <span style=color:#ae81ff>composite</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS Credentials</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502</span> <span style=color:#75715e># v4.0.2</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>${{ inputs.role_arn }}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>${{ inputs.aws_region }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup Terraform</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555b616811f2ccb203</span> <span style=color:#75715e># v3.1.2</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>terraform_version</span>: <span style=color:#ae81ff>${{ inputs.terraform_version }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Init</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>shell</span>: <span style=color:#ae81ff>bash</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>${{ inputs.working_directory }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform init</span>
+</span></span></code></pre></div><p>Then reference it in your workflow:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Checkout</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683</span> <span style=color:#75715e># v4.2.2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>./.github/actions/terraform-setup</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>role_arn</span>: <span style=color:#ae81ff>${{ secrets.AWS_ROLE_ARN }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>aws_region</span>: <span style=color:#ae81ff>${{ vars.AWS_REGION }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>working_directory</span>: <span style=color:#ae81ff>environments/staging</span>
+</span></span></code></pre></div><p>Composite actions live inside your repository. Inputs must be strings (no booleans). If you need a conditional, compare against the string <code>"true"</code>.</p><hr><h2 id=pinning-action-versions>Pinning Action Versions</h2><p>Always pin third-party actions to a specific commit hash rather than a tag. Tags can be moved. There have been incidents where a compromised repository had all its git tags repointed to a malicious commit to exfiltrate secrets.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Bad - tag can be moved</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Better - specific tag</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4.2.2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Best - commit hash cannot be changed after the fact</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683</span> <span style=color:#75715e># v4.2.2</span>
+</span></span></code></pre></div><p>Add a comment with the version number next to the hash so you can tell at a glance which version you are running when it comes time to update.</p><hr><h2 id=triggering-workflows>Triggering Workflows</h2><p>The most common triggers for a Terraform workflow:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#75715e># Plan on PRs, apply on merge</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>push</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull_request</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># Manual trigger with environment selection</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>workflow_dispatch</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>inputs</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>description</span>: <span style=color:#ae81ff>Environment to deploy</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>type</span>: <span style=color:#ae81ff>choice</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>options</span>:
+</span></span><span style=display:flex><span>          - <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>          - <span style=color:#ae81ff>production</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>action</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>description</span>: <span style=color:#ae81ff>Terraform action to run</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>type</span>: <span style=color:#ae81ff>choice</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>options</span>:
+</span></span><span style=display:flex><span>          - <span style=color:#ae81ff>plan</span>
+</span></span><span style=display:flex><span>          - <span style=color:#ae81ff>apply</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># Scheduled drift detection</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>schedule</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>cron</span>: <span style=color:#e6db74>&#39;0 6 * * 1&#39;</span>  <span style=color:#75715e># Monday 06:00 UTC</span>
+</span></span></code></pre></div><p>The <code>workflow_dispatch</code> trigger adds a &ldquo;Run workflow&rdquo; button in the GitHub UI with dropdown inputs. Useful for manual deploys or one-off operations like importing resources.</p><p>The <code>schedule</code> trigger runs on a cron schedule. Running a plan on a schedule can detect drift where someone has modified infrastructure outside of Terraform.</p><hr><h2 id=environment-protection-rules>Environment Protection Rules</h2><p>GitHub Environments can enforce approval gates before a workflow job proceeds. Under Settings > Environments, create environments for each deployment target and configure:</p><ul><li><strong>Required reviewers</strong> so that production applies need manual approval.</li><li><strong>Wait timer</strong> to introduce a delay between approval and execution.</li><li><strong>Branch restrictions</strong> to limit which branches can deploy to an environment.</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>plan</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-24.04</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      <span style=color:#75715e># ... plan steps</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apply</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>needs</span>: <span style=color:#ae81ff>plan</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-24.04</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>production </span> <span style=color:#75715e># requires approval if configured</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      <span style=color:#75715e># ... apply steps</span>
+</span></span></code></pre></div><p>The <code>needs</code> key ensures jobs run in order. The apply job will not start until the plan job succeeds and any environment protection rules are satisfied.</p><hr><h2 id=passing-data-between-jobs>Passing Data Between Jobs</h2><p>To share a plan file or status between jobs, use outputs and artifacts. Outputs pass small strings. Artifacts pass files.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>plan</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-24.04</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>outputs</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>has_changes</span>: <span style=color:#ae81ff>${{ steps.plan.outputs.has_changes }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          terraform plan -no-color -out=tfplan -detailed-exitcode || exit_code=$?
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          if [ &#34;$exit_code&#34; -eq 2 ]; then
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;has_changes=true&#34; &gt;&gt; &#34;$GITHUB_OUTPUT&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          else
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;has_changes=false&#34; &gt;&gt; &#34;$GITHUB_OUTPUT&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          fi</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Upload Plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882</span> <span style=color:#75715e># v4.4.3</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>tfplan</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>path</span>: <span style=color:#ae81ff>environments/staging/tfplan</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apply</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>needs</span>: <span style=color:#ae81ff>plan</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>if</span>: <span style=color:#ae81ff>needs.plan.outputs.has_changes == &#39;true&#39; &amp;&amp; github.ref == &#39;refs/heads/main&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-24.04</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Download Plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16</span> <span style=color:#75715e># v4.1.8</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>tfplan</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>path</span>: <span style=color:#ae81ff>environments/staging</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Apply</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>environments/staging</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform apply -auto-approve tfplan</span>
+</span></span></code></pre></div><p>Writing to <code>$GITHUB_OUTPUT</code> stores a value that other steps and downstream jobs can reference. The <code>if</code> conditional on the apply job checks whether the plan detected changes and only applies when there is something to do.</p><p>Terraform&rsquo;s <code>-detailed-exitcode</code> flag returns exit code 2 when there are changes, which lets us distinguish between &ldquo;no changes&rdquo; and &ldquo;changes pending&rdquo; without parsing plan output.</p><hr><h2 id=workflow-permissions>Workflow Permissions</h2><p>By default, the <code>GITHUB_TOKEN</code> has broad permissions. Scope it down to the minimum your workflow needs.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>permissions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>id-token</span>: <span style=color:#ae81ff>write      </span> <span style=color:#75715e># required for OIDC</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>contents</span>: <span style=color:#ae81ff>read       </span> <span style=color:#75715e># checkout the repo</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull-requests</span>: <span style=color:#ae81ff>write </span> <span style=color:#75715e># comment plan output on PRs</span>
+</span></span></code></pre></div><p>If a workflow only needs to read the repo and authenticate via OIDC, there is no reason to grant it write access to issues, packages, or anything else. This limits the blast radius if a third-party action is compromised.</p><hr><h2 id=state-backend>State Backend</h2><p>Terraform state should live in a remote backend with locking, not in the runner&rsquo;s filesystem. The state file is ephemeral and will be destroyed when the job ends.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>terraform</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>backend</span> <span style=color:#e6db74>&#34;s3&#34;</span> {
+</span></span><span style=display:flex><span>    bucket         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;myproject-terraform-state&#34;</span>
+</span></span><span style=display:flex><span>    key            <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;staging/terraform.tfstate&#34;</span>
+</span></span><span style=display:flex><span>    region         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;eu-west-2&#34;</span>
+</span></span><span style=display:flex><span>    encrypt        <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    dynamodb_table <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;terraform-locks&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The S3 backend with DynamoDB locking is the standard setup for AWS. Each environment should use a different state key to keep state files isolated. The DynamoDB table prevents two workflow runs from applying at the same time.</p><hr><h2 id=debugging-and-local-testing>Debugging and Local Testing</h2><p>The iteration loop of push-and-wait is slow and painful. Where possible, validate locally before pushing.</p><h3 id=validate-locally>Validate Locally</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>terraform init
+</span></span><span style=display:flex><span>terraform fmt -check -recursive
+</span></span><span style=display:flex><span>terraform validate
+</span></span><span style=display:flex><span>terraform plan
+</span></span></code></pre></div><p>These commands catch most issues before the workflow ever runs.</p><h3 id=using-act>Using ACT</h3><p>ACT is a tool that runs GitHub Actions workflows locally inside Docker containers. It is useful for testing workflow logic, conditionals, and job ordering without pushing to GitHub.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install</span>
+</span></span><span style=display:flex><span>brew install act       <span style=color:#75715e># macOS</span>
+</span></span><span style=display:flex><span>yay -S act             <span style=color:#75715e># Arch Linux</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run a workflow</span>
+</span></span><span style=display:flex><span>act workflow_dispatch -W .github/workflows/terraform.yml
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run with a specific event payload</span>
+</span></span><span style=display:flex><span>act push -e event.json -W .github/workflows/terraform.yml
+</span></span></code></pre></div><p>ACT has limitations. It cannot replicate OIDC authentication, GitHub-hosted runner images exactly, or certain API interactions. For anything that modifies remote state, you will still need to test against actual GitHub runners.</p><hr><h2 id=summary>Summary</h2><p>The core pattern for Terraform in GitHub Actions:</p><ol><li><strong>PR opens</strong> → workflow runs <code>plan</code> and posts the output as a comment.</li><li><strong>Reviewer approves</strong> the PR after checking the plan.</li><li><strong>PR merges to main</strong> → workflow runs <code>apply</code> using the reviewed plan.</li><li><strong>Concurrency controls</strong> ensure only one apply runs per environment at a time.</li><li><strong>OIDC authentication</strong> avoids long-lived static credentials.</li><li><strong>Environment protection rules</strong> gate production deploys behind manual approval.</li></ol><p>Keep the workflow simple. Start with a basic plan-and-apply pipeline and add complexity (matrix, composite actions, drift detection) as your infrastructure grows.</p></div></div><script src=/assets/shared-nav.js></script></body></html>

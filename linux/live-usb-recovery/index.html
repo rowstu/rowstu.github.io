@@ -1,0 +1,356 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Live USB Recovery Drive // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Live USB Recovery Drive</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/linuxlive-usb-recovery/>Linuxlive Usb Recovery</a></div><div class="card markdown-content"><p>Build your own bootable Linux USB with recovery and disk repair tools. This covers two approaches: a minimal hand-built system using BusyBox, and a more practical method using debootstrap for a full Debian-based environment.</p><hr><h2 id=what-you-need>What You Need</h2><table><thead><tr><th>Item</th><th>Notes</th></tr></thead><tbody><tr><td>USB drive</td><td>2 GB minimum (8 GB+ recommended for debootstrap method)</td></tr><tr><td>Linux host</td><td>Any running Linux system to build from</td></tr><tr><td>Root access</td><td>Partitioning and mounting require root</td></tr><tr><td>Internet</td><td>For downloading packages and kernels</td></tr></tbody></table><hr><h2 id=approach-1-minimal-busybox-recovery-usb>Approach 1: Minimal BusyBox Recovery USB</h2><p>A hand-rolled system with a tiny footprint. Good for learning how Linux boots and for carrying a lightweight rescue environment.</p><hr><h3 id=1-identify-and-prepare-the-usb-drive>1. Identify and Prepare the USB Drive</h3><p><strong>Find the device:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
+</span></span></code></pre></div><blockquote><p><strong>Warning:</strong> Double-check the device name. Writing to the wrong device will destroy data. The USB will typically be <code>/dev/sdX</code> where X is <strong>not</strong> your system disk.</p></blockquote><p><strong>Wipe and partition:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Zero the first few MB to clear old partition tables</span>
+</span></span><span style=display:flex><span>dd <span style=color:#66d9ef>if</span><span style=color:#f92672>=</span>/dev/zero of<span style=color:#f92672>=</span>/dev/sdX bs<span style=color:#f92672>=</span>1M count<span style=color:#f92672>=</span><span style=color:#ae81ff>10</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Create a new partition table and boot partition</span>
+</span></span><span style=display:flex><span>fdisk /dev/sdX <span style=color:#e6db74>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>o
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>n
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>p
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>a
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>w
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span></code></pre></div><p><strong>Format and mount:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>mkfs.ext4 -L RESCUE /dev/sdX1
+</span></span><span style=display:flex><span>mkdir -p /mnt/usb
+</span></span><span style=display:flex><span>mount /dev/sdX1 /mnt/usb
+</span></span></code></pre></div><hr><h3 id=2-install-the-kernel>2. Install the Kernel</h3><p>Download a stable kernel from kernel.org, or copy the one from your running system:</p><p><strong>Option A: Copy from host system</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>cp /boot/vmlinuz-<span style=color:#66d9ef>$(</span>uname -r<span style=color:#66d9ef>)</span> /mnt/usb/vmlinuz
+</span></span></code></pre></div><p><strong>Option B: Download from kernel.org</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Check latest stable version at https://www.kernel.org/</span>
+</span></span><span style=display:flex><span>wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.12.8.tar.xz
+</span></span><span style=display:flex><span>tar -xf linux-6.12.8.tar.xz
+</span></span><span style=display:flex><span>cd linux-6.12.8
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Configure for a generic x86_64 system</span>
+</span></span><span style=display:flex><span>make defconfig
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Enable important drivers for USB and common hardware</span>
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_USB_STORAGE
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_EXT4_FS
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_BTRFS_FS
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_XFS_FS
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_NTFS3_FS
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_VFAT_FS
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_RAID6_PQ
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_MD_RAID0
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_MD_RAID1
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_MD_RAID10
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_MD_RAID456
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_BLK_DEV_DM
+</span></span><span style=display:flex><span>scripts/config --enable CONFIG_DM_CRYPT
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>make -j<span style=color:#66d9ef>$(</span>nproc<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>cp arch/x86/boot/bzImage /mnt/usb/vmlinuz
+</span></span></code></pre></div><hr><h3 id=3-build-busybox>3. Build BusyBox</h3><p>BusyBox gives you a single binary containing hundreds of standard Unix utilities.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>wget https://busybox.net/downloads/busybox-1.36.1.tar.bz2
+</span></span><span style=display:flex><span>tar -xf busybox-1.36.1.tar.bz2
+</span></span><span style=display:flex><span>cd busybox-1.36.1
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Build statically linked so it has no library dependencies</span>
+</span></span><span style=display:flex><span>make defconfig
+</span></span><span style=display:flex><span>sed -i <span style=color:#e6db74>&#39;s/# CONFIG_STATIC is not set/CONFIG_STATIC=y/&#39;</span> .config
+</span></span><span style=display:flex><span>make -j<span style=color:#66d9ef>$(</span>nproc<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>make install CONFIG_PREFIX<span style=color:#f92672>=</span>/mnt/usb
+</span></span></code></pre></div><p>This populates <code>/mnt/usb/bin</code>, <code>/mnt/usb/sbin</code>, and <code>/mnt/usb/usr</code> with symlinks to the BusyBox binary.</p><hr><h3 id=4-create-the-root-filesystem-structure>4. Create the Root Filesystem Structure</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>cd /mnt/usb
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Create required directories</span>
+</span></span><span style=display:flex><span>mkdir -p proc sys dev tmp etc var/log run mnt/disk1 mnt/disk2 mnt/disk3
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Create essential device nodes</span>
+</span></span><span style=display:flex><span>mknod -m <span style=color:#ae81ff>622</span> dev/console c <span style=color:#ae81ff>5</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>mknod -m <span style=color:#ae81ff>666</span> dev/null c <span style=color:#ae81ff>1</span> <span style=color:#ae81ff>3</span>
+</span></span><span style=display:flex><span>mknod -m <span style=color:#ae81ff>666</span> dev/zero c <span style=color:#ae81ff>1</span> <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>mknod -m <span style=color:#ae81ff>666</span> dev/tty c <span style=color:#ae81ff>5</span> <span style=color:#ae81ff>0</span>
+</span></span></code></pre></div><hr><h3 id=5-create-the-init-script>5. Create the Init Script</h3><p>This is the first process that runs when the kernel boots.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>cat &gt; /mnt/usb/init <span style=color:#e6db74>&lt;&lt; &#39;INITEOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>#!/bin/sh
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74># Mount virtual filesystems
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>mount -t proc none /proc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>mount -t sysfs none /sys
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>mount -t devtmpfs none /dev
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>mount -t tmpfs none /tmp
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>mount -t tmpfs none /run
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>mkdir -p /dev/pts
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>mount -t devpts none /dev/pts
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74># Bring up loopback
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ifconfig lo 127.0.0.1 up
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74># Populate /dev dynamically
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;Populating /dev...&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>mdev -s
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74># Set hostname
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>hostname rescue
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74># Print banner
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>clear
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;================================================&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;  LINUX RECOVERY ENVIRONMENT&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;  Kernel: $(uname -r)&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;  Date:   $(date)&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;================================================&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;Useful commands:&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;  lsblk           - list block devices&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;  fdisk -l         - show partition tables&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;  mount /dev/sdXN /mnt/disk1  - mount a disk&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;  fsck /dev/sdXN   - check filesystem&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;  dd, hexdump      - low-level disk tools&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>echo &#34;&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74># Drop to shell
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>exec /bin/sh
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>INITEOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>chmod +x /mnt/usb/init
+</span></span></code></pre></div><hr><h3 id=6-create-etc-files>6. Create /etc Files</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Minimal fstab</span>
+</span></span><span style=display:flex><span>cat &gt; /mnt/usb/etc/fstab <span style=color:#e6db74>&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>proc    /proc   proc    defaults    0 0
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>sysfs   /sys    sysfs   defaults    0 0
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># DNS resolution</span>
+</span></span><span style=display:flex><span>cat &gt; /mnt/usb/etc/resolv.conf <span style=color:#e6db74>&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>nameserver 1.1.1.1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>nameserver 8.8.8.8
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Hostname</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;rescue&#34;</span> &gt; /mnt/usb/etc/hostname
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Password file (root with no password)</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;root::0:0:root:/:/bin/sh&#34;</span> &gt; /mnt/usb/etc/passwd
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;root:x:0:&#34;</span> &gt; /mnt/usb/etc/group
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Profile for shell</span>
+</span></span><span style=display:flex><span>cat &gt; /mnt/usb/etc/profile <span style=color:#e6db74>&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>export PS1=&#39;rescue# &#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>alias ll=&#39;ls -la&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>alias disks=&#39;lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span></code></pre></div><hr><h3 id=7-install-grub-bootloader>7. Install GRUB Bootloader</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install GRUB to the USB MBR</span>
+</span></span><span style=display:flex><span>grub-install --target<span style=color:#f92672>=</span>i386-pc --boot-directory<span style=color:#f92672>=</span>/mnt/usb/boot /dev/sdX
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Create GRUB config</span>
+</span></span><span style=display:flex><span>mkdir -p /mnt/usb/boot/grub
+</span></span><span style=display:flex><span>cat &gt; /mnt/usb/boot/grub/grub.cfg <span style=color:#e6db74>&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>set default=0
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>set timeout=5
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>menuentry &#34;Linux Recovery Environment&#34; {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    linux /vmlinuz root=/dev/sdX1 rw init=/init
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>}
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>menuentry &#34;Linux Recovery (Safe Mode - no USB3)&#34; {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    linux /vmlinuz root=/dev/sdX1 rw init=/init xhci_hcd.quirks=0x20000000
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>}
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span></code></pre></div><blockquote><p><strong>Note:</strong> Replace <code>/dev/sdX1</code> in grub.cfg with the actual partition, or use <code>root=LABEL=RESCUE</code> to avoid device name issues across machines.</p></blockquote><p><strong>Using a label instead (recommended):</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>cat &gt; /mnt/usb/boot/grub/grub.cfg <span style=color:#e6db74>&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>set default=0
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>set timeout=5
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>menuentry &#34;Linux Recovery Environment&#34; {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    search --label RESCUE --set root
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    linux /vmlinuz root=LABEL=RESCUE rw init=/init
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>}
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span></code></pre></div><hr><h3 id=8-unmount-and-test>8. Unmount and Test</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>sync
+</span></span><span style=display:flex><span>umount /mnt/usb
+</span></span></code></pre></div><p><strong>Test with QEMU before booting real hardware:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>qemu-system-x86_64 -hda /dev/sdX -m <span style=color:#ae81ff>512</span> -enable-kvm
+</span></span></code></pre></div><hr><h2 id=approach-2-debootstrap-recovery-usb>Approach 2: Debootstrap Recovery USB</h2><p>This builds a full Debian userspace with <code>apt</code> available for installing additional tools. More practical for serious recovery work.</p><hr><h3 id=1-prepare-the-usb-drive>1. Prepare the USB Drive</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Partition: 512MB EFI + rest as Linux root</span>
+</span></span><span style=display:flex><span>parted /dev/sdX --script mklabel gpt
+</span></span><span style=display:flex><span>parted /dev/sdX --script mkpart ESP fat32 1MiB 513MiB
+</span></span><span style=display:flex><span>parted /dev/sdX --script set <span style=color:#ae81ff>1</span> esp on
+</span></span><span style=display:flex><span>parted /dev/sdX --script mkpart primary ext4 513MiB 100%
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Format</span>
+</span></span><span style=display:flex><span>mkfs.fat -F32 /dev/sdX1
+</span></span><span style=display:flex><span>mkfs.ext4 -L RESCUE /dev/sdX2
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Mount</span>
+</span></span><span style=display:flex><span>mkdir -p /mnt/usb
+</span></span><span style=display:flex><span>mount /dev/sdX2 /mnt/usb
+</span></span><span style=display:flex><span>mkdir -p /mnt/usb/boot/efi
+</span></span><span style=display:flex><span>mount /dev/sdX1 /mnt/usb/boot/efi
+</span></span></code></pre></div><hr><h3 id=2-bootstrap-debian>2. Bootstrap Debian</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>apt install debootstrap    <span style=color:#75715e># or: pacman -S debootstrap</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>debootstrap --arch<span style=color:#f92672>=</span>amd64 bookworm /mnt/usb http://deb.debian.org/debian
+</span></span></code></pre></div><hr><h3 id=3-configure-the-system>3. Configure the System</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Bind mount for chroot</span>
+</span></span><span style=display:flex><span>mount --bind /dev /mnt/usb/dev
+</span></span><span style=display:flex><span>mount --bind /dev/pts /mnt/usb/dev/pts
+</span></span><span style=display:flex><span>mount -t proc proc /mnt/usb/proc
+</span></span><span style=display:flex><span>mount -t sysfs sysfs /mnt/usb/sys
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Enter chroot</span>
+</span></span><span style=display:flex><span>chroot /mnt/usb /bin/bash
+</span></span></code></pre></div><p><strong>Inside the chroot:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Set root password</span>
+</span></span><span style=display:flex><span>passwd root
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Set hostname</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;rescue&#34;</span> &gt; /etc/hostname
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Configure apt sources</span>
+</span></span><span style=display:flex><span>cat &gt; /etc/apt/sources.list <span style=color:#e6db74>&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>deb http://security.debian.org/debian-security bookworm-security main
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>apt update
+</span></span></code></pre></div><hr><h3 id=4-install-kernel-and-bootloader>4. Install Kernel and Bootloader</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>apt install linux-image-amd64 grub-efi-amd64 grub-pc-bin
+</span></span></code></pre></div><p><strong>For UEFI boot:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>grub-install --target<span style=color:#f92672>=</span>x86_64-efi --efi-directory<span style=color:#f92672>=</span>/boot/efi --removable
+</span></span><span style=display:flex><span>update-grub
+</span></span></code></pre></div><p><strong>For legacy BIOS boot (run from outside chroot):</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>grub-install --target<span style=color:#f92672>=</span>i386-pc --boot-directory<span style=color:#f92672>=</span>/mnt/usb/boot /dev/sdX
+</span></span></code></pre></div><hr><h3 id=5-install-recovery-and-disk-tools>5. Install Recovery and Disk Tools</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>apt install <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    busybox-static <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    testdisk <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    gddrescue <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    ddrescue <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    smartmontools <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    hdparm <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    sdparm <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    mdadm <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    lvm2 <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    cryptsetup <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    e2fsprogs <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    xfsprogs <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    btrfs-progs <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    dosfstools <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    ntfs-3g <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    parted <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    gdisk <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    gparted <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    fdisk <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    dmraid <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    dmsetup
+</span></span></code></pre></div><hr><h3 id=6-install-network-and-system-tools>6. Install Network and System Tools</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>apt install <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    net-tools <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    iproute2 <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    iputils-ping <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    isc-dhcp-client <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    wireless-tools <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    wpasupplicant <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    firmware-linux-free <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    openssh-client <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    rsync <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    curl <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    wget <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    vim-tiny <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    screen <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    tmux <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    htop <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    strace <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    lsof <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    pciutils <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    usbutils
+</span></span></code></pre></div><hr><h3 id=7-install-filesystem-recovery-tools>7. Install Filesystem Recovery Tools</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>apt install <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    extundelete <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    foremost <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    scalpel <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    sleuthkit <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    photorec <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    dcfldd <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    pv <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>    pigz
+</span></span></code></pre></div><table><thead><tr><th>Tool</th><th>Purpose</th></tr></thead><tbody><tr><td>testdisk</td><td>Recover lost partitions, fix partition tables</td></tr><tr><td>photorec</td><td>Recover deleted files by file signature</td></tr><tr><td>gddrescue</td><td>Copy data from failing drives with retry logic</td></tr><tr><td>extundelete</td><td>Recover deleted files from ext3/ext4</td></tr><tr><td>foremost</td><td>Carve files from raw disk images</td></tr><tr><td>scalpel</td><td>File carving based on headers and footers</td></tr><tr><td>sleuthkit</td><td>Filesystem forensics toolkit</td></tr><tr><td>smartmontools</td><td>Read SMART data from drives</td></tr><tr><td>dcfldd</td><td>Enhanced dd with hashing and progress</td></tr></tbody></table><hr><h3 id=8-configure-auto-login-console>8. Configure Auto-Login Console</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir -p /etc/systemd/system/getty@tty1.service.d
+</span></span><span style=display:flex><span>cat &gt; /etc/systemd/system/getty@tty1.service.d/autologin.conf <span style=color:#e6db74>&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>[Service]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ExecStart=
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span></code></pre></div><hr><h3 id=9-create-a-recovery-motd>9. Create a Recovery MOTD</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>cat &gt; /etc/motd <span style=color:#e6db74>&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>================================================
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  LINUX RECOVERY ENVIRONMENT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>================================================
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  Disk Recovery:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    testdisk          Recover partitions
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    photorec          Recover deleted files
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    ddrescue          Clone failing drives
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    extundelete       Recover ext4 files
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    foremost          Carve files from images
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  Disk Health:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    smartctl -a /dev/sdX   SMART diagnostics
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    hdparm -I /dev/sdX     Drive info
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    badblocks /dev/sdX     Scan for bad sectors
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  Filesystem Repair:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    fsck.ext4 /dev/sdXN    Check ext4
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    xfs_repair /dev/sdXN   Repair XFS
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    btrfs check /dev/sdXN  Check btrfs
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    ntfsfix /dev/sdXN      Fix NTFS
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  Disk Imaging:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    ddrescue /dev/sdX image.img logfile
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    dcfldd if=/dev/sdX of=image.img hash=sha256
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  Mounting:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    mount /dev/sdXN /mnt
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    cryptsetup open /dev/sdXN name
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    mdadm --assemble --scan
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>================================================
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span></code></pre></div><hr><h3 id=10-exit-chroot-and-unmount>10. Exit Chroot and Unmount</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>exit    <span style=color:#75715e># leave chroot</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>umount /mnt/usb/dev/pts
+</span></span><span style=display:flex><span>umount /mnt/usb/dev
+</span></span><span style=display:flex><span>umount /mnt/usb/proc
+</span></span><span style=display:flex><span>umount /mnt/usb/sys
+</span></span><span style=display:flex><span>umount /mnt/usb/boot/efi
+</span></span><span style=display:flex><span>umount /mnt/usb
+</span></span></code></pre></div><hr><h2 id=common-recovery-tasks>Common Recovery Tasks</h2><h3 id=clone-a-failing-drive>Clone a Failing Drive</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># ddrescue retries bad sectors and logs progress</span>
+</span></span><span style=display:flex><span>ddrescue -d -r3 /dev/sda /dev/sdb rescue.log
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Resume an interrupted clone</span>
+</span></span><span style=display:flex><span>ddrescue -d -r3 /dev/sda /dev/sdb rescue.log
+</span></span></code></pre></div><ul><li><code>-d</code> direct access, bypasses kernel cache</li><li><code>-r3</code> retry bad sectors 3 times</li><li>The log file tracks which sectors succeeded so you can resume</li></ul><hr><h3 id=recover-lost-partitions>Recover Lost Partitions</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>testdisk /dev/sda
+</span></span></code></pre></div><ol><li>Select the disk</li><li>Choose partition table type (Intel/GPT)</li><li>Select <strong>Analyse</strong></li><li>Select <strong>Quick Search</strong> then <strong>Deeper Search</strong> if needed</li><li>Write the recovered partition table</li></ol><hr><h3 id=recover-deleted-files>Recover Deleted Files</h3><p><strong>From ext4:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>extundelete /dev/sda1 --restore-all --output-dir /mnt/recovered/
+</span></span></code></pre></div><p><strong>By file signature (any filesystem):</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>photorec /dev/sda1
+</span></span></code></pre></div><hr><h3 id=check-drive-health>Check Drive Health</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># View SMART summary</span>
+</span></span><span style=display:flex><span>smartctl -H /dev/sda
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Full SMART data</span>
+</span></span><span style=display:flex><span>smartctl -a /dev/sda
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run a short self-test</span>
+</span></span><span style=display:flex><span>smartctl -t short /dev/sda
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Check results after test completes</span>
+</span></span><span style=display:flex><span>smartctl -l selftest /dev/sda
+</span></span></code></pre></div><p>Key SMART attributes to watch:</p><table><thead><tr><th>Attribute</th><th>What it Means</th></tr></thead><tbody><tr><td>Reallocated_Sector_Ct</td><td>Bad sectors remapped (rising = failing)</td></tr><tr><td>Current_Pending_Sector</td><td>Sectors waiting to be remapped</td></tr><tr><td>Offline_Uncorrectable</td><td>Sectors that cannot be read</td></tr><tr><td>UDMA_CRC_Error_Count</td><td>Cable or connection problems</td></tr></tbody></table><hr><h3 id=repair-filesystems>Repair Filesystems</h3><p><strong>Always unmount first.</strong> Never fsck a mounted filesystem.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># ext4</span>
+</span></span><span style=display:flex><span>fsck.ext4 -p /dev/sda1           <span style=color:#75715e># auto-fix safe problems</span>
+</span></span><span style=display:flex><span>fsck.ext4 -y /dev/sda1           <span style=color:#75715e># answer yes to everything</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># XFS</span>
+</span></span><span style=display:flex><span>xfs_repair /dev/sda1
+</span></span><span style=display:flex><span>xfs_repair -L /dev/sda1          <span style=color:#75715e># zero the log (last resort)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># btrfs</span>
+</span></span><span style=display:flex><span>btrfs check /dev/sda1
+</span></span><span style=display:flex><span>btrfs check --repair /dev/sda1   <span style=color:#75715e># destructive, use carefully</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># NTFS</span>
+</span></span><span style=display:flex><span>ntfsfix /dev/sda1
+</span></span></code></pre></div><hr><h3 id=assemble-raid-arrays>Assemble RAID Arrays</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Scan and assemble all arrays</span>
+</span></span><span style=display:flex><span>mdadm --assemble --scan
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Assemble a specific array</span>
+</span></span><span style=display:flex><span>mdadm --assemble /dev/md0 /dev/sda1 /dev/sdb1
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Check array status</span>
+</span></span><span style=display:flex><span>cat /proc/mdstat
+</span></span><span style=display:flex><span>mdadm --detail /dev/md0
+</span></span></code></pre></div><hr><h3 id=unlock-luks-encrypted-volumes>Unlock LUKS Encrypted Volumes</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Open encrypted partition</span>
+</span></span><span style=display:flex><span>cryptsetup luksOpen /dev/sda2 crypt_root
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Mount the decrypted volume</span>
+</span></span><span style=display:flex><span>mount /dev/mapper/crypt_root /mnt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Or scan for LVM on top of LUKS</span>
+</span></span><span style=display:flex><span>vgscan
+</span></span><span style=display:flex><span>vgchange -ay
+</span></span><span style=display:flex><span>mount /dev/mapper/vgname-lvname /mnt
+</span></span></code></pre></div><hr><h2 id=tips>Tips</h2><ul><li><strong>Image first, repair later</strong> &ndash; always clone a failing drive before attempting repairs</li><li><strong>Label your USB</strong> &ndash; using <code>e2label</code> or <code>LABEL=</code> in GRUB avoids device name confusion</li><li><strong>Test in QEMU</strong> &ndash; verify the USB boots in a VM before relying on it for real recovery</li><li><strong>Keep it updated</strong> &ndash; periodically boot the USB and run <code>apt update && apt upgrade</code></li><li><strong>Write-protect if possible</strong> &ndash; some USB drives have physical write-protect switches, useful for forensic work</li></ul></div></div><script src=/assets/shared-nav.js></script></body></html>
