@@ -8476,7 +8476,23 @@ if __name__ == &amp;#34;__main__&amp;#34;:
 &lt;li&gt;&lt;a href="https://www.digitalocean.com/community/tutorials/python-add-to-list"&gt;https://www.digitalocean.com/community/tutorials/python-add-to-list&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://www.geeksforgeeks.org/iterate-over-a-list-in-python/"&gt;https://www.geeksforgeeks.org/iterate-over-a-list-in-python/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://docs.python.org/3/library/io.html#"&gt;https://docs.python.org/3/library/io.html#&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</description></item><item><title>Yt Dlp</title><link>https://rowstu.net/linux/yt-dlp/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/yt-dlp/</guid><description>&lt;h1 id="notes-for-yt-dlp"&gt;Notes for yt-dlp&lt;/h1&gt;
-&lt;p&gt;download playlist&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;yt-dlp --yes-playlist --format &amp;#39;bestvideo*+bestaudio&amp;#39; -S res,ext:mp4:m4a --recode mp4 https://www.youtube.com/playlist\?list=&amp;lt;list id&amp;gt;
+&lt;/ul&gt;</description></item><item><title>yt-dlp notes</title><link>https://rowstu.net/linux/yt-dlp/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/yt-dlp/</guid><description>&lt;p&gt;download playlist&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;yt-dlp \
+ --yes-playlist \
+ --extractor-args &amp;#34;youtube:player_client=android&amp;#34; \
+ -f &amp;#34;bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]&amp;#34; \
+ -S &amp;#34;res:1080&amp;#34; \
+ --merge-output-format mp4 \
+ --cookies ~/yt_cookies.txt \
+ https://www.youtube.com/playlist\?list=&amp;lt;list id&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;latest - single video&lt;/p&gt;
+&lt;p&gt;now requires a javascript runtime to handle player yt&amp;rsquo;s strict player requirements.&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;yt-dlp \
+ --js-runtimes node \
+ --extractor-args &amp;#34;youtube:player_client=android&amp;#34; \
+ -f &amp;#34;bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]&amp;#34; \
+ -S &amp;#34;res:1080&amp;#34; \
+ --merge-output-format mp4 \
+ --cookies ~/yt_cookies.txt \
+ &amp;lt;video id&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>
