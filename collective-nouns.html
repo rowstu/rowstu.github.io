@@ -20,7 +20,9 @@
 			--warning: #f59e0b;
 			--danger: #ef4444;
 			--cat-mammals: #10b981;
+			--cat-birds: #ec4899;
 			--cat-reptiles: #3b82f6;
+			--cat-insects: #a855f7;
 			--cat-people: #f59e0b;
 		}
 
@@ -140,10 +142,22 @@
 			background: rgba(16, 185, 129, 0.1);
 		}
 
+		.filter-btn[data-cat="birds"].active {
+			border-color: var(--cat-birds);
+			color: var(--cat-birds);
+			background: rgba(236, 72, 153, 0.1);
+		}
+
 		.filter-btn[data-cat="reptiles"].active {
 			border-color: var(--cat-reptiles);
 			color: var(--cat-reptiles);
 			background: rgba(59, 130, 246, 0.1);
+		}
+
+		.filter-btn[data-cat="insects"].active {
+			border-color: var(--cat-insects);
+			color: var(--cat-insects);
+			background: rgba(168, 85, 247, 0.1);
 		}
 
 		.filter-btn[data-cat="people"].active {
@@ -197,9 +211,19 @@
 			color: var(--cat-mammals);
 		}
 
+		.cat-birds {
+			background: rgba(236, 72, 153, 0.15);
+			color: var(--cat-birds);
+		}
+
 		.cat-reptiles {
 			background: rgba(59, 130, 246, 0.15);
 			color: var(--cat-reptiles);
+		}
+
+		.cat-insects {
+			background: rgba(168, 85, 247, 0.15);
+			color: var(--cat-insects);
 		}
 
 		.cat-people {
@@ -433,7 +457,9 @@
 				<div class="filter-row">
 					<button class="filter-btn active" data-cat="all">All</button>
 					<button class="filter-btn" data-cat="mammals">Mammals</button>
+					<button class="filter-btn" data-cat="birds">Birds</button>
 					<button class="filter-btn" data-cat="reptiles">Reptiles &amp; Fish</button>
+					<button class="filter-btn" data-cat="insects">Insects</button>
 					<button class="filter-btn" data-cat="people">People</button>
 				</div>
 			</div>
@@ -484,7 +510,7 @@
 						<span class="stat-label">Collective Nouns</span>
 					</div>
 					<div class="stat-item">
-						<span class="stat-value" id="totalCategories">3</span>
+						<span class="stat-value" id="totalCategories">5</span>
 						<span class="stat-label">Categories</span>
 					</div>
 				</div>
@@ -500,7 +526,9 @@
 
 		const categoryMap = {
 			'MammalsandMarsupials': { label: 'Mammals', key: 'mammals', css: 'cat-mammals' },
+			'Birds': { label: 'Birds', key: 'birds', css: 'cat-birds' },
 			'ReptilesAmphibiansandFish': { label: 'Reptiles & Fish', key: 'reptiles', css: 'cat-reptiles' },
+			'InsectsandInvertebrates': { label: 'Insects', key: 'insects', css: 'cat-insects' },
 			'People': { label: 'People', key: 'people', css: 'cat-people' }
 		};
 
