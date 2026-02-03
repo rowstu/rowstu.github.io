@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>UK Daylight Tracker</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inconsolata:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0f1318;
+			--surface: #171d28;
+			--surface-alt: #1c2333;
+			--border: #2a3548;
+			--text: #e4e7eb;
+			--text-muted: #8b9ab3;
+			--amber: #e8a93b;
+			--amber-dim: rgba(232, 169, 59, 0.15);
+			--coral: #e07b5a;
+			--blue: #6b93d6;
+			--night: #1e2a40;
+			--gain: #56d364;
+			--loss: #f07178;
+			--twilight: #3a4a6b;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Lora', Georgia, serif;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image:
+				radial-gradient(ellipse at 50% 0%, rgba(232, 169, 59, 0.06) 0%, transparent 55%),
+				radial-gradient(ellipse at 80% 100%, rgba(107, 147, 214, 0.04) 0%, transparent 50%);
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header {
+			margin-bottom: 1.5rem;
+			animation: fadeIn 0.5s ease-out;
+		}
+
+		h1 {
+			font-family: 'Lora', Georgia, serif;
+			font-size: 2rem;
+			font-weight: 700;
+			background: linear-gradient(135deg, var(--amber), var(--coral));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin-bottom: 0.4rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+
+		.city-bar {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			margin-bottom: 1.5rem;
+			animation: fadeIn 0.5s ease-out 0.1s both;
+		}
+
+		.city-bar label {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			font-weight: 500;
+		}
+
+		.city-bar select {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			padding: 0.4rem 0.75rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			cursor: pointer;
+			transition: border-color 0.2s;
+		}
+
+		.city-bar select:hover,
+		.city-bar select:focus {
+			border-color: var(--amber);
+			outline: none;
+		}
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1.25rem;
+			overflow: hidden;
+		}
+
+		.panel-title {
+			font-size: 0.8rem;
+			font-weight: 600;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			padding: 0.85rem 1.25rem;
+			border-bottom: 1px solid var(--border);
+			font-family: 'Inconsolata', monospace;
+		}
+
+		.panel-body { padding: 1.25rem; }
+
+		/* ── Today Hero ── */
+		.today-hero {
+			background: linear-gradient(135deg, var(--surface), var(--surface-alt));
+			border-color: var(--amber-dim);
+			animation: fadeInUp 0.5s ease-out 0.15s both;
+		}
+
+		.today-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: baseline;
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.today-header h2 {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.8rem;
+			font-weight: 600;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+		}
+
+		.today-date {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+		}
+
+		.today-grid {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 1.5rem 1.25rem;
+			gap: 1rem;
+		}
+
+		.sun-block { text-align: center; flex: 0 0 auto; }
+
+		.sun-label {
+			display: block;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 0.35rem;
+		}
+
+		.sun-time {
+			font-family: 'Inconsolata', monospace;
+			font-size: 1.75rem;
+			font-weight: 700;
+		}
+
+		.sunrise-block .sun-time { color: var(--coral); }
+		.sunset-block .sun-time { color: var(--blue); }
+
+		.daylight-block {
+			text-align: center;
+			flex: 1;
+		}
+
+		.daylight-value {
+			display: block;
+			font-family: 'Inconsolata', monospace;
+			font-size: 2.2rem;
+			font-weight: 700;
+			color: var(--amber);
+			line-height: 1.2;
+		}
+
+		.daylight-sublabel {
+			display: block;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-top: 0.15rem;
+		}
+
+		.daylight-change {
+			display: inline-block;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			font-weight: 600;
+			margin-top: 0.5rem;
+			padding: 0.2rem 0.6rem;
+			border-radius: 4px;
+		}
+
+		.daylight-change.gaining {
+			color: var(--gain);
+			background: rgba(86, 211, 100, 0.1);
+		}
+
+		.daylight-change.losing {
+			color: var(--loss);
+			background: rgba(240, 113, 120, 0.1);
+		}
+
+		.daylight-change.neutral {
+			color: var(--text-muted);
+			background: rgba(139, 154, 179, 0.1);
+		}
+
+		/* ── Timeline Bar ── */
+		.timeline-wrap { padding: 0 1.25rem 0.75rem; }
+
+		.timeline-bar {
+			height: 28px;
+			border-radius: 6px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.timeline-labels {
+			display: flex;
+			justify-content: space-between;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			margin-top: 0.3rem;
+			padding: 0 0.15rem;
+		}
+
+		.timeline-labels .tl-sunrise { color: var(--coral); }
+		.timeline-labels .tl-sunset { color: var(--blue); }
+
+		/* ── Extras (dawn, noon, dusk) ── */
+		.today-extras {
+			display: flex;
+			justify-content: space-around;
+			padding: 0.85rem 1.25rem;
+			border-top: 1px solid var(--border);
+			gap: 1rem;
+		}
+
+		.extra-item { text-align: center; }
+
+		.extra-label {
+			display: block;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			margin-bottom: 0.2rem;
+		}
+
+		.extra-value {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		/* ── Section animations ── */
+		.section { animation: fadeInUp 0.5s ease-out both; }
+		.section:nth-child(2) { animation-delay: 0.2s; }
+		.section:nth-child(3) { animation-delay: 0.25s; }
+		.section:nth-child(4) { animation-delay: 0.3s; }
+		.section:nth-child(5) { animation-delay: 0.35s; }
+		.section:nth-child(6) { animation-delay: 0.4s; }
+		.section:nth-child(7) { animation-delay: 0.45s; }
+
+		/* ── Week View ── */
+		.week-grid {
+			display: grid;
+			grid-template-columns: repeat(7, 1fr);
+			gap: 0;
+		}
+
+		.week-day {
+			text-align: center;
+			padding: 0.85rem 0.4rem;
+			border-right: 1px solid var(--border);
+			transition: background 0.2s;
+		}
+
+		.week-day:last-child { border-right: none; }
+		.week-day:hover { background: var(--surface-alt); }
+
+		.week-day.is-today {
+			background: var(--amber-dim);
+		}
+
+		.wd-name {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.7rem;
+			font-weight: 600;
+			color: var(--text-muted);
+			text-transform: uppercase;
+		}
+
+		.wd-date {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+		}
+
+		.wd-duration {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			font-weight: 700;
+			color: var(--amber);
+			margin-bottom: 0.25rem;
+		}
+
+		.wd-change {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.7rem;
+			font-weight: 600;
+		}
+
+		.wd-change.gaining { color: var(--gain); }
+		.wd-change.losing { color: var(--loss); }
+
+		.wd-times {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.6rem;
+			color: var(--text-muted);
+			margin-top: 0.35rem;
+			line-height: 1.4;
+		}
+
+		/* ── Chart ── */
+		.chart-wrap {
+			padding: 1rem 1.25rem 1.25rem;
+			position: relative;
+		}
+
+		#daylight-chart {
+			display: block;
+			width: 100%;
+			cursor: crosshair;
+		}
+
+		.chart-tooltip {
+			display: none;
+			position: fixed;
+			background: var(--surface-alt);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 0.5rem 0.75rem;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.75rem;
+			color: var(--text);
+			pointer-events: none;
+			z-index: 100;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+			line-height: 1.5;
+		}
+
+		/* ── Key Dates ── */
+		.key-dates-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 0;
+		}
+
+		.key-date-card {
+			text-align: center;
+			padding: 1rem 0.5rem;
+			border-right: 1px solid var(--border);
+			transition: background 0.2s;
+		}
+
+		.key-date-card:last-child { border-right: none; }
+		.key-date-card:hover { background: var(--surface-alt); }
+
+		.key-date-card.is-next { background: var(--amber-dim); }
+
+		.kd-icon { font-size: 1.3rem; margin-bottom: 0.3rem; }
+
+		.kd-name {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.7rem;
+			font-weight: 600;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			margin-bottom: 0.25rem;
+		}
+
+		.kd-date {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.8rem;
+			color: var(--text);
+			font-weight: 600;
+			margin-bottom: 0.2rem;
+		}
+
+		.kd-daylight {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.75rem;
+			color: var(--amber);
+			margin-bottom: 0.25rem;
+		}
+
+		.kd-countdown {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+		}
+
+		/* ── Monthly Breakdown ── */
+		.monthly-grid { padding: 1rem 1.25rem; }
+
+		.month-row {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.month-row:last-child { margin-bottom: 0; }
+
+		.month-name {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.75rem;
+			font-weight: 600;
+			color: var(--text-muted);
+			width: 2.5rem;
+			flex-shrink: 0;
+		}
+
+		.month-bar-track {
+			flex: 1;
+			height: 18px;
+			background: rgba(255,255,255,0.03);
+			border-radius: 3px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.month-bar-fill {
+			height: 100%;
+			border-radius: 3px;
+			transition: width 0.6s ease-out;
+		}
+
+		.month-value {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.75rem;
+			color: var(--text);
+			font-weight: 500;
+			width: 4.5rem;
+			text-align: right;
+			flex-shrink: 0;
+		}
+
+		/* ── Almanac Stats ── */
+		.almanac-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 0;
+		}
+
+		.almanac-item {
+			text-align: center;
+			padding: 1rem 0.5rem;
+			border-right: 1px solid var(--border);
+		}
+
+		.almanac-item:nth-child(3n) { border-right: none; }
+		.almanac-item:nth-child(n+4) { border-top: 1px solid var(--border); }
+
+		.alm-value {
+			font-family: 'Inconsolata', monospace;
+			font-size: 1.1rem;
+			font-weight: 700;
+			color: var(--amber);
+			margin-bottom: 0.2rem;
+		}
+
+		.alm-label {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			line-height: 1.3;
+		}
+
+		/* ── Since Solstice ── */
+		.solstice-note {
+			padding: 0.85rem 1.25rem;
+			border-top: 1px solid var(--border);
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			text-align: center;
+		}
+
+		.solstice-note .highlight { color: var(--amber); font-weight: 600; }
+
+		/* ── Back Link ── */
+		.back-link {
+			display: inline-block;
+			margin-top: 0.5rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			transition: color 0.2s;
+		}
+
+		.back-link:hover { color: var(--amber); }
+
+		/* ── Animations ── */
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		@keyframes fadeInUp {
+			from { opacity: 0; transform: translateY(16px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		/* ── Responsive: Tablet ── */
+		@media (max-width: 900px) {
+			.week-grid { grid-template-columns: repeat(7, 1fr); }
+			.key-dates-grid { grid-template-columns: repeat(2, 1fr); }
+			.key-date-card:nth-child(2) { border-right: none; }
+			.key-date-card:nth-child(n+3) { border-top: 1px solid var(--border); }
+			.almanac-grid { grid-template-columns: repeat(2, 1fr); }
+			.almanac-item:nth-child(2n) { border-right: none; }
+			.almanac-item:nth-child(n+3) { border-top: 1px solid var(--border); }
+		}
+
+		/* ── Responsive: Mobile ── */
+		@media (max-width: 600px) {
+			body { padding: 0.75rem; }
+			h1 { font-size: 1.5rem; }
+			.subtitle { font-size: 0.8rem; }
+
+			.today-grid { flex-direction: column; gap: 0.75rem; padding: 1rem; }
+			.today-grid .daylight-block { order: -1; }
+			.daylight-value { font-size: 1.8rem; }
+			.sun-time { font-size: 1.3rem; }
+
+			.week-grid {
+				grid-template-columns: repeat(4, 1fr);
+			}
+			.week-day { padding: 0.6rem 0.25rem; }
+			.week-day:nth-child(4) { border-right: none; }
+			.week-day:nth-child(n+5) { border-top: 1px solid var(--border); }
+
+			.wd-times { display: none; }
+
+			.key-dates-grid { grid-template-columns: 1fr 1fr; }
+			.almanac-grid { grid-template-columns: 1fr 1fr; }
+
+			.today-extras { flex-wrap: wrap; gap: 0.75rem; }
+		}
+
+		@media (max-width: 400px) {
+			.week-grid { grid-template-columns: repeat(2, 1fr); }
+			.week-day:nth-child(2n) { border-right: none; }
+			.week-day:nth-child(n+3) { border-top: 1px solid var(--border); }
+
+			.key-dates-grid { grid-template-columns: 1fr; }
+			.key-date-card { border-right: none; }
+			.key-date-card + .key-date-card { border-top: 1px solid var(--border); }
+
+			.almanac-grid { grid-template-columns: 1fr; }
+			.almanac-item { border-right: none; }
+			.almanac-item + .almanac-item { border-top: 1px solid var(--border); }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>UK Daylight Tracker</h1>
+			<p class="subtitle">Sunrise, sunset, and daylight hours across Britain. See how daylight changes day by day.</p>
+		</header>
+
+		<div class="city-bar">
+			<label for="city-select">Location:</label>
+			<select id="city-select">
+				<option value="london">London</option>
+				<option value="edinburgh">Edinburgh</option>
+				<option value="cardiff">Cardiff</option>
+				<option value="belfast">Belfast</option>
+				<option value="manchester">Manchester</option>
+				<option value="birmingham">Birmingham</option>
+				<option value="glasgow">Glasgow</option>
+				<option value="bristol">Bristol</option>
+				<option value="leeds">Leeds</option>
+				<option value="liverpool">Liverpool</option>
+				<option value="nantwich">Nantwich</option>
+			</select>
+		</div>
+
+		<!-- Today -->
+		<div class="panel today-hero section">
+			<div class="today-header">
+				<h2>Today</h2>
+				<span id="today-date" class="today-date"></span>
+			</div>
+			<div class="today-grid">
+				<div class="sun-block sunrise-block">
+					<span class="sun-label">Sunrise</span>
+					<span id="sunrise-time" class="sun-time">--:--</span>
+				</div>
+				<div class="daylight-block">
+					<span id="daylight-duration" class="daylight-value">--h --m</span>
+					<span class="daylight-sublabel">of daylight</span>
+					<span id="daylight-change" class="daylight-change neutral">--</span>
+				</div>
+				<div class="sun-block sunset-block">
+					<span class="sun-label">Sunset</span>
+					<span id="sunset-time" class="sun-time">--:--</span>
+				</div>
+			</div>
+			<div class="timeline-wrap">
+				<div id="timeline-bar" class="timeline-bar"></div>
+				<div id="timeline-labels" class="timeline-labels"></div>
+			</div>
+			<div class="today-extras">
+				<div class="extra-item">
+					<span class="extra-label">Dawn</span>
+					<span id="dawn-time" class="extra-value">--:--</span>
+				</div>
+				<div class="extra-item">
+					<span class="extra-label">Solar Noon</span>
+					<span id="noon-time" class="extra-value">--:--</span>
+				</div>
+				<div class="extra-item">
+					<span class="extra-label">Dusk</span>
+					<span id="dusk-time" class="extra-value">--:--</span>
+				</div>
+				<div class="extra-item">
+					<span class="extra-label">Day of Year</span>
+					<span id="day-of-year" class="extra-value">--</span>
+				</div>
+			</div>
+			<div id="solstice-note" class="solstice-note"></div>
+		</div>
+
+		<!-- This Week -->
+		<div class="panel section">
+			<div class="panel-title">This Week</div>
+			<div id="week-grid" class="week-grid"></div>
+		</div>
+
+		<!-- Annual Chart -->
+		<div class="panel section">
+			<div class="panel-title">Annual Daylight</div>
+			<div class="chart-wrap">
+				<canvas id="daylight-chart"></canvas>
+				<div id="chart-tooltip" class="chart-tooltip"></div>
+			</div>
+		</div>
+
+		<!-- Key Dates -->
+		<div class="panel section">
+			<div class="panel-title">Key Dates</div>
+			<div id="key-dates-grid" class="key-dates-grid"></div>
+		</div>
+
+		<!-- Monthly Overview -->
+		<div class="panel section">
+			<div class="panel-title">Monthly Overview</div>
+			<div id="monthly-grid" class="monthly-grid"></div>
+		</div>
+
+		<!-- Daylight Almanac -->
+		<div class="panel section">
+			<div class="panel-title">Daylight Almanac</div>
+			<div id="almanac-grid" class="almanac-grid"></div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<script>
+	'use strict';
+
+	// ═══════════════════════════════════════════
+	// Constants
+	// ═══════════════════════════════════════════
+
+	const DEG = Math.PI / 180;
+	const RAD = 180 / Math.PI;
+	const ZENITH_STANDARD = 90.833;
+	const ZENITH_CIVIL = 96;
+
+	const CITIES = {
+		london:     { name: 'London',     lat: 51.5074, lon: -0.1278 },
+		edinburgh:  { name: 'Edinburgh',  lat: 55.9533, lon: -3.1883 },
+		cardiff:    { name: 'Cardiff',    lat: 51.4816, lon: -3.1791 },
+		belfast:    { name: 'Belfast',    lat: 54.5973, lon: -5.9301 },
+		manchester: { name: 'Manchester', lat: 53.4808, lon: -2.2426 },
+		birmingham: { name: 'Birmingham', lat: 52.4862, lon: -1.8904 },
+		glasgow:    { name: 'Glasgow',    lat: 55.8642, lon: -4.2518 },
+		bristol:    { name: 'Bristol',    lat: 51.4545, lon: -2.5879 },
+		leeds:      { name: 'Leeds',      lat: 53.8008, lon: -1.5491 },
+		liverpool:  { name: 'Liverpool',  lat: 53.4084, lon: -2.9916 },
+		nantwich:   { name: 'Nantwich',   lat: 53.0678, lon: -2.5222 }
+	};
+
+	const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+	const MONTH_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+	const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+	const DAY_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+	let currentCity = 'london';
+	let yearData = [];
+	let chartPad = {};
+	let chartDims = {};
+
+	// ═══════════════════════════════════════════
+	// Solar Calculations (NOAA algorithm)
+	// ═══════════════════════════════════════════
+
+	function getJulianDay(year, month, day) {
+		if (month <= 2) { year--; month += 12; }
+		const A = Math.floor(year / 100);
+		const B = 2 - A + Math.floor(A / 4);
+		return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+	}
+
+	function calcSunData(date, lat, lon, zenith) {
+		const y = date.getFullYear();
+		const m = date.getMonth() + 1;
+		const d = date.getDate();
+		const JD = getJulianDay(y, m, d);
+		const T = (JD - 2451545.0) / 36525.0;
+
+		// Geometric mean longitude (deg)
+		let L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360;
+		if (L0 < 0) L0 += 360;
+
+		// Mean anomaly (deg)
+		let M = (357.52911 + T * (35999.05029 - T * 0.0001537)) % 360;
+		if (M < 0) M += 360;
+
+		// Eccentricity
+		const e = 0.016708634 - T * (0.000042037 + T * 0.0000001267);
+
+		// Equation of center
+		const Mrad = M * DEG;
+		const C = (1.914602 - T * (0.004817 + T * 0.000014)) * Math.sin(Mrad)
+				+ (0.019993 - T * 0.000101) * Math.sin(2 * Mrad)
+				+ 0.000289 * Math.sin(3 * Mrad);
+
+		// Sun true longitude & apparent longitude
+		const sunTrueLong = L0 + C;
+		const omega = 125.04 - 1934.136 * T;
+		const sunAppLong = sunTrueLong - 0.00569 - 0.00478 * Math.sin(omega * DEG);
+
+		// Obliquity of ecliptic
+		const obliq = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60;
+		const obliqCorr = obliq + 0.00256 * Math.cos(omega * DEG);
+
+		// Sun declination
+		const decl = Math.asin(Math.sin(obliqCorr * DEG) * Math.sin(sunAppLong * DEG));
+
+		// Equation of time (minutes)
+		const y2 = Math.tan(obliqCorr * DEG / 2) ** 2;
+		const L0rad = L0 * DEG;
+		const eqTime = 4 * RAD * (
+			y2 * Math.sin(2 * L0rad)
+			- 2 * e * Math.sin(Mrad)
+			+ 4 * e * y2 * Math.sin(Mrad) * Math.cos(2 * L0rad)
+			- 0.5 * y2 * y2 * Math.sin(4 * L0rad)
+			- 1.25 * e * e * Math.sin(2 * Mrad)
+		);
+
+		// Solar noon (minutes from midnight UTC)
+		const solarNoon = 720 - 4 * lon - eqTime;
+
+		// Hour angle
+		const latRad = lat * DEG;
+		const cosHA = Math.cos(zenith * DEG) / (Math.cos(latRad) * Math.cos(decl))
+					 - Math.tan(latRad) * Math.tan(decl);
+
+		if (cosHA > 1 || cosHA < -1) {
+			// No sunrise/sunset (polar day or night)
+			return { sunrise: NaN, sunset: NaN, solarNoon: solarNoon, daylight: cosHA < -1 ? 1440 : 0 };
+		}
+
+		const HA = Math.acos(cosHA) * RAD; // degrees
+
+		const sunriseMin = solarNoon - HA * 4;
+		const sunsetMin = solarNoon + HA * 4;
+		const daylightMin = (sunsetMin - sunriseMin);
+
+		return {
+			sunrise: sunriseMin,    // minutes from midnight UTC
+			sunset: sunsetMin,      // minutes from midnight UTC
+			solarNoon: solarNoon,   // minutes from midnight UTC
+			daylight: daylightMin   // minutes
+		};
+	}
+
+	function getSunTimes(date, lat, lon) {
+		const standard = calcSunData(date, lat, lon, ZENITH_STANDARD);
+		const civil = calcSunData(date, lat, lon, ZENITH_CIVIL);
+
+		return {
+			sunrise: standard.sunrise,
+			sunset: standard.sunset,
+			solarNoon: standard.solarNoon,
+			daylight: standard.daylight,
+			dawn: civil.sunrise,
+			dusk: civil.sunset
+		};
+	}
+
+	// ═══════════════════════════════════════════
+	// UK Timezone Handling
+	// ═══════════════════════════════════════════
+
+	function isUKBST(date) {
+		const year = date.getFullYear();
+		// Last Sunday of March
+		const mar31 = new Date(year, 2, 31);
+		const bstStart = new Date(year, 2, 31 - mar31.getDay(), 1, 0, 0); // 1am UTC
+		// Last Sunday of October
+		const oct31 = new Date(year, 9, 31);
+		const bstEnd = new Date(year, 9, 31 - oct31.getDay(), 1, 0, 0); // 1am UTC
+		return date >= bstStart && date < bstEnd;
+	}
+
+	function getUKOffset(date) {
+		return isUKBST(date) ? 60 : 0; // minutes
+	}
+
+	// ═══════════════════════════════════════════
+	// Formatting Helpers
+	// ═══════════════════════════════════════════
+
+	function formatTime(utcMinutes, date) {
+		if (isNaN(utcMinutes)) return '--:--';
+		const localMin = utcMinutes + getUKOffset(date);
+		const h = Math.floor(localMin / 60) % 24;
+		const m = Math.floor(localMin % 60);
+		return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+	}
+
+	function formatDuration(minutes) {
+		if (isNaN(minutes)) return '--h --m';
+		const h = Math.floor(minutes / 60);
+		const m = Math.floor(minutes % 60);
+		return h + 'h ' + String(m).padStart(2, '0') + 'm';
+	}
+
+	function formatDurationLong(minutes) {
+		const h = Math.floor(minutes / 60);
+		const m = Math.floor(minutes % 60);
+		const s = Math.round((minutes - Math.floor(minutes)) * 60);
+		let str = '';
+		if (h > 0) str += h + 'h ';
+		str += m + 'm';
+		if (s > 0) str += ' ' + s + 's';
+		return str;
+	}
+
+	function formatChange(diffMinutes) {
+		const absDiff = Math.abs(diffMinutes);
+		const m = Math.floor(absDiff);
+		const s = Math.round((absDiff - m) * 60);
+		const sign = diffMinutes >= 0 ? '+' : '-';
+		let str = sign + m + 'm';
+		if (s > 0) str += ' ' + s + 's';
+		return str;
+	}
+
+	function formatDateShort(date) {
+		return date.getDate() + ' ' + MONTH_NAMES[date.getMonth()];
+	}
+
+	function formatDateFull(date) {
+		return DAY_FULL[date.getDay()] + ', ' + date.getDate() + ' ' + MONTH_FULL[date.getMonth()] + ' ' + date.getFullYear();
+	}
+
+	function getDayOfYear(date) {
+		const start = new Date(date.getFullYear(), 0, 0);
+		const diff = date - start;
+		return Math.floor(diff / 86400000);
+	}
+
+	function getDaysInYear(year) {
+		return ((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)) ? 366 : 365;
+	}
+
+	// ═══════════════════════════════════════════
+	// Data Calculations
+	// ═══════════════════════════════════════════
+
+	function calculateYearData(city) {
+		const year = new Date().getFullYear();
+		const totalDays = getDaysInYear(year);
+		const data = [];
+
+		for (let i = 0; i < totalDays; i++) {
+			const date = new Date(year, 0, i + 1);
+			const sun = getSunTimes(date, city.lat, city.lon);
+			data.push({ date, ...sun });
+		}
+
+		return data;
+	}
+
+	function getKeyAstroDates(year, city) {
+		// Approximate equinox/solstice dates (accurate to ~1 day)
+		const events = [
+			{ name: 'Spring Equinox', month: 2, searchStart: 18, searchEnd: 22, icon: '\u{1F331}' },
+			{ name: 'Summer Solstice', month: 5, searchStart: 19, searchEnd: 23, icon: '\u{2600}\u{FE0F}' },
+			{ name: 'Autumn Equinox', month: 8, searchStart: 21, searchEnd: 25, icon: '\u{1F342}' },
+			{ name: 'Winter Solstice', month: 11, searchStart: 19, searchEnd: 23, icon: '\u{2744}\u{FE0F}' }
+		];
+
+		return events.map(ev => {
+			// Find the actual solstice/equinox by looking for extremes
+			let bestDate = new Date(year, ev.month, ev.searchStart);
+			const sun = getSunTimes(bestDate, city.lat, city.lon);
+			let bestDaylight = sun.daylight;
+
+			if (ev.name.includes('Summer') || ev.name.includes('Winter')) {
+				// Solstice: find max or min daylight
+				const isMax = ev.name.includes('Summer');
+				for (let d = ev.searchStart; d <= ev.searchEnd; d++) {
+					const date = new Date(year, ev.month, d);
+					const s = getSunTimes(date, city.lat, city.lon);
+					if ((isMax && s.daylight > bestDaylight) || (!isMax && s.daylight < bestDaylight)) {
+						bestDaylight = s.daylight;
+						bestDate = date;
+					}
+				}
+			} else {
+				// Equinox: find closest to 12h
+				let bestDiff = Math.abs(bestDaylight - 720);
+				for (let d = ev.searchStart; d <= ev.searchEnd; d++) {
+					const date = new Date(year, ev.month, d);
+					const s = getSunTimes(date, city.lat, city.lon);
+					const diff = Math.abs(s.daylight - 720);
+					if (diff < bestDiff) {
+						bestDiff = diff;
+						bestDaylight = s.daylight;
+						bestDate = date;
+					}
+				}
+			}
+
+			return {
+				name: ev.name,
+				icon: ev.icon,
+				date: bestDate,
+				daylight: bestDaylight
+			};
+		});
+	}
+
+	// ═══════════════════════════════════════════
+	// UI Rendering
+	// ═══════════════════════════════════════════
+
+	function renderToday(city) {
+		const today = new Date();
+		const yesterday = new Date(today);
+		yesterday.setDate(yesterday.getDate() - 1);
+
+		const todaySun = getSunTimes(today, city.lat, city.lon);
+		const yesterdaySun = getSunTimes(yesterday, city.lat, city.lon);
+
+		const diff = todaySun.daylight - yesterdaySun.daylight;
+
+		document.getElementById('today-date').textContent = formatDateFull(today);
+		document.getElementById('sunrise-time').textContent = formatTime(todaySun.sunrise, today);
+		document.getElementById('sunset-time').textContent = formatTime(todaySun.sunset, today);
+		document.getElementById('daylight-duration').textContent = formatDuration(todaySun.daylight);
+		document.getElementById('dawn-time').textContent = formatTime(todaySun.dawn, today);
+		document.getElementById('noon-time').textContent = formatTime(todaySun.solarNoon, today);
+		document.getElementById('dusk-time').textContent = formatTime(todaySun.dusk, today);
+		document.getElementById('day-of-year').textContent = getDayOfYear(today) + ' / ' + getDaysInYear(today.getFullYear());
+
+		// Change badge
+		const changeEl = document.getElementById('daylight-change');
+		const changeText = formatChange(diff);
+		const changeWord = diff >= 0 ? ' more than yesterday' : ' less than yesterday';
+		changeEl.textContent = changeText + changeWord;
+		changeEl.className = 'daylight-change ' + (diff > 0.05 ? 'gaining' : diff < -0.05 ? 'losing' : 'neutral');
+
+		// Timeline bar
+		renderTimeline(todaySun, today);
+
+		// Solstice note
+		renderSolsticeNote(city, today, todaySun);
+	}
+
+	function renderTimeline(sun, date) {
+		const offset = getUKOffset(date);
+		const sunrise = (sun.sunrise + offset) / 1440 * 100;
+		const sunset = (sun.sunset + offset) / 1440 * 100;
+		const dawn = (sun.dawn + offset) / 1440 * 100;
+		const dusk = (sun.dusk + offset) / 1440 * 100;
+
+		const bar = document.getElementById('timeline-bar');
+		bar.style.background = `linear-gradient(to right,
+			var(--night) 0%,
+			var(--night) ${dawn}%,
+			var(--twilight) ${dawn}%,
+			var(--twilight) ${sunrise}%,
+			var(--amber) ${sunrise}%,
+			var(--amber) ${(sunrise + sunset) / 2}%,
+			var(--amber) ${sunset}%,
+			var(--twilight) ${sunset}%,
+			var(--twilight) ${dusk}%,
+			var(--night) ${dusk}%,
+			var(--night) 100%
+		)`;
+
+		const labels = document.getElementById('timeline-labels');
+		labels.innerHTML = `
+			<span>00:00</span>
+			<span class="tl-sunrise">${formatTime(sun.sunrise, date)}</span>
+			<span>${formatTime(sun.solarNoon, date)}</span>
+			<span class="tl-sunset">${formatTime(sun.sunset, date)}</span>
+			<span>23:59</span>
+		`;
+	}
+
+	function renderSolsticeNote(city, today, todaySun) {
+		const year = today.getFullYear();
+		// Find winter solstice (this year or last year)
+		let winterSolstice, winterDaylight;
+
+		// Check last December
+		const lastWinter = new Date(year - 1, 11, 21);
+		const thisWinter = new Date(year, 11, 21);
+
+		let refSolstice;
+		if (today < new Date(year, 5, 21)) {
+			// Before summer solstice, reference last winter
+			refSolstice = lastWinter;
+		} else {
+			// After summer solstice, check if closer to this winter
+			refSolstice = thisWinter;
+		}
+
+		const refSun = getSunTimes(refSolstice, city.lat, city.lon);
+		const gainedMinutes = todaySun.daylight - refSun.daylight;
+		const daysSince = Math.floor((today - refSolstice) / 86400000);
+
+		const el = document.getElementById('solstice-note');
+
+		if (gainedMinutes > 0) {
+			el.innerHTML = `Since the winter solstice (<span class="highlight">${Math.abs(daysSince)} days ago</span>), daylight has increased by <span class="highlight">${formatDurationLong(gainedMinutes)}</span>`;
+		} else if (gainedMinutes < 0) {
+			el.innerHTML = `Since the summer solstice, daylight has decreased by <span class="highlight">${formatDurationLong(Math.abs(gainedMinutes))}</span>. The winter solstice is in <span class="highlight">${Math.abs(daysSince)} days</span>`;
+		} else {
+			el.innerHTML = `Today is the solstice!`;
+		}
+	}
+
+	function renderWeek(city) {
+		const today = new Date();
+		const grid = document.getElementById('week-grid');
+		let html = '';
+
+		for (let i = -1; i <= 5; i++) {
+			const date = new Date(today);
+			date.setDate(date.getDate() + i);
+
+			const prevDate = new Date(date);
+			prevDate.setDate(prevDate.getDate() - 1);
+
+			const sun = getSunTimes(date, city.lat, city.lon);
+			const prevSun = getSunTimes(prevDate, city.lat, city.lon);
+			const diff = sun.daylight - prevSun.daylight;
+
+			const isToday = i === 0;
+			const label = i === -1 ? 'Yest' : i === 0 ? 'Today' : DAY_NAMES[date.getDay()];
+
+			html += `
+				<div class="week-day ${isToday ? 'is-today' : ''}">
+					<div class="wd-name">${label}</div>
+					<div class="wd-date">${formatDateShort(date)}</div>
+					<div class="wd-duration">${formatDuration(sun.daylight)}</div>
+					<div class="wd-change ${diff > 0.05 ? 'gaining' : diff < -0.05 ? 'losing' : ''}">${formatChange(diff)}</div>
+					<div class="wd-times">${formatTime(sun.sunrise, date)} - ${formatTime(sun.sunset, date)}</div>
+				</div>
+			`;
+		}
+
+		grid.innerHTML = html;
+	}
+
+	function renderKeyDates(city) {
+		const today = new Date();
+		const year = today.getFullYear();
+		const events = getKeyAstroDates(year, city);
+		const grid = document.getElementById('key-dates-grid');
+
+		// Find next upcoming event
+		let nextIdx = events.findIndex(ev => ev.date >= today);
+		if (nextIdx === -1) nextIdx = 0; // All passed, next year's spring
+
+		let html = '';
+		events.forEach((ev, idx) => {
+			const daysDiff = Math.round((ev.date - today) / 86400000);
+			let countdown;
+			if (daysDiff === 0) countdown = 'Today';
+			else if (daysDiff > 0) countdown = `In ${daysDiff} days`;
+			else countdown = `${Math.abs(daysDiff)} days ago`;
+
+			html += `
+				<div class="key-date-card ${idx === nextIdx ? 'is-next' : ''}">
+					<div class="kd-icon">${ev.icon}</div>
+					<div class="kd-name">${ev.name}</div>
+					<div class="kd-date">${formatDateShort(ev.date)}</div>
+					<div class="kd-daylight">${formatDuration(ev.daylight)}</div>
+					<div class="kd-countdown">${countdown}</div>
+				</div>
+			`;
+		});
+
+		grid.innerHTML = html;
+	}
+
+	function renderMonthly(city) {
+		const year = new Date().getFullYear();
+		const grid = document.getElementById('monthly-grid');
+		const currentMonth = new Date().getMonth();
+
+		// Calculate average daylight for the 15th of each month
+		const monthlyData = [];
+		let maxDaylight = 0;
+
+		for (let m = 0; m < 12; m++) {
+			const date = new Date(year, m, 15);
+			const sun = getSunTimes(date, city.lat, city.lon);
+			monthlyData.push(sun.daylight);
+			if (sun.daylight > maxDaylight) maxDaylight = sun.daylight;
+		}
+
+		// Generate month gradient colors
+		const colors = [
+			'#5a7ab5', '#6b8bc6', '#8ba7d4', '#a8c47c',
+			'#c8d654', '#e8c83b', '#e8a93b', '#d4a048',
+			'#b89055', '#8a7a68', '#6b7090', '#5a6aa0'
+		];
+
+		let html = '';
+		monthlyData.forEach((daylight, idx) => {
+			const pct = (daylight / maxDaylight * 100).toFixed(1);
+			const isCurrent = idx === currentMonth;
+
+			html += `
+				<div class="month-row" style="${isCurrent ? 'opacity: 1;' : 'opacity: 0.8;'}">
+					<span class="month-name" style="${isCurrent ? 'color: var(--amber);' : ''}">${MONTH_NAMES[idx]}</span>
+					<div class="month-bar-track">
+						<div class="month-bar-fill" style="width: ${pct}%; background: ${colors[idx]};${isCurrent ? ' box-shadow: 0 0 8px ' + colors[idx] + '66;' : ''}"></div>
+					</div>
+					<span class="month-value" style="${isCurrent ? 'color: var(--amber); font-weight: 700;' : ''}">${formatDuration(daylight)}</span>
+				</div>
+			`;
+		});
+
+		grid.innerHTML = html;
+	}
+
+	function renderAlmanac(city) {
+		if (!yearData.length) return;
+
+		const today = new Date();
+		const todayIdx = getDayOfYear(today) - 1;
+		const grid = document.getElementById('almanac-grid');
+
+		// Find longest and shortest days
+		let longestIdx = 0, shortestIdx = 0;
+		yearData.forEach((d, i) => {
+			if (d.daylight > yearData[longestIdx].daylight) longestIdx = i;
+			if (d.daylight < yearData[shortestIdx].daylight) shortestIdx = i;
+		});
+
+		const longest = yearData[longestIdx];
+		const shortest = yearData[shortestIdx];
+		const range = longest.daylight - shortest.daylight;
+
+		// Current rate of change (average over ±2 days for smoothing)
+		let rate = 0;
+		if (todayIdx > 0 && todayIdx < yearData.length - 1) {
+			const before = yearData[Math.max(0, todayIdx - 2)];
+			const after = yearData[Math.min(yearData.length - 1, todayIdx + 2)];
+			const span = Math.min(todayIdx + 2, yearData.length - 1) - Math.max(0, todayIdx - 2);
+			rate = (after.daylight - before.daylight) / span;
+		}
+
+		// Find next 12-hour milestone
+		let next12h = '';
+		const todayDaylight = yearData[todayIdx] ? yearData[todayIdx].daylight : 0;
+		if (todayDaylight < 720) {
+			for (let i = todayIdx + 1; i < yearData.length; i++) {
+				if (yearData[i].daylight >= 720) {
+					next12h = formatDateShort(yearData[i].date) + ' (' + (i - todayIdx) + ' days)';
+					break;
+				}
+			}
+		} else {
+			for (let i = todayIdx + 1; i < yearData.length; i++) {
+				if (yearData[i].daylight < 720) {
+					next12h = formatDateShort(yearData[i].date) + ' (' + (i - todayIdx) + ' days)';
+					break;
+				}
+			}
+		}
+		if (!next12h) next12h = 'N/A';
+
+		// Latest sunset and earliest sunrise
+		let latestSunset = 0, latestSunsetIdx = 0;
+		let earliestSunrise = 1440, earliestSunriseIdx = 0;
+		yearData.forEach((d, i) => {
+			if (!isNaN(d.sunset) && d.sunset > latestSunset) { latestSunset = d.sunset; latestSunsetIdx = i; }
+			if (!isNaN(d.sunrise) && d.sunrise < earliestSunrise) { earliestSunrise = d.sunrise; earliestSunriseIdx = i; }
+		});
+
+		grid.innerHTML = `
+			<div class="almanac-item">
+				<div class="alm-value">${formatDuration(longest.daylight)}</div>
+				<div class="alm-label">Longest day<br>${formatDateShort(longest.date)}</div>
+			</div>
+			<div class="almanac-item">
+				<div class="alm-value">${formatDuration(shortest.daylight)}</div>
+				<div class="alm-label">Shortest day<br>${formatDateShort(shortest.date)}</div>
+			</div>
+			<div class="almanac-item">
+				<div class="alm-value">${formatDuration(range)}</div>
+				<div class="alm-label">Annual range</div>
+			</div>
+			<div class="almanac-item">
+				<div class="alm-value" style="color: ${rate >= 0 ? 'var(--gain)' : 'var(--loss)'};">${rate >= 0 ? '+' : ''}${rate.toFixed(1)}m/day</div>
+				<div class="alm-label">Current rate<br>of change</div>
+			</div>
+			<div class="almanac-item">
+				<div class="alm-value" style="font-size: 0.9rem;">${formatTime(latestSunset, yearData[latestSunsetIdx].date)}</div>
+				<div class="alm-label">Latest sunset<br>${formatDateShort(yearData[latestSunsetIdx].date)}</div>
+			</div>
+			<div class="almanac-item">
+				<div class="alm-value" style="font-size: 0.9rem;">${next12h}</div>
+				<div class="alm-label">${todayDaylight < 720 ? 'Next 12h day' : 'Under 12h from'}</div>
+			</div>
+		`;
+	}
+
+	// ═══════════════════════════════════════════
+	// Annual Chart (Canvas)
+	// ═══════════════════════════════════════════
+
+	function drawChart() {
+		const canvas = document.getElementById('daylight-chart');
+		const ctx = canvas.getContext('2d');
+		const dpr = window.devicePixelRatio || 1;
+
+		const rect = canvas.parentElement.getBoundingClientRect();
+		const w = rect.width;
+		const h = 280;
+
+		canvas.width = w * dpr;
+		canvas.height = h * dpr;
+		canvas.style.width = w + 'px';
+		canvas.style.height = h + 'px';
+		ctx.scale(dpr, dpr);
+
+		const pad = { top: 28, right: 20, bottom: 34, left: 48 };
+		chartPad = pad;
+		chartDims = { w, h };
+
+		const plotW = w - pad.left - pad.right;
+		const plotH = h - pad.top - pad.bottom;
+
+		if (!yearData.length) return;
+
+		// Find min/max
+		const durations = yearData.map(d => d.daylight / 60);
+		const minH = Math.floor(Math.min(...durations));
+		const maxH = Math.ceil(Math.max(...durations));
+
+		// Clear
+		ctx.clearRect(0, 0, w, h);
+
+		// Grid lines (horizontal)
+		for (let hour = minH; hour <= maxH; hour++) {
+			const y = pad.top + plotH - (hour - minH) / (maxH - minH) * plotH;
+			ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(pad.left, y);
+			ctx.lineTo(w - pad.right, y);
+			ctx.stroke();
+
+			ctx.fillStyle = '#6b7a94';
+			ctx.font = '10px Inconsolata, monospace';
+			ctx.textAlign = 'right';
+			ctx.fillText(hour + 'h', pad.left - 8, y + 3);
+		}
+
+		// Month separators and labels
+		const cumDays = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+		const totalDays = yearData.length;
+
+		ctx.fillStyle = '#6b7a94';
+		ctx.font = '10px Inconsolata, monospace';
+		ctx.textAlign = 'center';
+
+		for (let i = 0; i < 12; i++) {
+			const x = pad.left + (cumDays[i] + 15) / totalDays * plotW;
+			ctx.fillText(MONTH_NAMES[i], x, h - 10);
+
+			if (i > 0) {
+				const sx = pad.left + cumDays[i] / totalDays * plotW;
+				ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+				ctx.lineWidth = 1;
+				ctx.beginPath();
+				ctx.moveTo(sx, pad.top);
+				ctx.lineTo(sx, h - pad.bottom);
+				ctx.stroke();
+			}
+		}
+
+		// 12-hour reference line
+		const y12 = pad.top + plotH - (12 - minH) / (maxH - minH) * plotH;
+		ctx.setLineDash([3, 3]);
+		ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		ctx.moveTo(pad.left, y12);
+		ctx.lineTo(w - pad.right, y12);
+		ctx.stroke();
+		ctx.setLineDash([]);
+		ctx.fillStyle = '#6b7a94';
+		ctx.font = '9px Inconsolata, monospace';
+		ctx.textAlign = 'left';
+		ctx.fillText('12h', w - pad.right + 4, y12 + 3);
+
+		// Area fill gradient
+		const gradient = ctx.createLinearGradient(0, pad.top, 0, h - pad.bottom);
+		gradient.addColorStop(0, 'rgba(232, 169, 59, 0.30)');
+		gradient.addColorStop(0.4, 'rgba(232, 169, 59, 0.12)');
+		gradient.addColorStop(0.7, 'rgba(107, 147, 214, 0.08)');
+		gradient.addColorStop(1, 'rgba(30, 42, 64, 0.25)');
+
+		// Build path
+		const points = yearData.map((d, i) => ({
+			x: pad.left + i / (totalDays - 1) * plotW,
+			y: pad.top + plotH - (d.daylight / 60 - minH) / (maxH - minH) * plotH
+		}));
+
+		// Area fill
+		ctx.beginPath();
+		ctx.moveTo(points[0].x, h - pad.bottom);
+		ctx.lineTo(points[0].x, points[0].y);
+		for (let i = 1; i < points.length; i++) {
+			ctx.lineTo(points[i].x, points[i].y);
+		}
+		ctx.lineTo(points[points.length - 1].x, h - pad.bottom);
+		ctx.closePath();
+		ctx.fillStyle = gradient;
+		ctx.fill();
+
+		// Line
+		ctx.beginPath();
+		ctx.moveTo(points[0].x, points[0].y);
+		for (let i = 1; i < points.length; i++) {
+			ctx.lineTo(points[i].x, points[i].y);
+		}
+		ctx.strokeStyle = '#e8a93b';
+		ctx.lineWidth = 2;
+		ctx.lineJoin = 'round';
+		ctx.stroke();
+
+		// Today marker
+		const todayIdx = getDayOfYear(new Date()) - 1;
+		if (todayIdx >= 0 && todayIdx < points.length) {
+			const tp = points[todayIdx];
+
+			// Vertical line
+			ctx.setLineDash([3, 3]);
+			ctx.strokeStyle = 'rgba(232, 169, 59, 0.4)';
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(tp.x, pad.top);
+			ctx.lineTo(tp.x, h - pad.bottom);
+			ctx.stroke();
+			ctx.setLineDash([]);
+
+			// Dot
+			ctx.beginPath();
+			ctx.arc(tp.x, tp.y, 5, 0, Math.PI * 2);
+			ctx.fillStyle = '#e8a93b';
+			ctx.fill();
+			ctx.strokeStyle = '#0f1318';
+			ctx.lineWidth = 2;
+			ctx.stroke();
+
+			// Label
+			ctx.fillStyle = '#e8a93b';
+			ctx.font = 'bold 10px Inconsolata, monospace';
+			ctx.textAlign = tp.x > w / 2 ? 'right' : 'left';
+			const labelX = tp.x > w / 2 ? tp.x - 10 : tp.x + 10;
+			ctx.fillText('Today: ' + formatDuration(yearData[todayIdx].daylight), labelX, tp.y - 10);
+		}
+	}
+
+	// Chart tooltip
+	function setupChartTooltip() {
+		const canvas = document.getElementById('daylight-chart');
+		const tooltip = document.getElementById('chart-tooltip');
+
+		canvas.addEventListener('mousemove', (e) => {
+			const rect = canvas.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+
+			const pad = chartPad;
+			const dims = chartDims;
+			if (!pad || !dims) return;
+
+			const plotW = dims.w - pad.left - pad.right;
+			const relX = x - pad.left;
+
+			if (relX < 0 || relX > plotW || !yearData.length) {
+				tooltip.style.display = 'none';
+				return;
+			}
+
+			const dayIdx = Math.round(relX / plotW * (yearData.length - 1));
+			if (dayIdx < 0 || dayIdx >= yearData.length) {
+				tooltip.style.display = 'none';
+				return;
+			}
+
+			const d = yearData[dayIdx];
+			const prevD = dayIdx > 0 ? yearData[dayIdx - 1] : null;
+			const diff = prevD ? d.daylight - prevD.daylight : 0;
+
+			tooltip.innerHTML = `
+				<strong>${formatDateShort(d.date)} ${d.date.getFullYear()}</strong><br>
+				Daylight: ${formatDuration(d.daylight)}<br>
+				${formatTime(d.sunrise, d.date)} &ndash; ${formatTime(d.sunset, d.date)}
+				${prevD ? '<br>Change: ' + formatChange(diff) : ''}
+			`;
+
+			const tipW = 180;
+			let left = e.clientX + 12;
+			if (left + tipW > window.innerWidth - 10) left = e.clientX - tipW - 12;
+			tooltip.style.left = left + 'px';
+			tooltip.style.top = (e.clientY - 60) + 'px';
+			tooltip.style.display = 'block';
+		});
+
+		canvas.addEventListener('mouseleave', () => {
+			tooltip.style.display = 'none';
+		});
+	}
+
+	// ═══════════════════════════════════════════
+	// Main Update
+	// ═══════════════════════════════════════════
+
+	function updateAll(cityKey) {
+		currentCity = cityKey;
+		const city = CITIES[cityKey];
+
+		yearData = calculateYearData(city);
+
+		renderToday(city);
+		renderWeek(city);
+		drawChart();
+		renderKeyDates(city);
+		renderMonthly(city);
+		renderAlmanac(city);
+	}
+
+	// ═══════════════════════════════════════════
+	// Initialization
+	// ═══════════════════════════════════════════
+
+	document.addEventListener('DOMContentLoaded', () => {
+		document.getElementById('city-select').addEventListener('change', (e) => {
+			updateAll(e.target.value);
+		});
+
+		setupChartTooltip();
+		updateAll('london');
+
+		// Handle resize
+		let resizeTimer;
+		window.addEventListener('resize', () => {
+			clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(() => drawChart(), 200);
+		});
+	});
+	</script>
+</body>
+</html>
