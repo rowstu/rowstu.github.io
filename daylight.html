@@ -605,7 +605,7 @@
 				<option value="bristol">Bristol</option>
 				<option value="leeds">Leeds</option>
 				<option value="liverpool">Liverpool</option>
-				<option value="nantwich">Nantwich</option>
+				<option value="nantwich" selected>Nantwich</option>
 			</select>
 		</div>
 
@@ -722,7 +722,7 @@
 	const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 	const DAY_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-	let currentCity = 'london';
+	let currentCity = 'nantwich';
 	let yearData = [];
 	let chartPad = {};
 	let chartDims = {};
@@ -1501,7 +1501,7 @@
 		});
 
 		setupChartTooltip();
-		updateAll('london');
+		updateAll('nantwich');
 
 		// Handle resize
 		let resizeTimer;
