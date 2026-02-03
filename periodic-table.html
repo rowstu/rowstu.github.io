@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Periodic Table // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg-primary: #0d1117;
+			--bg-surface: #161b22;
+			--bg-elevated: #21262d;
+			--text-primary: #e6edf3;
+			--text-secondary: #8b949e;
+			--text-muted: #5f6672;
+			--border: #30363d;
+			--border-light: #444c56;
+
+			--cat-alkali: #e8594f;
+			--cat-alkaline: #eab543;
+			--cat-transition: #4a9bd9;
+			--cat-post: #2ed8a3;
+			--cat-metalloid: #a78bfa;
+			--cat-nonmetal: #34d399;
+			--cat-halogen: #f472b6;
+			--cat-noble: #c084fc;
+			--cat-lanthanide: #fb923c;
+			--cat-actinide: #f87171;
+
+			--tile-size: 72px;
+			--tile-gap: 3px;
+			--modal-bg: rgba(0, 0, 0, 0.8);
+		}
+
+		.light-theme {
+			--bg-primary: #f0f2f5;
+			--bg-surface: #ffffff;
+			--bg-elevated: #e8ebef;
+			--text-primary: #1a1d23;
+			--text-secondary: #5f6672;
+			--text-muted: #8b949e;
+			--border: #d0d7de;
+			--border-light: #b8bfc7;
+			--modal-bg: rgba(0, 0, 0, 0.5);
+
+			--cat-alkali: #c73c32;
+			--cat-alkaline: #b8901a;
+			--cat-transition: #2a73b0;
+			--cat-post: #1a9e78;
+			--cat-metalloid: #7c5ec7;
+			--cat-nonmetal: #1a9e78;
+			--cat-halogen: #c24890;
+			--cat-noble: #8b4ecf;
+			--cat-lanthanide: #d97218;
+			--cat-actinide: #d14343;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Outfit', sans-serif;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			min-height: 100vh;
+			overflow-x: hidden;
+			transition: background 0.3s, color 0.3s;
+		}
+
+		/* Header */
+		.app-header {
+			background: var(--bg-surface);
+			border-bottom: 1px solid var(--border);
+			padding: 1.25rem 2rem;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			transition: background 0.3s, border-color 0.3s;
+		}
+
+		.header-inner {
+			max-width: 1500px;
+			margin: 0 auto;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			flex-wrap: wrap;
+		}
+
+		.app-title {
+			font-family: 'Syne', sans-serif;
+			font-size: 1.6rem;
+			font-weight: 800;
+			background: linear-gradient(135deg, var(--cat-transition), var(--cat-noble));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			white-space: nowrap;
+		}
+
+		.header-controls {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			flex-wrap: wrap;
+		}
+
+		.search-input {
+			padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+			background: var(--bg-elevated);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text-primary);
+			font-family: inherit;
+			font-size: 0.9rem;
+			width: 220px;
+			outline: none;
+			transition: border-color 0.2s, background 0.2s;
+		}
+
+		.search-input:focus {
+			border-color: var(--cat-transition);
+			box-shadow: 0 0 0 3px rgba(74, 155, 217, 0.15);
+		}
+
+		.search-wrap {
+			position: relative;
+		}
+
+		.search-wrap::before {
+			content: '\u2315';
+			position: absolute;
+			left: 0.75rem;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--text-muted);
+			font-size: 1rem;
+			pointer-events: none;
+		}
+
+		.header-btn {
+			padding: 0.5rem 1rem;
+			background: var(--bg-elevated);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text-primary);
+			font-family: inherit;
+			font-size: 0.85rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+			white-space: nowrap;
+		}
+
+		.header-btn:hover {
+			border-color: var(--cat-transition);
+			transform: translateY(-1px);
+		}
+
+		.header-btn.active {
+			background: var(--cat-transition);
+			border-color: var(--cat-transition);
+			color: #fff;
+		}
+
+		.theme-btn {
+			width: 38px;
+			height: 38px;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.1rem;
+			border-radius: 50%;
+		}
+
+		/* Main content */
+		.main-content {
+			max-width: 1500px;
+			margin: 0 auto;
+			padding: 1.5rem 1rem;
+		}
+
+		/* Legend */
+		.legend {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-bottom: 1.25rem;
+			justify-content: center;
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 0.4rem;
+			padding: 0.3rem 0.65rem;
+			background: var(--bg-surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			font-size: 0.75rem;
+			color: var(--text-secondary);
+			cursor: pointer;
+			transition: all 0.2s;
+			user-select: none;
+		}
+
+		.legend-item:hover {
+			border-color: var(--border-light);
+		}
+
+		.legend-item.active {
+			border-color: var(--swatch-color);
+			background: var(--bg-elevated);
+			color: var(--text-primary);
+		}
+
+		.legend-swatch {
+			width: 12px;
+			height: 12px;
+			border-radius: 3px;
+			flex-shrink: 0;
+		}
+
+		/* Periodic grid */
+		.table-wrapper {
+			overflow-x: auto;
+			padding-bottom: 1rem;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.periodic-grid {
+			display: grid;
+			grid-template-columns: repeat(18, var(--tile-size));
+			grid-template-rows: repeat(10, var(--tile-size));
+			gap: var(--tile-gap);
+			margin: 0 auto;
+			width: fit-content;
+			position: relative;
+		}
+
+		/* Gap row between main table and f-block */
+		.periodic-grid::before {
+			content: '';
+			grid-row: 8;
+			grid-column: 1 / -1;
+			height: calc(var(--tile-size) * 0.4);
+		}
+
+		/* Element tile */
+		.element-tile {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.2s;
+			position: relative;
+			overflow: hidden;
+			border: 1px solid transparent;
+			padding: 2px;
+		}
+
+		.element-tile .z {
+			font-size: 0.6rem;
+			font-weight: 400;
+			color: var(--text-muted);
+			line-height: 1;
+			position: absolute;
+			top: 3px;
+			left: 5px;
+		}
+
+		.element-tile .sym {
+			font-family: 'Syne', sans-serif;
+			font-size: 1.35rem;
+			font-weight: 700;
+			line-height: 1;
+			margin-top: 2px;
+		}
+
+		.element-tile .name {
+			font-size: 0.5rem;
+			font-weight: 400;
+			color: var(--text-secondary);
+			line-height: 1;
+			margin-top: 2px;
+			max-width: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.element-tile .weight {
+			font-size: 0.45rem;
+			color: var(--text-muted);
+			line-height: 1;
+			margin-top: 1px;
+		}
+
+		.element-tile:hover {
+			transform: scale(1.15);
+			z-index: 10;
+			border-color: var(--tile-accent);
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+		}
+
+		.element-tile.dimmed {
+			opacity: 0.15;
+			pointer-events: none;
+		}
+
+		.element-tile.highlight {
+			border-color: var(--tile-accent);
+			box-shadow: 0 0 8px var(--tile-accent);
+			animation: pulse 1s ease-in-out infinite alternate;
+		}
+
+		@keyframes pulse {
+			from { box-shadow: 0 0 4px var(--tile-accent); }
+			to { box-shadow: 0 0 12px var(--tile-accent); }
+		}
+
+		/* F-block label markers */
+		.fblock-marker {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.55rem;
+			color: var(--text-muted);
+			border: 1px dashed var(--border);
+			border-radius: 4px;
+			text-align: center;
+			line-height: 1.2;
+			cursor: default;
+		}
+
+		/* Tooltip */
+		.tooltip {
+			position: fixed;
+			z-index: 200;
+			background: var(--bg-surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 0.75rem 1rem;
+			pointer-events: none;
+			opacity: 0;
+			transition: opacity 0.15s;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+			max-width: 260px;
+		}
+
+		.tooltip.visible { opacity: 1; }
+
+		.tooltip-sym {
+			font-family: 'Syne', sans-serif;
+			font-size: 1.5rem;
+			font-weight: 800;
+		}
+
+		.tooltip-name {
+			font-size: 0.95rem;
+			font-weight: 600;
+		}
+
+		.tooltip-info {
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+			margin-top: 0.25rem;
+		}
+
+		.tooltip-cat {
+			font-size: 0.7rem;
+			margin-top: 0.35rem;
+			padding: 0.15rem 0.5rem;
+			border-radius: 3px;
+			display: inline-block;
+			font-weight: 500;
+		}
+
+		/* Modal */
+		.modal-overlay {
+			position: fixed;
+			inset: 0;
+			background: var(--modal-bg);
+			z-index: 500;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.25s;
+			padding: 1rem;
+			backdrop-filter: blur(4px);
+		}
+
+		.modal-overlay.open {
+			opacity: 1;
+			pointer-events: auto;
+		}
+
+		.modal {
+			background: var(--bg-surface);
+			border: 1px solid var(--border);
+			border-radius: 12px;
+			max-width: 560px;
+			width: 100%;
+			max-height: 90vh;
+			overflow-y: auto;
+			transform: translateY(20px) scale(0.95);
+			transition: transform 0.25s;
+			box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+		}
+
+		.modal-overlay.open .modal {
+			transform: translateY(0) scale(1);
+		}
+
+		.modal-header {
+			display: flex;
+			align-items: flex-start;
+			gap: 1.25rem;
+			padding: 1.5rem 1.5rem 1rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.modal-symbol-box {
+			width: 80px;
+			height: 80px;
+			border-radius: 10px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+		}
+
+		.modal-symbol-box .z {
+			font-size: 0.7rem;
+			opacity: 0.8;
+		}
+
+		.modal-symbol-box .sym {
+			font-family: 'Syne', sans-serif;
+			font-size: 2rem;
+			font-weight: 800;
+			line-height: 1;
+		}
+
+		.modal-title-area {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.modal-name {
+			font-family: 'Syne', sans-serif;
+			font-size: 1.6rem;
+			font-weight: 700;
+			line-height: 1.2;
+		}
+
+		.modal-category {
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+			margin-top: 0.25rem;
+		}
+
+		.modal-close {
+			width: 32px;
+			height: 32px;
+			background: var(--bg-elevated);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text-secondary);
+			font-size: 1.2rem;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.2s;
+			flex-shrink: 0;
+		}
+
+		.modal-close:hover {
+			background: var(--cat-actinide);
+			border-color: var(--cat-actinide);
+			color: #fff;
+		}
+
+		.modal-stats {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 0.75rem;
+			padding: 1rem 1.5rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.stat-card {
+			text-align: center;
+			padding: 0.5rem;
+			background: var(--bg-elevated);
+			border-radius: 6px;
+		}
+
+		.stat-value {
+			font-size: 1rem;
+			font-weight: 600;
+		}
+
+		.stat-label {
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			margin-top: 0.15rem;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		.modal-body {
+			padding: 1.25rem 1.5rem;
+		}
+
+		.modal-section {
+			margin-bottom: 1.25rem;
+		}
+
+		.modal-section:last-child { margin-bottom: 0; }
+
+		.modal-section-title {
+			font-size: 0.7rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+		}
+
+		.modal-section-content {
+			font-size: 0.9rem;
+			line-height: 1.6;
+			color: var(--text-secondary);
+		}
+
+		.electron-config {
+			font-family: 'Outfit', monospace;
+			font-size: 1rem;
+			color: var(--cat-transition);
+			background: var(--bg-elevated);
+			padding: 0.5rem 0.75rem;
+			border-radius: 4px;
+			display: inline-block;
+		}
+
+		/* Quiz panel */
+		.quiz-overlay {
+			position: fixed;
+			inset: 0;
+			background: var(--modal-bg);
+			z-index: 400;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.25s;
+			padding: 1rem;
+			backdrop-filter: blur(4px);
+		}
+
+		.quiz-overlay.open {
+			opacity: 1;
+			pointer-events: auto;
+		}
+
+		.quiz-panel {
+			background: var(--bg-surface);
+			border: 1px solid var(--border);
+			border-radius: 12px;
+			max-width: 500px;
+			width: 100%;
+			transform: translateY(20px) scale(0.95);
+			transition: transform 0.25s;
+			box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+		}
+
+		.quiz-overlay.open .quiz-panel {
+			transform: translateY(0) scale(1);
+		}
+
+		.quiz-header {
+			padding: 1.25rem 1.5rem;
+			border-bottom: 1px solid var(--border);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.quiz-title {
+			font-family: 'Syne', sans-serif;
+			font-size: 1.3rem;
+			font-weight: 700;
+		}
+
+		.quiz-stats {
+			display: flex;
+			gap: 1rem;
+			padding: 0.75rem 1.5rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+		}
+
+		.quiz-stat {
+			display: flex;
+			align-items: center;
+			gap: 0.35rem;
+		}
+
+		.quiz-stat-value {
+			font-weight: 700;
+			color: var(--text-primary);
+		}
+
+		.quiz-stat-label {
+			color: var(--text-muted);
+		}
+
+		.quiz-body {
+			padding: 1.5rem;
+		}
+
+		.quiz-question {
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-bottom: 1.25rem;
+			text-align: center;
+			min-height: 3rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.quiz-options {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.75rem;
+		}
+
+		.quiz-option {
+			padding: 0.85rem;
+			background: var(--bg-elevated);
+			border: 2px solid var(--border);
+			border-radius: 8px;
+			color: var(--text-primary);
+			font-family: inherit;
+			font-size: 0.95rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s;
+			text-align: center;
+		}
+
+		.quiz-option:hover:not(:disabled) {
+			border-color: var(--cat-transition);
+			transform: translateY(-2px);
+		}
+
+		.quiz-option.correct {
+			border-color: var(--cat-nonmetal);
+			background: rgba(52, 211, 153, 0.15);
+			color: var(--cat-nonmetal);
+		}
+
+		.quiz-option.wrong {
+			border-color: var(--cat-actinide);
+			background: rgba(248, 113, 113, 0.15);
+			color: var(--cat-actinide);
+		}
+
+		.quiz-option:disabled {
+			cursor: default;
+			opacity: 0.6;
+		}
+
+		.quiz-option:disabled.correct { opacity: 1; }
+		.quiz-option:disabled.wrong { opacity: 1; }
+
+		.quiz-footer {
+			padding: 1rem 1.5rem;
+			border-top: 1px solid var(--border);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.quiz-next {
+			padding: 0.6rem 1.5rem;
+			background: var(--cat-transition);
+			border: none;
+			border-radius: 6px;
+			color: #fff;
+			font-family: inherit;
+			font-size: 0.9rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.quiz-next:hover {
+			filter: brightness(1.1);
+			transform: translateY(-1px);
+		}
+
+		.quiz-next:disabled {
+			opacity: 0.4;
+			cursor: default;
+			transform: none;
+		}
+
+		.quiz-type-select {
+			padding: 0.4rem 0.6rem;
+			background: var(--bg-elevated);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text-primary);
+			font-family: inherit;
+			font-size: 0.8rem;
+		}
+
+		.quiz-feedback {
+			text-align: center;
+			font-size: 0.9rem;
+			font-weight: 600;
+			min-height: 1.5rem;
+			margin-top: 0.75rem;
+		}
+
+		.quiz-streak {
+			color: var(--cat-lanthanide);
+			font-weight: 700;
+		}
+
+		/* Responsive */
+		@media (max-width: 768px) {
+			.app-header { padding: 0.75rem 1rem; }
+			.app-title { font-size: 1.2rem; }
+			.header-controls { width: 100%; }
+			.search-input { flex: 1; width: auto; min-width: 120px; }
+
+			:root {
+				--tile-size: 44px;
+				--tile-gap: 2px;
+			}
+
+			.element-tile .z { font-size: 0.4rem; top: 1px; left: 2px; }
+			.element-tile .sym { font-size: 0.85rem; }
+			.element-tile .name { font-size: 0.35rem; }
+			.element-tile .weight { display: none; }
+
+			.legend-item { font-size: 0.65rem; padding: 0.2rem 0.45rem; }
+			.legend-swatch { width: 8px; height: 8px; }
+
+			.modal-stats { grid-template-columns: repeat(2, 1fr); }
+			.modal-header { padding: 1rem; }
+			.modal-body { padding: 1rem; }
+			.modal-name { font-size: 1.3rem; }
+
+			.quiz-options { grid-template-columns: 1fr; }
+			.main-content { padding: 1rem 0.5rem; }
+		}
+
+		@media (max-width: 480px) {
+			:root {
+				--tile-size: 36px;
+				--tile-gap: 1px;
+			}
+
+			.element-tile .sym { font-size: 0.7rem; }
+			.element-tile .name { display: none; }
+			.element-tile .z { font-size: 0.35rem; }
+
+			.fblock-marker { font-size: 0.4rem; }
+			.app-title { font-size: 1rem; }
+		}
+
+		/* Stagger animation */
+		.element-tile {
+			animation: tileIn 0.4s ease-out both;
+		}
+
+		@keyframes tileIn {
+			from {
+				opacity: 0;
+				transform: scale(0.8);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1);
+			}
+		}
+
+		/* Scrollbar */
+		.table-wrapper::-webkit-scrollbar {
+			height: 6px;
+		}
+
+		.table-wrapper::-webkit-scrollbar-track {
+			background: var(--bg-primary);
+		}
+
+		.table-wrapper::-webkit-scrollbar-thumb {
+			background: var(--border);
+			border-radius: 3px;
+		}
+	</style>
+</head>
+<body>
+	<header class="app-header">
+		<div class="header-inner">
+			<h1 class="app-title">Periodic Table</h1>
+			<div class="header-controls">
+				<div class="search-wrap">
+					<input type="text" class="search-input" id="search" placeholder="Search elements..." autocomplete="off">
+				</div>
+				<button class="header-btn" id="quiz-btn">Quiz</button>
+				<button class="header-btn theme-btn" id="theme-btn" title="Toggle theme">&#9790;</button>
+			</div>
+		</div>
+	</header>
+
+	<main class="main-content">
+		<div class="legend" id="legend"></div>
+		<div class="table-wrapper">
+			<div class="periodic-grid" id="grid"></div>
+		</div>
+	</main>
+
+	<div class="tooltip" id="tooltip"></div>
+
+	<div class="modal-overlay" id="modal-overlay">
+		<div class="modal" id="modal"></div>
+	</div>
+
+	<div class="quiz-overlay" id="quiz-overlay">
+		<div class="quiz-panel" id="quiz-panel"></div>
+	</div>
+
+	<script src="assets/shared-nav.js"></script>
+	<script>
+	'use strict';
+
+	/* ───── Category definitions ───── */
+	const CATEGORIES = {
+		alkali:     { label: 'Alkali Metal',          color: 'var(--cat-alkali)' },
+		alkaline:   { label: 'Alkaline Earth Metal',  color: 'var(--cat-alkaline)' },
+		transition: { label: 'Transition Metal',      color: 'var(--cat-transition)' },
+		post:       { label: 'Post-transition Metal', color: 'var(--cat-post)' },
+		metalloid:  { label: 'Metalloid',             color: 'var(--cat-metalloid)' },
+		nonmetal:   { label: 'Nonmetal',              color: 'var(--cat-nonmetal)' },
+		halogen:    { label: 'Halogen',               color: 'var(--cat-halogen)' },
+		noble:      { label: 'Noble Gas',             color: 'var(--cat-noble)' },
+		lanthanide: { label: 'Lanthanide',            color: 'var(--cat-lanthanide)' },
+		actinide:   { label: 'Actinide',              color: 'var(--cat-actinide)' }
+	};
+
+	/* ───── Element data (all 118) ───── */
+	const ELEMENTS = [
+		{z:1,s:'H',n:'Hydrogen',w:1.008,c:'nonmetal',r:1,g:1,p:'gas',ec:'1s\u00b9',
+		 d:'Lightest and most abundant element in the universe. Highly flammable diatomic gas used in fuel cells, ammonia production, and rocket propulsion.',
+		 h:'Identified by Henry Cavendish in 1766; named from Greek hydro (water) + genes (forming).'},
+		{z:2,s:'He',n:'Helium',w:4.003,c:'noble',r:1,g:18,p:'gas',ec:'1s\u00b2',
+		 d:'Second lightest element, inert noble gas. Used in cryogenics, MRI magnets, party balloons, and as a protective gas in arc welding.',
+		 h:'First detected in the solar spectrum by Jules Janssen during the 1868 eclipse; isolated on Earth by William Ramsay in 1895.'},
+		{z:3,s:'Li',n:'Lithium',w:6.941,c:'alkali',r:2,g:1,p:'solid',ec:'[He] 2s\u00b9',
+		 d:'Lightest metal, soft and silvery-white. Essential in rechargeable batteries, mood-stabilising medication, and lightweight alloys for aerospace.',
+		 h:'Discovered by Johan August Arfwedson in 1817 from the mineral petalite.'},
+		{z:4,s:'Be',n:'Beryllium',w:9.012,c:'alkaline',r:2,g:2,p:'solid',ec:'[He] 2s\u00b2',
+		 d:'Light, strong metal with a high melting point. Used in aerospace materials, X-ray windows, and nuclear reactors. Toxic if inhaled as dust.',
+		 h:'Discovered by Louis Nicolas Vauquelin in 1798 in beryl and emerald minerals.'},
+		{z:5,s:'B',n:'Boron',w:10.81,c:'metalloid',r:2,g:13,p:'solid',ec:'[He] 2s\u00b2 2p\u00b9',
+		 d:'Hard metalloid used in borosilicate glass (Pyrex), fiberglass insulation, and as a neutron absorber in nuclear reactors.',
+		 h:'Isolated independently by Humphry Davy and by Gay-Lussac and Th\u00e9nard in 1808.'},
+		{z:6,s:'C',n:'Carbon',w:12.01,c:'nonmetal',r:2,g:14,p:'solid',ec:'[He] 2s\u00b2 2p\u00b2',
+		 d:'Basis of all known organic chemistry. Found as diamond, graphite, graphene, and fullerenes. Essential to life and used in steel, fuels, and plastics.',
+		 h:'Known since antiquity. The name comes from Latin carbo meaning charcoal.'},
+		{z:7,s:'N',n:'Nitrogen',w:14.01,c:'nonmetal',r:2,g:15,p:'gas',ec:'[He] 2s\u00b2 2p\u00b3',
+		 d:'Makes up 78% of Earth\u2019s atmosphere. Used in fertilisers (ammonia), explosives, cryogenics, and as an inert gas in food packaging.',
+		 h:'Discovered by Daniel Rutherford in 1772. Named from Greek nitron + genes (nitre-forming).'},
+		{z:8,s:'O',n:'Oxygen',w:16.00,c:'nonmetal',r:2,g:16,p:'gas',ec:'[He] 2s\u00b2 2p\u2074',
+		 d:'Vital for respiration and combustion. Most abundant element in Earth\u2019s crust. Used in steelmaking, medicine, and water treatment.',
+		 h:'Independently discovered by Carl Wilhelm Scheele (1772) and Joseph Priestley (1774).'},
+		{z:9,s:'F',n:'Fluorine',w:19.00,c:'halogen',r:2,g:17,p:'gas',ec:'[He] 2s\u00b2 2p\u2075',
+		 d:'Most electronegative and reactive element. Used in Teflon (PTFE), refrigerants, toothpaste (fluoride), and uranium enrichment.',
+		 h:'Isolated by Henri Moissan in 1886 after decades of dangerous attempts by other chemists.'},
+		{z:10,s:'Ne',n:'Neon',w:20.18,c:'noble',r:2,g:18,p:'gas',ec:'[He] 2s\u00b2 2p\u2076',
+		 d:'Inert noble gas that emits a characteristic red-orange glow in discharge tubes. Used in neon signage, lasers, and cryogenics.',
+		 h:'Discovered by William Ramsay and Morris Travers in 1898 while studying liquid air.'},
+		{z:11,s:'Na',n:'Sodium',w:22.99,c:'alkali',r:3,g:1,p:'solid',ec:'[Ne] 3s\u00b9',
+		 d:'Soft, silvery-white alkali metal that reacts violently with water. Essential for nerve function. Used in table salt (NaCl), street lamps, and chemical synthesis.',
+		 h:'Isolated by Humphry Davy in 1807 via electrolysis of sodium hydroxide.'},
+		{z:12,s:'Mg',n:'Magnesium',w:24.31,c:'alkaline',r:3,g:2,p:'solid',ec:'[Ne] 3s\u00b2',
+		 d:'Lightweight structural metal that burns with a brilliant white flame. Used in alloys, fireworks, flash photography, and as a dietary supplement.',
+		 h:'Recognised as an element by Joseph Black in 1755; first isolated by Humphry Davy in 1808.'},
+		{z:13,s:'Al',n:'Aluminium',w:26.98,c:'post',r:3,g:13,p:'solid',ec:'[Ne] 3s\u00b2 3p\u00b9',
+		 d:'Most abundant metal in Earth\u2019s crust. Lightweight, corrosion-resistant. Used in aircraft, drink cans, foil, and construction.',
+		 h:'First produced by Hans Christian \u00d8rsted in 1825. Industrial production enabled by the Hall\u2013H\u00e9roult process (1886).'},
+		{z:14,s:'Si',n:'Silicon',w:28.09,c:'metalloid',r:3,g:14,p:'solid',ec:'[Ne] 3s\u00b2 3p\u00b2',
+		 d:'Semiconductor that forms the backbone of modern electronics. Second most abundant element in Earth\u2019s crust. Used in microchips, solar cells, and glass.',
+		 h:'First isolated by J\u00f6ns Jacob Berzelius in 1824.'},
+		{z:15,s:'P',n:'Phosphorus',w:30.97,c:'nonmetal',r:3,g:15,p:'solid',ec:'[Ne] 3s\u00b2 3p\u00b3',
+		 d:'Essential element for life, found in DNA, bones, and ATP. White phosphorus is highly toxic and flammable; red phosphorus is used in matches.',
+		 h:'Discovered by Hennig Brand in 1669 while experimenting with urine.'},
+		{z:16,s:'S',n:'Sulfur',w:32.07,c:'nonmetal',r:3,g:16,p:'solid',ec:'[Ne] 3s\u00b2 3p\u2074',
+		 d:'Yellow nonmetal with a distinctive smell. Used in sulfuric acid production, vulcanising rubber, fungicides, and gunpowder.',
+		 h:'Known since antiquity. Referred to as brimstone in the Bible.'},
+		{z:17,s:'Cl',n:'Chlorine',w:35.45,c:'halogen',r:3,g:17,p:'gas',ec:'[Ne] 3s\u00b2 3p\u2075',
+		 d:'Yellow-green toxic gas with a pungent odour. Used to disinfect water, produce PVC, bleach, and many organic chemicals.',
+		 h:'Discovered by Carl Wilhelm Scheele in 1774; recognised as an element by Humphry Davy in 1810.'},
+		{z:18,s:'Ar',n:'Argon',w:39.95,c:'noble',r:3,g:18,p:'gas',ec:'[Ne] 3s\u00b2 3p\u2076',
+		 d:'Third most abundant gas in Earth\u2019s atmosphere. Used as an inert shielding gas in welding, incandescent light bulbs, and preserving wine.',
+		 h:'Discovered by Lord Rayleigh and William Ramsay in 1894.'},
+		{z:19,s:'K',n:'Potassium',w:39.10,c:'alkali',r:4,g:1,p:'solid',ec:'[Ar] 4s\u00b9',
+		 d:'Soft silvery metal that reacts explosively with water. Essential nutrient for cells and nerves. Used in fertilisers and potassium hydroxide (KOH).',
+		 h:'Isolated by Humphry Davy in 1807 from potash (potassium carbonate).'},
+		{z:20,s:'Ca',n:'Calcium',w:40.08,c:'alkaline',r:4,g:2,p:'solid',ec:'[Ar] 4s\u00b2',
+		 d:'Essential for bones, teeth, and cellular signalling. Fifth most abundant element in Earth\u2019s crust. Used in cement, plaster, and steelmaking.',
+		 h:'Isolated by Humphry Davy in 1808 via electrolysis of lime.'},
+		{z:21,s:'Sc',n:'Scandium',w:44.96,c:'transition',r:4,g:3,p:'solid',ec:'[Ar] 3d\u00b9 4s\u00b2',
+		 d:'Lightweight transition metal used in aluminium-scandium alloys for aerospace and high-performance sports equipment like bicycle frames.',
+		 h:'Discovered by Lars Fredrik Nilson in 1879; its existence was predicted by Mendeleev.'},
+		{z:22,s:'Ti',n:'Titanium',w:47.87,c:'transition',r:4,g:4,p:'solid',ec:'[Ar] 3d\u00b2 4s\u00b2',
+		 d:'Strong, lightweight, corrosion-resistant metal. Used in aircraft, medical implants, and titanium dioxide (white pigment in paints and sunscreen).',
+		 h:'Discovered by William Gregor in 1791; named after the Titans of Greek mythology.'},
+		{z:23,s:'V',n:'Vanadium',w:50.94,c:'transition',r:4,g:5,p:'solid',ec:'[Ar] 3d\u00b3 4s\u00b2',
+		 d:'Hard metal that strengthens steel alloys. Used in tools, springs, jet engines, and vanadium redox flow batteries for energy storage.',
+		 h:'Discovered by Andr\u00e9s Manuel del R\u00edo in 1801 and rediscovered by Nils Gabriel Sefstr\u00f6m in 1830.'},
+		{z:24,s:'Cr',n:'Chromium',w:52.00,c:'transition',r:4,g:6,p:'solid',ec:'[Ar] 3d\u2075 4s\u00b9',
+		 d:'Hard, lustrous metal resistant to tarnishing. Used in stainless steel, chrome plating, pigments, and leather tanning.',
+		 h:'Discovered by Louis Nicolas Vauquelin in 1797 from a Siberian red lead mineral.'},
+		{z:25,s:'Mn',n:'Manganese',w:54.94,c:'transition',r:4,g:7,p:'solid',ec:'[Ar] 3d\u2075 4s\u00b2',
+		 d:'Essential trace element for humans. Used in steel production to improve hardness, in dry-cell batteries, and as a decolourant in glass.',
+		 h:'Recognised as an element by Carl Wilhelm Scheele in 1774; isolated by Johan Gottlieb Gahn that same year.'},
+		{z:26,s:'Fe',n:'Iron',w:55.85,c:'transition',r:4,g:8,p:'solid',ec:'[Ar] 3d\u2076 4s\u00b2',
+		 d:'Most used metal on Earth, making up the core of our planet. The basis of steel. Essential for blood haemoglobin and industrial civilisation.',
+		 h:'Used since at least 3000 BCE. The Iron Age followed the Bronze Age in many civilisations.'},
+		{z:27,s:'Co',n:'Cobalt',w:58.93,c:'transition',r:4,g:9,p:'solid',ec:'[Ar] 3d\u2077 4s\u00b2',
+		 d:'Hard, lustrous blue-grey metal. Used in lithium-ion batteries, superalloys for jet engines, blue pigments, and as a vitamin B12 component.',
+		 h:'Discovered by Georg Brandt around 1735, the first metal discovered in modern times.'},
+		{z:28,s:'Ni',n:'Nickel',w:58.69,c:'transition',r:4,g:10,p:'solid',ec:'[Ar] 3d\u2078 4s\u00b2',
+		 d:'Silvery-white corrosion-resistant metal. Used in stainless steel, coins, rechargeable batteries, and nickel plating.',
+		 h:'Isolated by Axel Fredrik Cronstedt in 1751 from a nickel arsenide mineral.'},
+		{z:29,s:'Cu',n:'Copper',w:63.55,c:'transition',r:4,g:11,p:'solid',ec:'[Ar] 3d\u00b9\u2070 4s\u00b9',
+		 d:'Excellent conductor of heat and electricity with distinctive reddish colour. Used in electrical wiring, plumbing, electronics, and bronze/brass alloys.',
+		 h:'One of the first metals used by humans, dating back over 10,000 years. Named from Latin cuprum (Cyprus).'},
+		{z:30,s:'Zn',n:'Zinc',w:65.38,c:'transition',r:4,g:12,p:'solid',ec:'[Ar] 3d\u00b9\u2070 4s\u00b2',
+		 d:'Bluish-white metal used to galvanise steel against corrosion. Also found in brass, batteries, sunscreen, and as an essential dietary mineral.',
+		 h:'Known in brass since antiquity. First identified as a distinct metal in India around the 9th century.'},
+		{z:31,s:'Ga',n:'Gallium',w:69.72,c:'post',r:4,g:13,p:'solid',ec:'[Ar] 3d\u00b9\u2070 4s\u00b2 4p\u00b9',
+		 d:'Soft metal that melts just above room temperature (29.8\u00b0C). Used in semiconductors (GaAs), LEDs, and medical thermometers.',
+		 h:'Discovered by Paul Emile Lecoq de Boisbaudran in 1875; predicted by Mendeleev as eka-aluminium.'},
+		{z:32,s:'Ge',n:'Germanium',w:72.63,c:'metalloid',r:4,g:14,p:'solid',ec:'[Ar] 3d\u00b9\u2070 4s\u00b2 4p\u00b2',
+		 d:'Semiconductor metalloid used in fibre optics, infrared optics, and early transistors. Also used in polymerisation catalysts.',
+		 h:'Discovered by Clemens Winkler in 1886; predicted by Mendeleev as eka-silicon.'},
+		{z:33,s:'As',n:'Arsenic',w:74.92,c:'metalloid',r:4,g:15,p:'solid',ec:'[Ar] 3d\u00b9\u2070 4s\u00b2 4p\u00b3',
+		 d:'Toxic metalloid historically infamous as a poison. Used in semiconductors (GaAs), wood preservatives, and some pesticides.',
+		 h:'Known since ancient times. Albertus Magnus is often credited with isolating it around 1250.'},
+		{z:34,s:'Se',n:'Selenium',w:78.97,c:'nonmetal',r:4,g:16,p:'solid',ec:'[Ar] 3d\u00b9\u2070 4s\u00b2 4p\u2074',
+		 d:'Essential trace element with photovoltaic and photoconductive properties. Used in electronics, glass decolouring, and dietary supplements.',
+		 h:'Discovered by J\u00f6ns Jacob Berzelius in 1817; named after Selene, the Greek Moon goddess.'},
+		{z:35,s:'Br',n:'Bromine',w:79.90,c:'halogen',r:4,g:17,p:'liquid',ec:'[Ar] 3d\u00b9\u2070 4s\u00b2 4p\u2075',
+		 d:'One of only two elements that are liquid at room temperature. Pungent red-brown liquid used in flame retardants, pesticides, and photography.',
+		 h:'Discovered independently by Carl Jacob L\u00f6wig (1825) and Antoine Balard (1826).'},
+		{z:36,s:'Kr',n:'Krypton',w:83.80,c:'noble',r:4,g:18,p:'gas',ec:'[Ar] 3d\u00b9\u2070 4s\u00b2 4p\u2076',
+		 d:'Noble gas used in high-performance lighting, flash photography, and formerly to define the metre. Can form compounds under extreme conditions.',
+		 h:'Discovered by William Ramsay and Morris Travers in 1898 from liquid air residues.'},
+		{z:37,s:'Rb',n:'Rubidium',w:85.47,c:'alkali',r:5,g:1,p:'solid',ec:'[Kr] 5s\u00b9',
+		 d:'Soft silvery metal that ignites spontaneously in air. Used in atomic clocks, speciality glass, and photocells.',
+		 h:'Discovered by Robert Bunsen and Gustav Kirchhoff in 1861 using flame spectroscopy.'},
+		{z:38,s:'Sr',n:'Strontium',w:87.62,c:'alkaline',r:5,g:2,p:'solid',ec:'[Kr] 5s\u00b2',
+		 d:'Soft silvery metal that produces brilliant red flames. Used in fireworks, flares, ferrite magnets, and strontium aluminate glow-in-the-dark materials.',
+		 h:'Discovered in 1790 by Adair Crawford; named after Strontian, a village in Scotland.'},
+		{z:39,s:'Y',n:'Yttrium',w:88.91,c:'transition',r:5,g:3,p:'solid',ec:'[Kr] 4d\u00b9 5s\u00b2',
+		 d:'Silvery metal used in red phosphors for LEDs and displays, yttrium-aluminium garnet (YAG) lasers, and superconductor ceramics.',
+		 h:'Discovered by Johan Gadolin in 1794 in a mineral from Ytterby, Sweden.'},
+		{z:40,s:'Zr',n:'Zirconium',w:91.22,c:'transition',r:5,g:4,p:'solid',ec:'[Kr] 4d\u00b2 5s\u00b2',
+		 d:'Corrosion-resistant metal with a low neutron absorption cross-section. Used in nuclear reactor cladding, ceramics, and cubic zirconia gems.',
+		 h:'Discovered by Martin Heinrich Klaproth in 1789; first isolated by J\u00f6ns Jacob Berzelius in 1824.'},
+		{z:41,s:'Nb',n:'Niobium',w:92.91,c:'transition',r:5,g:5,p:'solid',ec:'[Kr] 4d\u2074 5s\u00b9',
+		 d:'Soft grey metal used in high-grade steel alloys, superconducting magnets (MRI, particle accelerators), and hypoallergenic jewellery.',
+		 h:'Discovered by Charles Hatchett in 1801; named after Niobe from Greek mythology.'},
+		{z:42,s:'Mo',n:'Molybdenum',w:95.95,c:'transition',r:5,g:6,p:'solid',ec:'[Kr] 4d\u2075 5s\u00b9',
+		 d:'Hard, high-melting-point metal that strengthens steel. Used in catalysts, lubricants, and missile/aircraft parts. Essential trace element for life.',
+		 h:'Identified by Carl Wilhelm Scheele in 1778; isolated by Peter Jacob Hjelm in 1781.'},
+		{z:43,s:'Tc',n:'Technetium',w:98,c:'transition',r:5,g:7,p:'solid',ec:'[Kr] 4d\u2075 5s\u00b2',
+		 d:'First artificially produced element; all isotopes are radioactive. Used in medical imaging (Tc-99m is the most widely used radiotracer).',
+		 h:'Synthesised by Carlo Perrier and Emilio Segr\u00e8 in 1937. Name means "artificial" in Greek.'},
+		{z:44,s:'Ru',n:'Ruthenium',w:101.1,c:'transition',r:5,g:8,p:'solid',ec:'[Kr] 4d\u2077 5s\u00b9',
+		 d:'Hard, rare platinum-group metal. Used in electronics, wear-resistant coatings, catalysts, and solar cell technology.',
+		 h:'Discovered by Karl Ernst Claus in 1844; named after Ruthenia, the Latin name for Russia.'},
+		{z:45,s:'Rh',n:'Rhodium',w:102.9,c:'transition',r:5,g:9,p:'solid',ec:'[Kr] 4d\u2078 5s\u00b9',
+		 d:'Extremely rare, highly reflective noble metal. Primarily used in catalytic converters, also in jewellery plating and chemical catalysis.',
+		 h:'Discovered by William Hyde Wollaston in 1803; named for the rose colour of its salts.'},
+		{z:46,s:'Pd',n:'Palladium',w:106.4,c:'transition',r:5,g:10,p:'solid',ec:'[Kr] 4d\u00b9\u2070',
+		 d:'Precious metal used in catalytic converters, electronics, dentistry, hydrogen purification, and as a catalyst in organic chemistry.',
+		 h:'Discovered by William Hyde Wollaston in 1803; named after the asteroid Pallas.'},
+		{z:47,s:'Ag',n:'Silver',w:107.9,c:'transition',r:5,g:11,p:'solid',ec:'[Kr] 4d\u00b9\u2070 5s\u00b9',
+		 d:'Precious metal with the highest electrical and thermal conductivity of any element. Used in jewellery, electronics, photography, and antimicrobial applications.',
+		 h:'Known since antiquity. Symbol Ag from Latin argentum. Used as currency for millennia.'},
+		{z:48,s:'Cd',n:'Cadmium',w:112.4,c:'transition',r:5,g:12,p:'solid',ec:'[Kr] 4d\u00b9\u2070 5s\u00b2',
+		 d:'Soft bluish-white toxic metal. Used in NiCd rechargeable batteries, pigments, and corrosion-resistant coatings. Being phased out due to toxicity.',
+		 h:'Discovered by Friedrich Stromeyer and Karl Samuel Leberecht Hermann in 1817 in zinc ore impurities.'},
+		{z:49,s:'In',n:'Indium',w:114.8,c:'post',r:5,g:13,p:'solid',ec:'[Kr] 4d\u00b9\u2070 5s\u00b2 5p\u00b9',
+		 d:'Soft, malleable metal. Critical for indium tin oxide (ITO) used in touchscreens and LCD displays. Also used in solders and semiconductors.',
+		 h:'Discovered by Ferdinand Reich and Hieronymous Theodor Richter in 1863 via its indigo spectral line.'},
+		{z:50,s:'Sn',n:'Tin',w:118.7,c:'post',r:5,g:14,p:'solid',ec:'[Kr] 4d\u00b9\u2070 5s\u00b2 5p\u00b2',
+		 d:'Malleable silvery metal resistant to corrosion. Used to coat steel (tin cans), in solder, bronze, and pewter alloys.',
+		 h:'Known since antiquity, essential to the Bronze Age. Symbol Sn from Latin stannum.'},
+		{z:51,s:'Sb',n:'Antimony',w:121.8,c:'metalloid',r:5,g:15,p:'solid',ec:'[Kr] 4d\u00b9\u2070 5s\u00b2 5p\u00b3',
+		 d:'Brittle silvery metalloid. Used in flame retardants, lead-acid batteries, semiconductors, and as a hardening agent in lead alloys.',
+		 h:'Known since antiquity; used in ancient Egypt as kohl eye makeup. Symbol Sb from Latin stibium.'},
+		{z:52,s:'Te',n:'Tellurium',w:127.6,c:'metalloid',r:5,g:16,p:'solid',ec:'[Kr] 4d\u00b9\u2070 5s\u00b2 5p\u2074',
+		 d:'Rare brittle metalloid with semiconductor properties. Used in thermoelectric devices, solar cells (CdTe), and as an alloying agent in steel and copper.',
+		 h:'Discovered by Franz-Joseph M\u00fcller von Reichenstein in 1782; named after Latin tellus (Earth).'},
+		{z:53,s:'I',n:'Iodine',w:126.9,c:'halogen',r:5,g:17,p:'solid',ec:'[Kr] 4d\u00b9\u2070 5s\u00b2 5p\u2075',
+		 d:'Purple-black solid that sublimes into violet vapour. Essential for thyroid hormones. Used in disinfectants, photography, and iodised salt.',
+		 h:'Discovered by Bernard Courtois in 1811 while extracting chemicals from seaweed.'},
+		{z:54,s:'Xe',n:'Xenon',w:131.3,c:'noble',r:5,g:18,p:'gas',ec:'[Kr] 4d\u00b9\u2070 5s\u00b2 5p\u2076',
+		 d:'Noble gas that can form compounds (XeF\u2082, XeF\u2084). Used in car headlights, ion propulsion engines, medical imaging, and anaesthesia research.',
+		 h:'Discovered by William Ramsay and Morris Travers in 1898. Named from Greek xenon (stranger).'},
+		{z:55,s:'Cs',n:'Caesium',w:132.9,c:'alkali',r:6,g:1,p:'solid',ec:'[Xe] 6s\u00b9',
+		 d:'Most electropositive stable element, melts at 28.4\u00b0C. Used in atomic clocks (defining the second), photoelectric cells, and drilling fluids.',
+		 h:'Discovered by Robert Bunsen and Gustav Kirchhoff in 1860 using spectroscopy; first element discovered this way.'},
+		{z:56,s:'Ba',n:'Barium',w:137.3,c:'alkaline',r:6,g:2,p:'solid',ec:'[Xe] 6s\u00b2',
+		 d:'Soft silvery alkaline earth metal. Barium sulfate used as a radio-contrast agent for X-rays. Also used in drilling muds and fireworks (green).',
+		 h:'Discovered by Carl Wilhelm Scheele in 1774; isolated by Humphry Davy in 1808.'},
+		{z:57,s:'La',n:'Lanthanum',w:138.9,c:'lanthanide',r:9,g:4,p:'solid',ec:'[Xe] 5d\u00b9 6s\u00b2',
+		 d:'Soft silvery metal, first of the lanthanides. Used in camera lenses, catalytic converters, lighter flints (mischmetal), and NiMH batteries.',
+		 h:'Discovered by Carl Gustaf Mosander in 1839. Name from Greek lanthanein (to lie hidden).'},
+		{z:58,s:'Ce',n:'Cerium',w:140.1,c:'lanthanide',r:9,g:5,p:'solid',ec:'[Xe] 4f\u00b9 5d\u00b9 6s\u00b2',
+		 d:'Most abundant rare earth element. Used in catalytic converters, self-cleaning ovens, glass polishing (cerium oxide), and lighter flints.',
+		 h:'Discovered in 1803 by Berzelius and Hisinger; named after the asteroid Ceres.'},
+		{z:59,s:'Pr',n:'Praseodymium',w:140.9,c:'lanthanide',r:9,g:6,p:'solid',ec:'[Xe] 4f\u00b3 6s\u00b2',
+		 d:'Soft silvery metal that forms a green oxide. Used in NdFeB magnets, aircraft alloys, and to create yellow glass for welding goggles.',
+		 h:'Separated from didymium by Carl Auer von Welsbach in 1885.'},
+		{z:60,s:'Nd',n:'Neodymium',w:144.2,c:'lanthanide',r:9,g:7,p:'solid',ec:'[Xe] 4f\u2074 6s\u00b2',
+		 d:'Used to make the world\u2019s strongest permanent magnets (NdFeB). Found in headphones, hard drives, wind turbines, and electric vehicle motors.',
+		 h:'Separated from didymium by Carl Auer von Welsbach in 1885.'},
+		{z:61,s:'Pm',n:'Promethium',w:145,c:'lanthanide',r:9,g:8,p:'solid',ec:'[Xe] 4f\u2075 6s\u00b2',
+		 d:'Only lanthanide with no stable isotopes. Used in luminous paint, nuclear batteries, and as a beta radiation source for measuring thickness.',
+		 h:'First produced by Jacob Marinsky and colleagues in 1945 at Oak Ridge; named after Prometheus.'},
+		{z:62,s:'Sm',n:'Samarium',w:150.4,c:'lanthanide',r:9,g:9,p:'solid',ec:'[Xe] 4f\u2076 6s\u00b2',
+		 d:'Used in samarium-cobalt magnets (heat-resistant), cancer treatment (Sm-153), and nuclear reactor control rods.',
+		 h:'Discovered by Paul Emile Lecoq de Boisbaudran in 1879; named after the mineral samarskite.'},
+		{z:63,s:'Eu',n:'Europium',w:152.0,c:'lanthanide',r:9,g:10,p:'solid',ec:'[Xe] 4f\u2077 6s\u00b2',
+		 d:'Most reactive rare earth element. Used as a red phosphor in TV/monitor screens, fluorescent lamps, and anti-counterfeiting marks on Euro banknotes.',
+		 h:'Discovered by Eug\u00e8ne-Anatole Demar\u00e7ay in 1901; named after the continent of Europe.'},
+		{z:64,s:'Gd',n:'Gadolinium',w:157.3,c:'lanthanide',r:9,g:11,p:'solid',ec:'[Xe] 4f\u2077 5d\u00b9 6s\u00b2',
+		 d:'Paramagnetic metal used as a contrast agent in MRI scans. Also used in nuclear reactors, microwave applications, and memory alloys.',
+		 h:'Discovered by Jean Charles Galissard de Marignac in 1880; named after chemist Johan Gadolin.'},
+		{z:65,s:'Tb',n:'Terbium',w:158.9,c:'lanthanide',r:9,g:12,p:'solid',ec:'[Xe] 4f\u2079 6s\u00b2',
+		 d:'Silvery-grey metal used in green phosphors for displays, solid-state devices, and magnetostrictive alloys (Terfenol-D for sonar).',
+		 h:'Discovered by Carl Gustaf Mosander in 1843; named after Ytterby, Sweden.'},
+		{z:66,s:'Dy',n:'Dysprosium',w:162.5,c:'lanthanide',r:9,g:13,p:'solid',ec:'[Xe] 4f\u00b9\u2070 6s\u00b2',
+		 d:'Used in NdFeB magnets to improve high-temperature performance. Also used in nuclear control rods and data storage devices.',
+		 h:'Discovered by Paul Emile Lecoq de Boisbaudran in 1886. Named from Greek dysprositos (hard to get at).'},
+		{z:67,s:'Ho',n:'Holmium',w:164.9,c:'lanthanide',r:9,g:14,p:'solid',ec:'[Xe] 4f\u00b9\u00b9 6s\u00b2',
+		 d:'Has the highest magnetic moment of any naturally occurring element. Used in lasers for medical procedures and nuclear control rods.',
+		 h:'Discovered by Per Theodor Cleve and Jacques-Louis Soret in 1878; named after Stockholm (Holmia).'},
+		{z:68,s:'Er',n:'Erbium',w:167.3,c:'lanthanide',r:9,g:15,p:'solid',ec:'[Xe] 4f\u00b9\u00b2 6s\u00b2',
+		 d:'Pink-coloured salts used in fibre optic amplifiers (EDFA) that are critical for internet infrastructure. Also used in lasers and glass colouring.',
+		 h:'Discovered by Carl Gustaf Mosander in 1843; named after Ytterby, Sweden.'},
+		{z:69,s:'Tm',n:'Thulium',w:168.9,c:'lanthanide',r:9,g:16,p:'solid',ec:'[Xe] 4f\u00b9\u00b3 6s\u00b2',
+		 d:'Least abundant naturally occurring lanthanide. Used in portable X-ray devices, lasers, and as a radiation source for medical applications.',
+		 h:'Discovered by Per Theodor Cleve in 1879; named after Thule, a mythical northern land.'},
+		{z:70,s:'Yb',n:'Ytterbium',w:173.0,c:'lanthanide',r:9,g:17,p:'solid',ec:'[Xe] 4f\u00b9\u2074 6s\u00b2',
+		 d:'Soft silvery metal used in atomic clocks, stress gauges, metallurgy, and as a dopant in stainless steel and fibre optic cables.',
+		 h:'Discovered by Jean Charles Galissard de Marignac in 1878; named after Ytterby, Sweden.'},
+		{z:71,s:'Lu',n:'Lutetium',w:175.0,c:'lanthanide',r:9,g:18,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9 6s\u00b2',
+		 d:'Hardest and densest lanthanide. Used in PET scan detectors, petroleum refining catalysts, and as a dopant in certain materials.',
+		 h:'Discovered independently by Georges Urbain and Carl Auer von Welsbach in 1907; named after Lutetia (Paris).'},
+		{z:72,s:'Hf',n:'Hafnium',w:178.5,c:'transition',r:6,g:4,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b2 6s\u00b2',
+		 d:'Dense, corrosion-resistant metal used in nuclear reactor control rods, superalloys, and high-temperature ceramics. Always found with zirconium.',
+		 h:'Discovered by Dirk Coster and George de Hevesy in 1923; named after Hafnia (Copenhagen).'},
+		{z:73,s:'Ta',n:'Tantalum',w:180.9,c:'transition',r:6,g:5,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b3 6s\u00b2',
+		 d:'Hard, corrosion-resistant metal used in capacitors for mobile phones, surgical instruments, and chemical equipment. Biocompatible for implants.',
+		 h:'Discovered by Anders Gustaf Ekeberg in 1802; named after Tantalus from Greek mythology.'},
+		{z:74,s:'W',n:'Tungsten',w:183.8,c:'transition',r:6,g:6,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u2074 6s\u00b2',
+		 d:'Has the highest melting point of all elements (3422\u00b0C). Used in incandescent light bulb filaments, cutting tools, and armour-piercing ammunition.',
+		 h:'Identified by Carl Wilhelm Scheele in 1781; isolated by the brothers de Elhuyar in 1783. Symbol W from German Wolfram.'},
+		{z:75,s:'Re',n:'Rhenium',w:186.2,c:'transition',r:6,g:7,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u2075 6s\u00b2',
+		 d:'One of the rarest elements in Earth\u2019s crust. Used in jet engine superalloys, catalysts for petroleum refining, and high-temperature thermocouples.',
+		 h:'Discovered by Walter Noddack, Ida Tacke, and Otto Berg in 1925; last stable element to be discovered.'},
+		{z:76,s:'Os',n:'Osmium',w:190.2,c:'transition',r:6,g:8,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u2076 6s\u00b2',
+		 d:'Densest naturally occurring element. Extremely hard, bluish-white metal. Used in fountain pen tips, electrical contacts, and as a catalyst.',
+		 h:'Discovered by Smithson Tennant in 1803; named from Greek osme (smell) due to its pungent oxide.'},
+		{z:77,s:'Ir',n:'Iridium',w:192.2,c:'transition',r:6,g:9,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u2077 6s\u00b2',
+		 d:'Extremely dense and corrosion-resistant platinum-group metal. Used in spark plugs, crucibles, and the Cretaceous\u2013Paleogene extinction boundary marker.',
+		 h:'Discovered by Smithson Tennant in 1803; named from Latin iris (rainbow) for its colourful salts.'},
+		{z:78,s:'Pt',n:'Platinum',w:195.1,c:'transition',r:6,g:10,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u2079 6s\u00b9',
+		 d:'Precious metal used in catalytic converters, jewellery, chemotherapy drugs (cisplatin), and laboratory equipment. Highly corrosion-resistant.',
+		 h:'Used by pre-Columbian South Americans; introduced to Europe by Antonio de Ulloa in 1735.'},
+		{z:79,s:'Au',n:'Gold',w:197.0,c:'transition',r:6,g:11,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9\u2070 6s\u00b9',
+		 d:'The quintessential precious metal, prized for its beauty, rarity, and resistance to corrosion. Used in jewellery, electronics, dentistry, and as currency reserve.',
+		 h:'Known since prehistory. Symbol Au from Latin aurum. Central to human civilisation for millennia.'},
+		{z:80,s:'Hg',n:'Mercury',w:200.6,c:'transition',r:6,g:12,p:'liquid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9\u2070 6s\u00b2',
+		 d:'Only metal that is liquid at room temperature. Historically used in thermometers and barometers. Toxic; now largely replaced due to environmental concerns.',
+		 h:'Known since antiquity. Symbol Hg from Latin hydrargyrum (liquid silver). Named after the planet Mercury.'},
+		{z:81,s:'Tl',n:'Thallium',w:204.4,c:'post',r:6,g:13,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9\u2070 6s\u00b2 6p\u00b9',
+		 d:'Soft, highly toxic metal. Formerly used as a rat poison. Now used in electronic equipment, fibre optics, and medical imaging (thallium stress test).',
+		 h:'Discovered by William Crookes in 1861 using flame spectroscopy; named for its green spectral line (Greek thallos, green shoot).'},
+		{z:82,s:'Pb',n:'Lead',w:207.2,c:'post',r:6,g:14,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9\u2070 6s\u00b2 6p\u00b2',
+		 d:'Dense, soft, toxic metal used historically in pipes, paint, and petrol additives. Now used in car batteries, radiation shielding, and ammunition.',
+		 h:'Known since antiquity; widely used by the Romans. Symbol Pb from Latin plumbum.'},
+		{z:83,s:'Bi',n:'Bismuth',w:209.0,c:'post',r:6,g:15,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9\u2070 6s\u00b2 6p\u00b3',
+		 d:'Brittle metal with distinctive iridescent oxide tarnish. Used in Pepto-Bismol, cosmetics, fire sprinkler systems, and as a lead replacement.',
+		 h:'Known since the 15th century; long confused with tin and lead.'},
+		{z:84,s:'Po',n:'Polonium',w:209,c:'metalloid',r:6,g:16,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9\u2070 6s\u00b2 6p\u2074',
+		 d:'Extremely rare and highly radioactive. Used in anti-static devices and as a heat source in space probes. Notoriously toxic.',
+		 h:'Discovered by Marie and Pierre Curie in 1898; named after Marie\u2019s homeland, Poland.'},
+		{z:85,s:'At',n:'Astatine',w:210,c:'halogen',r:6,g:17,p:'solid',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9\u2070 6s\u00b2 6p\u2075',
+		 d:'Rarest naturally occurring element on Earth. Highly radioactive halogen being researched for targeted alpha therapy in cancer treatment.',
+		 h:'Synthesised by Dale Corson, Kenneth MacKenzie, and Emilio Segr\u00e8 in 1940 at UC Berkeley.'},
+		{z:86,s:'Rn',n:'Radon',w:222,c:'noble',r:6,g:18,p:'gas',ec:'[Xe] 4f\u00b9\u2074 5d\u00b9\u2070 6s\u00b2 6p\u2076',
+		 d:'Radioactive noble gas that seeps from rocks and soil. Second leading cause of lung cancer. Testing for radon is recommended in buildings.',
+		 h:'Discovered by Friedrich Ernst Dorn in 1900 as a decay product of radium.'},
+		{z:87,s:'Fr',n:'Francium',w:223,c:'alkali',r:7,g:1,p:'solid',ec:'[Rn] 7s\u00b9',
+		 d:'Most unstable of the first 101 elements with a half-life of only 22 minutes. Extremely rare; less than 30g exists on Earth at any time.',
+		 h:'Discovered by Marguerite Perey in 1939 at the Curie Institute, Paris; named after France.'},
+		{z:88,s:'Ra',n:'Radium',w:226,c:'alkaline',r:7,g:2,p:'solid',ec:'[Rn] 7s\u00b2',
+		 d:'Intensely radioactive metal that glows faintly blue. Historically used in luminous paint for watch dials. Now used in targeted cancer therapy.',
+		 h:'Discovered by Marie and Pierre Curie in 1898 from uranium ore residues.'},
+		{z:89,s:'Ac',n:'Actinium',w:227,c:'actinide',r:10,g:4,p:'solid',ec:'[Rn] 6d\u00b9 7s\u00b2',
+		 d:'Intensely radioactive metal, first of the actinides. Researched for targeted alpha therapy in cancer treatment.',
+		 h:'Discovered by Andr\u00e9-Louis Debierne in 1899 from uranium ore.'},
+		{z:90,s:'Th',n:'Thorium',w:232.0,c:'actinide',r:10,g:5,p:'solid',ec:'[Rn] 6d\u00b2 7s\u00b2',
+		 d:'Weakly radioactive metal being researched as a nuclear fuel alternative to uranium. Used in gas mantles and high-quality camera lenses.',
+		 h:'Discovered by J\u00f6ns Jacob Berzelius in 1829; named after Thor, the Norse god of thunder.'},
+		{z:91,s:'Pa',n:'Protactinium',w:231.0,c:'actinide',r:10,g:6,p:'solid',ec:'[Rn] 5f\u00b2 6d\u00b9 7s\u00b2',
+		 d:'Rare, highly radioactive metal with no significant commercial applications. Used in some scientific research.',
+		 h:'First identified by Kasimir Fajans and Oswald Helmuth G\u00f6hring in 1913.'},
+		{z:92,s:'U',n:'Uranium',w:238.0,c:'actinide',r:10,g:7,p:'solid',ec:'[Rn] 5f\u00b3 6d\u00b9 7s\u00b2',
+		 d:'Dense radioactive metal used as fuel in nuclear power plants and in nuclear weapons. Also used in radiation shielding and armour-piercing rounds.',
+		 h:'Discovered by Martin Heinrich Klaproth in 1789; named after the planet Uranus.'},
+		{z:93,s:'Np',n:'Neptunium',w:237,c:'actinide',r:10,g:8,p:'solid',ec:'[Rn] 5f\u2074 6d\u00b9 7s\u00b2',
+		 d:'First transuranic element produced synthetically. Used in neutron detection instruments.',
+		 h:'Synthesised by Edwin McMillan and Philip Abelson in 1940 at UC Berkeley; named after Neptune.'},
+		{z:94,s:'Pu',n:'Plutonium',w:244,c:'actinide',r:10,g:9,p:'solid',ec:'[Rn] 5f\u2076 7s\u00b2',
+		 d:'Key material for nuclear weapons and as fuel in nuclear reactors. Powers RTG batteries in deep-space probes like Voyager and New Horizons.',
+		 h:'Synthesised by Glenn Seaborg and colleagues in 1940; named after the dwarf planet Pluto.'},
+		{z:95,s:'Am',n:'Americium',w:243,c:'actinide',r:10,g:10,p:'solid',ec:'[Rn] 5f\u2077 7s\u00b2',
+		 d:'Commonly used in household smoke detectors (Am-241). Also used in industrial gauging devices.',
+		 h:'Synthesised by Glenn Seaborg and colleagues in 1944 during the Manhattan Project.'},
+		{z:96,s:'Cm',n:'Curium',w:247,c:'actinide',r:10,g:11,p:'solid',ec:'[Rn] 5f\u2077 6d\u00b9 7s\u00b2',
+		 d:'Highly radioactive synthetic element. Used as an alpha-particle source in space missions and scientific instruments.',
+		 h:'Synthesised by Glenn Seaborg and colleagues in 1944; named after Marie and Pierre Curie.'},
+		{z:97,s:'Bk',n:'Berkelium',w:247,c:'actinide',r:10,g:12,p:'solid',ec:'[Rn] 5f\u2079 7s\u00b2',
+		 d:'Synthetic radioactive element produced in microgram quantities. Used primarily in scientific research.',
+		 h:'Synthesised by Stanley Thompson and colleagues in 1949 at UC Berkeley; named after Berkeley, California.'},
+		{z:98,s:'Cf',n:'Californium',w:251,c:'actinide',r:10,g:13,p:'solid',ec:'[Rn] 5f\u00b9\u2070 7s\u00b2',
+		 d:'Strong neutron emitter used in nuclear reactor start-up, metal detection, mineral prospecting, and cancer treatment.',
+		 h:'Synthesised by Stanley Thompson and colleagues in 1950; named after the state of California.'},
+		{z:99,s:'Es',n:'Einsteinium',w:252,c:'actinide',r:10,g:14,p:'solid',ec:'[Rn] 5f\u00b9\u00b9 7s\u00b2',
+		 d:'Synthetic element first found in debris of the first hydrogen bomb test. Produced in very small quantities for research.',
+		 h:'Discovered in 1952 in thermonuclear test fallout; named after Albert Einstein.'},
+		{z:100,s:'Fm',n:'Fermium',w:257,c:'actinide',r:10,g:15,p:'solid',ec:'[Rn] 5f\u00b9\u00b2 7s\u00b2',
+		 d:'Synthetic radioactive element with no uses outside of basic scientific research.',
+		 h:'Discovered in 1952 in hydrogen bomb test debris; named after Enrico Fermi.'},
+		{z:101,s:'Md',n:'Mendelevium',w:258,c:'actinide',r:10,g:16,p:'solid',ec:'[Rn] 5f\u00b9\u00b3 7s\u00b2',
+		 d:'Synthetic element produced in tiny quantities. No practical applications beyond research.',
+		 h:'Synthesised by Albert Ghiorso and colleagues in 1955; named after Dmitri Mendeleev.'},
+		{z:102,s:'No',n:'Nobelium',w:259,c:'actinide',r:10,g:17,p:'solid',ec:'[Rn] 5f\u00b9\u2074 7s\u00b2',
+		 d:'Synthetic radioactive element. Only a few atoms have ever been produced at a time.',
+		 h:'First reliably produced by Georgy Flyorov\u2019s team in 1966; named after Alfred Nobel.'},
+		{z:103,s:'Lr',n:'Lawrencium',w:266,c:'actinide',r:10,g:18,p:'solid',ec:'[Rn] 5f\u00b9\u2074 7s\u00b2 7p\u00b9',
+		 d:'Last of the actinides. Synthetic element with very short half-life and no practical applications.',
+		 h:'Synthesised by Albert Ghiorso and colleagues in 1961; named after Ernest O. Lawrence.'},
+		{z:104,s:'Rf',n:'Rutherfordium',w:267,c:'transition',r:7,g:4,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b2 7s\u00b2',
+		 d:'Synthetic superheavy element. Very short half-life; no practical applications.',
+		 h:'First synthesised in 1964 at Dubna, Russia; named after Ernest Rutherford.'},
+		{z:105,s:'Db',n:'Dubnium',w:268,c:'transition',r:7,g:5,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b3 7s\u00b2',
+		 d:'Synthetic superheavy element with a half-life of about 28 hours. No practical uses.',
+		 h:'First synthesised in 1968 at Dubna; independently by Ghiorso at LBNL in 1970.'},
+		{z:106,s:'Sg',n:'Seaborgium',w:269,c:'transition',r:7,g:6,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u2074 7s\u00b2',
+		 d:'Synthetic superheavy element. Expected to have chemistry similar to tungsten and molybdenum.',
+		 h:'Synthesised by Albert Ghiorso and colleagues in 1974; named after Glenn T. Seaborg.'},
+		{z:107,s:'Bh',n:'Bohrium',w:270,c:'transition',r:7,g:7,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u2075 7s\u00b2',
+		 d:'Synthetic superheavy element with very short half-life. No practical applications.',
+		 h:'Synthesised by Peter Armbruster and Gottfried M\u00fcnzenberg in 1981; named after Niels Bohr.'},
+		{z:108,s:'Hs',n:'Hassium',w:277,c:'transition',r:7,g:8,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u2076 7s\u00b2',
+		 d:'Synthetic superheavy element. Expected to behave like osmium. Extremely unstable.',
+		 h:'Synthesised in 1984 at the GSI Helmholtz Centre, Darmstadt; named after the German state of Hesse (Hassia).'},
+		{z:109,s:'Mt',n:'Meitnerium',w:278,c:'transition',r:7,g:9,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u2077 7s\u00b2',
+		 d:'Synthetic superheavy element. Only a few atoms have ever been made.',
+		 h:'Synthesised by Armbruster and M\u00fcnzenberg in 1982; named after physicist Lise Meitner.'},
+		{z:110,s:'Ds',n:'Darmstadtium',w:281,c:'transition',r:7,g:10,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u2078 7s\u00b2',
+		 d:'Synthetic superheavy element. Predicted to have properties similar to platinum and nickel.',
+		 h:'Synthesised by Armbruster and M\u00fcnzenberg in 1994; named after Darmstadt, Germany.'},
+		{z:111,s:'Rg',n:'Roentgenium',w:282,c:'transition',r:7,g:11,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u2079 7s\u00b2',
+		 d:'Synthetic superheavy element. Predicted to be a noble metal similar to gold.',
+		 h:'Synthesised by Armbruster and M\u00fcnzenberg in 1994; named after Wilhelm R\u00f6ntgen.'},
+		{z:112,s:'Cn',n:'Copernicium',w:285,c:'transition',r:7,g:12,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b9\u2070 7s\u00b2',
+		 d:'Synthetic superheavy element. Predicted to be a volatile liquid metal, more inert than mercury.',
+		 h:'Synthesised by Sigurd Hofmann and colleagues in 1996; named after Nicolaus Copernicus.'},
+		{z:113,s:'Nh',n:'Nihonium',w:286,c:'post',r:7,g:13,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b9\u2070 7s\u00b2 7p\u00b9',
+		 d:'Synthetic superheavy element. First element discovered in Asia.',
+		 h:'Synthesised at RIKEN in 2003 by Kosuke Morita; named after Nihon (Japan).'},
+		{z:114,s:'Fl',n:'Flerovium',w:289,c:'post',r:7,g:14,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b9\u2070 7s\u00b2 7p\u00b2',
+		 d:'Synthetic superheavy element. Predicted to show some noble gas-like properties due to relativistic effects.',
+		 h:'Synthesised at Dubna in 1998; named after physicist Georgy Flyorov.'},
+		{z:115,s:'Mc',n:'Moscovium',w:290,c:'post',r:7,g:15,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b9\u2070 7s\u00b2 7p\u00b3',
+		 d:'Synthetic superheavy element with a half-life of about 0.65 seconds.',
+		 h:'Synthesised jointly at Dubna and LLNL in 2003; named after Moscow Oblast.'},
+		{z:116,s:'Lv',n:'Livermorium',w:293,c:'post',r:7,g:16,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b9\u2070 7s\u00b2 7p\u2074',
+		 d:'Synthetic superheavy element. Extremely unstable with a half-life under 100 milliseconds.',
+		 h:'Synthesised at Dubna in 2000; named after Lawrence Livermore National Laboratory.'},
+		{z:117,s:'Ts',n:'Tennessine',w:294,c:'halogen',r:7,g:17,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b9\u2070 7s\u00b2 7p\u2075',
+		 d:'Synthetic superheavy element. Placed in the halogen group but predicted to behave very differently due to relativistic effects.',
+		 h:'Synthesised at Dubna in 2010 with a tennessine target; named after Tennessee, USA.'},
+		{z:118,s:'Og',n:'Oganesson',w:294,c:'noble',r:7,g:18,p:'solid',ec:'[Rn] 5f\u00b9\u2074 6d\u00b9\u2070 7s\u00b2 7p\u2076',
+		 d:'Heaviest known element. Despite being in the noble gas group, predicted to be a solid with reactive properties due to relativistic effects.',
+		 h:'Synthesised at Dubna in 2002; named after nuclear physicist Yuri Oganessian.'}
+	];
+
+	/* ───── Application ───── */
+	const App = {
+		activeCategories: new Set(),
+		searchTerm: '',
+		quizState: null,
+		prefs: { theme: 'dark', quizTotal: 0, quizCorrect: 0, bestStreak: 0 },
+
+		init() {
+			this.loadPrefs();
+			this.renderLegend();
+			this.renderGrid();
+			this.setupSearch();
+			this.setupTheme();
+			this.setupQuiz();
+			this.setupModal();
+		},
+
+		/* ── Preferences (localStorage) ── */
+		loadPrefs() {
+			try {
+				const saved = localStorage.getItem('periodicTablePrefs');
+				if (saved) Object.assign(this.prefs, JSON.parse(saved));
+			} catch { /* ignore */ }
+			if (this.prefs.theme === 'light') document.body.classList.add('light-theme');
+		},
+
+		savePrefs() {
+			try { localStorage.setItem('periodicTablePrefs', JSON.stringify(this.prefs)); }
+			catch { /* ignore */ }
+		},
+
+		/* ── Legend ── */
+		renderLegend() {
+			const el = document.getElementById('legend');
+			el.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) =>
+				`<div class="legend-item" data-cat="${key}" style="--swatch-color: ${cat.color}">
+					<span class="legend-swatch" style="background: ${cat.color}"></span>
+					${cat.label}
+				</div>`
+			).join('');
+
+			el.addEventListener('click', e => {
+				const item = e.target.closest('.legend-item');
+				if (!item) return;
+				const cat = item.dataset.cat;
+				if (this.activeCategories.has(cat)) {
+					this.activeCategories.delete(cat);
+					item.classList.remove('active');
+				} else {
+					this.activeCategories.add(cat);
+					item.classList.add('active');
+				}
+				this.applyFilters();
+			});
+		},
+
+		/* ── Grid ── */
+		renderGrid() {
+			const grid = document.getElementById('grid');
+			let html = '';
+
+			/* f-block marker cells */
+			html += `<div class="fblock-marker" style="grid-row:6;grid-column:3;">57-71</div>`;
+			html += `<div class="fblock-marker" style="grid-row:7;grid-column:3;">89-103</div>`;
+
+			ELEMENTS.forEach((el, i) => {
+				const catColor = CATEGORIES[el.c]?.color || '#666';
+				const bgAlpha = '26'; /* ~15% opacity in hex */
+				html += `<div class="element-tile" data-idx="${i}"
+					style="grid-row:${el.r};grid-column:${el.g};
+					       --tile-accent:${catColor};
+					       background:color-mix(in srgb, ${catColor} 15%, var(--bg-surface));
+					       animation-delay:${Math.min(i * 8, 600)}ms"
+					>
+					<span class="z">${el.z}</span>
+					<span class="sym" style="color:${catColor}">${el.s}</span>
+					<span class="name">${el.n}</span>
+					<span class="weight">${el.w}</span>
+				</div>`;
+			});
+
+			grid.innerHTML = html;
+
+			/* Tooltip on hover (desktop) */
+			const tooltip = document.getElementById('tooltip');
+			grid.addEventListener('mouseover', e => {
+				const tile = e.target.closest('.element-tile');
+				if (!tile || window.innerWidth < 768) { tooltip.classList.remove('visible'); return; }
+				const el = ELEMENTS[tile.dataset.idx];
+				const cat = CATEGORIES[el.c];
+				tooltip.innerHTML = `
+					<div style="display:flex;align-items:center;gap:0.5rem">
+						<span class="tooltip-sym" style="color:${cat.color}">${el.s}</span>
+						<div>
+							<div class="tooltip-name">${el.n}</div>
+							<div class="tooltip-info">#${el.z} \u00b7 ${el.w} u</div>
+						</div>
+					</div>
+					<div class="tooltip-cat" style="background:color-mix(in srgb, ${cat.color} 15%, var(--bg-elevated));color:${cat.color}">${cat.label}</div>`;
+				tooltip.classList.add('visible');
+			});
+
+			grid.addEventListener('mousemove', e => {
+				const x = Math.min(e.clientX + 16, window.innerWidth - 280);
+				const y = Math.min(e.clientY + 16, window.innerHeight - 140);
+				tooltip.style.left = x + 'px';
+				tooltip.style.top = y + 'px';
+			});
+
+			grid.addEventListener('mouseout', e => {
+				if (!e.target.closest('.element-tile')) tooltip.classList.remove('visible');
+			});
+
+			/* Click to open detail */
+			grid.addEventListener('click', e => {
+				const tile = e.target.closest('.element-tile');
+				if (!tile) return;
+				tooltip.classList.remove('visible');
+				this.openModal(ELEMENTS[tile.dataset.idx]);
+			});
+		},
+
+		/* ── Filtering ── */
+		applyFilters() {
+			const tiles = document.querySelectorAll('.element-tile');
+			const hasCatFilter = this.activeCategories.size > 0;
+			const term = this.searchTerm.toLowerCase().trim();
+
+			tiles.forEach(tile => {
+				const el = ELEMENTS[tile.dataset.idx];
+				let matchCat = !hasCatFilter || this.activeCategories.has(el.c);
+				let matchSearch = !term ||
+					el.n.toLowerCase().includes(term) ||
+					el.s.toLowerCase() === term ||
+					String(el.z) === term;
+
+				const show = matchCat && matchSearch;
+				tile.classList.toggle('dimmed', !show);
+				tile.classList.toggle('highlight', !!term && matchSearch && show);
+			});
+		},
+
+		/* ── Search ── */
+		setupSearch() {
+			const input = document.getElementById('search');
+			input.addEventListener('input', () => {
+				this.searchTerm = input.value;
+				this.applyFilters();
+			});
+		},
+
+		/* ── Theme ── */
+		setupTheme() {
+			const btn = document.getElementById('theme-btn');
+			const updateIcon = () => {
+				btn.innerHTML = this.prefs.theme === 'dark' ? '&#9790;' : '&#9788;';
+			};
+			updateIcon();
+
+			btn.addEventListener('click', () => {
+				this.prefs.theme = this.prefs.theme === 'dark' ? 'light' : 'dark';
+				document.body.classList.toggle('light-theme', this.prefs.theme === 'light');
+				updateIcon();
+				this.savePrefs();
+			});
+		},
+
+		/* ── Modal ── */
+		setupModal() {
+			const overlay = document.getElementById('modal-overlay');
+			overlay.addEventListener('click', e => {
+				if (e.target === overlay) overlay.classList.remove('open');
+			});
+			document.addEventListener('keydown', e => {
+				if (e.key === 'Escape') {
+					overlay.classList.remove('open');
+					document.getElementById('quiz-overlay').classList.remove('open');
+				}
+			});
+		},
+
+		openModal(el) {
+			const cat = CATEGORIES[el.c];
+			const phaseLabel = { solid: 'Solid', liquid: 'Liquid', gas: 'Gas' }[el.p] || 'Unknown';
+			const periodNum = el.r <= 7 ? el.r : (el.r === 9 ? 6 : 7);
+			const groupNum = el.g;
+
+			document.getElementById('modal').innerHTML = `
+				<div class="modal-header">
+					<div class="modal-symbol-box" style="background:color-mix(in srgb, ${cat.color} 20%, var(--bg-elevated));color:${cat.color}">
+						<span class="z">${el.z}</span>
+						<span class="sym">${el.s}</span>
+					</div>
+					<div class="modal-title-area">
+						<div class="modal-name">${el.n}</div>
+						<div class="modal-category" style="color:${cat.color}">${cat.label}</div>
+					</div>
+					<button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">\u00d7</button>
+				</div>
+				<div class="modal-stats">
+					<div class="stat-card">
+						<div class="stat-value">${el.w}</div>
+						<div class="stat-label">Atomic Weight</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-value">${phaseLabel}</div>
+						<div class="stat-label">Phase</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-value">${periodNum}</div>
+						<div class="stat-label">Period</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-value">${groupNum}</div>
+						<div class="stat-label">Group</div>
+					</div>
+				</div>
+				<div class="modal-body">
+					<div class="modal-section">
+						<div class="modal-section-title">Electron Configuration</div>
+						<div class="electron-config">${el.ec}</div>
+					</div>
+					<div class="modal-section">
+						<div class="modal-section-title">Description</div>
+						<div class="modal-section-content">${el.d}</div>
+					</div>
+					<div class="modal-section">
+						<div class="modal-section-title">History</div>
+						<div class="modal-section-content">${el.h}</div>
+					</div>
+				</div>`;
+
+			document.getElementById('modal-overlay').classList.add('open');
+		},
+
+		/* ── Quiz ── */
+		setupQuiz() {
+			const btn = document.getElementById('quiz-btn');
+			const overlay = document.getElementById('quiz-overlay');
+
+			btn.addEventListener('click', () => {
+				this.initQuiz();
+				overlay.classList.add('open');
+				btn.classList.add('active');
+			});
+
+			overlay.addEventListener('click', e => {
+				if (e.target === overlay) {
+					overlay.classList.remove('open');
+					btn.classList.remove('active');
+				}
+			});
+		},
+
+		initQuiz() {
+			this.quizState = {
+				current: 0,
+				streak: 0,
+				sessionCorrect: 0,
+				sessionTotal: 0,
+				answered: false,
+				type: 'mixed'
+			};
+			this.renderQuizPanel();
+			this.nextQuestion();
+		},
+
+		renderQuizPanel() {
+			document.getElementById('quiz-panel').innerHTML = `
+				<div class="quiz-header">
+					<div class="quiz-title">Element Quiz</div>
+					<button class="modal-close" onclick="document.getElementById('quiz-overlay').classList.remove('open');document.getElementById('quiz-btn').classList.remove('active')">\u00d7</button>
+				</div>
+				<div class="quiz-stats" id="quiz-stats">
+					<div class="quiz-stat">
+						<span class="quiz-stat-value" id="q-score">0</span>
+						<span class="quiz-stat-label">/ 0</span>
+					</div>
+					<div class="quiz-stat">
+						<span class="quiz-stat-label">Streak:</span>
+						<span class="quiz-stat-value quiz-streak" id="q-streak">0</span>
+					</div>
+					<div class="quiz-stat">
+						<span class="quiz-stat-label">Best:</span>
+						<span class="quiz-stat-value" id="q-best">${this.prefs.bestStreak}</span>
+					</div>
+				</div>
+				<div class="quiz-body">
+					<div class="quiz-question" id="q-question"></div>
+					<div class="quiz-options" id="q-options"></div>
+					<div class="quiz-feedback" id="q-feedback"></div>
+				</div>
+				<div class="quiz-footer">
+					<select class="quiz-type-select" id="q-type">
+						<option value="mixed">Mixed Questions</option>
+						<option value="symbol">Name \u2192 Symbol</option>
+						<option value="name">Symbol \u2192 Name</option>
+						<option value="number">Atomic Number</option>
+						<option value="category">Category</option>
+					</select>
+					<button class="quiz-next" id="q-next" disabled>Next Question</button>
+				</div>`;
+
+			document.getElementById('q-type').addEventListener('change', e => {
+				this.quizState.type = e.target.value;
+				this.nextQuestion();
+			});
+
+			document.getElementById('q-next').addEventListener('click', () => this.nextQuestion());
+		},
+
+		nextQuestion() {
+			const qs = this.quizState;
+			qs.answered = false;
+			document.getElementById('q-next').disabled = true;
+			document.getElementById('q-feedback').textContent = '';
+
+			/* Pick random element (first 103 for better-known elements in quizzes) */
+			const pool = ELEMENTS.filter(e => e.z <= 103);
+			const target = pool[Math.floor(Math.random() * pool.length)];
+
+			/* Pick question type */
+			const types = qs.type === 'mixed'
+				? ['symbol', 'name', 'number', 'category']
+				: [qs.type];
+			const type = types[Math.floor(Math.random() * types.length)];
+
+			let question, correct, wrongPool;
+
+			switch (type) {
+				case 'symbol':
+					question = `What is the symbol for <strong>${target.n}</strong>?`;
+					correct = target.s;
+					wrongPool = this.pickWrong(pool, target, 3).map(e => e.s);
+					break;
+				case 'name':
+					question = `Which element has the symbol <strong>${target.s}</strong>?`;
+					correct = target.n;
+					wrongPool = this.pickWrong(pool, target, 3).map(e => e.n);
+					break;
+				case 'number':
+					question = `Which element has atomic number <strong>${target.z}</strong>?`;
+					correct = target.n;
+					wrongPool = this.pickWrong(pool, target, 3).map(e => e.n);
+					break;
+				case 'category':
+					question = `What category does <strong>${target.n}</strong> belong to?`;
+					correct = CATEGORIES[target.c].label;
+					wrongPool = Object.entries(CATEGORIES)
+						.filter(([k]) => k !== target.c)
+						.sort(() => Math.random() - 0.5)
+						.slice(0, 3)
+						.map(([, v]) => v.label);
+					break;
+			}
+
+			const options = this.shuffle([correct, ...wrongPool]);
+
+			document.getElementById('q-question').innerHTML = question;
+			const optContainer = document.getElementById('q-options');
+			optContainer.innerHTML = options.map(opt =>
+				`<button class="quiz-option" data-answer="${this.escapeHtml(opt)}" data-correct="${this.escapeHtml(correct)}">${opt}</button>`
+			).join('');
+
+			optContainer.querySelectorAll('.quiz-option').forEach(btn => {
+				btn.addEventListener('click', () => this.handleAnswer(btn));
+			});
+		},
+
+		handleAnswer(btn) {
+			if (this.quizState.answered) return;
+			this.quizState.answered = true;
+
+			const answer = btn.dataset.answer;
+			const correct = btn.dataset.correct;
+			const isCorrect = answer === correct;
+
+			const qs = this.quizState;
+			qs.sessionTotal++;
+			this.prefs.quizTotal++;
+
+			if (isCorrect) {
+				qs.sessionCorrect++;
+				qs.streak++;
+				this.prefs.quizCorrect++;
+				if (qs.streak > this.prefs.bestStreak) this.prefs.bestStreak = qs.streak;
+				btn.classList.add('correct');
+				document.getElementById('q-feedback').innerHTML =
+					`<span style="color:var(--cat-nonmetal)">Correct!</span>`;
+			} else {
+				qs.streak = 0;
+				btn.classList.add('wrong');
+				/* Highlight correct answer */
+				document.querySelectorAll('.quiz-option').forEach(b => {
+					if (b.dataset.answer === correct) b.classList.add('correct');
+				});
+				document.getElementById('q-feedback').innerHTML =
+					`<span style="color:var(--cat-actinide)">The answer was ${correct}</span>`;
+			}
+
+			/* Disable all buttons */
+			document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+
+			/* Update stats */
+			document.getElementById('q-score').textContent = qs.sessionCorrect;
+			document.querySelector('#quiz-stats .quiz-stat-label').textContent = `/ ${qs.sessionTotal}`;
+			document.getElementById('q-streak').textContent = qs.streak;
+			document.getElementById('q-best').textContent = this.prefs.bestStreak;
+			document.getElementById('q-next').disabled = false;
+
+			this.savePrefs();
+		},
+
+		/* ── Utility ── */
+		pickWrong(pool, target, n) {
+			const others = pool.filter(e => e.z !== target.z);
+			const shuffled = others.sort(() => Math.random() - 0.5);
+			return shuffled.slice(0, n);
+		},
+
+		shuffle(arr) {
+			const a = [...arr];
+			for (let i = a.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[a[i], a[j]] = [a[j], a[i]];
+			}
+			return a;
+		},
+
+		escapeHtml(str) {
+			return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		}
+	};
+
+	/* ── Boot ── */
+	document.addEventListener('DOMContentLoaded', () => App.init());
+	</script>
+</body>
+</html>
