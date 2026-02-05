@@ -850,10 +850,11 @@
 	const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 	// Default: Ade's retirement - 715 working days from 2026-02-05
-	// The 715 figure already accounts for annual leave, bank holidays, etc.
+	// Ade does 220 working days/year (weekends + bank holidays + 33 days leave)
+	// 221 in 2028 due to leap year. End date: 30 April 2029
 	const DEFAULT_SETTINGS = {
 		title: "Ade's Retirement",
-		targetDate: '2028-01-21',
+		targetDate: '2029-04-30',
 		targetTime: '17:00',
 		startDate: '2026-02-05',
 		startingWorkingDays: 715, // Pre-calculated working days at start date
