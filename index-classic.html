@@ -135,11 +135,13 @@
 		}
 
 		.section:nth-child(1) { animation-delay: 0.1s; }
-		.section:nth-child(2) { animation-delay: 0.2s; }
-		.section:nth-child(3) { animation-delay: 0.3s; }
-		.section:nth-child(4) { animation-delay: 0.4s; }
-		.section:nth-child(5) { animation-delay: 0.5s; }
-		.section:nth-child(6) { animation-delay: 0.6s; }
+		.section:nth-child(2) { animation-delay: 0.15s; }
+		.section:nth-child(3) { animation-delay: 0.2s; }
+		.section:nth-child(4) { animation-delay: 0.25s; }
+		.section:nth-child(5) { animation-delay: 0.3s; }
+		.section:nth-child(6) { animation-delay: 0.35s; }
+		.section:nth-child(7) { animation-delay: 0.4s; }
+		.section:nth-child(8) { animation-delay: 0.45s; }
 
 		@keyframes fadeInUp {
 			from {
@@ -294,6 +296,71 @@
 			box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2);
 		}
 
+		/* Top Navigation Bar */
+		.top-nav {
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			background: rgba(13, 17, 23, 0.95);
+			backdrop-filter: blur(10px);
+			border-bottom: 1px solid var(--border);
+			padding: 0.75rem 2rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.nav-brand {
+			font-weight: 800;
+			font-size: 1.1rem;
+			color: var(--accent-teal);
+			text-decoration: none;
+			letter-spacing: -0.5px;
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 1.5rem;
+			align-items: center;
+		}
+
+		.nav-link {
+			color: var(--text-secondary);
+			text-decoration: none;
+			font-weight: 500;
+			font-size: 0.95rem;
+			padding: 0.4rem 0.8rem;
+			border-radius: 4px;
+			transition: all 0.2s;
+		}
+
+		.nav-link:hover {
+			color: var(--text-primary);
+			background: var(--bg-light);
+		}
+
+		.nav-link.active {
+			color: var(--accent-orange);
+			background: rgba(255, 107, 53, 0.1);
+		}
+
+		.nav-link.posts-link {
+			color: var(--accent-teal);
+			border: 1px solid var(--accent-teal);
+		}
+
+		.nav-link.posts-link:hover {
+			background: var(--accent-teal);
+			color: var(--bg-dark);
+		}
+
+		.posts .section-title::before { background: #22d3ee; }
+		.posts .card::before { background: #22d3ee; }
+		.posts .card:hover {
+			border-color: #22d3ee;
+			box-shadow: 0 8px 24px rgba(34, 211, 238, 0.2);
+		}
+
 		/* Tablet - 2 columns, smaller cards */
 		@media (max-width: 900px) {
 			.grid {
@@ -331,6 +398,23 @@
 
 		/* Mobile - compact list-style cards */
 		@media (max-width: 600px) {
+			.top-nav {
+				padding: 0.5rem 1rem;
+			}
+
+			.nav-brand {
+				font-size: 0.95rem;
+			}
+
+			.nav-links {
+				gap: 0.5rem;
+			}
+
+			.nav-link {
+				font-size: 0.8rem;
+				padding: 0.3rem 0.5rem;
+			}
+
 			header {
 				padding: 1rem;
 			}
@@ -433,6 +517,15 @@
 	</style>
 </head>
 <body>
+	<nav class="top-nav">
+		<a href="/" class="nav-brand">rowstu.net</a>
+		<div class="nav-links">
+			<a href="index-classic.html" class="nav-link active">Browse</a>
+			<a href="/posts/" class="nav-link posts-link">Posts</a>
+			<a href="index.html" class="nav-link">Terminal</a>
+		</div>
+	</nav>
+
 	<header>
 		<a href="index.html" class="terminal-switch">← Terminal Mode</a>
 		<h1>rowstu.net</h1>
@@ -440,6 +533,18 @@
 	</header>
 
 	<div class="container">
+		<section class="section posts">
+			<h2 class="section-title">Blog Posts</h2>
+			<div class="grid">
+				<div class="card">
+					<a href="/posts/">
+						<div class="card-title">Coming Soon</div>
+						<div class="card-desc">New blog posts will appear here</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
 		<section class="section notes">
 			<h2 class="section-title">Technical Notes</h2>
 			<div class="grid">
@@ -861,6 +966,12 @@
 					<a href="daylight.html">
 						<div class="card-title">UK Daylight Tracker</div>
 						<div class="card-desc">Sunrise, sunset, and daylight hours across Britain</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="countdown.html">
+						<div class="card-title">Countdown Timer</div>
+						<div class="card-desc">Countdown to any date with working days and milestones</div>
 					</a>
 				</div>
 			</div>

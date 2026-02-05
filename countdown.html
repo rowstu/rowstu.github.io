@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Countdown Timer</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inconsolata:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0f1318;
+			--surface: #171d28;
+			--surface-alt: #1c2333;
+			--border: #2a3548;
+			--text: #e4e7eb;
+			--text-muted: #8b9ab3;
+			--gold: #f0b429;
+			--gold-dim: rgba(240, 180, 41, 0.15);
+			--teal: #38bdf8;
+			--coral: #fb7185;
+			--green: #4ade80;
+			--purple: #a78bfa;
+			--night: #1e2a40;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Lora', Georgia, serif;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image:
+				radial-gradient(ellipse at 30% 0%, rgba(240, 180, 41, 0.08) 0%, transparent 55%),
+				radial-gradient(ellipse at 70% 100%, rgba(56, 189, 248, 0.05) 0%, transparent 50%);
+		}
+
+		.container { max-width: 1000px; margin: 0 auto; }
+
+		header {
+			margin-bottom: 1.5rem;
+			animation: fadeIn 0.5s ease-out;
+		}
+
+		h1 {
+			font-family: 'Lora', Georgia, serif;
+			font-size: 2rem;
+			font-weight: 700;
+			background: linear-gradient(135deg, var(--gold), var(--coral));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin-bottom: 0.4rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1.25rem;
+			overflow: hidden;
+		}
+
+		.panel-title {
+			font-size: 0.8rem;
+			font-weight: 600;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			padding: 0.85rem 1.25rem;
+			border-bottom: 1px solid var(--border);
+			font-family: 'Inconsolata', monospace;
+		}
+
+		.panel-body { padding: 1.25rem; }
+
+		/* Hero countdown */
+		.hero-panel {
+			background: linear-gradient(135deg, var(--surface), var(--surface-alt));
+			border-color: var(--gold-dim);
+			animation: fadeInUp 0.5s ease-out 0.1s both;
+		}
+
+		.hero-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.hero-title {
+			font-family: 'Lora', Georgia, serif;
+			font-size: 1.1rem;
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		.edit-btn {
+			background: transparent;
+			border: 1px solid var(--border);
+			color: var(--text-muted);
+			padding: 0.35rem 0.75rem;
+			border-radius: 4px;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.edit-btn:hover {
+			border-color: var(--gold);
+			color: var(--gold);
+		}
+
+		.countdown-display {
+			display: flex;
+			justify-content: center;
+			gap: 1rem;
+			padding: 2rem 1.25rem;
+			flex-wrap: wrap;
+		}
+
+		.countdown-unit {
+			text-align: center;
+			min-width: 80px;
+		}
+
+		.countdown-value {
+			font-family: 'Inconsolata', monospace;
+			font-size: 3.5rem;
+			font-weight: 700;
+			color: var(--gold);
+			line-height: 1;
+			text-shadow: 0 0 30px rgba(240, 180, 41, 0.3);
+		}
+
+		.countdown-label {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			margin-top: 0.5rem;
+		}
+
+		.countdown-separator {
+			font-family: 'Inconsolata', monospace;
+			font-size: 3rem;
+			color: var(--border);
+			align-self: flex-start;
+			padding-top: 0.25rem;
+		}
+
+		.target-info {
+			text-align: center;
+			padding: 1rem 1.25rem;
+			border-top: 1px solid var(--border);
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			color: var(--text-muted);
+		}
+
+		.target-info .highlight {
+			color: var(--gold);
+			font-weight: 600;
+		}
+
+		/* Progress ring */
+		.progress-section {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 3rem;
+			padding: 1.5rem;
+			flex-wrap: wrap;
+		}
+
+		.progress-ring-container {
+			position: relative;
+			width: 160px;
+			height: 160px;
+		}
+
+		.progress-ring {
+			transform: rotate(-90deg);
+		}
+
+		.progress-ring-bg {
+			fill: none;
+			stroke: var(--border);
+			stroke-width: 8;
+		}
+
+		.progress-ring-fill {
+			fill: none;
+			stroke: var(--gold);
+			stroke-width: 8;
+			stroke-linecap: round;
+			transition: stroke-dashoffset 0.5s ease-out;
+		}
+
+		.progress-text {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			text-align: center;
+		}
+
+		.progress-percent {
+			font-family: 'Inconsolata', monospace;
+			font-size: 2rem;
+			font-weight: 700;
+			color: var(--gold);
+		}
+
+		.progress-label {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+		}
+
+		.progress-stats { flex: 1; min-width: 200px; }
+
+		.stat-row {
+			display: flex;
+			justify-content: space-between;
+			padding: 0.6rem 0;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.stat-row:last-child { border-bottom: none; }
+
+		.stat-label {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+		}
+
+		.stat-value {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		/* Working days */
+		.working-days-hero {
+			text-align: center;
+			padding: 2rem;
+		}
+
+		.working-value {
+			font-family: 'Inconsolata', monospace;
+			font-size: 4rem;
+			font-weight: 700;
+			color: var(--teal);
+			line-height: 1;
+			text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+		}
+
+		.working-label {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			margin-top: 0.5rem;
+		}
+
+		.working-sub {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.75rem;
+		}
+
+		/* Fun facts grid */
+		.facts-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 0;
+		}
+
+		.fact-item {
+			text-align: center;
+			padding: 1.25rem 0.5rem;
+			border-right: 1px solid var(--border);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.fact-item:nth-child(4n) { border-right: none; }
+		.fact-item:nth-last-child(-n+4) { border-bottom: none; }
+
+		.fact-value {
+			font-family: 'Inconsolata', monospace;
+			font-size: 1.4rem;
+			font-weight: 700;
+			color: var(--purple);
+			margin-bottom: 0.25rem;
+		}
+
+		.fact-label {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			line-height: 1.3;
+		}
+
+		/* Milestones */
+		.milestones-list { padding: 1rem 1.25rem; }
+
+		.milestone-item {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			padding: 0.75rem 0;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.milestone-item:last-child { border-bottom: none; }
+
+		.milestone-icon {
+			width: 36px;
+			height: 36px;
+			border-radius: 50%;
+			background: var(--surface-alt);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1rem;
+			flex-shrink: 0;
+		}
+
+		.milestone-icon.passed {
+			background: rgba(74, 222, 128, 0.15);
+		}
+
+		.milestone-content { flex: 1; }
+
+		.milestone-name {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		.milestone-date {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		.milestone-status {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.75rem;
+			font-weight: 600;
+		}
+
+		.milestone-status.passed { color: var(--green); }
+		.milestone-status.upcoming { color: var(--gold); }
+
+		/* Daylight on target day */
+		.daylight-preview {
+			display: flex;
+			align-items: center;
+			justify-content: space-around;
+			padding: 1.5rem;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.daylight-item { text-align: center; }
+
+		.daylight-value {
+			font-family: 'Inconsolata', monospace;
+			font-size: 1.5rem;
+			font-weight: 700;
+		}
+
+		.daylight-value.sunrise { color: var(--coral); }
+		.daylight-value.sunset { color: var(--teal); }
+		.daylight-value.duration { color: var(--gold); }
+
+		.daylight-label {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin-top: 0.3rem;
+		}
+
+		/* Settings modal */
+		.modal-overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0, 0, 0, 0.7);
+			z-index: 1000;
+			align-items: center;
+			justify-content: center;
+			padding: 1rem;
+		}
+
+		.modal-overlay.active { display: flex; }
+
+		.modal {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 12px;
+			width: 100%;
+			max-width: 450px;
+			animation: modalSlide 0.3s ease-out;
+		}
+
+		@keyframes modalSlide {
+			from { transform: translateY(-20px); opacity: 0; }
+			to { transform: translateY(0); opacity: 1; }
+		}
+
+		.modal-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.modal-title {
+			font-family: 'Lora', Georgia, serif;
+			font-size: 1.1rem;
+			font-weight: 600;
+		}
+
+		.modal-close {
+			background: transparent;
+			border: none;
+			color: var(--text-muted);
+			font-size: 1.5rem;
+			cursor: pointer;
+			line-height: 1;
+		}
+
+		.modal-close:hover { color: var(--text); }
+
+		.modal-body { padding: 1.25rem; }
+
+		.form-group {
+			margin-bottom: 1.25rem;
+		}
+
+		.form-group:last-child { margin-bottom: 0; }
+
+		.form-label {
+			display: block;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			margin-bottom: 0.5rem;
+		}
+
+		.form-input {
+			width: 100%;
+			padding: 0.75rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.9rem;
+		}
+
+		.form-input:focus {
+			outline: none;
+			border-color: var(--gold);
+		}
+
+		.form-hint {
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-top: 0.35rem;
+		}
+
+		.modal-footer {
+			display: flex;
+			gap: 0.75rem;
+			padding: 1rem 1.25rem;
+			border-top: 1px solid var(--border);
+		}
+
+		.btn {
+			flex: 1;
+			padding: 0.75rem 1rem;
+			border-radius: 6px;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.btn-secondary {
+			background: transparent;
+			border: 1px solid var(--border);
+			color: var(--text-muted);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--text-muted);
+			color: var(--text);
+		}
+
+		.btn-primary {
+			background: var(--gold);
+			border: 1px solid var(--gold);
+			color: var(--bg);
+		}
+
+		.btn-primary:hover {
+			background: #d4a027;
+			border-color: #d4a027;
+		}
+
+		/* Back link */
+		.back-link {
+			display: inline-block;
+			margin-top: 0.5rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-family: 'Inconsolata', monospace;
+			font-size: 0.85rem;
+			transition: color 0.2s;
+		}
+
+		.back-link:hover { color: var(--gold); }
+
+		/* Section animations */
+		.section { animation: fadeInUp 0.5s ease-out both; }
+		.section:nth-child(2) { animation-delay: 0.15s; }
+		.section:nth-child(3) { animation-delay: 0.2s; }
+		.section:nth-child(4) { animation-delay: 0.25s; }
+		.section:nth-child(5) { animation-delay: 0.3s; }
+		.section:nth-child(6) { animation-delay: 0.35s; }
+
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		@keyframes fadeInUp {
+			from { opacity: 0; transform: translateY(16px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		/* Completed state */
+		.completed .countdown-value {
+			color: var(--green);
+			text-shadow: 0 0 30px rgba(74, 222, 128, 0.4);
+		}
+
+		.completed .hero-panel {
+			border-color: rgba(74, 222, 128, 0.3);
+		}
+
+		/* Confetti canvas */
+		#confetti-canvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 999;
+		}
+
+		/* Responsive */
+		@media (max-width: 900px) {
+			.facts-grid { grid-template-columns: repeat(2, 1fr); }
+			.fact-item:nth-child(2n) { border-right: none; }
+			.fact-item:nth-child(n+7) { border-bottom: none; }
+		}
+
+		@media (max-width: 600px) {
+			body { padding: 0.75rem; }
+			h1 { font-size: 1.5rem; }
+			.subtitle { font-size: 0.8rem; }
+
+			.countdown-display { gap: 0.5rem; padding: 1.5rem 0.75rem; }
+			.countdown-value { font-size: 2.2rem; }
+			.countdown-separator { font-size: 2rem; display: none; }
+			.countdown-unit { min-width: 60px; }
+
+			.progress-section { gap: 1.5rem; }
+			.progress-ring-container { width: 130px; height: 130px; }
+			.progress-percent { font-size: 1.5rem; }
+
+			.working-value { font-size: 3rem; }
+
+			.fact-value { font-size: 1.1rem; }
+			.fact-item { padding: 1rem 0.5rem; }
+
+			.daylight-preview { gap: 1.5rem; }
+			.daylight-value { font-size: 1.2rem; }
+		}
+
+		@media (max-width: 400px) {
+			.facts-grid { grid-template-columns: 1fr 1fr; }
+			.countdown-value { font-size: 1.8rem; }
+			.countdown-unit { min-width: 50px; }
+			.working-value { font-size: 2.5rem; }
+		}
+	</style>
+</head>
+<body>
+	<canvas id="confetti-canvas"></canvas>
+	<div class="container">
+		<header>
+			<h1 id="page-title">Countdown Timer</h1>
+			<p class="subtitle" id="page-subtitle">Counting down to the big day</p>
+		</header>
+
+		<!-- Main Countdown -->
+		<div class="panel hero-panel section" id="hero-panel">
+			<div class="hero-header">
+				<span class="hero-title" id="countdown-title">Ade's Retirement</span>
+				<button class="edit-btn" id="edit-btn">Settings</button>
+			</div>
+			<div class="countdown-display" id="countdown-display">
+				<div class="countdown-unit">
+					<div class="countdown-value" id="days">---</div>
+					<div class="countdown-label">Days</div>
+				</div>
+				<span class="countdown-separator">:</span>
+				<div class="countdown-unit">
+					<div class="countdown-value" id="hours">--</div>
+					<div class="countdown-label">Hours</div>
+				</div>
+				<span class="countdown-separator">:</span>
+				<div class="countdown-unit">
+					<div class="countdown-value" id="minutes">--</div>
+					<div class="countdown-label">Minutes</div>
+				</div>
+				<span class="countdown-separator">:</span>
+				<div class="countdown-unit">
+					<div class="countdown-value" id="seconds">--</div>
+					<div class="countdown-label">Seconds</div>
+				</div>
+			</div>
+			<div class="target-info">
+				Target: <span class="highlight" id="target-date">---</span>
+			</div>
+		</div>
+
+		<!-- Progress & Stats -->
+		<div class="panel section">
+			<div class="panel-title">Progress</div>
+			<div class="progress-section">
+				<div class="progress-ring-container">
+					<svg class="progress-ring" width="160" height="160">
+						<circle class="progress-ring-bg" cx="80" cy="80" r="70"></circle>
+						<circle class="progress-ring-fill" id="progress-fill" cx="80" cy="80" r="70"
+							stroke-dasharray="439.82" stroke-dashoffset="439.82"></circle>
+					</svg>
+					<div class="progress-text">
+						<div class="progress-percent" id="progress-percent">0%</div>
+						<div class="progress-label">Complete</div>
+					</div>
+				</div>
+				<div class="progress-stats">
+					<div class="stat-row">
+						<span class="stat-label">Started</span>
+						<span class="stat-value" id="start-date">---</span>
+					</div>
+					<div class="stat-row">
+						<span class="stat-label">Total Duration</span>
+						<span class="stat-value" id="total-days">--- days</span>
+					</div>
+					<div class="stat-row">
+						<span class="stat-label">Days Elapsed</span>
+						<span class="stat-value" id="elapsed-days">--- days</span>
+					</div>
+					<div class="stat-row">
+						<span class="stat-label">Days Remaining</span>
+						<span class="stat-value" id="remaining-days">--- days</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Working Days -->
+		<div class="panel section">
+			<div class="panel-title">Working Days</div>
+			<div class="working-days-hero">
+				<div class="working-value" id="working-days">---</div>
+				<div class="working-label">Working Days Remaining</div>
+				<div class="working-sub">(Counting down from start, excludes weekends)</div>
+			</div>
+		</div>
+
+		<!-- Fun Facts -->
+		<div class="panel section">
+			<div class="panel-title">By The Numbers</div>
+			<div class="facts-grid" id="facts-grid">
+				<div class="fact-item">
+					<div class="fact-value" id="fact-weeks">--</div>
+					<div class="fact-label">Weeks</div>
+				</div>
+				<div class="fact-item">
+					<div class="fact-value" id="fact-months">--</div>
+					<div class="fact-label">Months</div>
+				</div>
+				<div class="fact-item">
+					<div class="fact-value" id="fact-weekends">--</div>
+					<div class="fact-label">Weekends</div>
+				</div>
+				<div class="fact-item">
+					<div class="fact-value" id="fact-hours">--</div>
+					<div class="fact-label">Hours</div>
+				</div>
+				<div class="fact-item">
+					<div class="fact-value" id="fact-sleeps">--</div>
+					<div class="fact-label">Sleeps</div>
+				</div>
+				<div class="fact-item">
+					<div class="fact-value" id="fact-coffees">--</div>
+					<div class="fact-label">Coffees (est.)</div>
+				</div>
+				<div class="fact-item">
+					<div class="fact-value" id="fact-meetings">--</div>
+					<div class="fact-label">Meetings (est.)</div>
+				</div>
+				<div class="fact-item">
+					<div class="fact-value" id="fact-commutes">--</div>
+					<div class="fact-label">Commutes</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Milestones -->
+		<div class="panel section">
+			<div class="panel-title">Milestones</div>
+			<div class="milestones-list" id="milestones-list">
+				<!-- Populated by JS -->
+			</div>
+		</div>
+
+		<!-- Daylight on Target Day -->
+		<div class="panel section">
+			<div class="panel-title">Daylight on Target Day (London)</div>
+			<div class="daylight-preview" id="daylight-preview">
+				<div class="daylight-item">
+					<div class="daylight-value sunrise" id="target-sunrise">--:--</div>
+					<div class="daylight-label">Sunrise</div>
+				</div>
+				<div class="daylight-item">
+					<div class="daylight-value duration" id="target-daylight">--h --m</div>
+					<div class="daylight-label">Daylight</div>
+				</div>
+				<div class="daylight-item">
+					<div class="daylight-value sunset" id="target-sunset">--:--</div>
+					<div class="daylight-label">Sunset</div>
+				</div>
+			</div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<!-- Settings Modal -->
+	<div class="modal-overlay" id="modal-overlay">
+		<div class="modal">
+			<div class="modal-header">
+				<span class="modal-title">Countdown Settings</span>
+				<button class="modal-close" id="modal-close">&times;</button>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="form-label">Event Title</label>
+					<input type="text" class="form-input" id="input-title" placeholder="e.g., My Retirement">
+				</div>
+				<div class="form-group">
+					<label class="form-label">Target Date</label>
+					<input type="date" class="form-input" id="input-date">
+				</div>
+				<div class="form-group">
+					<label class="form-label">Target Time (optional)</label>
+					<input type="time" class="form-input" id="input-time" value="17:00">
+					<div class="form-hint">Default is 5:00 PM (end of work day)</div>
+				</div>
+				<div class="form-group">
+					<label class="form-label">Start Date (for progress tracking)</label>
+					<input type="date" class="form-input" id="input-start">
+					<div class="form-hint">When did you start counting? Defaults to today.</div>
+				</div>
+				<div class="form-group">
+					<label class="form-label">Working Days Variance</label>
+					<input type="number" class="form-input" id="input-variance" value="0" step="1">
+					<div class="form-hint">Adjust +/- days for additional leave or ad-hoc days off</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-secondary" id="btn-reset">Reset to Default</button>
+				<button class="btn btn-primary" id="btn-save">Save</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	'use strict';
+
+	// ═══════════════════════════════════════════
+	// Constants
+	// ═══════════════════════════════════════════
+
+	const STORAGE_KEY = 'countdown_settings';
+	const DEG = Math.PI / 180;
+	const RAD = 180 / Math.PI;
+	const ZENITH_STANDARD = 90.833;
+
+	// UK Bank Holidays 2024-2030 (approximate - major ones)
+	const UK_BANK_HOLIDAYS = [
+		// 2024
+		'2024-01-01', '2024-03-29', '2024-04-01', '2024-05-06', '2024-05-27', '2024-08-26', '2024-12-25', '2024-12-26',
+		// 2025
+		'2025-01-01', '2025-04-18', '2025-04-21', '2025-05-05', '2025-05-26', '2025-08-25', '2025-12-25', '2025-12-26',
+		// 2026
+		'2026-01-01', '2026-04-03', '2026-04-06', '2026-05-04', '2026-05-25', '2026-08-31', '2026-12-25', '2026-12-28',
+		// 2027
+		'2027-01-01', '2027-03-26', '2027-03-29', '2027-05-03', '2027-05-31', '2027-08-30', '2027-12-27', '2027-12-28',
+		// 2028
+		'2028-01-03', '2028-04-14', '2028-04-17', '2028-05-01', '2028-05-29', '2028-08-28', '2028-12-25', '2028-12-26',
+		// 2029
+		'2029-01-01', '2029-03-30', '2029-04-02', '2029-05-07', '2029-05-28', '2029-08-27', '2029-12-25', '2029-12-26',
+		// 2030
+		'2030-01-01', '2030-04-19', '2030-04-22', '2030-05-06', '2030-05-27', '2030-08-26', '2030-12-25', '2030-12-26'
+	];
+
+	const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
+		'July', 'August', 'September', 'October', 'November', 'December'];
+	const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+	// Default: Ade's retirement - 715 working days from 2026-02-05
+	// The 715 figure already accounts for annual leave, bank holidays, etc.
+	const DEFAULT_SETTINGS = {
+		title: "Ade's Retirement",
+		targetDate: '2028-01-21',
+		targetTime: '17:00',
+		startDate: '2026-02-05',
+		startingWorkingDays: 715, // Pre-calculated working days at start date
+		variance: 0 // +/- adjustment for additional leave or ad-hoc days off
+	};
+
+	let settings = { ...DEFAULT_SETTINGS };
+	let countdownInterval = null;
+	let confettiTriggered = false;
+
+	// ═══════════════════════════════════════════
+	// Storage
+	// ═══════════════════════════════════════════
+
+	function loadSettings() {
+		try {
+			const stored = localStorage.getItem(STORAGE_KEY);
+			if (stored) {
+				const parsed = JSON.parse(stored);
+				settings = { ...DEFAULT_SETTINGS, ...parsed };
+			}
+		} catch (e) {
+			console.warn('Failed to load settings:', e);
+		}
+	}
+
+	function saveSettings() {
+		try {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+		} catch (e) {
+			console.warn('Failed to save settings:', e);
+		}
+	}
+
+	// ═══════════════════════════════════════════
+	// Date Helpers
+	// ═══════════════════════════════════════════
+
+	function formatDate(date) {
+		return DAY_NAMES[date.getDay()] + ', ' + date.getDate() + ' ' +
+			MONTH_NAMES[date.getMonth()] + ' ' + date.getFullYear();
+	}
+
+	function formatDateShort(date) {
+		return date.getDate() + ' ' + MONTH_NAMES[date.getMonth()].substring(0, 3) + ' ' + date.getFullYear();
+	}
+
+	function isWeekday(date) {
+		const day = date.getDay();
+		return day !== 0 && day !== 6;
+	}
+
+	function isBankHoliday(date) {
+		const dateStr = date.toISOString().split('T')[0];
+		return UK_BANK_HOLIDAYS.includes(dateStr);
+	}
+
+	function isWorkingDay(date) {
+		return isWeekday(date) && !isBankHoliday(date);
+	}
+
+	function countWorkingDays(startDate, endDate) {
+		let count = 0;
+		const current = new Date(startDate);
+		current.setHours(0, 0, 0, 0);
+		const end = new Date(endDate);
+		end.setHours(0, 0, 0, 0);
+
+		while (current < end) {
+			if (isWorkingDay(current)) {
+				count++;
+			}
+			current.setDate(current.getDate() + 1);
+		}
+		return count;
+	}
+
+	function countWeekends(startDate, endDate) {
+		let count = 0;
+		const current = new Date(startDate);
+		current.setHours(0, 0, 0, 0);
+		const end = new Date(endDate);
+		end.setHours(0, 0, 0, 0);
+
+		while (current < end) {
+			if (current.getDay() === 6) { // Saturday starts weekend
+				count++;
+			}
+			current.setDate(current.getDate() + 1);
+		}
+		return count;
+	}
+
+	// ═══════════════════════════════════════════
+	// Solar Calculations (simplified NOAA)
+	// ═══════════════════════════════════════════
+
+	function getJulianDay(year, month, day) {
+		if (month <= 2) { year--; month += 12; }
+		const A = Math.floor(year / 100);
+		const B = 2 - A + Math.floor(A / 4);
+		return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+	}
+
+	function calcSunData(date, lat, lon) {
+		const y = date.getFullYear();
+		const m = date.getMonth() + 1;
+		const d = date.getDate();
+		const JD = getJulianDay(y, m, d);
+		const T = (JD - 2451545.0) / 36525.0;
+
+		let L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360;
+		if (L0 < 0) L0 += 360;
+
+		let M = (357.52911 + T * (35999.05029 - T * 0.0001537)) % 360;
+		if (M < 0) M += 360;
+
+		const e = 0.016708634 - T * (0.000042037 + T * 0.0000001267);
+		const Mrad = M * DEG;
+		const C = (1.914602 - T * (0.004817 + T * 0.000014)) * Math.sin(Mrad)
+				+ (0.019993 - T * 0.000101) * Math.sin(2 * Mrad)
+				+ 0.000289 * Math.sin(3 * Mrad);
+
+		const sunTrueLong = L0 + C;
+		const omega = 125.04 - 1934.136 * T;
+		const sunAppLong = sunTrueLong - 0.00569 - 0.00478 * Math.sin(omega * DEG);
+
+		const obliq = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60;
+		const obliqCorr = obliq + 0.00256 * Math.cos(omega * DEG);
+
+		const decl = Math.asin(Math.sin(obliqCorr * DEG) * Math.sin(sunAppLong * DEG));
+
+		const y2 = Math.tan(obliqCorr * DEG / 2) ** 2;
+		const L0rad = L0 * DEG;
+		const eqTime = 4 * RAD * (
+			y2 * Math.sin(2 * L0rad)
+			- 2 * e * Math.sin(Mrad)
+			+ 4 * e * y2 * Math.sin(Mrad) * Math.cos(2 * L0rad)
+			- 0.5 * y2 * y2 * Math.sin(4 * L0rad)
+			- 1.25 * e * e * Math.sin(2 * Mrad)
+		);
+
+		const solarNoon = 720 - 4 * lon - eqTime;
+		const latRad = lat * DEG;
+		const cosHA = Math.cos(ZENITH_STANDARD * DEG) / (Math.cos(latRad) * Math.cos(decl))
+					 - Math.tan(latRad) * Math.tan(decl);
+
+		if (cosHA > 1 || cosHA < -1) {
+			return { sunrise: NaN, sunset: NaN, daylight: cosHA < -1 ? 1440 : 0 };
+		}
+
+		const HA = Math.acos(cosHA) * RAD;
+		const sunriseMin = solarNoon - HA * 4;
+		const sunsetMin = solarNoon + HA * 4;
+		const daylightMin = sunsetMin - sunriseMin;
+
+		return { sunrise: sunriseMin, sunset: sunsetMin, daylight: daylightMin };
+	}
+
+	function formatTime(utcMinutes) {
+		if (isNaN(utcMinutes)) return '--:--';
+		const h = Math.floor(utcMinutes / 60) % 24;
+		const m = Math.floor(utcMinutes % 60);
+		return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+	}
+
+	function formatDuration(minutes) {
+		if (isNaN(minutes)) return '--h --m';
+		const h = Math.floor(minutes / 60);
+		const m = Math.floor(minutes % 60);
+		return h + 'h ' + String(m).padStart(2, '0') + 'm';
+	}
+
+	// ═══════════════════════════════════════════
+	// Countdown Logic
+	// ═══════════════════════════════════════════
+
+	function getTargetDate() {
+		const [year, month, day] = settings.targetDate.split('-').map(Number);
+		const [hours, mins] = (settings.targetTime || '17:00').split(':').map(Number);
+		return new Date(year, month - 1, day, hours, mins, 0);
+	}
+
+	function getStartDate() {
+		const [year, month, day] = settings.startDate.split('-').map(Number);
+		return new Date(year, month - 1, day, 0, 0, 0);
+	}
+
+	function updateCountdown() {
+		const now = new Date();
+		const target = getTargetDate();
+		const diff = target - now;
+
+		const heroPanel = document.getElementById('hero-panel');
+
+		if (diff <= 0) {
+			// Countdown complete!
+			document.getElementById('days').textContent = '0';
+			document.getElementById('hours').textContent = '00';
+			document.getElementById('minutes').textContent = '00';
+			document.getElementById('seconds').textContent = '00';
+			heroPanel.classList.add('completed');
+
+			if (!confettiTriggered) {
+				confettiTriggered = true;
+				launchConfetti();
+			}
+			return;
+		}
+
+		heroPanel.classList.remove('completed');
+
+		const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+		const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+		document.getElementById('days').textContent = days;
+		document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+		document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+		document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+	}
+
+	function updateStats() {
+		const now = new Date();
+		const target = getTargetDate();
+		const start = getStartDate();
+
+		const totalMs = target - start;
+		const elapsedMs = now - start;
+		const remainingMs = Math.max(0, target - now);
+
+		const totalDays = Math.ceil(totalMs / (1000 * 60 * 60 * 24));
+		const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
+		const remainingDays = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
+
+		const progress = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
+
+		// Update display
+		document.getElementById('countdown-title').textContent = settings.title;
+		document.getElementById('page-title').textContent = settings.title;
+		document.getElementById('page-subtitle').textContent = 'Counting down to ' + formatDate(target);
+		document.getElementById('target-date').textContent = formatDate(target);
+		document.getElementById('start-date').textContent = formatDateShort(start);
+		document.getElementById('total-days').textContent = totalDays.toLocaleString() + ' days';
+		document.getElementById('elapsed-days').textContent = Math.max(0, elapsedDays).toLocaleString() + ' days';
+		document.getElementById('remaining-days').textContent = remainingDays.toLocaleString() + ' days';
+
+		// Progress ring
+		const progressPercent = Math.round(progress);
+		document.getElementById('progress-percent').textContent = progressPercent + '%';
+
+		const circumference = 2 * Math.PI * 70;
+		const offset = circumference - (progress / 100) * circumference;
+		document.getElementById('progress-fill').style.strokeDashoffset = offset;
+
+		// Working days - count down from pre-calculated starting figure
+		// based on actual working days elapsed since start date
+		// variance allows +/- adjustment for additional leave or ad-hoc days off
+		const workingDaysElapsed = countWorkingDays(start, now);
+		const variance = settings.variance || 0;
+		const workingDays = Math.max(0, (settings.startingWorkingDays || 715) - workingDaysElapsed + variance);
+		document.getElementById('working-days').textContent = workingDays.toLocaleString();
+
+		// Fun facts
+		const weeks = Math.floor(remainingDays / 7);
+		const months = Math.round(remainingDays / 30.44);
+		const weekends = countWeekends(now, target);
+		const hours = remainingDays * 24;
+		const sleeps = remainingDays;
+		const coffees = workingDays * 3; // 3 coffees per work day
+		const meetings = Math.floor(workingDays * 1.5); // 1.5 meetings per work day
+		const commutes = workingDays * 2; // 2 commutes per work day
+
+		document.getElementById('fact-weeks').textContent = weeks.toLocaleString();
+		document.getElementById('fact-months').textContent = months.toLocaleString();
+		document.getElementById('fact-weekends').textContent = weekends.toLocaleString();
+		document.getElementById('fact-hours').textContent = hours.toLocaleString();
+		document.getElementById('fact-sleeps').textContent = sleeps.toLocaleString();
+		document.getElementById('fact-coffees').textContent = coffees.toLocaleString();
+		document.getElementById('fact-meetings').textContent = meetings.toLocaleString();
+		document.getElementById('fact-commutes').textContent = commutes.toLocaleString();
+
+		// Milestones
+		updateMilestones(start, target, now, remainingDays);
+
+		// Daylight on target day (London)
+		const sunData = calcSunData(target, 51.5074, -0.1278);
+		document.getElementById('target-sunrise').textContent = formatTime(sunData.sunrise);
+		document.getElementById('target-sunset').textContent = formatTime(sunData.sunset);
+		document.getElementById('target-daylight').textContent = formatDuration(sunData.daylight);
+	}
+
+	function updateMilestones(start, target, now, remainingDays) {
+		const totalDays = Math.ceil((target - start) / (1000 * 60 * 60 * 24));
+
+		const milestones = [
+			{ percent: 25, icon: '🎯' },
+			{ percent: 50, icon: '⏳' },
+			{ percent: 75, icon: '🚀' },
+			{ percent: 90, icon: '🔥' },
+			{ days: 100, icon: '💯', name: '100 Days Left' },
+			{ days: 30, icon: '📅', name: '1 Month Left' },
+			{ days: 7, icon: '🎉', name: '1 Week Left' },
+		];
+
+		const milestonesHtml = milestones.map(m => {
+			let targetDate, name, passed;
+
+			if (m.percent) {
+				const daysToMilestone = Math.floor(totalDays * (m.percent / 100));
+				targetDate = new Date(start);
+				targetDate.setDate(targetDate.getDate() + daysToMilestone);
+				name = m.percent + '% Complete';
+				passed = now >= targetDate;
+			} else if (m.days) {
+				targetDate = new Date(target);
+				targetDate.setDate(targetDate.getDate() - m.days);
+				name = m.name;
+				passed = now >= targetDate;
+			}
+
+			const status = passed ? 'Passed' : `In ${Math.ceil((targetDate - now) / (1000 * 60 * 60 * 24))} days`;
+
+			return `
+				<div class="milestone-item">
+					<div class="milestone-icon ${passed ? 'passed' : ''}">${m.icon}</div>
+					<div class="milestone-content">
+						<div class="milestone-name">${name}</div>
+						<div class="milestone-date">${formatDateShort(targetDate)}</div>
+					</div>
+					<div class="milestone-status ${passed ? 'passed' : 'upcoming'}">${status}</div>
+				</div>
+			`;
+		}).join('');
+
+		document.getElementById('milestones-list').innerHTML = milestonesHtml;
+	}
+
+	// ═══════════════════════════════════════════
+	// Confetti
+	// ═══════════════════════════════════════════
+
+	function launchConfetti() {
+		const canvas = document.getElementById('confetti-canvas');
+		const ctx = canvas.getContext('2d');
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+
+		const colors = ['#f0b429', '#38bdf8', '#fb7185', '#4ade80', '#a78bfa'];
+		const particles = [];
+
+		for (let i = 0; i < 150; i++) {
+			particles.push({
+				x: Math.random() * canvas.width,
+				y: Math.random() * canvas.height - canvas.height,
+				vx: (Math.random() - 0.5) * 4,
+				vy: Math.random() * 3 + 2,
+				color: colors[Math.floor(Math.random() * colors.length)],
+				size: Math.random() * 8 + 4,
+				rotation: Math.random() * Math.PI * 2,
+				rotationSpeed: (Math.random() - 0.5) * 0.2
+			});
+		}
+
+		let frame = 0;
+		function animate() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			particles.forEach(p => {
+				p.x += p.vx;
+				p.y += p.vy;
+				p.vy += 0.05;
+				p.rotation += p.rotationSpeed;
+
+				ctx.save();
+				ctx.translate(p.x, p.y);
+				ctx.rotate(p.rotation);
+				ctx.fillStyle = p.color;
+				ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+				ctx.restore();
+			});
+
+			frame++;
+			if (frame < 300) {
+				requestAnimationFrame(animate);
+			} else {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+			}
+		}
+
+		animate();
+	}
+
+	// ═══════════════════════════════════════════
+	// Modal
+	// ═══════════════════════════════════════════
+
+	function openModal() {
+		document.getElementById('input-title').value = settings.title;
+		document.getElementById('input-date').value = settings.targetDate;
+		document.getElementById('input-time').value = settings.targetTime || '17:00';
+		document.getElementById('input-start').value = settings.startDate;
+		document.getElementById('input-variance').value = settings.variance || 0;
+		document.getElementById('modal-overlay').classList.add('active');
+	}
+
+	function closeModal() {
+		document.getElementById('modal-overlay').classList.remove('active');
+	}
+
+	function saveModal() {
+		const title = document.getElementById('input-title').value.trim();
+		const targetDate = document.getElementById('input-date').value;
+		const targetTime = document.getElementById('input-time').value;
+		const startDate = document.getElementById('input-start').value;
+		const variance = parseInt(document.getElementById('input-variance').value, 10) || 0;
+
+		if (!title || !targetDate) {
+			alert('Please enter a title and target date.');
+			return;
+		}
+
+		settings.title = title;
+		settings.targetDate = targetDate;
+		settings.targetTime = targetTime || '17:00';
+		settings.startDate = startDate || new Date().toISOString().split('T')[0];
+		settings.variance = variance;
+
+		saveSettings();
+		confettiTriggered = false;
+		updateCountdown();
+		updateStats();
+		closeModal();
+	}
+
+	function resetToDefault() {
+		if (confirm('Reset to default settings (Ade\'s Retirement)?')) {
+			settings = { ...DEFAULT_SETTINGS };
+			saveSettings();
+			confettiTriggered = false;
+			updateCountdown();
+			updateStats();
+			closeModal();
+		}
+	}
+
+	// ═══════════════════════════════════════════
+	// Initialization
+	// ═══════════════════════════════════════════
+
+	document.addEventListener('DOMContentLoaded', () => {
+		loadSettings();
+
+		// Initial render
+		updateCountdown();
+		updateStats();
+
+		// Start countdown interval
+		countdownInterval = setInterval(updateCountdown, 1000);
+
+		// Event listeners
+		document.getElementById('edit-btn').addEventListener('click', openModal);
+		document.getElementById('modal-close').addEventListener('click', closeModal);
+		document.getElementById('btn-save').addEventListener('click', saveModal);
+		document.getElementById('btn-reset').addEventListener('click', resetToDefault);
+
+		document.getElementById('modal-overlay').addEventListener('click', (e) => {
+			if (e.target === e.currentTarget) closeModal();
+		});
+
+		// Handle window resize for confetti
+		window.addEventListener('resize', () => {
+			const canvas = document.getElementById('confetti-canvas');
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+		});
+	});
+	</script>
+</body>
+</html>
