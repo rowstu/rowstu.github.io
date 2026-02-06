@@ -1,0 +1,315 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Remote Access Configuration // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Remote Access Configuration</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ciscoremote-access/>Ciscoremote Access</a></div><div class="card markdown-content"><h1 id=configuring-remote-access-to-cisco-switches>Configuring Remote Access to Cisco Switches</h1><p>Complete guide to setting up SSH and secure remote management access on Cisco switches.</p><hr><h2 id=overview>Overview</h2><p>Remote management allows you to configure and monitor switches without physical console access. This guide covers:</p><ul><li>Assigning management IP addresses</li><li>Configuring SSH (recommended)</li><li>Securing remote access</li><li>Troubleshooting connectivity</li></ul><hr><h2 id=prerequisites>Prerequisites</h2><p>Before configuring remote access:</p><ul><li><strong>Console access</strong> to the switch</li><li><strong>Network connectivity</strong> to the switch</li><li><strong>IP address plan</strong> for management interface</li><li><strong>DNS/hostname</strong> (required for SSH)</li></ul><hr><h2 id=assigning-an-ip-address-to-a-switch>Assigning an IP Address to a Switch</h2><h3 id=method-1-using-vlan-1-default-simple>Method 1: Using VLAN 1 (Default, Simple)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# configure terminal
+
+! Configure VLAN 1 interface
+Switch(config)# interface vlan 1
+Switch(config-if)# ip address 192.168.1.10 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# description Management Interface
+Switch(config-if)# exit
+
+! Set default gateway
+Switch(config)# ip default-gateway 192.168.1.1
+
+! Save configuration
+Switch(config)# exit
+Switch# write memory
+</code></pre><h3 id=method-2-using-dedicated-management-vlan-best-practice>Method 2: Using Dedicated Management VLAN (Best Practice)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create management VLAN
+Switch(config)# vlan 99
+Switch(config-vlan)# name MANAGEMENT
+Switch(config-vlan)# exit
+
+! Configure VLAN interface
+Switch(config)# interface vlan 99
+Switch(config-if)# ip address 192.168.99.10 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# description Management Interface
+Switch(config-if)# exit
+
+! Set default gateway
+Switch(config)# ip default-gateway 192.168.99.1
+
+! Assign a physical port to management VLAN (for connectivity)
+Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 99
+Switch(config-if)# description Management Port
+Switch(config-if)# exit
+</code></pre><h3 id=verify-ip-configuration>Verify IP Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol
+Vlan1                  unassigned      YES unset  administratively down down
+Vlan99                 192.168.99.10   YES manual up                    up
+
+! Test connectivity
+Switch# ping 192.168.99.1
+</code></pre><hr><h2 id=configuring-ssh-access>Configuring SSH Access</h2><p>SSH provides encrypted remote access. Telnet is <strong>not recommended</strong> (unencrypted).</p><h3 id=step-1-set-hostname-and-domain-name>Step 1: Set Hostname and Domain Name</h3><p><strong>Required for SSH key generation:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# hostname CoreSwitch
+CoreSwitch(config)# ip domain-name company.local
+</code></pre><h3 id=step-2-generate-rsa-keys>Step 2: Generate RSA Keys</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# crypto key generate rsa
+The name for the keys will be: CoreSwitch.company.local
+Choose the size of the key modulus in the range of 360 to 4096 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 2048
+% Generating 2048 bit RSA keys, keys will be non-exportable...
+[OK] (elapsed time was 3 seconds)
+</code></pre><p><strong>Key sizes:</strong></p><ul><li><strong>1024 bits:</strong> Minimum for SSH version 2 (acceptable)</li><li><strong>2048 bits:</strong> Recommended</li><li><strong>4096 bits:</strong> Maximum security (slower)</li></ul><h3 id=step-3-configure-ssh-version-2>Step 3: Configure SSH Version 2</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# ip ssh version 2
+CoreSwitch(config)# ip ssh time-out 60
+CoreSwitch(config)# ip ssh authentication-retries 3
+</code></pre><h3 id=step-4-create-local-user-accounts>Step 4: Create Local User Accounts</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# username admin privilege 15 secret Admin123!@#
+CoreSwitch(config)# username netadmin privilege 15 secret NetAdmin456!@#
+CoreSwitch(config)# username readonly privilege 1 secret ReadOnly789!@#
+</code></pre><h3 id=step-5-configure-vty-lines>Step 5: Configure VTY Lines</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# line vty 0 15
+CoreSwitch(config-line)# transport input ssh
+CoreSwitch(config-line)# login local
+CoreSwitch(config-line)# exec-timeout 10 0
+CoreSwitch(config-line)# logging synchronous
+CoreSwitch(config-line)# exit
+</code></pre><p><strong>VTY Line Parameters:</strong></p><ul><li><code>transport input ssh</code> - Only allow SSH (block Telnet)</li><li><code>login local</code> - Use local user accounts</li><li><code>exec-timeout 10 0</code> - 10-minute session timeout</li></ul><h3 id=step-6-save-and-test>Step 6: Save and Test</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# exit
+CoreSwitch# write memory
+
+! From another device
+ssh admin@192.168.99.10
+</code></pre><hr><h2 id=restricting-ssh-access-with-acls>Restricting SSH Access with ACLs</h2><p>Limit SSH access to specific IP addresses or networks:</p><h3 id=create-access-list>Create Access List</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Allow SSH from management network only
+CoreSwitch(config)# access-list 10 remark Management Network Only
+CoreSwitch(config)# access-list 10 permit 192.168.100.0 0.0.0.255
+CoreSwitch(config)# access-list 10 deny any log
+</code></pre><h3 id=apply-to-vty-lines>Apply to VTY Lines</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# line vty 0 15
+CoreSwitch(config-line)# access-class 10 in
+CoreSwitch(config-line)# exit
+</code></pre><p><strong>Result:</strong> Only devices from 192.168.100.0/24 can SSH to the switch.</p><h3 id=extended-acl-example>Extended ACL Example</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Named extended ACL for more control
+CoreSwitch(config)# ip access-list extended SSH-ACCESS
+CoreSwitch(config-ext-nacl)# remark Allow SSH from admin workstations
+CoreSwitch(config-ext-nacl)# permit tcp host 192.168.100.10 any eq 22
+CoreSwitch(config-ext-nacl)# permit tcp host 192.168.100.11 any eq 22
+CoreSwitch(config-ext-nacl)# permit tcp 10.0.0.0 0.255.255.255 any eq 22
+CoreSwitch(config-ext-nacl)# deny ip any any log
+CoreSwitch(config-ext-nacl)# exit
+
+! Apply to VTY
+CoreSwitch(config)# line vty 0 15
+CoreSwitch(config-line)# access-class SSH-ACCESS in
+</code></pre><hr><h2 id=aaa-authentication-for-remote-access>AAA Authentication for Remote Access</h2><p>For enterprise environments, use centralized authentication:</p><h3 id=tacacs-configuration>TACACS+ Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable AAA
+CoreSwitch(config)# aaa new-model
+
+! Configure authentication
+CoreSwitch(config)# aaa authentication login default group tacacs+ local
+CoreSwitch(config)# aaa authorization exec default group tacacs+ local
+
+! Configure TACACS+ servers
+CoreSwitch(config)# tacacs-server host 192.168.100.50
+CoreSwitch(config)# tacacs-server host 192.168.100.51
+CoreSwitch(config)# tacacs-server key TacacsSecretKey123!
+
+! Apply to VTY lines
+CoreSwitch(config)# line vty 0 15
+CoreSwitch(config-line)# authorization exec default
+CoreSwitch(config-line)# accounting exec default start-stop group tacacs+
+CoreSwitch(config-line)# exit
+</code></pre><h3 id=radius-configuration>RADIUS Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable AAA
+CoreSwitch(config)# aaa new-model
+
+! Configure authentication
+CoreSwitch(config)# aaa authentication login default group radius local
+CoreSwitch(config)# aaa authorization exec default group radius local
+
+! Configure RADIUS servers
+CoreSwitch(config)# radius-server host 192.168.100.60 auth-port 1812 acct-port 1813
+CoreSwitch(config)# radius-server key RadiusSecretKey456!
+
+! Apply to VTY lines
+CoreSwitch(config)# line vty 0 15
+CoreSwitch(config-line)# authorization exec default
+CoreSwitch(config-line)# accounting exec default start-stop group radius
+</code></pre><p><strong>Always include <code>local</code> as fallback</strong> in case AAA server is unreachable!</p><hr><h2 id=configuring-telnet-not-recommended>Configuring Telnet (Not Recommended)</h2><p>Telnet transmits passwords in clear text. Only use in isolated lab environments.</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# line vty 0 15
+Switch(config-line)# transport input telnet
+Switch(config-line)# password TelnetPass123
+Switch(config-line)# login
+Switch(config-line)# exit
+</code></pre><p><strong>To allow both SSH and Telnet:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config-line)# transport input ssh telnet
+</code></pre><p><strong>Best practice:</strong> <code>transport input ssh</code> (SSH only)</p><hr><h2 id=httphttps-web-interface>HTTP/HTTPS Web Interface</h2><p>Some Cisco switches support web-based management:</p><h3 id=enable-http>Enable HTTP</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# ip http server
+Switch(config)# ip http authentication local
+</code></pre><h3 id=enable-https-recommended>Enable HTTPS (Recommended)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# ip http secure-server
+Switch(config)# ip http authentication local
+Switch(config)# no ip http server
+</code></pre><p>Access via: <code>https://192.168.99.10</code></p><h3 id=restrict-http-access>Restrict HTTP Access</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# ip http access-class 10
+</code></pre><p><strong>Note:</strong> Web interface is less common and not recommended for production. Use SSH.</p><hr><h2 id=layer-3-switch---routed-port-configuration>Layer 3 Switch - Routed Port Configuration</h2><p>For Layer 3 switches with routed ports:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable IP routing
+Switch(config)# ip routing
+
+! Configure routed port (not a switchport)
+Switch(config)# interface gigabitethernet 0/1
+Switch(config-if)# no switchport
+Switch(config-if)# ip address 10.1.1.1 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# description WAN Link
+Switch(config-if)# exit
+
+! Configure default route (if needed)
+Switch(config)# ip route 0.0.0.0 0.0.0.0 10.1.1.254
+</code></pre><hr><h2 id=monitoring-and-verification>Monitoring and Verification</h2><h3 id=view-ssh-status>View SSH Status</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch# show ip ssh
+SSH Enabled - version 2.0
+Authentication timeout: 60 secs; Authentication retries: 3
+</code></pre><h3 id=view-active-ssh-sessions>View Active SSH Sessions</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch# show ssh
+Connection Version Mode Encryption  Hmac         State           Username
+0          2.0     IN   aes256-ctr  hmac-sha2-256 Session started admin
+1          2.0     IN   aes128-cbc  hmac-sha1    Session started netadmin
+</code></pre><h3 id=view-vty-line-status>View VTY Line Status</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch# show line vty 0 15
+   Tty Line Typ     Tx/Rx    A Roty AccO AccI  Uses   Noise  Overruns  Int
+*    2   2 VTY              -    -    -   10      0       0      0/0      -
+</code></pre><h3 id=view-connected-users>View Connected Users</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch# show users
+    Line       User       Host(s)              Idle       Location
+*  2 vty 0     admin      idle                 00:00:00   10.1.1.50
+
+  Interface    User               Mode         Idle     Peer Address
+</code></pre><h3 id=test-ssh-connection>Test SSH Connection</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! From switch to another device
+CoreSwitch# ssh -l username 192.168.1.20
+
+! Check reachability
+CoreSwitch# ping 192.168.99.1
+</code></pre><hr><h2 id=securing-remote-access>Securing Remote Access</h2><h3 id=1-use-ssh-only-never-telnet>1. Use SSH Only (Never Telnet)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>line vty 0 15
+ transport input ssh
+</code></pre><h3 id=2-implement-access-control-lists>2. Implement Access Control Lists</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>access-list 10 permit 192.168.100.0 0.0.0.255
+line vty 0 15
+ access-class 10 in
+</code></pre><h3 id=3-use-strong-passwords>3. Use Strong Passwords</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>username admin privilege 15 algorithm-type scrypt secret C0mplex!P@ssw0rd#123
+</code></pre><h3 id=4-enable-session-timeouts>4. Enable Session Timeouts</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>line vty 0 15
+ exec-timeout 10 0
+</code></pre><h3 id=5-limit-concurrent-sessions>5. Limit Concurrent Sessions</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>line vty 0 4
+ ! Only 5 simultaneous SSH sessions (lines 0-4)
+</code></pre><h3 id=6-enable-logging>6. Enable Logging</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# logging buffered 51200
+CoreSwitch(config)# logging console warnings
+CoreSwitch(config)# logging monitor informational
+CoreSwitch(config)# service timestamps log datetime msec
+CoreSwitch(config)# service timestamps debug datetime msec
+</code></pre><h3 id=7-configure-banner>7. Configure Banner</h3><p>Legal warning banner:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# banner login ^C
+*******************************************************************************
+*                                                                             *
+*  WARNING: Unauthorized access to this device is prohibited!                *
+*           All activities are monitored and logged.                          *
+*           Violators will be prosecuted to the fullest extent of the law.    *
+*                                                                             *
+*******************************************************************************
+^C
+</code></pre><hr><h2 id=troubleshooting-remote-access>Troubleshooting Remote Access</h2><h3 id=cannot-connect-via-ssh>Cannot Connect via SSH</h3><p><strong>1. Verify IP configuration</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show ip interface brief
+Switch# ping [destination]
+</code></pre><p><strong>2. Verify SSH is enabled</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show ip ssh
+</code></pre><p>If SSH is disabled:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# ip ssh version 2
+</code></pre><p><strong>3. Verify RSA keys are generated</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show crypto key mypubkey rsa
+</code></pre><p>If no keys:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# crypto key generate rsa modulus 2048
+</code></pre><p><strong>4. Check VTY configuration</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show running-config | section line vty
+</code></pre><p><strong>5. Verify ACL isn&rsquo;t blocking</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show access-lists
+Switch# show line vty 0 15 | include access-class
+</code></pre><h3 id=ssh-connection-refused>SSH Connection Refused</h3><p><strong>Possible causes:</strong></p><ul><li>RSA keys not generated</li><li>SSH not enabled</li><li>VTY lines not configured for SSH</li></ul><p><strong>Fix:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# crypto key generate rsa modulus 2048
+Switch(config)# ip ssh version 2
+Switch(config)# line vty 0 15
+Switch(config-line)# transport input ssh
+</code></pre><h3 id=password-rejected>Password Rejected</h3><p><strong>1. Verify user account exists</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show running-config | include username
+</code></pre><p><strong>2. Check authentication method</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show running-config | section line vty
+</code></pre><p>If using <code>login local</code>, ensure user exists:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# username admin privilege 15 secret NewPassword123!
+</code></pre><h3 id=connection-times-out>Connection Times Out</h3><p><strong>1. Check network connectivity</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>ping 192.168.99.10
+</span></span><span style=display:flex><span>telnet 192.168.99.10 <span style=color:#ae81ff>22</span>
+</span></span></code></pre></div><p><strong>2. Verify default gateway</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show running-config | include ip default-gateway
+</code></pre><p><strong>3. Check interface status</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show ip interface brief
+Switch# show interface vlan 99
+</code></pre><h3 id=aaa-server-unreachable>AAA Server Unreachable</h3><p>If using TACACS+/RADIUS and server is down:</p><p><strong>Ensure local fallback is configured:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show running-config | include aaa authentication
+aaa authentication login default group tacacs+ local
+</code></pre><p>If missing <code>local</code>:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# aaa authentication login default group tacacs+ local
+</code></pre><hr><h2 id=complete-remote-access-configuration>Complete Remote Access Configuration</h2><p>Here&rsquo;s a complete, secure remote access setup:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Set hostname and domain
+hostname CoreSwitch
+ip domain-name company.local
+
+! Generate SSH keys
+crypto key generate rsa modulus 2048
+
+! Configure SSH
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 3
+
+! Create local users
+username admin privilege 15 algorithm-type scrypt secret Admin!SecureP@ss123
+username engineer privilege 15 secret Engineer!P@ss456
+username viewer privilege 1 secret Viewer!P@ss789
+
+! Create management VLAN
+vlan 99
+ name MANAGEMENT
+ exit
+
+! Configure management interface
+interface vlan 99
+ ip address 192.168.99.10 255.255.255.0
+ no shutdown
+ description Management Interface
+ exit
+
+! Set default gateway
+ip default-gateway 192.168.99.1
+
+! Create access list for SSH
+access-list 10 remark SSH Access from Management Network
+access-list 10 permit 192.168.100.0 0.0.0.255
+access-list 10 deny any log
+
+! Configure VTY lines
+line vty 0 15
+ transport input ssh
+ login local
+ access-class 10 in
+ exec-timeout 10 0
+ logging synchronous
+ exit
+
+! Configure console (for comparison)
+line console 0
+ logging synchronous
+ exec-timeout 5 0
+ exit
+
+! Enable logging
+logging buffered 51200
+service timestamps log datetime msec
+service timestamps debug datetime msec
+
+! Configure login banner
+banner login ^C
+*******************************************************************************
+*  WARNING: Unauthorized access prohibited!                                  *
+*  All activities are logged and monitored.                                  *
+*******************************************************************************
+^C
+
+! Save configuration
+end
+write memory
+</code></pre><hr><h2 id=remote-access-checklist>Remote Access Checklist</h2><h3 id=pre-configuration>Pre-Configuration</h3><ul><li><input disabled type=checkbox> Plan IP addressing scheme</li><li><input disabled type=checkbox> Document management VLAN</li><li><input disabled type=checkbox> Plan ACL for SSH access</li><li><input disabled type=checkbox> Prepare user accounts</li><li><input disabled type=checkbox> Test network connectivity</li></ul><h3 id=configuration>Configuration</h3><ul><li><input disabled type=checkbox> Hostname configured</li><li><input disabled type=checkbox> Domain name configured</li><li><input disabled type=checkbox> Management IP assigned</li><li><input disabled type=checkbox> Default gateway configured</li><li><input disabled type=checkbox> RSA keys generated (2048-bit minimum)</li><li><input disabled type=checkbox> SSH version 2 enabled</li><li><input disabled type=checkbox> Local user accounts created</li><li><input disabled type=checkbox> VTY lines configured for SSH only</li><li><input disabled type=checkbox> Access control list created and applied</li><li><input disabled type=checkbox> Session timeout configured</li><li><input disabled type=checkbox> Logging enabled</li><li><input disabled type=checkbox> Banner configured</li><li><input disabled type=checkbox> Configuration saved</li></ul><h3 id=testing>Testing</h3><ul><li><input disabled type=checkbox> SSH from authorized network works</li><li><input disabled type=checkbox> SSH from unauthorized network blocked</li><li><input disabled type=checkbox> Telnet blocked (if applicable)</li><li><input disabled type=checkbox> Session timeout works</li><li><input disabled type=checkbox> Logging captures SSH sessions</li><li><input disabled type=checkbox> User authentication works</li><li><input disabled type=checkbox> AAA fallback works (if configured)</li></ul><h3 id=documentation>Documentation</h3><ul><li><input disabled type=checkbox> Management IP documented</li><li><input disabled type=checkbox> User accounts documented</li><li><input disabled type=checkbox> ACL details documented</li><li><input disabled type=checkbox> Network diagram updated</li><li><input disabled type=checkbox> Password vault updated</li></ul><hr><h2 id=quick-reference-commands>Quick Reference Commands</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>! Basic IP configuration
+interface vlan 99
+ ip address 192.168.99.10 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 192.168.99.1
+
+! SSH configuration
+hostname Switch
+ip domain-name company.local
+crypto key generate rsa modulus 2048
+ip ssh version 2
+
+! User and VTY configuration
+username admin privilege 15 secret AdminPass123!
+line vty 0 15
+ transport input ssh
+ login local
+ exec-timeout 10 0
+
+! Verification
+show ip interface brief
+show ip ssh
+show ssh
+show users
+show running-config | section line vty
+
+! Troubleshooting
+show crypto key mypubkey rsa
+show access-lists
+debug ip ssh
+</code></pre><hr><h2 id=security-best-practices>Security Best Practices</h2><ol><li><strong>Always use SSH, never Telnet</strong> - encryption is essential</li><li><strong>Generate strong RSA keys</strong> - 2048 bits minimum</li><li><strong>Implement access control lists</strong> - restrict source IPs</li><li><strong>Use individual user accounts</strong> - no shared passwords</li><li><strong>Enable session timeouts</strong> - 10 minutes maximum</li><li><strong>Configure AAA with local fallback</strong> - don&rsquo;t lock yourself out</li><li><strong>Use dedicated management VLAN</strong> - separate from user traffic</li><li><strong>Enable logging</strong> - monitor all access</li><li><strong>Display legal banner</strong> - warn unauthorized users</li><li><strong>Keep SSH updated</strong> - use latest IOS version with security patches</li></ol></div></div><script src=/assets/shared-nav.js></script></body></html>

@@ -1,0 +1,637 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>AWS & GitHub OIDC Integration // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>AWS & GitHub OIDC Integration</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/authenticationaws-github-oidc/>Authenticationaws Github Oidc</a></div><div class="card markdown-content"><h1 id=aws--github-oidc-for-terraform-deployments>AWS & GitHub OIDC for Terraform Deployments</h1><p>Setting up OpenID Connect (OIDC) between AWS and GitHub Actions to deploy Terraform infrastructure without long-lived credentials.</p><hr><h2 id=why-oidc>Why OIDC?</h2><p><strong>Traditional Approach Problems:</strong></p><pre tabindex=0><code>GitHub Actions → AWS Access Key + Secret → Security Risk
+├─ Long-lived credentials stored in GitHub Secrets
+├─ Credentials can be exfiltrated
+├─ Manual rotation required
+└─ Broad permissions difficult to scope
+</code></pre><p><strong>OIDC Approach Benefits:</strong></p><pre tabindex=0><code>GitHub Actions → OIDC Token → AWS IAM Role → Temporary Credentials
+├─ No long-lived credentials to store
+├─ Tokens are short-lived (hours)
+├─ Fine-grained trust policies
+└─ Automatic credential rotation
+</code></pre><hr><h2 id=architecture-overview>Architecture Overview</h2><pre tabindex=0><code>┌─────────────────────────────────────────────────────────────────┐
+│ GitHub Actions Workflow                                         │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 1. Request OIDC token from GitHub                        │  │
+│  │    Token includes: repo, branch, environment, etc.       │  │
+│  └────────────────────┬─────────────────────────────────────┘  │
+│                       │                                          │
+│                       ▼                                          │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 2. Assume AWS IAM Role using OIDC token                  │  │
+│  │    aws-actions/configure-aws-credentials@v4              │  │
+│  └────────────────────┬─────────────────────────────────────┘  │
+└────────────────────────┼──────────────────────────────────────┘
+                         │
+                         │ OIDC Token
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ AWS Account                                                      │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 3. OIDC Identity Provider                                 │  │
+│  │    Validates token signature from GitHub                  │  │
+│  └────────────────────┬─────────────────────────────────────┘  │
+│                       │                                          │
+│                       ▼                                          │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 4. IAM Role with Trust Policy                             │  │
+│  │    Validates: repo, branch, environment claims            │  │
+│  └────────────────────┬─────────────────────────────────────┘  │
+│                       │                                          │
+│                       ▼                                          │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 5. Return Temporary AWS Credentials                       │  │
+│  │    Valid for 1 hour (default)                             │  │
+│  └────────────────────┬─────────────────────────────────────┘  │
+└────────────────────────┼──────────────────────────────────────┘
+                         │
+                         │ Temporary Credentials
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ GitHub Actions Workflow (continued)                             │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 6. Run Terraform commands                                 │  │
+│  │    terraform plan / terraform apply                       │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre><hr><h2 id=step-1-create-aws-oidc-identity-provider>Step 1: Create AWS OIDC Identity Provider</h2><h3 id=using-aws-console>Using AWS Console</h3><ol><li>Navigate to IAM → Identity Providers → Add Provider</li><li>Configure provider:<ul><li>Provider Type: <code>OpenID Connect</code></li><li>Provider URL: <code>https://token.actions.githubusercontent.com</code></li><li>Audience: <code>sts.amazonaws.com</code></li></ul></li></ol><h3 id=using-terraform>Using Terraform</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#75715e># oidc-provider.tf
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_openid_connect_provider&#34; &#34;github_actions&#34;</span> {
+</span></span><span style=display:flex><span>  url <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;https://token.actions.githubusercontent.com&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  client_id_list <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;sts.amazonaws.com&#34;</span>,
+</span></span><span style=display:flex><span>  ]<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  # Get from: https://github.com/aws-actions/configure-aws-credentials
+</span></span></span><span style=display:flex><span>  thumbprint_list <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;6938fd4d98bab03faadb97b34396831e3780aea1&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;1c58a3a8518e8759bf075b76b750d4f2df264fcd&#34;</span>
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  tags <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>    Name        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;github-actions-oidc&#34;</span>
+</span></span><span style=display:flex><span>    Description <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;OIDC provider for GitHub Actions&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>Note:</strong> Thumbprints can be verified at the <a href=https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect>GitHub OIDC documentation</a>.</p><hr><h2 id=step-2-create-iam-role-with-trust-policy>Step 2: Create IAM Role with Trust Policy</h2><h3 id=basic-trust-policy>Basic Trust Policy</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#75715e># iam-role.tf
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>data</span> <span style=color:#e6db74>&#34;aws_iam_policy_document&#34; &#34;github_actions_assume_role&#34;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>principals</span> {
+</span></span><span style=display:flex><span>      type        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Federated&#34;</span>
+</span></span><span style=display:flex><span>      identifiers <span style=color:#f92672>=</span> [<span style=color:#66d9ef>aws_iam_openid_connect_provider</span>.<span style=color:#66d9ef>github_actions</span>.<span style=color:#66d9ef>arn</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;sts:AssumeRoleWithWebIdentity&#34;</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>      test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringEquals&#34;</span>
+</span></span><span style=display:flex><span>      variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:aud&#34;</span>
+</span></span><span style=display:flex><span>      values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;sts.amazonaws.com&#34;</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>      test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringLike&#34;</span>
+</span></span><span style=display:flex><span>      variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:sub&#34;</span>
+</span></span><span style=display:flex><span>      values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;repo:your-org/your-repo:*&#34;</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role&#34; &#34;github_actions_terraform&#34;</span> {
+</span></span><span style=display:flex><span>  name               <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;github-actions-terraform-role&#34;</span>
+</span></span><span style=display:flex><span>  assume_role_policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>data</span>.<span style=color:#66d9ef>aws_iam_policy_document</span>.<span style=color:#66d9ef>github_actions_assume_role</span>.<span style=color:#66d9ef>json</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  tags <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>    Name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GitHub Actions Terraform Role&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=restrictive-trust-policy-recommended>Restrictive Trust Policy (Recommended)</h3><p>Limit access to specific branches and environments:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>data</span> <span style=color:#e6db74>&#34;aws_iam_policy_document&#34; &#34;github_actions_assume_role_restricted&#34;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>principals</span> {
+</span></span><span style=display:flex><span>      type        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Federated&#34;</span>
+</span></span><span style=display:flex><span>      identifiers <span style=color:#f92672>=</span> [<span style=color:#66d9ef>aws_iam_openid_connect_provider</span>.<span style=color:#66d9ef>github_actions</span>.<span style=color:#66d9ef>arn</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;sts:AssumeRoleWithWebIdentity&#34;</span>]<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    # Must match audience
+</span></span></span><span style=display:flex><span>    <span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>      test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringEquals&#34;</span>
+</span></span><span style=display:flex><span>      variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:aud&#34;</span>
+</span></span><span style=display:flex><span>      values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;sts.amazonaws.com&#34;</span>]
+</span></span><span style=display:flex><span>    }<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    # Only from main branch
+</span></span></span><span style=display:flex><span>    <span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>      test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringEquals&#34;</span>
+</span></span><span style=display:flex><span>      variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:sub&#34;</span>
+</span></span><span style=display:flex><span>      values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;repo:your-org/your-repo:ref:refs/heads/main&#34;</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  # Separate statement for production environment
+</span></span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>principals</span> {
+</span></span><span style=display:flex><span>      type        <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Federated&#34;</span>
+</span></span><span style=display:flex><span>      identifiers <span style=color:#f92672>=</span> [<span style=color:#66d9ef>aws_iam_openid_connect_provider</span>.<span style=color:#66d9ef>github_actions</span>.<span style=color:#66d9ef>arn</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;sts:AssumeRoleWithWebIdentity&#34;</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>      test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringEquals&#34;</span>
+</span></span><span style=display:flex><span>      variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:aud&#34;</span>
+</span></span><span style=display:flex><span>      values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;sts.amazonaws.com&#34;</span>]
+</span></span><span style=display:flex><span>    }<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    # Only from production environment
+</span></span></span><span style=display:flex><span>    <span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>      test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringEquals&#34;</span>
+</span></span><span style=display:flex><span>      variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:sub&#34;</span>
+</span></span><span style=display:flex><span>      values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;repo:your-org/your-repo:environment:production&#34;</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=understanding-token-claims>Understanding Token Claims</h3><p>GitHub OIDC tokens include these claims you can validate:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;sub&#34;</span>: <span style=color:#e6db74>&#34;repo:octo-org/octo-repo:ref:refs/heads/main&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;aud&#34;</span>: <span style=color:#e6db74>&#34;sts.amazonaws.com&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;repository&#34;</span>: <span style=color:#e6db74>&#34;octo-org/octo-repo&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;repository_owner&#34;</span>: <span style=color:#e6db74>&#34;octo-org&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;ref&#34;</span>: <span style=color:#e6db74>&#34;refs/heads/main&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;sha&#34;</span>: <span style=color:#e6db74>&#34;abc123...&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;workflow&#34;</span>: <span style=color:#e6db74>&#34;Deploy&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;environment&#34;</span>: <span style=color:#e6db74>&#34;production&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;actor&#34;</span>: <span style=color:#e6db74>&#34;username&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>Common <code>sub</code> claim patterns:</strong></p><table><thead><tr><th>Pattern</th><th>Use Case</th></tr></thead><tbody><tr><td><code>repo:org/repo:*</code></td><td>Any workflow in the repository</td></tr><tr><td><code>repo:org/repo:ref:refs/heads/main</code></td><td>Only main branch</td></tr><tr><td><code>repo:org/repo:ref:refs/heads/*</code></td><td>Any branch</td></tr><tr><td><code>repo:org/repo:environment:prod</code></td><td>Only production environment</td></tr><tr><td><code>repo:org/repo:pull_request</code></td><td>Only pull requests</td></tr></tbody></table><hr><h2 id=step-3-attach-permissions-policy>Step 3: Attach Permissions Policy</h2><h3 id=terraform-admin-permissions-example>Terraform Admin Permissions (Example)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#75715e># iam-policies.tf
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>data</span> <span style=color:#e6db74>&#34;aws_iam_policy_document&#34; &#34;terraform_permissions&#34;</span> {<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  # Allow Terraform state operations
+</span></span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;s3:ListBucket&#34;</span>,
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>    resources <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;arn:aws:s3:::your-terraform-state-bucket&#34;</span>
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;s3:GetObject&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;s3:PutObject&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;s3:DeleteObject&#34;</span>,
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>    resources <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;arn:aws:s3:::your-terraform-state-bucket/*&#34;</span>
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  # DynamoDB for state locking
+</span></span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;dynamodb:DescribeTable&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;dynamodb:GetItem&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;dynamodb:PutItem&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;dynamodb:DeleteItem&#34;</span>,
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>    resources <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;arn:aws:dynamodb:*:*:table/terraform-state-lock&#34;</span>
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  # Resource permissions (adjust as needed)
+</span></span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;ec2:*&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;iam:*&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;s3:*&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;rds:*&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;lambda:*&#34;</span>,<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>      # Add other required services
+</span></span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>    resources <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;*&#34;</span>]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role_policy&#34; &#34;terraform_permissions&#34;</span> {
+</span></span><span style=display:flex><span>  name   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;terraform-permissions&#34;</span>
+</span></span><span style=display:flex><span>  role   <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_iam_role</span>.<span style=color:#66d9ef>github_actions_terraform</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>  policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>data</span>.<span style=color:#66d9ef>aws_iam_policy_document</span>.<span style=color:#66d9ef>terraform_permissions</span>.<span style=color:#66d9ef>json</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=least-privilege-example>Least Privilege Example</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#75715e># For a specific application deployment
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>data</span> <span style=color:#e6db74>&#34;aws_iam_policy_document&#34; &#34;app_deployment&#34;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;s3:ListBucket&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;s3:GetObject&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;s3:PutObject&#34;</span>,
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>    resources <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;arn:aws:s3:::app-deployment-bucket&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;arn:aws:s3:::app-deployment-bucket/*&#34;</span>,
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;lambda:UpdateFunctionCode&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;lambda:GetFunction&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;lambda:PublishVersion&#34;</span>,
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>    resources <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;arn:aws:lambda:us-east-1:123456789012:function:my-app-*&#34;</span>
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>    effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>    actions <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;cloudfront:CreateInvalidation&#34;</span>,
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>    resources <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;arn:aws:cloudfront::123456789012:distribution/E1234567890ABC&#34;</span>
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><hr><h2 id=step-4-github-actions-workflow>Step 4: GitHub Actions Workflow</h2><h3 id=basic-terraform-workflow>Basic Terraform Workflow</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># .github/workflows/terraform.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Deploy</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>push</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull_request</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Required for OIDC</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>permissions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>id-token</span>: <span style=color:#ae81ff>write  </span> <span style=color:#75715e># Required for requesting JWT</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>contents</span>: <span style=color:#ae81ff>read   </span> <span style=color:#75715e># Required for checking out code</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>terraform</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Plan &amp; Apply</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Checkout code</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS credentials</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@v4</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>arn:aws:iam::123456789012:role/github-actions-terraform-role</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>us-east-1</span>
+</span></span><span style=display:flex><span>          <span style=color:#75715e># Optional: role session name for CloudTrail</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>role-session-name</span>: <span style=color:#ae81ff>GitHubActions-${{ github.run_id }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Verify AWS identity</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>aws sts get-caller-identity</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup Terraform</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>hashicorp/setup-terraform@v3</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>terraform_version</span>: <span style=color:#ae81ff>1.7.0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Init</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform init</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Validate</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform validate</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform plan -no-color -out=tfplan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Apply</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.ref == &#39;refs/heads/main&#39; &amp;&amp; github.event_name == &#39;push&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform apply -auto-approve tfplan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span></code></pre></div><h3 id=multi-environment-workflow>Multi-Environment Workflow</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># .github/workflows/terraform-multi-env.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Multi-Environment</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>push</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main, staging, dev]</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull_request</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main, staging, dev]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>permissions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>id-token</span>: <span style=color:#ae81ff>write</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>contents</span>: <span style=color:#ae81ff>read</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>determine-environment</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>outputs</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ steps.set-env.outputs.environment }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>${{ steps.set-env.outputs.aws-region }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>role-arn</span>: <span style=color:#ae81ff>${{ steps.set-env.outputs.role-arn }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Determine environment</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>set-env</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          if [ &#34;${{ github.ref }}&#34; == &#34;refs/heads/main&#34; ]; then
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;environment=production&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;aws-region=us-east-1&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;role-arn=arn:aws:iam::123456789012:role/github-terraform-prod&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          elif [ &#34;${{ github.ref }}&#34; == &#34;refs/heads/staging&#34; ]; then
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;environment=staging&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;aws-region=us-west-2&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;role-arn=arn:aws:iam::123456789012:role/github-terraform-staging&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          else
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;environment=dev&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;aws-region=us-west-2&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;role-arn=arn:aws:iam::123456789012:role/github-terraform-dev&#34; &gt;&gt; $GITHUB_OUTPUT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          fi</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>terraform</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>needs</span>: <span style=color:#ae81ff>determine-environment</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ needs.determine-environment.outputs.environment }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS credentials</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@v4</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>${{ needs.determine-environment.outputs.role-arn }}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>${{ needs.determine-environment.outputs.aws-region }}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>role-session-name</span>: <span style=color:#ae81ff>TF-${{ needs.determine-environment.outputs.environment }}-${{ github.run_id }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup Terraform</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>hashicorp/setup-terraform@v3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Init</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          terraform init \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            -backend-config=&#34;key=${{ needs.determine-environment.outputs.environment }}/terraform.tfstate&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          terraform plan \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            -var-file=&#34;environments/${{ needs.determine-environment.outputs.environment }}.tfvars&#34; \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            -out=tfplan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Apply</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.event_name == &#39;push&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform apply -auto-approve tfplan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span></code></pre></div><h3 id=workflow-with-plan-comments-on-prs>Workflow with Plan Comments on PRs</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># .github/workflows/terraform-pr-comment.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform PR Plan</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull_request</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>permissions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>id-token</span>: <span style=color:#ae81ff>write</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>contents</span>: <span style=color:#ae81ff>read</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>pull-requests</span>: <span style=color:#ae81ff>write </span> <span style=color:#75715e># Required to post comments</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>terraform-plan</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v4</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS credentials</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@v4</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>arn:aws:iam::123456789012:role/github-actions-terraform-role</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>us-east-1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup Terraform</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>hashicorp/setup-terraform@v3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Init</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform init</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>plan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>terraform plan -no-color -out=tfplan</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>working-directory</span>: <span style=color:#ae81ff>./terraform</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>continue-on-error</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Comment Plan on PR</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/github-script@v7</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>github-token</span>: <span style=color:#ae81ff>${{ secrets.GITHUB_TOKEN }}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            const output = `#### Terraform Plan 📖
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            \`\`\`
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            ${{ steps.plan.outputs.stdout }}
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            \`\`\`
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            github.rest.issues.createComment({
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              issue_number: context.issue.number,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              owner: context.repo.owner,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              repo: context.repo.repo,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>              body: output
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            })</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Terraform Plan Status</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>steps.plan.outcome == &#39;failure&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>exit 1</span>
+</span></span></code></pre></div><hr><h2 id=step-5-terraform-backend-configuration>Step 5: Terraform Backend Configuration</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#75715e># backend.tf
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>terraform</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>backend</span> <span style=color:#e6db74>&#34;s3&#34;</span> {
+</span></span><span style=display:flex><span>    bucket         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;your-terraform-state-bucket&#34;</span>
+</span></span><span style=display:flex><span>    key            <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;production/terraform.tfstate&#34;</span>
+</span></span><span style=display:flex><span>    region         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;us-east-1&#34;</span>
+</span></span><span style=display:flex><span>    encrypt        <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    dynamodb_table <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;terraform-state-lock&#34;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    # Use the IAM role from OIDC, not access keys
+</span></span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><hr><h2 id=complete-example-repository-structure>Complete Example Repository Structure</h2><pre tabindex=0><code>terraform-aws-infrastructure/
+├── .github/
+│   └── workflows/
+│       ├── terraform.yml
+│       └── terraform-pr.yml
+├── terraform/
+│   ├── environments/
+│   │   ├── dev.tfvars
+│   │   ├── staging.tfvars
+│   │   └── production.tfvars
+│   ├── modules/
+│   │   ├── vpc/
+│   │   ├── ecs/
+│   │   └── rds/
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── versions.tf
+└── iam/
+    ├── oidc-provider.tf
+    ├── iam-role.tf
+    └── iam-policies.tf
+</code></pre><hr><h2 id=troubleshooting>Troubleshooting</h2><h3 id=error-not-authorized-to-perform-stsassumerolewithwebidentity>Error: &ldquo;Not authorized to perform sts:AssumeRoleWithWebIdentity&rdquo;</h3><p><strong>Cause:</strong> Trust policy doesn&rsquo;t match the token claims.</p><p><strong>Solution:</strong> Check the <code>sub</code> claim in your trust policy:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Decode the OIDC token to see claims</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Add this to your workflow temporarily:</span>
+</span></span><span style=display:flex><span>- name: Debug OIDC Token
+</span></span><span style=display:flex><span>  run: |
+</span></span><span style=display:flex><span>    OIDC_TOKEN<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>curl -H <span style=color:#e6db74>&#34;Authorization: bearer </span>$ACTIONS_ID_TOKEN_REQUEST_TOKEN<span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>      <span style=color:#e6db74>&#34;</span>$ACTIONS_ID_TOKEN_REQUEST_URL<span style=color:#e6db74>&amp;audience=sts.amazonaws.com&#34;</span> | jq -r <span style=color:#e6db74>&#39;.value&#39;</span><span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>    echo $OIDC_TOKEN | cut -d <span style=color:#e6db74>&#39;.&#39;</span> -f2 | base64 -d | jq
+</span></span></code></pre></div><p>Common issues:</p><ul><li>Trust policy specifies <code>ref:refs/heads/main</code> but workflow runs on a tag</li><li>Trust policy specifies <code>environment:production</code> but workflow doesn&rsquo;t use environments</li><li>Repository name mismatch (case-sensitive)</li></ul><h3 id=error-an-error-occurred-validationerror-when-calling-the-createidentityprovider-operation>Error: &ldquo;An error occurred (ValidationError) when calling the CreateIdentityProvider operation&rdquo;</h3><p><strong>Cause:</strong> Invalid thumbprint.</p><p><strong>Solution:</strong> Use the correct thumbprints from GitHub&rsquo;s documentation or calculate them:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Calculate thumbprint manually</span>
+</span></span><span style=display:flex><span>echo | openssl s_client -servername token.actions.githubusercontent.com <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  -showcerts -connect token.actions.githubusercontent.com:443 2&gt;&amp;<span style=color:#ae81ff>1</span> | <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  sed -n <span style=color:#e6db74>&#39;/BEGIN/,/END/p&#39;</span> | <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  openssl x509 -fingerprint -sha1 -noout | <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  sed <span style=color:#e6db74>&#39;s/://g&#39;</span> | <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  awk -F<span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;{print tolower($2)}&#39;</span>
+</span></span></code></pre></div><h3 id=error-terraform-state-locking-failed>Error: &ldquo;Terraform state locking failed&rdquo;</h3><p><strong>Cause:</strong> IAM role doesn&rsquo;t have DynamoDB permissions.</p><p><strong>Solution:</strong> Ensure your IAM policy includes DynamoDB permissions for state locking.</p><h3 id=token-expiration-issues>Token Expiration Issues</h3><p><strong>Cause:</strong> Workflow takes longer than token lifetime (default 1 hour).</p><p><strong>Solution:</strong> Adjust the duration:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS credentials</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@v4</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>arn:aws:iam::123456789012:role/github-actions-terraform-role</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>us-east-1</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>role-duration-seconds</span>: <span style=color:#ae81ff>3600</span>  <span style=color:#75715e># 1 hour (default)</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Max is 12 hours if role&#39;s max session duration is configured</span>
+</span></span></code></pre></div><p>Set max session duration in IAM role:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role&#34; &#34;github_actions_terraform&#34;</span> {
+</span></span><span style=display:flex><span>  name                 <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;github-actions-terraform-role&#34;</span>
+</span></span><span style=display:flex><span>  assume_role_policy   <span style=color:#f92672>=</span> <span style=color:#66d9ef>data</span>.<span style=color:#66d9ef>aws_iam_policy_document</span>.<span style=color:#66d9ef>github_actions_assume_role</span>.<span style=color:#66d9ef>json</span>
+</span></span><span style=display:flex><span>  max_session_duration <span style=color:#f92672>=</span> <span style=color:#ae81ff>43200</span><span style=color:#75715e>  # 12 hours
+</span></span></span><span style=display:flex><span>}
+</span></span></code></pre></div><hr><h2 id=security-best-practices>Security Best Practices</h2><h3 id=1-principle-of-least-privilege>1. Principle of Least Privilege</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#75715e># Bad: Too permissive
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>  effect    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>  actions   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;*&#34;</span>]
+</span></span><span style=display:flex><span>  resources <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;*&#34;</span>]
+</span></span><span style=display:flex><span>}<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Good: Specific permissions
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>statement</span> {
+</span></span><span style=display:flex><span>  effect <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Allow&#34;</span>
+</span></span><span style=display:flex><span>  actions <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;s3:GetObject&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;s3:PutObject&#34;</span>,
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>  resources <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;arn:aws:s3:::specific-bucket/*&#34;</span>
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=2-restrict-by-environment>2. Restrict by Environment</h3><p>Use GitHub environments with protection rules:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># .github/workflows/terraform.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>terraform</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environment</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>production</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>url</span>: <span style=color:#ae81ff>https://console.aws.amazon.com</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Requires approval before running</span>
+</span></span></code></pre></div><p>Configure in GitHub:</p><ul><li>Settings → Environments → production</li><li>Add required reviewers</li><li>Add deployment branch rules</li></ul><h3 id=3-separate-roles-per-environment>3. Separate Roles per Environment</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#75715e># Production role - restrictive
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role&#34; &#34;github_terraform_prod&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;github-terraform-prod&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  assume_role_policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>data</span>.<span style=color:#66d9ef>aws_iam_policy_document</span>.<span style=color:#66d9ef>prod_trust</span>.<span style=color:#66d9ef>json</span>
+</span></span><span style=display:flex><span>}<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Dev role - more permissive
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_iam_role&#34; &#34;github_terraform_dev&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;github-terraform-dev&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  assume_role_policy <span style=color:#f92672>=</span> <span style=color:#66d9ef>data</span>.<span style=color:#66d9ef>aws_iam_policy_document</span>.<span style=color:#66d9ef>dev_trust</span>.<span style=color:#66d9ef>json</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=4-enable-cloudtrail-logging>4. Enable CloudTrail Logging</h3><p>Monitor all API calls made by GitHub Actions:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;aws_cloudtrail&#34; &#34;github_actions&#34;</span> {
+</span></span><span style=display:flex><span>  name           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;github-actions-audit&#34;</span>
+</span></span><span style=display:flex><span>  s3_bucket_name <span style=color:#f92672>=</span> <span style=color:#66d9ef>aws_s3_bucket</span>.<span style=color:#66d9ef>cloudtrail</span>.<span style=color:#66d9ef>id</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>event_selector</span> {
+</span></span><span style=display:flex><span>    read_write_type           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;All&#34;</span>
+</span></span><span style=display:flex><span>    include_management_events <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>data_resource</span> {
+</span></span><span style=display:flex><span>      type   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;AWS::S3::Object&#34;</span>
+</span></span><span style=display:flex><span>      values <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;arn:aws:s3:::*/*&#34;</span>]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  tags <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>    Purpose <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;GitHub Actions OIDC Audit&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=5-use-condition-keys>5. Use Condition Keys</h3><p>Add additional security conditions:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>  test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringEquals&#34;</span>
+</span></span><span style=display:flex><span>  variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:sub&#34;</span>
+</span></span><span style=display:flex><span>  values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;repo:your-org/your-repo:ref:refs/heads/main&#34;</span>]
+</span></span><span style=display:flex><span>}<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Additional: Require specific actor
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>  test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringLike&#34;</span>
+</span></span><span style=display:flex><span>  variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:actor&#34;</span>
+</span></span><span style=display:flex><span>  values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;approved-user-1&#34;, &#34;approved-user-2&#34;</span>]
+</span></span><span style=display:flex><span>}<span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e># Additional: Limit to specific workflows
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>condition</span> {
+</span></span><span style=display:flex><span>  test     <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;StringEquals&#34;</span>
+</span></span><span style=display:flex><span>  variable <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;token.actions.githubusercontent.com:workflow&#34;</span>
+</span></span><span style=display:flex><span>  values   <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;Terraform Deploy&#34;</span>]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><hr><h2 id=migration-from-access-keys>Migration from Access Keys</h2><h3 id=before-access-keys>Before (Access Keys)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS credentials</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@v4</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>aws-access-key-id</span>: <span style=color:#ae81ff>${{ secrets.AWS_ACCESS_KEY_ID }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>aws-secret-access-key</span>: <span style=color:#ae81ff>${{ secrets.AWS_SECRET_ACCESS_KEY }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>us-east-1</span>
+</span></span></code></pre></div><h3 id=after-oidc>After (OIDC)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>permissions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>id-token</span>: <span style=color:#ae81ff>write</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>contents</span>: <span style=color:#ae81ff>read</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># ...</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Configure AWS credentials</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>aws-actions/configure-aws-credentials@v4</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>role-to-assume</span>: <span style=color:#ae81ff>arn:aws:iam::123456789012:role/github-actions-terraform-role</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>aws-region</span>: <span style=color:#ae81ff>us-east-1</span>
+</span></span></code></pre></div><h3 id=migration-checklist>Migration Checklist</h3><ul><li><input disabled type=checkbox> Create OIDC identity provider in AWS</li><li><input disabled type=checkbox> Create IAM role with trust policy</li><li><input disabled type=checkbox> Attach necessary permissions policies</li><li><input disabled type=checkbox> Update GitHub Actions workflow</li><li><input disabled type=checkbox> Test with PR first</li><li><input disabled type=checkbox> Deploy to production</li><li><input disabled type=checkbox> Remove access keys from GitHub Secrets</li><li><input disabled type=checkbox> Delete IAM user (if no longer needed)</li><li><input disabled type=checkbox> Update documentation</li></ul><hr><h2 id=quick-reference>Quick Reference</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Common AWS CLI commands for verification</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Verify OIDC provider exists</span>
+</span></span><span style=display:flex><span>aws iam list-open-id-connect-providers
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Get OIDC provider details</span>
+</span></span><span style=display:flex><span>aws iam get-open-id-connect-provider <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --open-id-connect-provider-arn arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># List roles</span>
+</span></span><span style=display:flex><span>aws iam list-roles | jq <span style=color:#e6db74>&#39;.Roles[] | select(.RoleName | contains(&#34;github&#34;))&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Get role trust policy</span>
+</span></span><span style=display:flex><span>aws iam get-role --role-name github-actions-terraform-role | jq <span style=color:#e6db74>&#39;.Role.AssumeRolePolicyDocument&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Get role permissions</span>
+</span></span><span style=display:flex><span>aws iam list-attached-role-policies --role-name github-actions-terraform-role
+</span></span><span style=display:flex><span>aws iam list-role-policies --role-name github-actions-terraform-role
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Test assume role (from GitHub Actions)</span>
+</span></span><span style=display:flex><span>aws sts assume-role-with-web-identity <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --role-arn arn:aws:iam::123456789012:role/github-actions-terraform-role <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --role-session-name test-session <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --web-identity-token $OIDC_TOKEN
+</span></span></code></pre></div><h3 id=useful-links>Useful Links</h3><ul><li><a href=https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect>GitHub OIDC Documentation</a></li><li><a href=https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html>AWS IAM OIDC Identity Providers</a></li><li><a href=https://github.com/aws-actions/configure-aws-credentials>configure-aws-credentials Action</a></li><li><a href=https://registry.terraform.io/providers/hashicorp/aws/latest/docs>Terraform AWS Provider</a></li></ul></div></div><script src=/assets/shared-nav.js></script></body></html>

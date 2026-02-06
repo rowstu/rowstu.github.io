@@ -1,0 +1,93 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Reconfiguring a Cisco Switch // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Reconfiguring a Cisco Switch</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ciscoreconfiguration/>Ciscoreconfiguration</a></div><div class="card markdown-content"><h1 id=reconfiguring-a-cisco-switch-from-scratch>Reconfiguring a Cisco Switch from Scratch</h1><p>How to completely reset and reconfigure a Cisco switch that has existing configuration.</p><hr><h2 id=pre-reconfiguration-checklist>Pre-Reconfiguration Checklist</h2><p>Before wiping a switch, ensure:</p><ul><li><input disabled type=checkbox> You have console access</li><li><input disabled type=checkbox> You&rsquo;ve backed up the current configuration (if needed)</li><li><input disabled type=checkbox> You understand the current network topology</li><li><input disabled type=checkbox> You have authorization to reset the device</li><li><input disabled type=checkbox> You have the new configuration ready</li></ul><hr><h2 id=option-1-delete-configuration-and-reload>Option 1: Delete Configuration and Reload</h2><h3 id=step-1-backup-current-configuration-optional>Step 1: Backup Current Configuration (Optional)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show running-config
+# Copy output to text file
+
+# Or via TFTP
+Switch# copy running-config tftp:
+# Enter TFTP server IP and filename
+</code></pre><h3 id=step-2-erase-startup-configuration>Step 2: Erase Startup Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# write erase
+Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
+[OK]
+Erase of nvram: complete
+</code></pre><p><strong>Alternative commands:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# erase startup-config
+# Or
+Switch# erase nvram:
+</code></pre><h3 id=step-3-delete-vlan-database>Step 3: Delete VLAN Database</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# delete flash:vlan.dat
+Delete filename [vlan.dat]? [Enter]
+Delete flash:vlan.dat? [confirm] [Enter]
+</code></pre><p><strong>Note:</strong> This is critical! If you don&rsquo;t delete vlan.dat, old VLAN configurations will persist.</p><h3 id=step-4-reload-the-switch>Step 4: Reload the Switch</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# reload
+System configuration has been modified. Save? [yes/no]: no
+Proceed with reload? [confirm] [Enter]
+</code></pre><h3 id=step-5-post-reload>Step 5: Post-Reload</h3><p>After reboot, the switch will be in factory default state:</p><pre tabindex=0><code>Would you like to enter the initial configuration dialog? [yes/no]: no
+</code></pre><p>Type <code>no</code> and configure manually.</p><hr><h2 id=option-2-factory-reset-physical-button-method>Option 2: Factory Reset (Physical Button Method)</h2><p>Some Cisco switches have a physical mode button:</p><ol><li><strong>Power off</strong> the switch</li><li><strong>Hold the Mode button</strong> while powering on</li><li><strong>Continue holding</strong> for 10-15 seconds until LED stops flashing</li><li><strong>Release</strong> - switch will boot with blank configuration</li></ol><p><strong>Note:</strong> Not all models support this method.</p><hr><h2 id=option-3-partial-configuration-reset>Option 3: Partial Configuration Reset</h2><p>If you want to keep some settings and remove others:</p><h3 id=remove-specific-configuration-sections>Remove Specific Configuration Sections</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# configure terminal
+
+! Remove all interface configurations
+Switch(config)# default interface gigabitethernet 0/1
+Switch(config)# default interface range gi0/1-24
+
+! Remove specific VLAN
+Switch(config)# no vlan 10
+
+! Remove all VLANs except 1, 1002-1005
+Switch(config)# no vlan 2-1001
+
+! Remove routing configuration
+Switch(config)# no ip routing
+
+! Remove all access lists
+Switch(config)# no access-list 10
+</code></pre><hr><h2 id=dealing-with-existing-passwords>Dealing with Existing Passwords</h2><h3 id=if-you-know-the-enable-password>If You Know the Enable Password</h3><p>Simply login and proceed with reset.</p><h3 id=if-you-dont-know-the-password>If You Don&rsquo;t Know the Password</h3><p>See <a href=password-recovery.md>Password Recovery Guide</a> for detailed steps.</p><p><strong>Quick summary:</strong></p><ol><li>Interrupt boot process</li><li>Bypass startup-config</li><li>Reset or recover password</li><li>Boot normally</li></ol><hr><h2 id=verifying-complete-reset>Verifying Complete Reset</h2><p>After reload, verify the switch is in default state:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch&gt; enable
+Switch# show running-config
+</code></pre><p>You should see minimal configuration:</p><ul><li>Default hostname &ldquo;Switch&rdquo;</li><li>No passwords configured</li><li>All interfaces in default state</li><li>Only VLAN 1 exists</li></ul><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show vlan brief
+# Should only show VLAN 1, 1002-1005 (default)
+
+Switch# show ip interface brief
+# VLAN 1 should be unassigned with no IP
+</code></pre><hr><h2 id=post-reset-configuration-steps>Post-Reset Configuration Steps</h2><p>Now follow the <a href=basic-setup.md>Basic Setup Guide</a> to configure:</p><ol><li><strong>Set hostname</strong></li><li><strong>Configure enable password</strong></li><li><strong>Configure management IP</strong></li><li><strong>Set console and VTY passwords</strong></li><li><strong>Configure SSH</strong> (if remote access needed)</li><li><strong>Create VLANs</strong> (if needed)</li><li><strong>Configure interfaces</strong></li><li><strong>Set security settings</strong></li><li><strong>Save configuration</strong></li></ol><hr><h2 id=common-issues-and-solutions>Common Issues and Solutions</h2><h3 id=configuration-still-present-after-reload>Configuration Still Present After Reload</h3><p><strong>Problem:</strong> Old config returns after reload</p><p><strong>Solution:</strong> You forgot to erase startup-config</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# write erase
+Switch# reload
+</code></pre><h3 id=vlans-still-present-after-reset>VLANs Still Present After Reset</h3><p><strong>Problem:</strong> Old VLANs still exist</p><p><strong>Solution:</strong> Delete vlan.dat before reload</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# delete flash:vlan.dat
+Switch# reload
+</code></pre><h3 id=cannot-delete-vlandat>Cannot Delete vlan.dat</h3><p><strong>Problem:</strong> &ldquo;File is in use&rdquo; error</p><p><strong>Solution:</strong> Delete will work after next reload, or:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# no vlan 2-1001
+Switch# delete flash:vlan.dat
+</code></pre><h3 id=switch-hangs-during-reload>Switch Hangs During Reload</h3><p><strong>Problem:</strong> Switch not responding during reload</p><p><strong>Solution:</strong> Wait 5-10 minutes. If still hung, power cycle:</p><ol><li>Unplug power</li><li>Wait 30 seconds</li><li>Plug back in</li></ol><h3 id=lost-console-access-after-reset>Lost Console Access After Reset</h3><p><strong>Problem:</strong> Console not responding after reset</p><p><strong>Solution:</strong></p><ul><li>Check console cable</li><li>Verify baud rate (9600)</li><li>Press Enter several times</li><li>Wait for full boot (2-5 minutes)</li></ul><hr><h2 id=emergency-recovery-procedures>Emergency Recovery Procedures</h2><h3 id=if-configuration-is-corrupt>If Configuration is Corrupt</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# rename flash:config.text flash:config.old
+Switch# reload
+</code></pre><h3 id=if-switch-wont-boot-properly>If Switch Won&rsquo;t Boot Properly</h3><ol><li>Interrupt boot (Ctrl+Break or Break key)</li><li>Enter ROMMON mode</li><li>Format flash (WARNING: deletes everything)</li></ol><pre tabindex=0><code>switch: flash_init
+switch: format flash:
+# Confirm formatting
+switch: boot
+</code></pre><h3 id=if-you-need-to-preserve-specific-config>If You Need to Preserve Specific Config</h3><p>Before resetting, extract what you need:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! View specific configuration sections
+Switch# show running-config | section interface
+Switch# show running-config | section vlan
+Switch# show running-config | include ip address
+
+! Save to file via terminal capture
+</code></pre><hr><h2 id=configuration-replacement-method>Configuration Replacement Method</h2><p>Instead of deleting and starting fresh, you can replace configuration:</p><h3 id=using-configuration-replace>Using Configuration Replace</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Save new config to flash first
+Switch# copy tftp: flash:new-config.txt
+
+! Replace configuration
+Switch# configure replace flash:new-config.txt force
+
+! This replaces running-config without reload
+</code></pre><h3 id=using-merge-method>Using Merge Method</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Copy new configuration
+Switch# copy tftp: running-config
+
+! This merges new config with existing
+! Use with caution - doesn&#39;t remove old commands
+</code></pre><hr><h2 id=best-practices-for-reconfiguration>Best Practices for Reconfiguration</h2><ol><li><strong>Always backup first</strong> - even if you think you don&rsquo;t need it</li><li><strong>Document the reason</strong> - why are you resetting?</li><li><strong>Plan downtime</strong> - coordinate with users</li><li><strong>Have new config ready</strong> - don&rsquo;t wing it</li><li><strong>Test in maintenance window</strong> - not during business hours</li><li><strong>Verify connectivity</strong> - before and after</li><li><strong>Keep console access</strong> - don&rsquo;t rely on network access</li><li><strong>Save often</strong> - after each major configuration change</li><li><strong>Label the switch</strong> - physical labels with current config info</li><li><strong>Update documentation</strong> - immediately after changes</li></ol><hr><h2 id=reconfiguration-checklist>Reconfiguration Checklist</h2><h3 id=pre-work>Pre-Work</h3><ul><li><input disabled type=checkbox> Backup current configuration</li><li><input disabled type=checkbox> Document current setup</li><li><input disabled type=checkbox> Get change approval</li><li><input disabled type=checkbox> Schedule maintenance window</li><li><input disabled type=checkbox> Prepare new configuration</li><li><input disabled type=checkbox> Verify console access</li><li><input disabled type=checkbox> Notify affected users</li></ul><h3 id=execution>Execution</h3><ul><li><input disabled type=checkbox> Connect via console</li><li><input disabled type=checkbox> Backup one more time</li><li><input disabled type=checkbox> Erase startup-config</li><li><input disabled type=checkbox> Delete vlan.dat</li><li><input disabled type=checkbox> Reload switch</li><li><input disabled type=checkbox> Apply new configuration</li><li><input disabled type=checkbox> Verify basic connectivity</li><li><input disabled type=checkbox> Test all required functions</li><li><input disabled type=checkbox> Save configuration</li></ul><h3 id=post-work>Post-Work</h3><ul><li><input disabled type=checkbox> Document changes</li><li><input disabled type=checkbox> Update network diagrams</li><li><input disabled type=checkbox> Verify monitoring alerts</li><li><input disabled type=checkbox> Close change ticket</li><li><input disabled type=checkbox> Notify users of completion</li><li><input disabled type=checkbox> Backup new configuration</li></ul><hr><h2 id=quick-command-reference>Quick Command Reference</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>! Complete reset procedure
+write erase
+delete flash:vlan.dat
+reload
+
+! After reload
+enable
+configure terminal
+! Apply new configuration here
+end
+write memory
+
+! Verification
+show startup-config
+show running-config
+show vlan brief
+show ip interface brief
+show version
+</code></pre><hr><h2 id=time-estimates>Time Estimates</h2><ul><li><strong>Configuration backup:</strong> 5 minutes</li><li><strong>Erase and reload:</strong> 5-10 minutes</li><li><strong>Post-reload boot:</strong> 2-5 minutes</li><li><strong>Basic reconfiguration:</strong> 15-30 minutes</li><li><strong>Testing and verification:</strong> 10-20 minutes</li><li><strong>Total downtime:</strong> 30-60 minutes (typical)</li></ul><p><strong>Note:</strong> Plan for at least 2x the estimated time for unexpected issues.</p></div></div><script src=/assets/shared-nav.js></script></body></html>

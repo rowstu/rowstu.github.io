@@ -1,0 +1,476 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Cisco Switch Hardening // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Cisco Switch Hardening</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ciscohardening/>Ciscohardening</a></div><div class="card markdown-content"><h1 id=cisco-switch-security-hardening>Cisco Switch Security Hardening</h1><p>Comprehensive guide to hardening Cisco switches against attacks and unauthorized access.</p><hr><h2 id=security-hardening-overview>Security Hardening Overview</h2><p>Switch hardening involves multiple layers of security controls to protect against:</p><ul><li><strong>Unauthorized access</strong> - Physical and remote</li><li><strong>Network attacks</strong> - VLAN hopping, MAC flooding, ARP spoofing</li><li><strong>Layer 2 attacks</strong> - STP manipulation, DHCP starvation</li><li><strong>Password attacks</strong> - Brute force, dictionary attacks</li><li><strong>Denial of service</strong> - Resource exhaustion</li></ul><hr><h2 id=layer-1-physical-security>Layer 1: Physical Security</h2><h3 id=disable-unused-ports>Disable Unused Ports</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Disable and assign to parking VLAN
+Switch(config)# vlan 999
+Switch(config-vlan)# name PARKING_LOT
+Switch(config-vlan)# exit
+
+Switch(config)# interface range gigabitethernet 0/10-24
+Switch(config-if-range)# description UNUSED - DISABLED
+Switch(config-if-range)# switchport mode access
+Switch(config-if-range)# switchport access vlan 999
+Switch(config-if-range)# shutdown
+Switch(config-if-range)# exit
+</code></pre><h3 id=port-security>Port Security</h3><p>Prevent unauthorized devices from connecting:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable port security on access ports
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+Switch(config-if)# switchport port-security
+Switch(config-if)# switchport port-security maximum 2
+Switch(config-if)# switchport port-security violation restrict
+Switch(config-if)# switchport port-security mac-address sticky
+Switch(config-if)# switchport port-security aging time 120
+Switch(config-if)# exit
+</code></pre><p><strong>Violation Actions:</strong></p><ul><li><strong>protect</strong> - Drops packets, no log</li><li><strong>restrict</strong> - Drops packets, logs violation, increments counter</li><li><strong>shutdown</strong> - Disables port (most secure, requires manual recovery)</li></ul><p><strong>For maximum security:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config-if)# switchport port-security violation shutdown
+</code></pre><p><strong>To recover a shutdown port:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# shutdown
+Switch(config-if)# no shutdown
+Switch(config-if)# exit
+
+! Or globally
+Switch# clear port-security all
+</code></pre><h3 id=bpdu-guard>BPDU Guard</h3><p>Prevents rogue switches from affecting STP:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable globally on all PortFast ports
+Switch(config)# spanning-tree portfast bpduguard default
+
+! Or per-interface
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# spanning-tree bpduguard enable
+Switch(config-if)# exit
+</code></pre><h3 id=root-guard>Root Guard</h3><p>Prevents unauthorized switches from becoming root bridge:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# spanning-tree guard root
+Switch(config-if)# exit
+</code></pre><hr><h2 id=layer-2-access-control>Layer 2: Access Control</h2><h3 id=disable-cdp-on-untrusted-ports>Disable CDP on Untrusted Ports</h3><p>CDP leaks network information:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Disable CDP globally
+Switch(config)# no cdp run
+
+! Or per-interface
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# no cdp enable
+Switch(config-if)# exit
+</code></pre><p><strong>Keep CDP enabled only on trusted ports</strong> (switch-to-switch).</p><h3 id=disable-lldp-on-untrusted-ports>Disable LLDP on Untrusted Ports</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Disable LLDP globally
+Switch(config)# no lldp run
+
+! Or per-interface
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# no lldp transmit
+Switch(config-if)# no lldp receive
+Switch(config-if)# exit
+</code></pre><h3 id=private-vlans>Private VLANs</h3><p>Isolate hosts within the same VLAN:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# vtp mode transparent
+Switch(config)# vlan 100
+Switch(config-vlan)# private-vlan primary
+Switch(config-vlan)# private-vlan association 101,102
+Switch(config-vlan)# exit
+
+Switch(config)# vlan 101
+Switch(config-vlan)# private-vlan isolated
+Switch(config-vlan)# exit
+
+Switch(config)# vlan 102
+Switch(config-vlan)# private-vlan community
+Switch(config-vlan)# exit
+
+! Configure promiscuous port (gateway)
+Switch(config)# interface gigabitethernet 0/1
+Switch(config-if)# switchport mode private-vlan promiscuous
+Switch(config-if)# switchport private-vlan mapping 100 101,102
+Switch(config-if)# exit
+
+! Configure isolated port
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# switchport mode private-vlan host
+Switch(config-if)# switchport private-vlan host-association 100 101
+Switch(config-if)# exit
+</code></pre><hr><h2 id=layer-3-vlan-security>Layer 3: VLAN Security</h2><h3 id=disable-vlan-1>Disable VLAN 1</h3><p>VLAN 1 is default and commonly targeted:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Remove all ports from VLAN 1
+Switch(config)# interface range gigabitethernet 0/1-48
+Switch(config-if-range)# switchport access vlan 10
+Switch(config-if-range)# exit
+
+! Remove VLAN 1 from trunks
+Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# switchport trunk allowed vlan 10-4094
+Switch(config-if)# exit
+</code></pre><p><strong>Note:</strong> You cannot delete VLAN 1, but you can ensure nothing uses it.</p><h3 id=vlan-access-control-lists-vacls>VLAN Access Control Lists (VACLs)</h3><p>Filter traffic within a VLAN:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create VLAN access map
+Switch(config)# vlan access-map BLOCK_10.1.1.50 10
+Switch(config-access-map)# match ip address 10
+Switch(config-access-map)# action drop
+Switch(config-access-map)# exit
+
+Switch(config)# vlan access-map BLOCK_10.1.1.50 20
+Switch(config-access-map)# action forward
+Switch(config-access-map)# exit
+
+! Define access list
+Switch(config)# access-list 10 permit host 10.1.1.50
+
+! Apply to VLAN
+Switch(config)# vlan filter BLOCK_10.1.1.50 vlan-list 10
+</code></pre><h3 id=prevent-vlan-hopping>Prevent VLAN Hopping</h3><p><strong>Method 1: Disable DTP (Dynamic Trunking Protocol)</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>! On all access ports
+Switch(config)# interface range gigabitethernet 0/1-20
+Switch(config-if-range)# switchport mode access
+Switch(config-if-range)# switchport nonegotiate
+Switch(config-if-range)# exit
+</code></pre><p><strong>Method 2: Change Native VLAN on Trunks</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create unused native VLAN
+Switch(config)# vlan 999
+Switch(config-vlan)# name NATIVE_UNUSED
+Switch(config-vlan)# exit
+
+! Set on all trunks
+Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# switchport trunk native vlan 999
+Switch(config-if)# exit
+</code></pre><p><strong>Method 3: Manually Configure Trunks</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# switchport mode trunk
+Switch(config-if)# switchport trunk encapsulation dot1q
+Switch(config-if)# switchport trunk allowed vlan 10,20,30
+Switch(config-if)# switchport nonegotiate
+Switch(config-if)# exit
+</code></pre><hr><h2 id=layer-4-attack-mitigation>Layer 4: Attack Mitigation</h2><h3 id=dhcp-snooping>DHCP Snooping</h3><p>Prevents rogue DHCP servers:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable globally
+Switch(config)# ip dhcp snooping
+Switch(config)# ip dhcp snooping vlan 10,20,30
+
+! Trust legitimate DHCP server ports
+Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# description Trunk to DHCP Server
+Switch(config-if)# ip dhcp snooping trust
+Switch(config-if)# exit
+
+! All other ports remain untrusted (default)
+
+! Optional: limit DHCP rate on untrusted ports
+Switch(config)# interface range gigabitethernet 0/1-20
+Switch(config-if-range)# ip dhcp snooping limit rate 10
+Switch(config-if-range)# exit
+</code></pre><h3 id=dynamic-arp-inspection-dai>Dynamic ARP Inspection (DAI)</h3><p>Prevents ARP spoofing attacks:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable DAI on VLANs (requires DHCP snooping)
+Switch(config)# ip arp inspection vlan 10,20,30
+
+! Trust uplink ports
+Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# ip arp inspection trust
+Switch(config-if)# exit
+
+! Validate source MAC
+Switch(config)# ip arp inspection validate src-mac
+
+! Rate limit on untrusted ports
+Switch(config)# interface range gigabitethernet 0/1-20
+Switch(config-if-range)# ip arp inspection limit rate 15
+Switch(config-if-range)# exit
+</code></pre><h3 id=ip-source-guard>IP Source Guard</h3><p>Prevents IP spoofing:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable on access ports (requires DHCP snooping)
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# ip verify source
+Switch(config-if)# exit
+
+! Or verify source with MAC address
+Switch(config)# interface gigabitethernet 0/6
+Switch(config-if)# ip verify source port-security
+Switch(config-if)# exit
+</code></pre><h3 id=storm-control>Storm Control</h3><p>Prevents broadcast/multicast storms:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface range gigabitethernet 0/1-20
+Switch(config-if-range)# storm-control broadcast level 50.00
+Switch(config-if-range)# storm-control multicast level 50.00
+Switch(config-if-range)# storm-control action shutdown
+Switch(config-if-range)# exit
+</code></pre><p><strong>Parameters:</strong></p><ul><li><code>level 50.00</code> - 50% of bandwidth threshold</li><li><code>action shutdown</code> - Disable port if exceeded (most secure)</li><li><code>action trap</code> - Send SNMP trap only</li></ul><hr><h2 id=layer-5-authentication-and-access-control>Layer 5: Authentication and Access Control</h2><h3 id=enable-aaa>Enable AAA</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# aaa new-model
+Switch(config)# aaa authentication login default group tacacs+ local
+Switch(config)# aaa authorization exec default group tacacs+ local
+Switch(config)# aaa accounting exec default start-stop group tacacs+
+Switch(config)# aaa accounting commands 15 default start-stop group tacacs+
+</code></pre><h3 id=8021x-port-based-authentication>802.1X Port-Based Authentication</h3><p>Authenticate devices before granting network access:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable 802.1X globally
+Switch(config)# aaa new-model
+Switch(config)# aaa authentication dot1x default group radius
+Switch(config)# dot1x system-auth-control
+
+! Configure RADIUS server
+Switch(config)# radius-server host 192.168.1.100 key RadiusKey123
+
+! Configure port
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# description 802.1X Authenticated Port
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+Switch(config-if)# authentication port-control auto
+Switch(config-if)# dot1x pae authenticator
+Switch(config-if)# exit
+</code></pre><h3 id=mac-authentication-bypass-mab>MAC Authentication Bypass (MAB)</h3><p>For devices that don&rsquo;t support 802.1X (printers, cameras):</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/8
+Switch(config-if)# authentication port-control auto
+Switch(config-if)# mab
+Switch(config-if)# exit
+</code></pre><hr><h2 id=layer-6-logging-and-monitoring>Layer 6: Logging and Monitoring</h2><h3 id=configure-syslog>Configure Syslog</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Set logging level
+Switch(config)# logging buffered 51200
+Switch(config)# logging console warnings
+Switch(config)# logging monitor informational
+
+! Send to syslog server
+Switch(config)# logging host 192.168.1.200
+Switch(config)# logging trap informational
+Switch(config)# logging source-interface vlan 99
+
+! Add timestamps
+Switch(config)# service timestamps log datetime msec localtime show-timezone
+Switch(config)# service timestamps debug datetime msec
+</code></pre><h3 id=enable-snmp-read-only>Enable SNMP (Read-Only)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create ACL for SNMP access
+Switch(config)# access-list 20 remark SNMP Management Stations
+Switch(config)# access-list 20 permit 192.168.100.0 0.0.0.255
+
+! Configure SNMPv2c (basic)
+Switch(config)# snmp-server community SecureReadString RO 20
+Switch(config)# snmp-server location &#34;Data Center Rack 5&#34;
+Switch(config)# snmp-server contact &#34;netadmin@company.com&#34;
+
+! Enable traps
+Switch(config)# snmp-server enable traps snmp authentication linkdown linkup
+Switch(config)# snmp-server enable traps port-security
+Switch(config)# snmp-server host 192.168.100.50 version 2c SecureReadString
+</code></pre><p><strong>Better: Use SNMPv3 (encrypted)</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create SNMPv3 user
+Switch(config)# snmp-server group SNMPV3GROUP v3 priv read SNMPV3VIEW access 20
+Switch(config)# snmp-server user snmpuser SNMPV3GROUP v3 auth sha AuthPass123! priv aes 128 PrivPass456!
+Switch(config)# snmp-server view SNMPV3VIEW internet included
+</code></pre><h3 id=configure-netflow-if-supported>Configure NetFlow (if supported)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Configure NetFlow
+Switch(config)# ip flow-export version 9
+Switch(config)# ip flow-export destination 192.168.1.210 2055
+
+! Enable on interface
+Switch(config)# interface gigabitethernet 0/1
+Switch(config-if)# ip flow ingress
+Switch(config-if)# ip flow egress
+Switch(config-if)# exit
+</code></pre><hr><h2 id=layer-7-password-and-access-security>Layer 7: Password and Access Security</h2><h3 id=use-strong-passwords>Use Strong Passwords</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Type 15 (SCRYPT) - most secure
+Switch(config)# enable algorithm-type scrypt secret V3ry$tr0ng!P@ssw0rd#789
+
+! For user accounts
+Switch(config)# username admin privilege 15 algorithm-type scrypt secret Admin!$ecure#123
+</code></pre><h3 id=encrypt-all-passwords>Encrypt All Passwords</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# service password-encryption
+</code></pre><p><strong>Note:</strong> This only provides Type 7 encryption (weak). Use <code>secret</code> instead of <code>password</code> for better security.</p><h3 id=disable-password-recovery-optional>Disable Password Recovery (Optional)</h3><p><strong>Warning:</strong> If you lose the password, you must factory reset!</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# no service password-recovery
+</code></pre><h3 id=set-minimum-password-length>Set Minimum Password Length</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# security passwords min-length 12
+</code></pre><h3 id=configure-login-delay>Configure Login Delay</h3><p>Slow down brute force attacks:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Wait 3 seconds between login attempts
+Switch(config)# login delay 3
+</code></pre><h3 id=configure-login-block>Configure Login Block</h3><p>Block access after failed attempts:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Block for 300 seconds after 3 failures within 60 seconds
+Switch(config)# login block-for 300 attempts 3 within 60
+
+! Exempt management IPs from blocking
+Switch(config)# login quiet-mode access-class 99
+Switch(config)# access-list 99 permit 192.168.100.10
+</code></pre><hr><h2 id=layer-8-management-plane-security>Layer 8: Management Plane Security</h2><h3 id=secure-console-access>Secure Console Access</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# line console 0
+Switch(config-line)# login local
+Switch(config-line)# exec-timeout 5 0
+Switch(config-line)# logging synchronous
+Switch(config-line)# transport output none
+Switch(config-line)# exit
+</code></pre><h3 id=secure-vty-access-ssh-only>Secure VTY Access (SSH Only)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Generate keys
+Switch(config)# hostname Switch
+Switch(config)# ip domain-name company.local
+Switch(config)# crypto key generate rsa modulus 2048
+
+! Configure SSH
+Switch(config)# ip ssh version 2
+Switch(config)# ip ssh time-out 60
+Switch(config)# ip ssh authentication-retries 3
+
+! Configure VTY
+Switch(config)# access-list 10 permit 192.168.100.0 0.0.0.255
+Switch(config)# line vty 0 15
+Switch(config-line)# transport input ssh
+Switch(config-line)# access-class 10 in
+Switch(config-line)# login local
+Switch(config-line)# exec-timeout 10 0
+Switch(config-line)# logging synchronous
+Switch(config-line)# exit
+</code></pre><h3 id=disable-httphttps-if-not-needed>Disable HTTP/HTTPS (if not needed)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# no ip http server
+Switch(config)# no ip http secure-server
+</code></pre><hr><h2 id=layer-9-spanning-tree-security>Layer 9: Spanning Tree Security</h2><h3 id=enable-portfast-on-access-ports>Enable PortFast on Access Ports</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Globally on all access ports
+Switch(config)# spanning-tree portfast default
+
+! Or per-interface
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# spanning-tree portfast
+Switch(config-if)# exit
+</code></pre><h3 id=enable-bpdu-guard>Enable BPDU Guard</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Globally
+Switch(config)# spanning-tree portfast bpduguard default
+
+! Or per-interface
+Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# spanning-tree bpduguard enable
+Switch(config-if)# exit
+</code></pre><h3 id=set-root-bridge-priority>Set Root Bridge Priority</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Primary root
+Switch(config)# spanning-tree vlan 1-4094 priority 4096
+
+! Secondary root
+Switch(config)# spanning-tree vlan 1-4094 priority 8192
+</code></pre><h3 id=enable-root-guard-on-uplinks>Enable Root Guard on Uplinks</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# spanning-tree guard root
+Switch(config-if)# exit
+</code></pre><hr><h2 id=complete-hardening-configuration>Complete Hardening Configuration</h2><p>Here&rsquo;s a comprehensive hardened configuration:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! ===== HOSTNAME AND DOMAIN =====
+hostname SecureSwitch
+ip domain-name company.local
+
+! ===== PASSWORD SECURITY =====
+security passwords min-length 12
+service password-encryption
+login delay 3
+login block-for 300 attempts 3 within 60
+enable algorithm-type scrypt secret Enab1e!P@ss#Secure789
+
+! ===== LOCAL USERS =====
+username admin privilege 15 algorithm-type scrypt secret Admin!$tr0ng#123
+username engineer privilege 10 secret Engineer!P@ss456
+
+! ===== AAA =====
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authorization exec default group tacacs+ local
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+
+tacacs-server host 192.168.100.50
+tacacs-server key TacacsSecretKey!789
+
+! ===== VLANs =====
+vlan 10
+ name USERS
+vlan 99
+ name MANAGEMENT
+vlan 999
+ name PARKING_LOT
+
+! ===== MANAGEMENT INTERFACE =====
+interface vlan 99
+ ip address 192.168.99.10 255.255.255.0
+ no shutdown
+ description Management Interface
+
+ip default-gateway 192.168.99.1
+
+! ===== PORT SECURITY =====
+interface range gigabitethernet 0/1-20
+ description Access Ports
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation shutdown
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ storm-control broadcast level 50.00
+ storm-control action shutdown
+ no cdp enable
+ no lldp transmit
+ no lldp receive
+
+! ===== DHCP SNOOPING =====
+ip dhcp snooping
+ip dhcp snooping vlan 10
+
+interface gigabitethernet 0/24
+ description Trunk to Core (Trusted)
+ ip dhcp snooping trust
+ ip arp inspection trust
+
+interface range gigabitethernet 0/1-20
+ ip dhcp snooping limit rate 10
+ ip arp inspection limit rate 15
+
+! ===== DYNAMIC ARP INSPECTION =====
+ip arp inspection vlan 10
+ip arp inspection validate src-mac dst-mac ip
+
+! ===== UNUSED PORTS =====
+interface range gigabitethernet 0/21-23
+ description UNUSED
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+
+! ===== SSH =====
+crypto key generate rsa modulus 2048
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 3
+
+! ===== ACCESS CONTROL =====
+access-list 10 remark SSH Access
+access-list 10 permit 192.168.100.0 0.0.0.255
+access-list 10 deny any log
+
+access-list 20 remark SNMP Access
+access-list 20 permit 192.168.100.0 0.0.0.255
+
+! ===== CONSOLE =====
+line console 0
+ login local
+ exec-timeout 5 0
+ logging synchronous
+ transport output none
+
+! ===== VTY =====
+line vty 0 15
+ transport input ssh
+ access-class 10 in
+ login authentication default
+ authorization exec default
+ exec-timeout 10 0
+ logging synchronous
+
+! ===== LOGGING =====
+logging buffered 51200
+logging console warnings
+logging monitor informational
+logging host 192.168.100.200
+logging trap informational
+logging source-interface vlan 99
+service timestamps log datetime msec localtime show-timezone
+service timestamps debug datetime msec
+
+! ===== SNMP (v3) =====
+snmp-server group SNMPV3GROUP v3 priv read SNMPV3VIEW access 20
+snmp-server user snmpuser SNMPV3GROUP v3 auth sha AuthKey!123 priv aes 128 PrivKey!456
+snmp-server view SNMPV3VIEW internet included
+snmp-server enable traps snmp authentication linkdown linkup port-security
+
+! ===== DISABLE UNNECESSARY SERVICES =====
+no ip http server
+no ip http secure-server
+no cdp run
+no lldp run
+no ip bootp server
+no service dhcp
+no ip source-route
+
+! ===== BANNER =====
+banner login ^C
+*******************************************************************************
+*                                                                             *
+*  WARNING: Unauthorized access to this device is prohibited!                *
+*           All activities are monitored and logged.                          *
+*           Violators will be prosecuted.                                     *
+*                                                                             *
+*******************************************************************************
+^C
+
+! ===== SAVE =====
+end
+write memory
+</code></pre><hr><h2 id=security-hardening-checklist>Security Hardening Checklist</h2><h3 id=physical-security>Physical Security</h3><ul><li><input disabled type=checkbox> Unused ports disabled</li><li><input disabled type=checkbox> Ports assigned to parking VLAN</li><li><input disabled type=checkbox> Port security enabled</li><li><input disabled type=checkbox> BPDU guard enabled</li><li><input disabled type=checkbox> Root guard configured</li></ul><h3 id=access-control>Access Control</h3><ul><li><input disabled type=checkbox> CDP disabled on untrusted ports</li><li><input disabled type=checkbox> LLDP disabled on untrusted ports</li><li><input disabled type=checkbox> DTP disabled (switchport nonegotiate)</li><li><input disabled type=checkbox> Private VLANs configured (if needed)</li></ul><h3 id=vlan-security>VLAN Security</h3><ul><li><input disabled type=checkbox> VLAN 1 not in use</li><li><input disabled type=checkbox> Native VLAN changed</li><li><input disabled type=checkbox> Trunks manually configured</li><li><input disabled type=checkbox> VACLs implemented (if needed)</li></ul><h3 id=attack-mitigation>Attack Mitigation</h3><ul><li><input disabled type=checkbox> DHCP snooping enabled</li><li><input disabled type=checkbox> DAI enabled</li><li><input disabled type=checkbox> IP Source Guard enabled</li><li><input disabled type=checkbox> Storm control configured</li></ul><h3 id=authentication>Authentication</h3><ul><li><input disabled type=checkbox> AAA configured</li><li><input disabled type=checkbox> TACACS+/RADIUS servers configured</li><li><input disabled type=checkbox> Local fallback configured</li><li><input disabled type=checkbox> 802.1X enabled (if applicable)</li></ul><h3 id=logging>Logging</h3><ul><li><input disabled type=checkbox> Syslog configured</li><li><input disabled type=checkbox> SNMP configured (v3 preferred)</li><li><input disabled type=checkbox> NetFlow enabled (if supported)</li><li><input disabled type=checkbox> Timestamps enabled</li></ul><h3 id=password-security>Password Security</h3><ul><li><input disabled type=checkbox> Strong enable secret set (Type 15)</li><li><input disabled type=checkbox> Local user accounts created</li><li><input disabled type=checkbox> Minimum password length set</li><li><input disabled type=checkbox> Login delay configured</li><li><input disabled type=checkbox> Login blocking configured</li><li><input disabled type=checkbox> Service password-encryption enabled</li></ul><h3 id=management-security>Management Security</h3><ul><li><input disabled type=checkbox> Console secured</li><li><input disabled type=checkbox> SSH configured (version 2)</li><li><input disabled type=checkbox> VTY access restricted (ACL)</li><li><input disabled type=checkbox> Session timeouts configured</li><li><input disabled type=checkbox> HTTP/HTTPS disabled</li></ul><h3 id=spanning-tree>Spanning Tree</h3><ul><li><input disabled type=checkbox> PortFast on access ports</li><li><input disabled type=checkbox> BPDU Guard enabled</li><li><input disabled type=checkbox> Root bridge priority set</li><li><input disabled type=checkbox> Root Guard on uplinks</li></ul><h3 id=miscellaneous>Miscellaneous</h3><ul><li><input disabled type=checkbox> Banner configured</li><li><input disabled type=checkbox> Unnecessary services disabled</li><li><input disabled type=checkbox> Configuration saved</li><li><input disabled type=checkbox> Documentation updated</li></ul><hr><h2 id=verification-commands>Verification Commands</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>! Port security
+show port-security
+show port-security interface gi0/5
+show port-security address
+
+! DHCP snooping
+show ip dhcp snooping
+show ip dhcp snooping binding
+
+! DAI
+show ip arp inspection
+show ip arp inspection interfaces
+show ip arp inspection statistics
+
+! Spanning tree
+show spanning-tree summary
+show spanning-tree interface gi0/5 detail
+
+! Access control
+show access-lists
+show ip ssh
+show users
+
+! Logging
+show logging
+show snmp
+</code></pre><hr><h2 id=maintenance-and-monitoring>Maintenance and Monitoring</h2><h3 id=regular-tasks>Regular Tasks</h3><p><strong>Daily:</strong></p><ul><li>Review syslog for security events</li><li>Check for port security violations</li><li>Monitor failed login attempts</li></ul><p><strong>Weekly:</strong></p><ul><li>Review AAA logs</li><li>Check for DHCP snooping violations</li><li>Review DAI statistics</li><li>Verify SSH access patterns</li></ul><p><strong>Monthly:</strong></p><ul><li>Audit user accounts</li><li>Review ACLs</li><li>Update firmware (test first!)</li><li>Test backup/recovery</li></ul><p><strong>Quarterly:</strong></p><ul><li>Full security audit</li><li>Penetration testing</li><li>Review and update documentation</li><li>Password rotation</li></ul><hr><h2 id=common-security-pitfalls>Common Security Pitfalls</h2><ol><li><strong>Leaving default passwords</strong></li><li><strong>Not disabling unused ports</strong></li><li><strong>Using VLAN 1 for everything</strong></li><li><strong>Enabling Telnet instead of SSH</strong></li><li><strong>No port security</strong></li><li><strong>Ignoring DHCP snooping/DAI</strong></li><li><strong>CDP/LLDP enabled on all ports</strong></li><li><strong>No access control lists</strong></li><li><strong>Poor logging configuration</strong></li><li><strong>Not testing recovery procedures</strong></li></ol><hr><h2 id=compliance-frameworks>Compliance Frameworks</h2><p>Ensure your hardening meets relevant standards:</p><ul><li><strong>PCI-DSS</strong> - Payment card industry</li><li><strong>HIPAA</strong> - Healthcare</li><li><strong>SOX</strong> - Financial</li><li><strong>NIST</strong> - Government</li><li><strong>ISO 27001</strong> - Information security</li></ul><p>Each has specific requirements for network device hardening.</p><hr><p>This comprehensive hardening guide, when fully implemented, significantly improves switch security posture and helps protect against common network attacks.</p></div></div><script src=/assets/shared-nav.js></script></body></html>

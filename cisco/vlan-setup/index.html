@@ -1,0 +1,319 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>VLAN Configuration // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>VLAN Configuration</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ciscovlan-setup/>Ciscovlan Setup</a></div><div class="card markdown-content"><h1 id=cisco-switch-vlan-setup>Cisco Switch VLAN Setup</h1><p>Complete guide to creating, configuring, and managing VLANs on Cisco switches.</p><hr><h2 id=what-is-a-vlan>What is a VLAN?</h2><p>A <strong>Virtual Local Area Network (VLAN)</strong> is a logical segmentation of a physical network:</p><ul><li><strong>Broadcast domain isolation</strong> - Traffic contained within VLAN</li><li><strong>Security</strong> - Separate traffic between departments/functions</li><li><strong>Performance</strong> - Reduce broadcast traffic</li><li><strong>Flexibility</strong> - Group users by function, not physical location</li></ul><hr><h2 id=vlan-basics>VLAN Basics</h2><h3 id=default-vlans>Default VLANs</h3><p>All Cisco switches come with these default VLANs:</p><table><thead><tr><th>VLAN</th><th>Name</th><th>Purpose</th></tr></thead><tbody><tr><td>1</td><td>default</td><td>Default VLAN for all ports</td></tr><tr><td>1002</td><td>fddi-default</td><td>Legacy FDDI</td></tr><tr><td>1003</td><td>token-ring-default</td><td>Legacy Token Ring</td></tr><tr><td>1004</td><td>fddinet-default</td><td>Legacy FDDI</td></tr><tr><td>1005</td><td>trnet-default</td><td>Legacy Token Ring</td></tr></tbody></table><p><strong>Note:</strong> VLAN 1 cannot be deleted or renamed. VLANs 1002-1005 are reserved.</p><h3 id=vlan-id-ranges>VLAN ID Ranges</h3><ul><li><strong>1-1005:</strong> Normal range (stored in vlan.dat)</li><li><strong>1006-4094:</strong> Extended range (stored in running-config, requires VTP transparent mode)</li></ul><hr><h2 id=creating-vlans>Creating VLANs</h2><h3 id=method-1-global-configuration-mode-recommended>Method 1: Global Configuration Mode (Recommended)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# configure terminal
+
+! Create VLAN 10
+Switch(config)# vlan 10
+Switch(config-vlan)# name SALES
+Switch(config-vlan)# exit
+
+! Create VLAN 20
+Switch(config)# vlan 20
+Switch(config-vlan)# name ENGINEERING
+Switch(config-vlan)# exit
+
+! Create VLAN 30
+Switch(config)# vlan 30
+Switch(config-vlan)# name MANAGEMENT
+Switch(config-vlan)# exit
+
+Switch(config)# exit
+</code></pre><h3 id=method-2-vlan-database-mode-legacy>Method 2: VLAN Database Mode (Legacy)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# vlan database
+Switch(vlan)# vlan 10 name SALES
+Switch(vlan)# vlan 20 name ENGINEERING
+Switch(vlan)# exit
+</code></pre><p><strong>Note:</strong> This method is deprecated. Use global configuration mode.</p><h3 id=quick-multiple-vlan-creation>Quick Multiple VLAN Creation</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# vlan 10
+Switch(config-vlan)# name SALES
+Switch(config-vlan)# vlan 20
+Switch(config-vlan)# name ENGINEERING
+Switch(config-vlan)# vlan 30
+Switch(config-vlan)# name MANAGEMENT
+Switch(config-vlan)# exit
+</code></pre><hr><h2 id=assigning-ports-to-vlans>Assigning Ports to VLANs</h2><h3 id=access-port-configuration>Access Port Configuration</h3><p>An <strong>access port</strong> carries traffic for a single VLAN:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/5
+Switch(config-if)# description Sales Department PC
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+Switch(config-if)# exit
+</code></pre><h3 id=assigning-multiple-ports>Assigning Multiple Ports</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Assign interfaces 1-10 to VLAN 10
+Switch(config)# interface range gigabitethernet 0/1-10
+Switch(config-if-range)# switchport mode access
+Switch(config-if-range)# switchport access vlan 10
+Switch(config-if-range)# exit
+
+! Assign non-contiguous interfaces
+Switch(config)# interface range gi0/5, gi0/7, gi0/9-12
+Switch(config-if-range)# switchport mode access
+Switch(config-if-range)# switchport access vlan 20
+Switch(config-if-range)# exit
+</code></pre><h3 id=voice-vlan-ip-phone--pc>Voice VLAN (IP Phone + PC)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/8
+Switch(config-if)# description IP Phone with PC
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+Switch(config-if)# switchport voice vlan 50
+Switch(config-if)# exit
+</code></pre><p><strong>Result:</strong> Data traffic → VLAN 10, Voice traffic → VLAN 50</p><hr><h2 id=trunk-port-configuration>Trunk Port Configuration</h2><p>A <strong>trunk port</strong> carries traffic for multiple VLANs (switch-to-switch or switch-to-router):</p><h3 id=basic-trunk-configuration>Basic Trunk Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# description Trunk to Core Switch
+Switch(config-if)# switchport trunk encapsulation dot1q
+Switch(config-if)# switchport mode trunk
+Switch(config-if)# switchport trunk allowed vlan 10,20,30
+Switch(config-if)# exit
+</code></pre><p><strong>Note:</strong> <code>switchport trunk encapsulation dot1q</code> is only needed on some platforms (like 3560/3750). Most modern switches only support 802.1Q.</p><h3 id=allow-all-vlans-on-trunk>Allow All VLANs on Trunk</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config-if)# switchport trunk allowed vlan all
+</code></pre><h3 id=add-vlans-to-existing-trunk>Add VLANs to Existing Trunk</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Add VLAN 40 to existing allowed list
+Switch(config-if)# switchport trunk allowed vlan add 40
+
+! Remove VLAN 20 from allowed list
+Switch(config-if)# switchport trunk allowed vlan remove 20
+
+! Replace entire list
+Switch(config-if)# switchport trunk allowed vlan 10,30,40
+</code></pre><h3 id=native-vlan-configuration>Native VLAN Configuration</h3><p>The <strong>native VLAN</strong> carries untagged traffic on a trunk:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config-if)# switchport trunk native vlan 99
+</code></pre><p><strong>Important:</strong> Native VLAN must match on both ends of trunk!</p><p><strong>Security Best Practice:</strong> Change native VLAN from default (VLAN 1):</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create dedicated native VLAN
+Switch(config)# vlan 999
+Switch(config-vlan)# name NATIVE_VLAN
+Switch(config-vlan)# exit
+
+! Configure on all trunks
+Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# switchport trunk native vlan 999
+Switch(config-if)# exit
+</code></pre><hr><h2 id=inter-vlan-routing>Inter-VLAN Routing</h2><p>VLANs cannot communicate without routing. Three methods:</p><h3 id=method-1-router-with-separate-interfaces>Method 1: Router with Separate Interfaces</h3><p>Requires one router interface per VLAN (not scalable).</p><p><strong>Switch Configuration:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Connect VLAN 10 to router Gi0/1
+Switch(config)# interface gigabitethernet 0/1
+Switch(config-if)# switchport access vlan 10
+Switch(config-if)# exit
+
+! Connect VLAN 20 to router Gi0/2
+Switch(config)# interface gigabitethernet 0/2
+Switch(config-if)# switchport access vlan 20
+Switch(config-if)# exit
+</code></pre><h3 id=method-2-router-on-a-stick-common>Method 2: Router-on-a-Stick (Common)</h3><p>Single trunk from switch to router with subinterfaces.</p><p><strong>Switch Configuration:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# description Trunk to Router
+Switch(config-if)# switchport trunk encapsulation dot1q
+Switch(config-if)# switchport mode trunk
+Switch(config-if)# switchport trunk allowed vlan 10,20,30
+Switch(config-if)# exit
+</code></pre><p><strong>Router Configuration:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Router(config)# interface gigabitethernet 0/0
+Router(config-if)# no shutdown
+Router(config-if)# exit
+
+! Subinterface for VLAN 10
+Router(config)# interface gigabitethernet 0/0.10
+Router(config-subif)# encapsulation dot1q 10
+Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 20
+Router(config)# interface gigabitethernet 0/0.20
+Router(config-subif)# encapsulation dot1q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+Router(config-subif)# exit
+</code></pre><h3 id=method-3-layer-3-switch-best-for-large-networks>Method 3: Layer 3 Switch (Best for Large Networks)</h3><p>Layer 3 switches can route between VLANs directly:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable IP routing
+Switch(config)# ip routing
+
+! Create SVIs (Switched Virtual Interfaces)
+Switch(config)# interface vlan 10
+Switch(config-if)# ip address 192.168.10.1 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# exit
+
+Switch(config)# interface vlan 20
+Switch(config-if)# ip address 192.168.20.1 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# exit
+
+Switch(config)# interface vlan 30
+Switch(config-if)# ip address 192.168.30.1 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# exit
+</code></pre><hr><h2 id=management-vlan-configuration>Management VLAN Configuration</h2><p>Best practice: Use separate VLAN for management traffic.</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create management VLAN
+Switch(config)# vlan 99
+Switch(config-vlan)# name MANAGEMENT
+Switch(config-vlan)# exit
+
+! Configure management interface
+Switch(config)# interface vlan 99
+Switch(config-if)# ip address 192.168.99.10 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# exit
+
+! Set default gateway
+Switch(config)# ip default-gateway 192.168.99.1
+
+! Move management to VLAN 99 (remove from VLAN 1)
+Switch(config)# no interface vlan 1
+</code></pre><hr><h2 id=vlan-verification-commands>VLAN Verification Commands</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>! View all VLANs
+Switch# show vlan brief
+
+! View detailed VLAN information
+Switch# show vlan
+
+! View specific VLAN
+Switch# show vlan id 10
+
+! View VLAN assignment for specific interface
+Switch# show interfaces gigabitethernet 0/5 switchport
+
+! View trunk status
+Switch# show interfaces trunk
+
+! View trunk details for specific interface
+Switch# show interfaces gigabitethernet 0/24 trunk
+
+! View MAC addresses per VLAN
+Switch# show mac address-table vlan 10
+</code></pre><hr><h2 id=vlan-troubleshooting>VLAN Troubleshooting</h2><h3 id=port-not-in-correct-vlan>Port Not in Correct VLAN</h3><p><strong>Verify port assignment:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show vlan brief
+Switch# show interfaces gi0/5 switchport | include VLAN
+</code></pre><p><strong>Fix:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gi0/5
+Switch(config-if)# switchport access vlan 10
+</code></pre><h3 id=trunk-not-passing-vlan-traffic>Trunk Not Passing VLAN Traffic</h3><p><strong>Check trunk status:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show interfaces gi0/24 trunk
+</code></pre><p><strong>Common issues:</strong></p><ol><li>VLAN not allowed on trunk</li><li>Native VLAN mismatch</li><li>Trunk not established</li></ol><p><strong>Fix allowed VLANs:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gi0/24
+Switch(config-if)# switchport trunk allowed vlan add 10
+</code></pre><h3 id=vlan-exists-but-no-connectivity>VLAN Exists But No Connectivity</h3><p><strong>Check:</strong></p><ol><li>Ports assigned to VLAN</li><li>VLAN active on both switches</li><li>Trunk carrying VLAN</li><li>No spanning tree blocking</li></ol><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show vlan id 10
+Switch# show spanning-tree vlan 10
+</code></pre><h3 id=native-vlan-mismatch>Native VLAN Mismatch</h3><p><strong>Symptoms:</strong> CDP messages about native VLAN mismatch</p><p><strong>Check both switches:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show interfaces gi0/24 trunk | include Native
+</code></pre><p><strong>Fix - make native VLAN match:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# interface gi0/24
+Switch(config-if)# switchport trunk native vlan 999
+</code></pre><hr><h2 id=vtp-vlan-trunking-protocol>VTP (VLAN Trunking Protocol)</h2><p>VTP propagates VLAN configuration across switches. Use with caution!</p><h3 id=vtp-modes>VTP Modes</h3><table><thead><tr><th>Mode</th><th>Can Create VLANs</th><th>Forwards VTP</th><th>Saves VLAN DB</th></tr></thead><tbody><tr><td><strong>Server</strong></td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td><strong>Client</strong></td><td>No</td><td>Yes</td><td>No</td></tr><tr><td><strong>Transparent</strong></td><td>Yes (local only)</td><td>Yes</td><td>Yes</td></tr><tr><td><strong>Off</strong></td><td>Yes (local only)</td><td>No</td><td>Yes</td></tr></tbody></table><h3 id=configure-vtp-not-recommended-for-most-networks>Configure VTP (Not Recommended for Most Networks)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Set VTP domain
+Switch(config)# vtp domain COMPANY
+
+! Set VTP mode
+Switch(config)# vtp mode transparent
+
+! Set VTP password (optional)
+Switch(config)# vtp password SecurePass123
+
+! VTP version
+Switch(config)# vtp version 2
+</code></pre><h3 id=disable-vtp-recommended>Disable VTP (Recommended)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# vtp mode off
+</code></pre><p><strong>Why disable VTP?</strong></p><ul><li>Prevents accidental VLAN deletion</li><li>Simplifies troubleshooting</li><li>Reduces security risks</li><li>More predictable behavior</li></ul><hr><h2 id=vlan-security-best-practices>VLAN Security Best Practices</h2><h3 id=1-dont-use-vlan-1>1. Don&rsquo;t Use VLAN 1</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Move all ports off VLAN 1
+Switch(config)# interface range gi0/1-24
+Switch(config-if-range)# switchport access vlan 10
+Switch(config-if-range)# exit
+
+! Disable VLAN 1 on trunks
+Switch(config)# interface gi0/24
+Switch(config-if)# switchport trunk allowed vlan 10-4094
+</code></pre><h3 id=2-use-dedicated-native-vlan>2. Use Dedicated Native VLAN</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# vlan 999
+Switch(config-vlan)# name NATIVE_UNUSED
+Switch(config-vlan)# exit
+
+Switch(config)# interface gi0/24
+Switch(config-if)# switchport trunk native vlan 999
+</code></pre><h3 id=3-disable-unused-ports-and-assign-to-parking-vlan>3. Disable Unused Ports and Assign to &ldquo;Parking&rdquo; VLAN</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create parking VLAN
+Switch(config)# vlan 999
+Switch(config-vlan)# name PARKING_LOT
+Switch(config-vlan)# exit
+
+! Move unused ports
+Switch(config)# interface range gi0/15-23
+Switch(config-if-range)# switchport mode access
+Switch(config-if-range)# switchport access vlan 999
+Switch(config-if-range)# shutdown
+Switch(config-if-range)# description UNUSED
+Switch(config-if-range)# exit
+</code></pre><h3 id=4-implement-private-vlans-advanced>4. Implement Private VLANs (Advanced)</h3><p>Private VLANs provide isolation within a VLAN:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# vtp mode transparent
+Switch(config)# vlan 100
+Switch(config-vlan)# private-vlan primary
+Switch(config-vlan)# private-vlan association 101,102
+Switch(config-vlan)# exit
+
+Switch(config)# vlan 101
+Switch(config-vlan)# private-vlan isolated
+Switch(config-vlan)# exit
+
+Switch(config)# vlan 102
+Switch(config-vlan)# private-vlan community
+Switch(config-vlan)# exit
+</code></pre><hr><h2 id=vlan-design-examples>VLAN Design Examples</h2><h3 id=small-office-single-switch>Small Office (Single Switch)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! VLANs
+vlan 10
+ name STAFF
+vlan 20
+ name GUEST
+vlan 30
+ name MANAGEMENT
+vlan 99
+ name NATIVE
+
+! Port assignments
+interface range gi0/1-10
+ switchport mode access
+ switchport access vlan 10
+ description Staff PCs
+
+interface range gi0/11-15
+ switchport mode access
+ switchport access vlan 20
+ description Guest WiFi APs
+
+! Management
+interface vlan 30
+ ip address 192.168.30.10 255.255.255.0
+ no shutdown
+</code></pre><h3 id=medium-office-multiple-switches>Medium Office (Multiple Switches)</h3><p><strong>Access Switch:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>vlan 10
+ name SALES
+vlan 20
+ name ENGINEERING
+vlan 99
+ name MANAGEMENT
+
+! Access ports
+interface range gi0/1-12
+ switchport mode access
+ switchport access vlan 10
+
+interface range gi0/13-24
+ switchport mode access
+ switchport access vlan 20
+
+! Trunk to core
+interface gi0/48
+ description Trunk to Core Switch
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 10,20,99
+</code></pre><p><strong>Core Switch (Layer 3):</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>ip routing
+
+vlan 10
+ name SALES
+vlan 20
+ name ENGINEERING
+vlan 99
+ name MANAGEMENT
+
+! SVIs for routing
+interface vlan 10
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+
+interface vlan 20
+ ip address 192.168.20.1 255.255.255.0
+ no shutdown
+
+interface vlan 99
+ ip address 192.168.99.1 255.255.255.0
+ no shutdown
+</code></pre><hr><h2 id=quick-reference-commands>Quick Reference Commands</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create VLAN
+vlan 10
+ name SALES
+
+! Assign port to VLAN
+interface gi0/5
+ switchport mode access
+ switchport access vlan 10
+
+! Configure trunk
+interface gi0/24
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+
+! View VLANs
+show vlan brief
+show interfaces trunk
+
+! Delete VLAN
+no vlan 10
+! Or
+config)# no vlan 10
+
+! Reset port to VLAN 1
+interface gi0/5
+ no switchport access vlan
+</code></pre><hr><h2 id=common-vlan-configurations-checklist>Common VLAN Configurations Checklist</h2><ul><li><input disabled type=checkbox> VLANs created with descriptive names</li><li><input disabled type=checkbox> Ports assigned to appropriate VLANs</li><li><input disabled type=checkbox> Trunk ports configured correctly</li><li><input disabled type=checkbox> Native VLAN changed from default (VLAN 1)</li><li><input disabled type=checkbox> Unused ports disabled and assigned to parking VLAN</li><li><input disabled type=checkbox> Management VLAN separated from user VLANs</li><li><input disabled type=checkbox> Inter-VLAN routing configured (if needed)</li><li><input disabled type=checkbox> VTP mode set to transparent or off</li><li><input disabled type=checkbox> Configuration saved</li><li><input disabled type=checkbox> Documentation updated</li></ul></div></div><script src=/assets/shared-nav.js></script></body></html>

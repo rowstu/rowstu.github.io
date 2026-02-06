@@ -1,0 +1,189 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Console Port Security // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Console Port Security</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ciscoconsole-security/>Ciscoconsole Security</a></div><div class="card markdown-content"><h1 id=cisco-console-port-security>Cisco Console Port Security</h1><p>Comprehensive guide to securing console access on Cisco switches and routers.</p><hr><h2 id=why-console-security-matters>Why Console Security Matters</h2><p>The console port is often overlooked in security configurations, but represents a critical vulnerability:</p><ul><li><strong>Direct physical access</strong> bypasses most security controls</li><li><strong>Password recovery</strong> can be performed via console</li><li><strong>Full administrative access</strong> available once logged in</li><li><strong>No network logging</strong> for some attack vectors</li></ul><hr><h2 id=basic-console-security>Basic Console Security</h2><h3 id=set-console-password>Set Console Password</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# line console 0
+Switch(config-line)# password ConsolePass123!
+Switch(config-line)# login
+Switch(config-line)# exit
+</code></pre><p><strong>Test:</strong> Disconnect and reconnect - should prompt for password.</p><h3 id=use-strong-password>Use Strong Password</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# line console 0
+Switch(config-line)# password 8#mK9$pLq2@nXz4
+Switch(config-line)# login
+Switch(config-line)# exit
+</code></pre><hr><h2 id=advanced-console-security>Advanced Console Security</h2><h3 id=enable-local-user-authentication>Enable Local User Authentication</h3><p>Instead of shared password, use individual user accounts:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create local users
+Switch(config)# username admin privilege 15 secret Admin123!@#
+Switch(config)# username tech privilege 5 secret Tech456!@#
+
+! Configure console to use local authentication
+Switch(config)# line console 0
+Switch(config-line)# login local
+Switch(config-line)# exit
+</code></pre><p><strong>Benefits:</strong></p><ul><li>Individual accountability</li><li>Different privilege levels</li><li>Audit trail by username</li></ul><h3 id=set-session-timeout>Set Session Timeout</h3><p>Automatically log out inactive sessions:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# line console 0
+Switch(config-line)# exec-timeout 5 0
+Switch(config-line)# exit
+</code></pre><p><strong>Format:</strong> <code>exec-timeout [minutes] [seconds]</code></p><p>Examples:</p><ul><li><code>exec-timeout 5 0</code> - 5 minutes timeout</li><li><code>exec-timeout 0 30</code> - 30 seconds timeout</li><li><code>exec-timeout 0 0</code> - No timeout (NOT recommended)</li></ul><p><strong>Recommended:</strong> 5-10 minutes for production, 30 minutes for lab.</p><h3 id=implement-aaa-authentication>Implement AAA Authentication</h3><p>For enterprise environments, use centralized authentication:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>! Enable AAA
+Switch(config)# aaa new-model
+
+! Define authentication method list
+Switch(config)# aaa authentication login default group tacacs+ local
+
+! Configure TACACS+ server
+Switch(config)# tacacs-server host 192.168.1.50
+Switch(config)# tacacs-server key TacacsSecretKey123
+
+! Apply to console
+Switch(config)# line console 0
+Switch(config-line)# login authentication default
+Switch(config-line)# exit
+</code></pre><p><strong>With RADIUS:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# aaa authentication login default group radius local
+Switch(config)# radius-server host 192.168.1.51
+Switch(config)# radius-server key RadiusSecretKey456
+</code></pre><hr><h2 id=logging-and-auditing>Logging and Auditing</h2><h3 id=enable-console-logging>Enable Console Logging</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# line console 0
+Switch(config-line)# logging synchronous
+Switch(config-line)# exit
+</code></pre><p><strong>Purpose:</strong> Prevents log messages from interrupting command input.</p><h3 id=configure-aaa-accounting>Configure AAA Accounting</h3><p>Track all console access and commands:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# aaa new-model
+
+! Log all commands
+Switch(config)# aaa accounting commands 15 default start-stop group tacacs+
+
+! Log exec sessions
+Switch(config)# aaa accounting exec default start-stop group tacacs+
+</code></pre><h3 id=enable-command-logging>Enable Command Logging</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Archive configuration changes
+Switch(config)# archive
+Switch(config-archive)# log config
+Switch(config-archive-log-cfg)# logging enable
+Switch(config-archive-log-cfg)# notify syslog
+Switch(config-archive-log-cfg)# exit
+Switch(config-archive)# exit
+</code></pre><h3 id=view-console-access-logs>View Console Access Logs</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Show who is currently logged in
+Switch# show users
+
+! Show command history
+Switch# show history
+
+! Show logging buffer
+Switch# show logging
+</code></pre><hr><h2 id=access-control-lists-acl-for-console>Access Control Lists (ACL) for Console</h2><h3 id=restrict-console-access-by-time>Restrict Console Access by Time</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create time-based ACL
+Switch(config)# time-range BUSINESS-HOURS
+Switch(config-time-range)# periodic weekdays 08:00 to 18:00
+Switch(config-time-range)# exit
+
+! Apply to console (requires AAA)
+Switch(config)# aaa authentication login console-auth local
+Switch(config)# line console 0
+Switch(config-line)# login authentication console-auth
+Switch(config-line)# access-class BUSINESS-HOURS in
+Switch(config-line)# exit
+</code></pre><p><strong>Note:</strong> Time-based restrictions require accurate system clock (use NTP).</p><hr><h2 id=physical-security-measures>Physical Security Measures</h2><h3 id=disable-password-recovery>Disable Password Recovery</h3><p><strong>Warning:</strong> This prevents password recovery! Document passwords securely.</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# no service password-recovery
+Switch(config)# exit
+Switch# write memory
+</code></pre><p><strong>Impact:</strong> If you lose the password, you must factory reset the switch (losing all configuration).</p><p><strong>To re-enable:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# service password-recovery
+</code></pre><h3 id=lock-network-closets>Lock Network Closets</h3><p>Non-technical but critical:</p><ul><li>Install locks on all network closets/cabinets</li><li>Restrict physical access with badge readers</li><li>Install security cameras</li><li>Use tamper-evident seals</li><li>Log all physical access</li></ul><hr><h2 id=console-port-lockdown-configuration>Console Port Lockdown Configuration</h2><h3 id=maximum-security-console-configuration>Maximum Security Console Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create privilege 15 user
+Switch(config)# username admin privilege 15 algorithm-type scrypt secret SuperSecure!Pass#123
+
+! Enable AAA
+Switch(config)# aaa new-model
+Switch(config)# aaa authentication login default local
+Switch(config)# aaa authorization exec default local
+
+! Configure console line
+Switch(config)# line console 0
+Switch(config-line)# login authentication default
+Switch(config-line)# authorization exec default
+Switch(config-line)# logging synchronous
+Switch(config-line)# exec-timeout 5 0
+Switch(config-line)# transport output none
+Switch(config-line)# exit
+
+! Disable password recovery (optional - understand risks!)
+Switch(config)# no service password-recovery
+
+! Archive configuration changes
+Switch(config)# archive
+Switch(config-archive)# log config
+Switch(config-archive-log-cfg)# logging enable
+Switch(config-archive-log-cfg)# notify syslog
+Switch(config-archive-log-cfg)# hidekeys
+Switch(config-archive-log-cfg)# exit
+Switch(config-archive)# exit
+
+! Save configuration
+Switch(config)# exit
+Switch# write memory
+</code></pre><hr><h2 id=privilege-levels>Privilege Levels</h2><p>Cisco IOS supports 16 privilege levels (0-15):</p><h3 id=default-levels>Default Levels</h3><ul><li><strong>Level 0:</strong> Minimal access (logout, enable, disable, help)</li><li><strong>Level 1:</strong> User EXEC mode (show commands, ping, traceroute)</li><li><strong>Level 15:</strong> Privileged EXEC mode (full access)</li></ul><h3 id=creating-custom-privilege-levels>Creating Custom Privilege Levels</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Create level 5 with limited commands
+Switch(config)# privilege exec level 5 show running-config
+Switch(config)# privilege exec level 5 show ip interface brief
+Switch(config)# privilege exec level 5 reload
+
+! Create user with level 5 access
+Switch(config)# username operator privilege 5 secret Oper123!
+
+! User logs in at level 5
+</code></pre><h3 id=best-practice-privilege-configuration>Best Practice Privilege Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Level 15 - Full administrator
+Switch(config)# username admin privilege 15 secret Admin!Full@123
+
+! Level 10 - Network engineer (can configure, but not sensitive items)
+Switch(config)# username engineer privilege 10 secret Eng!Pass@456
+Switch(config)# privilege exec level 10 configure terminal
+Switch(config)# privilege exec level 10 show running-config
+
+! Level 5 - Operator (monitoring only)
+Switch(config)# username operator privilege 5 secret Oper!View@789
+Switch(config)# privilege exec level 5 show
+Switch(config)# privilege exec level 5 ping
+</code></pre><hr><h2 id=monitoring-console-access>Monitoring Console Access</h2><h3 id=show-current-console-users>Show Current Console Users</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show users
+    Line       User       Host(s)              Idle       Location
+*  0 con 0     admin      idle                 00:00:00
+  66 vty 0     engineer   idle                 00:02:15 10.1.1.50
+</code></pre><h3 id=show-login-history>Show Login History</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show login
+! If AAA accounting is configured
+Switch# show accounting
+</code></pre><h3 id=configure-snmp-traps-for-console-access>Configure SNMP Traps for Console Access</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# snmp-server enable traps snmp authentication linkdown linkup
+Switch(config)# snmp-server host 192.168.1.100 version 2c public
+</code></pre><hr><h2 id=emergency-access-scenarios>Emergency Access Scenarios</h2><h3 id=lost-console-password-with-local-auth>Lost Console Password with Local Auth</h3><p>If using local authentication and password is lost:</p><ol><li>Perform password recovery (see <a href=password-recovery.md>Password Recovery</a>)</li><li>Reset user password:</li></ol><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# username admin secret NewPassword123!
+</code></pre><h3 id=locked-out-with-aaa>Locked Out with AAA</h3><p>If TACACS+/RADIUS server is down:</p><p><strong>Prevention - Always configure local fallback:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# aaa authentication login default group tacacs+ local
+</code></pre><p>This tries TACACS+ first, then local accounts if server is unreachable.</p><h3 id=console-port-not-responding>Console Port Not Responding</h3><p>Try these steps:</p><ol><li>Check physical console cable</li><li>Verify terminal settings (9600 8-N-1)</li><li>Press Enter multiple times</li><li>Try different terminal emulator</li><li>Power cycle switch (last resort)</li></ol><hr><h2 id=console-security-checklist>Console Security Checklist</h2><h3 id=essential-security>Essential Security</h3><ul><li><input disabled type=checkbox> Console password configured</li><li><input disabled type=checkbox> Session timeout enabled (5-10 minutes)</li><li><input disabled type=checkbox> Logging synchronous enabled</li><li><input disabled type=checkbox> Local user accounts created</li><li><input disabled type=checkbox> Strong passwords used (12+ characters)</li></ul><h3 id=advanced-security>Advanced Security</h3><ul><li><input disabled type=checkbox> AAA authentication configured</li><li><input disabled type=checkbox> TACACS+/RADIUS server configured with local fallback</li><li><input disabled type=checkbox> AAA accounting enabled</li><li><input disabled type=checkbox> Privilege levels configured</li><li><input disabled type=checkbox> Configuration archiving enabled</li><li><input disabled type=checkbox> Command logging enabled</li></ul><h3 id=physical-security>Physical Security</h3><ul><li><input disabled type=checkbox> Network closets locked</li><li><input disabled type=checkbox> Access logs maintained</li><li><input disabled type=checkbox> Security cameras installed</li><li><input disabled type=checkbox> Console ports physically secured</li><li><input disabled type=checkbox> Tamper-evident seals used</li></ul><h3 id=documentation>Documentation</h3><ul><li><input disabled type=checkbox> User accounts documented</li><li><input disabled type=checkbox> Privilege levels documented</li><li><input disabled type=checkbox> Password policy documented</li><li><input disabled type=checkbox> Recovery procedures documented</li><li><input disabled type=checkbox> AAA server details documented</li></ul><hr><h2 id=common-console-security-mistakes>Common Console Security Mistakes</h2><h3 id=mistake-1-no-console-password>Mistake 1: No Console Password</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>line console 0
+! No password configured - DANGEROUS!
+</code></pre><p><strong>Fix:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# line console 0
+Switch(config-line)# password SecurePass123!
+Switch(config-line)# login
+</code></pre><h3 id=mistake-2-no-session-timeout>Mistake 2: No Session Timeout</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>line console 0
+ exec-timeout 0 0  ! Never times out - DANGEROUS!
+</code></pre><p><strong>Fix:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# line console 0
+Switch(config-line)# exec-timeout 5 0
+</code></pre><h3 id=mistake-3-using-default-passwords>Mistake 3: Using Default Passwords</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>line console 0
+ password cisco
+</code></pre><p><strong>Fix:</strong> Use strong, unique passwords:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config-line)# password 9#xK2$mPq8@nZz3!
+</code></pre><h3 id=mistake-4-no-logging>Mistake 4: No Logging</h3><p>Can&rsquo;t track who did what on the console.</p><p><strong>Fix:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# archive
+Switch(config-archive)# log config
+Switch(config-archive-log-cfg)# logging enable
+Switch(config-archive-log-cfg)# notify syslog
+</code></pre><h3 id=mistake-5-shared-passwords>Mistake 5: Shared Passwords</h3><p>Everyone uses the same console password.</p><p><strong>Fix:</strong> Use local user accounts:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# username admin privilege 15 secret UniquePass1!
+Switch(config)# username tech privilege 10 secret UniquePass2!
+Switch(config)# line console 0
+Switch(config-line)# login local
+</code></pre><hr><h2 id=testing-console-security>Testing Console Security</h2><h3 id=test-1-password-prompt>Test 1: Password Prompt</h3><ol><li>Disconnect console cable</li><li>Reconnect</li><li>Should immediately prompt for password/username</li></ol><h3 id=test-2-session-timeout>Test 2: Session Timeout</h3><ol><li>Login to console</li><li>Leave idle for configured timeout</li><li>Should automatically disconnect</li></ol><h3 id=test-3-aaa-fallback>Test 3: AAA Fallback</h3><ol><li>Disconnect TACACS+/RADIUS server</li><li>Try console login</li><li>Should fall back to local authentication</li></ol><h3 id=test-4-logging>Test 4: Logging</h3><ol><li>Execute some commands on console</li><li>Check logs:</li></ol><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show logging | include CONSOLE
+</code></pre><hr><h2 id=quick-reference-commands>Quick Reference Commands</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>! Basic console security
+line console 0
+ password SecurePassword123!
+ login
+ exec-timeout 5 0
+ logging synchronous
+
+! Local user authentication
+username admin privilege 15 secret AdminPass123!
+line console 0
+ login local
+
+! AAA authentication
+aaa new-model
+aaa authentication login default group tacacs+ local
+tacacs-server host 192.168.1.50
+tacacs-server key SecretKey
+line console 0
+ login authentication default
+
+! View console access
+show users
+show logging | include CONSOLE
+show accounting
+
+! Disable password recovery (CAUTION!)
+no service password-recovery
+</code></pre><hr><h2 id=security-best-practices-summary>Security Best Practices Summary</h2><ol><li><strong>Always set a console password</strong> - Never leave it open</li><li><strong>Use individual accounts</strong> - No shared passwords</li><li><strong>Implement session timeouts</strong> - 5-10 minutes recommended</li><li><strong>Enable logging</strong> - Track all console access</li><li><strong>Use AAA when possible</strong> - Centralized authentication</li><li><strong>Configure local fallback</strong> - Don&rsquo;t lock yourself out</li><li><strong>Secure physically</strong> - Lock network closets</li><li><strong>Document everything</strong> - Maintain password documentation</li><li><strong>Test regularly</strong> - Verify security controls work</li><li><strong>Review logs</strong> - Monitor for unauthorized access</li></ol><hr><h2 id=compliance-considerations>Compliance Considerations</h2><p>Different standards have different requirements:</p><h3 id=pci-dss>PCI-DSS</h3><ul><li>Unique user IDs</li><li>Strong passwords</li><li>Session timeouts (15 minutes maximum)</li><li>Audit logging</li></ul><h3 id=hipaa>HIPAA</h3><ul><li>Role-based access control</li><li>Audit trails</li><li>Unique user identification</li><li>Session timeouts</li></ul><h3 id=iso-27001>ISO 27001</h3><ul><li>Access control policy</li><li>User access management</li><li>Password management</li><li>Audit logging</li></ul><p>Ensure your console security configuration meets applicable compliance requirements.</p></div></div><script src=/assets/shared-nav.js></script></body></html>

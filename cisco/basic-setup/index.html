@@ -1,0 +1,156 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Basic Cisco Switch Setup // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Basic Cisco Switch Setup</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ciscobasic-setup/>Ciscobasic Setup</a></div><div class="card markdown-content"><h1 id=setting-up-a-new-cisco-switch>Setting Up a New Cisco Switch</h1><p>Step-by-step guide for configuring a brand new Cisco switch for basic switching operations.</p><hr><h2 id=initial-connection>Initial Connection</h2><p>Connect to the switch via console cable:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Using screen (Linux/Mac)</span>
+</span></span><span style=display:flex><span>screen /dev/ttyUSB0 <span style=color:#ae81ff>9600</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Using minicom (Linux)</span>
+</span></span><span style=display:flex><span>minicom -D /dev/ttyUSB0
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Using PuTTY (Windows)</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Serial line: COM3 (check Device Manager)</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Speed: 9600</span>
+</span></span></code></pre></div><p><strong>Console Settings:</strong></p><ul><li>Baud rate: 9600</li><li>Data bits: 8</li><li>Parity: None</li><li>Stop bits: 1</li><li>Flow control: None</li></ul><hr><h2 id=initial-configuration-dialog>Initial Configuration Dialog</h2><p>On first boot, the switch will prompt:</p><pre tabindex=0><code>Would you like to enter the initial configuration dialog? [yes/no]:
+</code></pre><p>Type <code>no</code> to configure manually (recommended for learning).</p><hr><h2 id=basic-configuration-commands>Basic Configuration Commands</h2><h3 id=enter-privileged-mode>Enter Privileged Mode</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch&gt; enable
+Switch#
+</code></pre><h3 id=enter-global-configuration-mode>Enter Global Configuration Mode</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# configure terminal
+Switch(config)#
+</code></pre><h3 id=set-hostname>Set Hostname</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# hostname CoreSwitch
+CoreSwitch(config)#
+</code></pre><h3 id=configure-enable-password>Configure Enable Password</h3><pre tabindex=0><code class=language-cisco data-lang=cisco># Secret password (encrypted with MD5)
+CoreSwitch(config)# enable secret YourSecurePassword123!
+
+# Or enable password (older, less secure)
+CoreSwitch(config)# enable password YourPassword
+</code></pre><p><strong>Note:</strong> Use <code>enable secret</code> - it&rsquo;s encrypted by default. The <code>enable password</code> is stored in plain text unless service password-encryption is enabled.</p><hr><h2 id=configure-management-interface>Configure Management Interface</h2><h3 id=assign-ip-to-vlan-1-default-management-vlan>Assign IP to VLAN 1 (Default Management VLAN)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# interface vlan 1
+CoreSwitch(config-if)# ip address 192.168.1.10 255.255.255.0
+CoreSwitch(config-if)# no shutdown
+CoreSwitch(config-if)# exit
+</code></pre><h3 id=set-default-gateway>Set Default Gateway</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# ip default-gateway 192.168.1.1
+</code></pre><hr><h2 id=configure-console-access>Configure Console Access</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# line console 0
+CoreSwitch(config-line)# password ConsolePass123
+CoreSwitch(config-line)# login
+CoreSwitch(config-line)# logging synchronous
+CoreSwitch(config-line)# exec-timeout 5 0
+CoreSwitch(config-line)# exit
+</code></pre><p><strong>Parameters:</strong></p><ul><li><code>logging synchronous</code> - Prevents log messages from interrupting commands</li><li><code>exec-timeout 5 0</code> - Session timeout (5 minutes, 0 seconds)</li></ul><hr><h2 id=configure-vty-lines-telnetssh>Configure VTY Lines (Telnet/SSH)</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# line vty 0 15
+CoreSwitch(config-line)# password VtyPass123
+CoreSwitch(config-line)# login
+CoreSwitch(config-line)# transport input ssh
+CoreSwitch(config-line)# exec-timeout 5 0
+CoreSwitch(config-line)# exit
+</code></pre><p><strong>Note:</strong> <code>transport input ssh</code> restricts to SSH only (recommended). For telnet, use <code>transport input telnet</code> or <code>transport input all</code>.</p><hr><h2 id=configure-interface-descriptions>Configure Interface Descriptions</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# interface gigabitethernet 0/1
+CoreSwitch(config-if)# description Connection to Router
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface gigabitethernet 0/2
+CoreSwitch(config-if)# description Server Room Connection
+CoreSwitch(config-if)# exit
+</code></pre><hr><h2 id=configure-port-security-basics>Configure Port Security Basics</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# interface gigabitethernet 0/5
+CoreSwitch(config-if)# switchport mode access
+CoreSwitch(config-if)# switchport port-security
+CoreSwitch(config-if)# switchport port-security maximum 2
+CoreSwitch(config-if)# switchport port-security violation restrict
+CoreSwitch(config-if)# switchport port-security mac-address sticky
+CoreSwitch(config-if)# exit
+</code></pre><hr><h2 id=save-configuration>Save Configuration</h2><pre tabindex=0><code class=language-cisco data-lang=cisco># Save running config to startup config
+CoreSwitch# copy running-config startup-config
+# Or shorthand
+CoreSwitch# write memory
+# Or even shorter
+CoreSwitch# wr
+</code></pre><hr><h2 id=verify-configuration>Verify Configuration</h2><pre tabindex=0><code class=language-cisco data-lang=cisco># Show running configuration
+CoreSwitch# show running-config
+
+# Show startup configuration
+CoreSwitch# show startup-config
+
+# Show interface status
+CoreSwitch# show ip interface brief
+
+# Show VLAN information
+CoreSwitch# show vlan brief
+
+# Show MAC address table
+CoreSwitch# show mac address-table
+
+# Show version
+CoreSwitch# show version
+</code></pre><hr><h2 id=essential-configuration-checklist>Essential Configuration Checklist</h2><ul><li><input disabled type=checkbox> Hostname configured</li><li><input disabled type=checkbox> Enable secret password set</li><li><input disabled type=checkbox> Console password set</li><li><input disabled type=checkbox> VTY password set</li><li><input disabled type=checkbox> Management IP assigned</li><li><input disabled type=checkbox> Default gateway configured</li><li><input disabled type=checkbox> Interface descriptions added</li><li><input disabled type=checkbox> Configuration saved to NVRAM</li><li><input disabled type=checkbox> Remote access tested (if applicable)</li><li><input disabled type=checkbox> Documentation updated</li></ul><hr><h2 id=common-post-setup-tasks>Common Post-Setup Tasks</h2><h3 id=disable-unused-interfaces>Disable Unused Interfaces</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# interface range gigabitethernet 0/10-24
+CoreSwitch(config-if-range)# shutdown
+CoreSwitch(config-if-range)# description UNUSED
+CoreSwitch(config-if-range)# exit
+</code></pre><h3 id=set-domain-name-required-for-ssh>Set Domain Name (Required for SSH)</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# ip domain-name example.com
+</code></pre><h3 id=configure-time-and-date>Configure Time and Date</h3><pre tabindex=0><code class=language-cisco data-lang=cisco># Set clock manually
+CoreSwitch# clock set 14:30:00 6 Feb 2026
+
+# Or configure NTP
+CoreSwitch(config)# ntp server 192.168.1.1
+</code></pre><h3 id=configure-banner>Configure Banner</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>CoreSwitch(config)# banner motd #
+***********************************************
+* WARNING: Unauthorized access prohibited!   *
+* All activities are monitored and logged.   *
+***********************************************
+#
+</code></pre><hr><h2 id=quick-setup-script>Quick Setup Script</h2><p>Here&rsquo;s a complete basic setup you can paste in:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>enable
+configure terminal
+hostname CoreSwitch
+enable secret Cisco123!
+ip domain-name lab.local
+
+! Management interface
+interface vlan 1
+ ip address 192.168.1.10 255.255.255.0
+ no shutdown
+ exit
+
+ip default-gateway 192.168.1.1
+
+! Console line
+line console 0
+ password Console123
+ login
+ logging synchronous
+ exec-timeout 5 0
+ exit
+
+! VTY lines
+line vty 0 15
+ password Vty123
+ login
+ transport input ssh
+ exec-timeout 5 0
+ exit
+
+! Disable unused ports
+interface range gi0/20-24
+ shutdown
+ description UNUSED
+ exit
+
+! Save
+end
+write memory
+</code></pre><hr><h2 id=verification-commands>Verification Commands</h2><pre tabindex=0><code class=language-cisco data-lang=cisco># Verify IP configuration
+show ip interface brief
+
+# Verify management access
+ping 192.168.1.1
+
+# Verify saved configuration
+show startup-config | include hostname
+
+# Check system status
+show version
+show inventory
+</code></pre><hr><h2 id=troubleshooting-common-issues>Troubleshooting Common Issues</h2><h3 id=cannot-connect-via-console>Cannot Connect via Console</h3><ul><li>Check baud rate (9600)</li><li>Try different USB port</li><li>Check cable (Cisco console cable vs null modem)</li><li>Press Enter several times to activate</li></ul><h3 id=no-network-connectivity>No Network Connectivity</h3><pre tabindex=0><code class=language-cisco data-lang=cisco># Check interface status
+show ip interface brief
+
+# Ensure VLAN 1 is up
+show vlan brief
+
+# Verify at least one port is in VLAN 1 and up
+show interfaces status
+</code></pre><h3 id=forgotten-to-save-config>Forgotten to Save Config</h3><pre tabindex=0><code class=language-cisco data-lang=cisco># Compare running vs startup
+show archive config differences system:running-config system:startup-config
+
+# If changes exist, save them
+copy running-config startup-config
+</code></pre><hr><h2 id=best-practices>Best Practices</h2><ol><li><strong>Always use <code>enable secret</code></strong> instead of <code>enable password</code></li><li><strong>Save configuration immediately</strong> after making changes</li><li><strong>Document everything</strong> - use interface descriptions</li><li><strong>Use strong passwords</strong> - minimum 8 characters with complexity</li><li><strong>Disable unused ports</strong> - security best practice</li><li><strong>Set appropriate timeouts</strong> - balance security and usability</li><li><strong>Use SSH instead of Telnet</strong> - encrypted communications</li><li><strong>Configure NTP</strong> - accurate timestamps for logs</li><li><strong>Set timezone</strong> - for accurate logging</li><li><strong>Regular backups</strong> - save configurations off-switch</li></ol></div></div><script src=/assets/shared-nav.js></script></body></html>

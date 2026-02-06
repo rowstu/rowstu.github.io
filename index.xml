@@ -816,7 +816,108 @@ else
  echo -e &amp;#34;${GREEN}✓ No reboot needed${NC}&amp;#34;
  exit 0
 fi
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>AWS CI/CD Pipeline Examples</title><link>https://rowstu.net/aws/cicd-aws-github/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/aws/cicd-aws-github/</guid><description>&lt;h2 id="github-actions-example"&gt;GitHub Actions Example&lt;/h2&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>AWS &amp; GitHub OIDC Integration</title><link>https://rowstu.net/authentication/aws-github-oidc/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/authentication/aws-github-oidc/</guid><description>&lt;h1 id="aws--github-oidc-for-terraform-deployments"&gt;AWS &amp;amp; GitHub OIDC for Terraform Deployments&lt;/h1&gt;
+&lt;p&gt;Setting up OpenID Connect (OIDC) between AWS and GitHub Actions to deploy Terraform infrastructure without long-lived credentials.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="why-oidc"&gt;Why OIDC?&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Traditional Approach Problems:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;GitHub Actions → AWS Access Key + Secret → Security Risk
+├─ Long-lived credentials stored in GitHub Secrets
+├─ Credentials can be exfiltrated
+├─ Manual rotation required
+└─ Broad permissions difficult to scope
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;OIDC Approach Benefits:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;GitHub Actions → OIDC Token → AWS IAM Role → Temporary Credentials
+├─ No long-lived credentials to store
+├─ Tokens are short-lived (hours)
+├─ Fine-grained trust policies
+└─ Automatic credential rotation
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id="architecture-overview"&gt;Architecture Overview&lt;/h2&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;┌─────────────────────────────────────────────────────────────────┐
+│ GitHub Actions Workflow │
+│ │
+│ ┌──────────────────────────────────────────────────────────┐ │
+│ │ 1. Request OIDC token from GitHub │ │
+│ │ Token includes: repo, branch, environment, etc. │ │
+│ └────────────────────┬─────────────────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌──────────────────────────────────────────────────────────┐ │
+│ │ 2. Assume AWS IAM Role using OIDC token │ │
+│ │ aws-actions/configure-aws-credentials@v4 │ │
+│ └────────────────────┬─────────────────────────────────────┘ │
+└────────────────────────┼──────────────────────────────────────┘
+ │
+ │ OIDC Token
+ │
+ ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ AWS Account │
+│ │
+│ ┌──────────────────────────────────────────────────────────┐ │
+│ │ 3. OIDC Identity Provider │ │
+│ │ Validates token signature from GitHub │ │
+│ └────────────────────┬─────────────────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌──────────────────────────────────────────────────────────┐ │
+│ │ 4. IAM Role with Trust Policy │ │
+│ │ Validates: repo, branch, environment claims │ │
+│ └────────────────────┬─────────────────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌──────────────────────────────────────────────────────────┐ │
+│ │ 5. Return Temporary AWS Credentials │ │
+│ │ Valid for 1 hour (default) │ │
+│ └────────────────────┬─────────────────────────────────────┘ │
+└────────────────────────┼──────────────────────────────────────┘
+ │
+ │ Temporary Credentials
+ │
+ ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ GitHub Actions Workflow (continued) │
+│ │
+│ ┌──────────────────────────────────────────────────────────┐ │
+│ │ 6. Run Terraform commands │ │
+│ │ terraform plan / terraform apply │ │
+│ └──────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id="step-1-create-aws-oidc-identity-provider"&gt;Step 1: Create AWS OIDC Identity Provider&lt;/h2&gt;
+&lt;h3 id="using-aws-console"&gt;Using AWS Console&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Navigate to IAM → Identity Providers → Add Provider&lt;/li&gt;
+&lt;li&gt;Configure provider:
+&lt;ul&gt;
+&lt;li&gt;Provider Type: &lt;code&gt;OpenID Connect&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Provider URL: &lt;code&gt;https://token.actions.githubusercontent.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Audience: &lt;code&gt;sts.amazonaws.com&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="using-terraform"&gt;Using Terraform&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-hcl" data-lang="hcl"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# oidc-provider.tf
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;resource&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;aws_iam_openid_connect_provider&amp;#34; &amp;#34;github_actions&amp;#34;&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; url &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;https://token.actions.githubusercontent.com&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; client_id_list &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;sts.amazonaws.com&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; ]&lt;span style="color:#75715e"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt; # Get from: https://github.com/aws-actions/configure-aws-credentials
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; thumbprint_list &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;6938fd4d98bab03faadb97b34396831e3780aea1&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;1c58a3a8518e8759bf075b76b750d4f2df264fcd&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; ]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; tags &lt;span style="color:#f92672"&gt;=&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Name &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;github-actions-oidc&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Description &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;OIDC provider for GitHub Actions&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Thumbprints can be verified at the &lt;a href="https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect"&gt;GitHub OIDC documentation&lt;/a&gt;.&lt;/p&gt;</description></item><item><title>AWS CI/CD Pipeline Examples</title><link>https://rowstu.net/aws/cicd-aws-github/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/aws/cicd-aws-github/</guid><description>&lt;h2 id="github-actions-example"&gt;GitHub Actions Example&lt;/h2&gt;
 &lt;h3 id="cigithub-actionsdeployyml"&gt;&lt;code&gt;ci/github-actions/deploy.yml&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;This pipeline:&lt;/p&gt;
 &lt;ul&gt;
@@ -991,7 +1092,31 @@ Default output format [None]: json
 &lt;li&gt;&lt;strong&gt;Azure Backup &amp;amp; Site Recovery&lt;/strong&gt; integration for disaster recovery strategies. (&lt;a href="https://azure.microsoft.com/en-us/blog/the-new-azure-vmware-solution-is-now-generally-available/?utm_source=chatgpt.com" title="The new Azure VMware Solution is now generally available | Microsoft Azure Blog"&gt;Microsoft Azure&lt;/a&gt;)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;Further reading:&lt;/strong&gt;
-🔗 Azure VMware Solution docs — &lt;a href="https://learn.microsoft.com/en-us/azure/azure-vmware/?utm_source=chatgpt.com"&gt;Official AVS Microsoft Docs&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Book.Thinking</title><link>https://rowstu.net/books/book.thinking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/book.thinking/</guid><description>&lt;h1 id="key-lessons-from-dont-believe-everything-you-think"&gt;Key lessons from Don&amp;rsquo;t Believe Everything You Think&lt;/h1&gt;
+🔗 Azure VMware Solution docs — &lt;a href="https://learn.microsoft.com/en-us/azure/azure-vmware/?utm_source=chatgpt.com"&gt;Official AVS Microsoft Docs&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Basic Cisco Switch Setup</title><link>https://rowstu.net/cisco/basic-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/basic-setup/</guid><description>&lt;h1 id="setting-up-a-new-cisco-switch"&gt;Setting Up a New Cisco Switch&lt;/h1&gt;
+&lt;p&gt;Step-by-step guide for configuring a brand new Cisco switch for basic switching operations.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="initial-connection"&gt;Initial Connection&lt;/h2&gt;
+&lt;p&gt;Connect to the switch via console cable:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Using screen (Linux/Mac)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;screen /dev/ttyUSB0 &lt;span style="color:#ae81ff"&gt;9600&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Using minicom (Linux)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;minicom -D /dev/ttyUSB0
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Using PuTTY (Windows)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Serial line: COM3 (check Device Manager)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Speed: 9600&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Console Settings:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Baud rate: 9600&lt;/li&gt;
+&lt;li&gt;Data bits: 8&lt;/li&gt;
+&lt;li&gt;Parity: None&lt;/li&gt;
+&lt;li&gt;Stop bits: 1&lt;/li&gt;
+&lt;li&gt;Flow control: None&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="initial-configuration-dialog"&gt;Initial Configuration Dialog&lt;/h2&gt;
+&lt;p&gt;On first boot, the switch will prompt:&lt;/p&gt;</description></item><item><title>Book.Thinking</title><link>https://rowstu.net/books/book.thinking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/book.thinking/</guid><description>&lt;h1 id="key-lessons-from-dont-believe-everything-you-think"&gt;Key lessons from Don&amp;rsquo;t Believe Everything You Think&lt;/h1&gt;
 &lt;p&gt;Thinking is an active process.&lt;/p&gt;
 &lt;p&gt;Thoughts happen all by them selves.&lt;/p&gt;
 &lt;p&gt;The two are similar but not the same thing.&lt;/p&gt;
@@ -1498,7 +1623,34 @@ CD Checklist:
 □ Secrets management
 □ Rollback capability
 □ Monitoring and alerting
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Cli</title><link>https://rowstu.net/windows/cli/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/windows/cli/</guid><description>&lt;h1 id="windows-cli-commands-that-have-similar-functionality-to-linux-utilities"&gt;Windows CLI commands that have similar functionality to Linux utilities&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Cisco Switch Hardening</title><link>https://rowstu.net/cisco/hardening/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/hardening/</guid><description>&lt;h1 id="cisco-switch-security-hardening"&gt;Cisco Switch Security Hardening&lt;/h1&gt;
+&lt;p&gt;Comprehensive guide to hardening Cisco switches against attacks and unauthorized access.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="security-hardening-overview"&gt;Security Hardening Overview&lt;/h2&gt;
+&lt;p&gt;Switch hardening involves multiple layers of security controls to protect against:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Unauthorized access&lt;/strong&gt; - Physical and remote&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Network attacks&lt;/strong&gt; - VLAN hopping, MAC flooding, ARP spoofing&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Layer 2 attacks&lt;/strong&gt; - STP manipulation, DHCP starvation&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Password attacks&lt;/strong&gt; - Brute force, dictionary attacks&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Denial of service&lt;/strong&gt; - Resource exhaustion&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="layer-1-physical-security"&gt;Layer 1: Physical Security&lt;/h2&gt;
+&lt;h3 id="disable-unused-ports"&gt;Disable Unused Ports&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;! Disable and assign to parking VLAN
+Switch(config)# vlan 999
+Switch(config-vlan)# name PARKING_LOT
+Switch(config-vlan)# exit
+
+Switch(config)# interface range gigabitethernet 0/10-24
+Switch(config-if-range)# description UNUSED - DISABLED
+Switch(config-if-range)# switchport mode access
+Switch(config-if-range)# switchport access vlan 999
+Switch(config-if-range)# shutdown
+Switch(config-if-range)# exit
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="port-security"&gt;Port Security&lt;/h3&gt;
+&lt;p&gt;Prevent unauthorized devices from connecting:&lt;/p&gt;</description></item><item><title>Cli</title><link>https://rowstu.net/windows/cli/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/windows/cli/</guid><description>&lt;h1 id="windows-cli-commands-that-have-similar-functionality-to-linux-utilities"&gt;Windows CLI commands that have similar functionality to Linux utilities&lt;/h1&gt;
 &lt;p&gt;sed find and replace&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;Get-Content file.txt | ForEach-Object { $_ -replace &amp;#39;old&amp;#39;, &amp;#39;new&amp;#39; } | Set-Content file.txt
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;awk split a csv&lt;/p&gt;
@@ -1632,7 +1784,25 @@ Get-Service -Name &amp;#34;ServiceName&amp;#34;
 &lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-plaintext" data-lang="plaintext"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;USER user_name
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="examples"&gt;Examples&lt;/h2&gt;
 &lt;h3 id="copying-files-example"&gt;Copying Files Example&lt;/h3&gt;
-&lt;p&gt;To copy a file named &lt;code&gt;example.txt&lt;/code&gt; to a directory called &lt;code&gt;backup&lt;/code&gt;, you would use:&lt;/p&gt;</description></item><item><title>Cost Explorer &amp; Budgets</title><link>https://rowstu.net/tf/cost-explorer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/tf/cost-explorer/</guid><description>&lt;h1 id="cost-explorer--budgets"&gt;Cost Explorer &amp;amp; Budgets&lt;/h1&gt;
+&lt;p&gt;To copy a file named &lt;code&gt;example.txt&lt;/code&gt; to a directory called &lt;code&gt;backup&lt;/code&gt;, you would use:&lt;/p&gt;</description></item><item><title>Console Port Security</title><link>https://rowstu.net/cisco/console-security/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/console-security/</guid><description>&lt;h1 id="cisco-console-port-security"&gt;Cisco Console Port Security&lt;/h1&gt;
+&lt;p&gt;Comprehensive guide to securing console access on Cisco switches and routers.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="why-console-security-matters"&gt;Why Console Security Matters&lt;/h2&gt;
+&lt;p&gt;The console port is often overlooked in security configurations, but represents a critical vulnerability:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Direct physical access&lt;/strong&gt; bypasses most security controls&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Password recovery&lt;/strong&gt; can be performed via console&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Full administrative access&lt;/strong&gt; available once logged in&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No network logging&lt;/strong&gt; for some attack vectors&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="basic-console-security"&gt;Basic Console Security&lt;/h2&gt;
+&lt;h3 id="set-console-password"&gt;Set Console Password&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch(config)# line console 0
+Switch(config-line)# password ConsolePass123!
+Switch(config-line)# login
+Switch(config-line)# exit
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Test:&lt;/strong&gt; Disconnect and reconnect - should prompt for password.&lt;/p&gt;</description></item><item><title>Cost Explorer &amp; Budgets</title><link>https://rowstu.net/tf/cost-explorer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/tf/cost-explorer/</guid><description>&lt;h1 id="cost-explorer--budgets"&gt;Cost Explorer &amp;amp; Budgets&lt;/h1&gt;
 &lt;p&gt;Managing AWS costs with Terraform using Cost Explorer, Budgets, and Cost Allocation Tags.&lt;/p&gt;
 &lt;h2 id="aws-budgets"&gt;AWS Budgets&lt;/h2&gt;
 &lt;h3 id="monthly-cost-budget"&gt;Monthly Cost Budget&lt;/h3&gt;
@@ -5267,7 +5437,33 @@ In my whole life, I have known no wise people who didn’t read all the time - n
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Format the Partitions:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Regex Examples</title><link>https://rowstu.net/python/regex-examples/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/regex-examples/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import re
+&lt;p&gt;&lt;strong&gt;Format the Partitions:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Reconfiguring a Cisco Switch</title><link>https://rowstu.net/cisco/reconfiguration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/reconfiguration/</guid><description>&lt;h1 id="reconfiguring-a-cisco-switch-from-scratch"&gt;Reconfiguring a Cisco Switch from Scratch&lt;/h1&gt;
+&lt;p&gt;How to completely reset and reconfigure a Cisco switch that has existing configuration.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="pre-reconfiguration-checklist"&gt;Pre-Reconfiguration Checklist&lt;/h2&gt;
+&lt;p&gt;Before wiping a switch, ensure:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You have console access&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You&amp;rsquo;ve backed up the current configuration (if needed)&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You understand the current network topology&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You have authorization to reset the device&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You have the new configuration ready&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="option-1-delete-configuration-and-reload"&gt;Option 1: Delete Configuration and Reload&lt;/h2&gt;
+&lt;h3 id="step-1-backup-current-configuration-optional"&gt;Step 1: Backup Current Configuration (Optional)&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch# show running-config
+# Copy output to text file
+
+# Or via TFTP
+Switch# copy running-config tftp:
+# Enter TFTP server IP and filename
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="step-2-erase-startup-configuration"&gt;Step 2: Erase Startup Configuration&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch# write erase
+Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
+[OK]
+Erase of nvram: complete
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Alternative commands:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Regex Examples</title><link>https://rowstu.net/python/regex-examples/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/regex-examples/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import re
 
 def regex_examples():
  # 1. Basic Pattern Matching
@@ -5340,7 +5536,77 @@ def regex_examples():
 
 # Run the examples
 regex_examples()
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Remove Irrationality</title><link>https://rowstu.net/maths/remove-irrationality/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/maths/remove-irrationality/</guid><description>&lt;h1 id="removing-irrationality-from-denominators"&gt;Removing Irrationality from Denominators&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Remote Access Configuration</title><link>https://rowstu.net/cisco/remote-access/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/remote-access/</guid><description>&lt;h1 id="configuring-remote-access-to-cisco-switches"&gt;Configuring Remote Access to Cisco Switches&lt;/h1&gt;
+&lt;p&gt;Complete guide to setting up SSH and secure remote management access on Cisco switches.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
+&lt;p&gt;Remote management allows you to configure and monitor switches without physical console access. This guide covers:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Assigning management IP addresses&lt;/li&gt;
+&lt;li&gt;Configuring SSH (recommended)&lt;/li&gt;
+&lt;li&gt;Securing remote access&lt;/li&gt;
+&lt;li&gt;Troubleshooting connectivity&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;p&gt;Before configuring remote access:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Console access&lt;/strong&gt; to the switch&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Network connectivity&lt;/strong&gt; to the switch&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;IP address plan&lt;/strong&gt; for management interface&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DNS/hostname&lt;/strong&gt; (required for SSH)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="assigning-an-ip-address-to-a-switch"&gt;Assigning an IP Address to a Switch&lt;/h2&gt;
+&lt;h3 id="method-1-using-vlan-1-default-simple"&gt;Method 1: Using VLAN 1 (Default, Simple)&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch# configure terminal
+
+! Configure VLAN 1 interface
+Switch(config)# interface vlan 1
+Switch(config-if)# ip address 192.168.1.10 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# description Management Interface
+Switch(config-if)# exit
+
+! Set default gateway
+Switch(config)# ip default-gateway 192.168.1.1
+
+! Save configuration
+Switch(config)# exit
+Switch# write memory
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="method-2-using-dedicated-management-vlan-best-practice"&gt;Method 2: Using Dedicated Management VLAN (Best Practice)&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;! Create management VLAN
+Switch(config)# vlan 99
+Switch(config-vlan)# name MANAGEMENT
+Switch(config-vlan)# exit
+
+! Configure VLAN interface
+Switch(config)# interface vlan 99
+Switch(config-if)# ip address 192.168.99.10 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# description Management Interface
+Switch(config-if)# exit
+
+! Set default gateway
+Switch(config)# ip default-gateway 192.168.99.1
+
+! Assign a physical port to management VLAN (for connectivity)
+Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 99
+Switch(config-if)# description Management Port
+Switch(config-if)# exit
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="verify-ip-configuration"&gt;Verify IP Configuration&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch# show ip interface brief
+Interface IP-Address OK? Method Status Protocol
+Vlan1 unassigned YES unset administratively down down
+Vlan99 192.168.99.10 YES manual up up
+
+! Test connectivity
+Switch# ping 192.168.99.1
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id="configuring-ssh-access"&gt;Configuring SSH Access&lt;/h2&gt;
+&lt;p&gt;SSH provides encrypted remote access. Telnet is &lt;strong&gt;not recommended&lt;/strong&gt; (unencrypted).&lt;/p&gt;</description></item><item><title>Remove Irrationality</title><link>https://rowstu.net/maths/remove-irrationality/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/maths/remove-irrationality/</guid><description>&lt;h1 id="removing-irrationality-from-denominators"&gt;Removing Irrationality from Denominators&lt;/h1&gt;
 &lt;h2 id="example-1-simplify-9--36"&gt;Example 1: Simplify 9 / 3√6&lt;/h2&gt;
 &lt;p&gt;&lt;strong&gt;1. Start with the original expression:&lt;/strong&gt;&lt;/p&gt;
 &lt;pre style="text-align: center; padding: 0.5em;"&gt;
@@ -7650,7 +7916,21 @@ Visual: v V Ctrl+v &amp;gt; &amp;lt; =
 Search: / ? n N * # :%s/old/new/g
 Windows: Ctrl+w s/v/h/j/k/l/q
 Files: :e :w :q :wq :ls :bn :bp
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>VMware Aria</title><link>https://rowstu.net/vmware/aria/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/aria/</guid><description>&lt;p&gt;&lt;strong&gt;Aria Operations&lt;/strong&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>VLAN Configuration</title><link>https://rowstu.net/cisco/vlan-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/vlan-setup/</guid><description>&lt;h1 id="cisco-switch-vlan-setup"&gt;Cisco Switch VLAN Setup&lt;/h1&gt;
+&lt;p&gt;Complete guide to creating, configuring, and managing VLANs on Cisco switches.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="what-is-a-vlan"&gt;What is a VLAN?&lt;/h2&gt;
+&lt;p&gt;A &lt;strong&gt;Virtual Local Area Network (VLAN)&lt;/strong&gt; is a logical segmentation of a physical network:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Broadcast domain isolation&lt;/strong&gt; - Traffic contained within VLAN&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Security&lt;/strong&gt; - Separate traffic between departments/functions&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Performance&lt;/strong&gt; - Reduce broadcast traffic&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Flexibility&lt;/strong&gt; - Group users by function, not physical location&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="vlan-basics"&gt;VLAN Basics&lt;/h2&gt;
+&lt;h3 id="default-vlans"&gt;Default VLANs&lt;/h3&gt;
+&lt;p&gt;All Cisco switches come with these default VLANs:&lt;/p&gt;</description></item><item><title>VMware Aria</title><link>https://rowstu.net/vmware/aria/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vmware/aria/</guid><description>&lt;p&gt;&lt;strong&gt;Aria Operations&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Unified operations management: performance, capacity, configuration, and compliance across vSphere and hybrid cloud. (&lt;a href="https://techdocs.broadcom.com/us/en/vmware-cis/aria.html?utm_source=chatgpt.com" title="VMware Aria - Broadcom Techdocs"&gt;techdocs.broadcom.com&lt;/a&gt;)&lt;/li&gt;
 &lt;li&gt;Predictive analytics and intelligent remediation with dashboards and alerts. (&lt;a href="https://techdocs.broadcom.com/us/en/vmware-cis/aria.html?utm_source=chatgpt.com" title="VMware Aria - Broadcom Techdocs"&gt;techdocs.broadcom.com&lt;/a&gt;)&lt;/li&gt;

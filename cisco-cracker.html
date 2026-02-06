@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cisco Password Recovery // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg-primary: #0d1117;
+			--bg-secondary: #161b22;
+			--surface: #1f2937;
+			--surface-hover: #374151;
+			--border: #30363d;
+			--text: #c9d1d9;
+			--text-muted: #8b949e;
+			--accent: #00d9ff;
+			--accent-dim: rgba(0, 217, 255, 0.2);
+			--success: #00ff88;
+			--warning: #ffaa00;
+			--danger: #ff4757;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Orbitron', 'IBM Plex Mono', monospace;
+			background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 50%, #0d1117 100%);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			position: relative;
+			overflow-x: hidden;
+		}
+
+		body::before {
+			content: '';
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background:
+				repeating-linear-gradient(
+					0deg,
+					rgba(0, 217, 255, 0.03) 0px,
+					transparent 1px,
+					transparent 2px,
+					rgba(0, 217, 255, 0.03) 3px
+				);
+			pointer-events: none;
+			z-index: 1;
+		}
+
+		.container {
+			max-width: 900px;
+			margin: 0 auto;
+			position: relative;
+			z-index: 2;
+		}
+
+		header {
+			margin-bottom: 2rem;
+			text-align: center;
+			padding: 1.5rem;
+			background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--surface) 100%);
+			border: 2px solid var(--border);
+			border-radius: 12px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		header::before {
+			content: '';
+			position: absolute;
+			top: -50%;
+			left: -50%;
+			width: 200%;
+			height: 200%;
+			background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+			animation: pulse 4s ease-in-out infinite;
+		}
+
+		@keyframes pulse {
+			0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.3; }
+			50% { transform: scale(1.1) rotate(180deg); opacity: 0.5; }
+		}
+
+		h1 {
+			font-size: 2rem;
+			font-weight: 900;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+			position: relative;
+			z-index: 1;
+		}
+
+		.subtitle {
+			color: var(--text-muted);
+			font-size: 0.875rem;
+			font-weight: 400;
+			position: relative;
+			z-index: 1;
+		}
+
+		.panel {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1.5rem;
+			margin-bottom: 1.5rem;
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+			transition: all 0.3s ease;
+		}
+
+		.panel:hover {
+			border-color: var(--accent);
+			box-shadow: 0 4px 24px rgba(0, 217, 255, 0.2);
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+			padding-bottom: 0.75rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.panel-title {
+			font-size: 0.9rem;
+			font-weight: 700;
+			color: var(--accent);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.type-badge {
+			display: inline-block;
+			padding: 0.25rem 0.75rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: 700;
+			text-transform: uppercase;
+		}
+
+		.type-badge.type-7 {
+			background: rgba(255, 170, 0, 0.2);
+			color: var(--warning);
+			border: 1px solid var(--warning);
+		}
+
+		.type-badge.type-5 {
+			background: rgba(255, 71, 87, 0.2);
+			color: var(--danger);
+			border: 1px solid var(--danger);
+		}
+
+		textarea, input[type="text"] {
+			width: 100%;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			color: var(--text);
+			font-family: 'IBM Plex Mono', monospace;
+			font-size: 0.9rem;
+			resize: vertical;
+			outline: none;
+			transition: all 0.2s;
+		}
+
+		textarea {
+			min-height: 120px;
+		}
+
+		textarea:focus, input[type="text"]:focus {
+			border-color: var(--accent);
+			box-shadow: 0 0 0 3px var(--accent-dim);
+		}
+
+		textarea::placeholder, input[type="text"]::placeholder {
+			color: var(--text-muted);
+		}
+
+		.btn-group {
+			display: flex;
+			gap: 0.75rem;
+			margin-top: 1rem;
+			flex-wrap: wrap;
+		}
+
+		button {
+			padding: 0.75rem 1.5rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		button:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+		}
+
+		button.primary {
+			background: linear-gradient(135deg, var(--accent) 0%, #0099cc 100%);
+			border-color: var(--accent);
+			color: #000;
+		}
+
+		button.primary:hover {
+			opacity: 0.9;
+		}
+
+		button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.result-box {
+			background: var(--surface);
+			border: 2px solid var(--border);
+			border-radius: 8px;
+			padding: 1.25rem;
+			margin-top: 1rem;
+			display: none;
+		}
+
+		.result-box.visible {
+			display: block;
+			animation: slideIn 0.3s ease;
+		}
+
+		@keyframes slideIn {
+			from {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.result-box.success {
+			border-color: var(--success);
+			background: rgba(0, 255, 136, 0.05);
+		}
+
+		.result-box.error {
+			border-color: var(--danger);
+			background: rgba(255, 71, 87, 0.05);
+		}
+
+		.result-box.warning {
+			border-color: var(--warning);
+			background: rgba(255, 170, 0, 0.05);
+		}
+
+		.result-header {
+			font-weight: 700;
+			font-size: 0.9rem;
+			margin-bottom: 0.75rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.result-box.success .result-header {
+			color: var(--success);
+		}
+
+		.result-box.error .result-header {
+			color: var(--danger);
+		}
+
+		.result-box.warning .result-header {
+			color: var(--warning);
+		}
+
+		.result-content {
+			font-family: 'IBM Plex Mono', monospace;
+			font-size: 1rem;
+			word-break: break-all;
+			line-height: 1.8;
+		}
+
+		.info-grid {
+			display: grid;
+			grid-template-columns: 120px 1fr;
+			gap: 0.75rem;
+			margin-top: 0.75rem;
+		}
+
+		.info-label {
+			color: var(--text-muted);
+			font-size: 0.8rem;
+			font-weight: 500;
+		}
+
+		.info-value {
+			color: var(--text);
+			font-family: 'IBM Plex Mono', monospace;
+			font-size: 0.85rem;
+		}
+
+		.copy-btn {
+			margin-top: 0.75rem;
+			padding: 0.5rem 1rem;
+			font-size: 0.75rem;
+		}
+
+		.tabs {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1.5rem;
+			background: var(--bg-secondary);
+			padding: 0.5rem;
+			border-radius: 8px;
+			border: 1px solid var(--border);
+		}
+
+		.tab {
+			flex: 1;
+			background: transparent;
+			border: 1px solid transparent;
+			color: var(--text-muted);
+			padding: 0.75rem 1rem;
+			border-radius: 6px;
+			font-size: 0.85rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.tab:hover {
+			color: var(--text);
+			background: var(--surface);
+		}
+
+		.tab.active {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #000;
+			box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+		}
+
+		.tab-content {
+			display: none;
+		}
+
+		.tab-content.active {
+			display: block;
+		}
+
+		.wordlist-info {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.5rem;
+		}
+
+		.progress-bar {
+			width: 100%;
+			height: 6px;
+			background: var(--surface);
+			border-radius: 3px;
+			overflow: hidden;
+			margin-top: 1rem;
+			display: none;
+		}
+
+		.progress-bar.visible {
+			display: block;
+		}
+
+		.progress-fill {
+			height: 100%;
+			background: linear-gradient(90deg, var(--accent) 0%, var(--success) 100%);
+			width: 0%;
+			transition: width 0.3s ease;
+			animation: shimmer 2s infinite;
+		}
+
+		@keyframes shimmer {
+			0% { opacity: 0.6; }
+			50% { opacity: 1; }
+			100% { opacity: 0.6; }
+		}
+
+		@media (max-width: 768px) {
+			h1 { font-size: 1.5rem; }
+			.info-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+			.btn-group { flex-direction: column; }
+			button { width: 100%; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>⚡ Cisco Password Recovery ⚡</h1>
+			<p class="subtitle">Decrypt Type 7 passwords • Crack Type 5 MD5 hashes</p>
+		</header>
+
+		<div class="tabs">
+			<button class="tab active" data-tab="type7">Type 7 Decrypt</button>
+			<button class="tab" data-tab="type5">Type 5 Crack</button>
+		</div>
+
+		<!-- Type 7 Decryption -->
+		<div id="type7-tab" class="tab-content active">
+			<div class="panel">
+				<div class="panel-header">
+					<span class="panel-title">Decrypt Type 7 Password</span>
+					<span class="type-badge type-7">Reversible</span>
+				</div>
+				<textarea id="type7Input" placeholder="Enter Type 7 encrypted password (e.g., 060506324F41584B56)"></textarea>
+				<div class="btn-group">
+					<button class="primary" onclick="decryptType7()">Decrypt</button>
+					<button onclick="clearType7()">Clear</button>
+				</div>
+				<div id="type7Result" class="result-box"></div>
+			</div>
+
+			<div class="panel">
+				<div class="panel-header">
+					<span class="panel-title">About Type 7 Encryption</span>
+				</div>
+				<p style="line-height: 1.8; font-size: 0.85rem;">
+					Cisco Type 7 passwords use a simple Vigenere cipher with a known key. They are <strong style="color: var(--warning);">NOT secure</strong>
+					and should only be used to prevent shoulder-surfing. The algorithm is easily reversible, making these passwords trivially
+					recoverable. Format: <code style="color: var(--accent);">&lt;2-digit-seed&gt;&lt;encrypted-hex&gt;</code>
+				</p>
+			</div>
+		</div>
+
+		<!-- Type 5 Cracking -->
+		<div id="type5-tab" class="tab-content">
+			<div class="panel">
+				<div class="panel-header">
+					<span class="panel-title">Crack Type 5 Password</span>
+					<span class="type-badge type-5">MD5 Hash</span>
+				</div>
+				<textarea id="type5Input" placeholder="Enter Type 5 hash (e.g., $1$mERr$hx5rVt7rPNoS4wqbXKX7m0)"></textarea>
+				<div class="btn-group">
+					<button class="primary" onclick="crackType5()">Crack Password</button>
+					<button onclick="clearType5()">Clear</button>
+				</div>
+				<div class="progress-bar" id="type5Progress">
+					<div class="progress-fill"></div>
+				</div>
+				<div id="type5Result" class="result-box"></div>
+				<p class="wordlist-info">
+					Uses a built-in dictionary of 10,000+ common passwords, Cisco defaults, and variations.
+				</p>
+			</div>
+
+			<div class="panel">
+				<div class="panel-header">
+					<span class="panel-title">About Type 5 Hashing</span>
+				</div>
+				<p style="line-height: 1.8; font-size: 0.85rem;">
+					Cisco Type 5 passwords use MD5 hashing with salt. While more secure than Type 7, MD5 is considered
+					<strong style="color: var(--danger);">cryptographically weak</strong> and vulnerable to dictionary/rainbow table attacks.
+					Format: <code style="color: var(--accent);">$1$&lt;salt&gt;$&lt;hash&gt;</code>. This tool attempts to crack using
+					common passwords and Cisco-specific defaults.
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Cisco Type 7 XOR key
+		const TYPE7_KEY = "dsfd;kfoA,.iyewrkldJKDHSUBsgvca69834ncxv9873254k;fg87";
+
+		// Tab switching
+		document.querySelectorAll('.tab').forEach(tab => {
+			tab.addEventListener('click', () => {
+				const tabName = tab.dataset.tab;
+				document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+				document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+				tab.classList.add('active');
+				document.getElementById(`${tabName}-tab`).classList.add('active');
+			});
+		});
+
+		// Type 7 Decryption
+		function decryptType7() {
+			const input = document.getElementById('type7Input').value.trim();
+			const resultBox = document.getElementById('type7Result');
+
+			if (!input) {
+				showResult(resultBox, 'error', 'Error', 'Please enter a Type 7 encrypted password');
+				return;
+			}
+
+			try {
+				// Validate format (should be hex string)
+				if (!/^[0-9A-Fa-f]+$/.test(input)) {
+					throw new Error('Invalid Type 7 format - must be hexadecimal');
+				}
+
+				if (input.length < 4) {
+					throw new Error('Password too short - minimum 4 characters');
+				}
+
+				// Extract seed (first 2 digits)
+				const seed = parseInt(input.substring(0, 2), 10);
+				if (isNaN(seed) || seed > TYPE7_KEY.length - 1) {
+					throw new Error('Invalid seed value');
+				}
+
+				// Decrypt
+				let decrypted = '';
+				for (let i = 2; i < input.length; i += 2) {
+					const hexPair = input.substring(i, i + 2);
+					const encryptedChar = parseInt(hexPair, 16);
+					const keyChar = TYPE7_KEY.charCodeAt(seed + (i - 2) / 2);
+					decrypted += String.fromCharCode(encryptedChar ^ keyChar);
+				}
+
+				const resultHTML = `
+					<div class="result-header">✓ Decrypted Successfully</div>
+					<div class="result-content">${escapeHtml(decrypted)}</div>
+					<div class="info-grid">
+						<div class="info-label">Algorithm:</div>
+						<div class="info-value">Vigenere Cipher (XOR)</div>
+						<div class="info-label">Seed:</div>
+						<div class="info-value">${seed}</div>
+						<div class="info-label">Key Offset:</div>
+						<div class="info-value">${seed} (KEY[${seed}] = '${TYPE7_KEY[seed]}')</div>
+					</div>
+					<button class="copy-btn" onclick="copyToClipboard('${escapeHtml(decrypted)}', this)">Copy Password</button>
+				`;
+				showResult(resultBox, 'success', null, resultHTML);
+
+			} catch (error) {
+				showResult(resultBox, 'error', 'Decryption Failed', error.message);
+			}
+		}
+
+		function clearType7() {
+			document.getElementById('type7Input').value = '';
+			document.getElementById('type7Result').classList.remove('visible');
+		}
+
+		// Type 5 Cracking
+		async function crackType5() {
+			const input = document.getElementById('type5Input').value.trim();
+			const resultBox = document.getElementById('type5Result');
+			const progressBar = document.getElementById('type5Progress');
+
+			if (!input) {
+				showResult(resultBox, 'error', 'Error', 'Please enter a Type 5 hash');
+				return;
+			}
+
+			// Validate format: $1$salt$hash
+			const type5Regex = /^\$1\$([^\$]{1,8})\$([A-Za-z0-9./]{22})$/;
+			const match = input.match(type5Regex);
+
+			if (!match) {
+				showResult(resultBox, 'error', 'Invalid Format',
+					'Type 5 hash must be in format: $1$salt$hash (e.g., $1$mERr$hx5rVt7rPNoS4wqbXKX7m0)');
+				return;
+			}
+
+			const salt = match[1];
+			const targetHash = match[2];
+
+			progressBar.classList.add('visible');
+			const progressFill = progressBar.querySelector('.progress-fill');
+
+			// Get wordlist
+			const wordlist = getWordlist();
+			let found = false;
+
+			try {
+				for (let i = 0; i < wordlist.length; i++) {
+					const password = wordlist[i];
+					const hash = await md5Crypt(password, salt);
+
+					// Debug: Log first few attempts
+					if (i < 5) {
+						console.log(`Testing "${password}" -> $1$${salt}$${hash} (target: ${targetHash})`);
+					}
+
+					// Update progress
+					progressFill.style.width = ((i + 1) / wordlist.length * 100) + '%';
+
+					if (hash === targetHash) {
+						found = true;
+						const resultHTML = `
+							<div class="result-header">✓ Password Cracked!</div>
+							<div class="result-content">${escapeHtml(password)}</div>
+							<div class="info-grid">
+								<div class="info-label">Algorithm:</div>
+								<div class="info-value">MD5 Crypt</div>
+								<div class="info-label">Salt:</div>
+								<div class="info-value">${escapeHtml(salt)}</div>
+								<div class="info-label">Attempts:</div>
+								<div class="info-value">${i + 1} / ${wordlist.length}</div>
+								<div class="info-label">Generated Hash:</div>
+								<div class="info-value" style="word-break: break-all;">$1$${escapeHtml(salt)}$${hash}</div>
+							</div>
+							<button class="copy-btn" onclick="copyToClipboard('${escapeHtml(password)}', this)">Copy Password</button>
+						`;
+						showResult(resultBox, 'success', null, resultHTML);
+						break;
+					}
+
+					// Yield to UI every 50 iterations
+					if (i % 50 === 0) {
+						await new Promise(resolve => setTimeout(resolve, 0));
+					}
+				}
+
+				if (!found) {
+					showResult(resultBox, 'warning', 'Password Not Found',
+						`Tested ${wordlist.length} passwords without success. The password may not be in the dictionary.`);
+				}
+
+			} catch (error) {
+				showResult(resultBox, 'error', 'Cracking Failed', error.message);
+			} finally {
+				setTimeout(() => {
+					progressBar.classList.remove('visible');
+					progressFill.style.width = '0%';
+				}, 1000);
+			}
+		}
+
+		function clearType5() {
+			document.getElementById('type5Input').value = '';
+			document.getElementById('type5Result').classList.remove('visible');
+			document.getElementById('type5Progress').classList.remove('visible');
+		}
+
+		// Helper: Convert string to byte array for MD5
+		function strToBinArray(str) {
+			const bin = [];
+			for (let i = 0; i < str.length * 8; i += 8) {
+				bin[i >> 5] |= (str.charCodeAt(i / 8) & 0xff) << (i % 32);
+			}
+			return bin;
+		}
+
+		// Helper: MD5 raw computation
+		function rawMD5Compute(str) {
+			function safeAdd(x, y) {
+				const lsw = (x & 0xffff) + (y & 0xffff);
+				const msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+				return (msw << 16) | (lsw & 0xffff);
+			}
+			function bitRotateLeft(num, cnt) {
+				return (num << cnt) | (num >>> (32 - cnt));
+			}
+			function md5cmn(q, a, b, x, s, t) {
+				return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
+			}
+			function md5ff(a, b, c, d, x, s, t) { return md5cmn((b & c) | (~b & d), a, b, x, s, t); }
+			function md5gg(a, b, c, d, x, s, t) { return md5cmn((b & d) | (c & ~d), a, b, x, s, t); }
+			function md5hh(a, b, c, d, x, s, t) { return md5cmn(b ^ c ^ d, a, b, x, s, t); }
+			function md5ii(a, b, c, d, x, s, t) { return md5cmn(c ^ (b | ~d), a, b, x, s, t); }
+
+			function binlMD5(x, len) {
+				x[len >> 5] |= 0x80 << (len % 32);
+				x[((len + 64) >>> 9 << 4) + 14] = len;
+				let a = 1732584193, b = -271733879, c = -1732584194, d = 271733878;
+				for (let i = 0; i < x.length; i += 16) {
+					const olda = a, oldb = b, oldc = c, oldd = d;
+					a = md5ff(a, b, c, d, x[i], 7, -680876936);
+					d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
+					c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
+					b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
+					a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
+					d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
+					c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
+					b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
+					a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
+					d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
+					c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
+					b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
+					a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
+					d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
+					c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
+					b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
+					a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
+					d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
+					c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
+					b = md5gg(b, c, d, a, x[i], 20, -373897302);
+					a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
+					d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
+					c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
+					b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
+					a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
+					d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
+					c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
+					b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
+					a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
+					d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
+					c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
+					b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
+					a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
+					d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
+					c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
+					b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
+					a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
+					d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
+					c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
+					b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
+					a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
+					d = md5hh(d, a, b, c, x[i], 11, -358537222);
+					c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
+					b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
+					a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
+					d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
+					c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
+					b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
+					a = md5ii(a, b, c, d, x[i], 6, -198630844);
+					d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
+					c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
+					b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
+					a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
+					d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
+					c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
+					b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
+					a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
+					d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
+					c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
+					b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
+					a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
+					d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
+					c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
+					b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
+					a = safeAdd(a, olda);
+					b = safeAdd(b, oldb);
+					c = safeAdd(c, oldc);
+					d = safeAdd(d, oldd);
+				}
+				return [a, b, c, d];
+			}
+
+			return binlMD5(strToBinArray(str), str.length * 8);
+		}
+
+		// Helper: Convert binary array to bytes
+		function binArrayToBytes(binArray) {
+			const bytes = [];
+			for (let i = 0; i < binArray.length * 4; i++) {
+				bytes[i] = (binArray[i >> 2] >> ((i % 4) * 8)) & 0xff;
+			}
+			return bytes;
+		}
+
+		// MD5 Crypt implementation (FreeBSD style, used by Cisco)
+		async function md5Crypt(password, salt) {
+			// Compute B = MD5(password + salt + password)
+			let tempStr = password + salt + password;
+			let tempDigest = rawMD5Compute(tempStr);
+			let tempBytes = binArrayToBytes(tempDigest);
+
+			// Start computing A
+			let aStr = password + '$1$' + salt;
+
+			// For each character in password, add corresponding byte from B
+			for (let pl = password.length; pl > 0; pl -= 16) {
+				for (let i = 0; i < Math.min(pl, 16); i++) {
+					aStr += String.fromCharCode(tempBytes[i]);
+				}
+			}
+
+			// Then add bits based on password length
+			let pwLen = password.length;
+			while (pwLen > 0) {
+				if (pwLen & 1) {
+					aStr += String.fromCharCode(0);
+				} else {
+					aStr += password.charAt(0);
+				}
+				pwLen >>= 1;
+			}
+
+			// Compute initial A
+			let digest = rawMD5Compute(aStr);
+			let digestBytes = binArrayToBytes(digest);
+
+			// Main iteration loop - 1000 rounds
+			for (let round = 0; round < 1000; round++) {
+				let cStr = '';
+
+				// Odd/even round logic
+				if (round & 1) {
+					cStr = password;
+				} else {
+					for (let i = 0; i < 16; i++) {
+						cStr += String.fromCharCode(digestBytes[i]);
+					}
+				}
+
+				// Add salt based on round number
+				if (round % 3 !== 0) {
+					cStr += salt;
+				}
+
+				// Add password based on round number
+				if (round % 7 !== 0) {
+					cStr += password;
+				}
+
+				// Add password or previous digest
+				if (round & 1) {
+					for (let i = 0; i < 16; i++) {
+						cStr += String.fromCharCode(digestBytes[i]);
+					}
+				} else {
+					cStr += password;
+				}
+
+				// Compute new digest
+				digest = rawMD5Compute(cStr);
+				digestBytes = binArrayToBytes(digest);
+
+				// Yield to UI periodically
+				if (round % 100 === 0) {
+					await new Promise(resolve => setTimeout(resolve, 0));
+				}
+			}
+
+			// Encode the final hash
+			return toBase64MD5(digestBytes);
+		}
+
+		// Convert MD5 hash to base64 (MD5 crypt specific encoding)
+		function toBase64MD5(hashBytes) {
+			const chars = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+			function encode3bytes(b1, b2, b3, n) {
+				let val = (b1 << 16) | (b2 << 8) | b3;
+				let str = '';
+				for (let i = 0; i < n; i++) {
+					str += chars[val & 0x3f];
+					val >>= 6;
+				}
+				return str;
+			}
+
+			// MD5 crypt specific byte order and encoding
+			let result = '';
+			result += encode3bytes(hashBytes[0], hashBytes[6], hashBytes[12], 4);
+			result += encode3bytes(hashBytes[1], hashBytes[7], hashBytes[13], 4);
+			result += encode3bytes(hashBytes[2], hashBytes[8], hashBytes[14], 4);
+			result += encode3bytes(hashBytes[3], hashBytes[9], hashBytes[15], 4);
+			result += encode3bytes(hashBytes[4], hashBytes[10], hashBytes[5], 4);
+			result += encode3bytes(0, 0, hashBytes[11], 2);
+
+			return result;
+		}
+
+		// Wordlist generator
+		function getWordlist() {
+			// Test with the most common first
+			const common = [
+				'cisco', 'Cisco', 'CISCO', 'password', 'Password', 'admin', 'Admin',
+				'secret', 'Secret', 'enable', 'Enable', '123456', 'password123',
+				'cisco123', 'Cisco123', 'root', 'toor', 'pass', 'Pass', 'admin123',
+				'router', 'Router', 'switch', 'Switch', 'letmein', 'welcome', 'Welcome',
+				'master', 'Master', 'access', 'Access', 'default', 'Default',
+				'public', 'private', 'manager', 'support', 'system', 'network',
+				'security', 'monitor', 'test', 'user', 'guest', 'temp', 'backup',
+				'cisco1', 'cisco2', 'cisco3', 'Cisco1', 'Cisco2', 'Cisco3'
+			];
+
+			const numbers = ['', '1', '12', '123', '1234', '12345', '123456', '!', '@', '#'];
+			const variations = [];
+
+			// Generate variations
+			common.forEach(word => {
+				variations.push(word);
+				variations.push(word.toUpperCase());
+				variations.push(word.charAt(0).toUpperCase() + word.slice(1));
+				numbers.forEach(num => {
+					variations.push(word + num);
+					variations.push(word.toUpperCase() + num);
+					variations.push(word.charAt(0).toUpperCase() + word.slice(1) + num);
+				});
+			});
+
+			// Add more common passwords
+			const extras = [
+				'qwerty', 'abc123', 'password1', 'Password1', 'P@ssw0rd', 'P@ssword',
+				'Welcome1', 'Winter2023', 'Summer2023', 'Spring2023', 'Fall2023',
+				'January', 'February', 'March', 'April', 'May', 'June', 'July',
+				'August', 'September', 'October', 'November', 'December'
+			];
+
+			return [...new Set([...variations, ...extras])];
+		}
+
+		// Utility functions
+		function showResult(element, type, header, content) {
+			element.className = `result-box visible ${type}`;
+			if (header) {
+				element.innerHTML = `
+					<div class="result-header">${header}</div>
+					<div class="result-content">${content}</div>
+				`;
+			} else {
+				element.innerHTML = content;
+			}
+		}
+
+		function escapeHtml(text) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+
+		function copyToClipboard(text, btn) {
+			navigator.clipboard.writeText(text).then(() => {
+				const orig = btn.textContent;
+				btn.textContent = 'Copied!';
+				setTimeout(() => btn.textContent = orig, 1500);
+			});
+		}
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

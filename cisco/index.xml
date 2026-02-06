@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cisco Switch Administration on rowstu.net</title><link>https://rowstu.net/cisco/</link><description>Recent content in Cisco Switch Administration on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/cisco/index.xml" rel="self" type="application/rss+xml"/><item><title>Basic Cisco Switch Setup</title><link>https://rowstu.net/cisco/basic-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/basic-setup/</guid><description>&lt;h1 id="setting-up-a-new-cisco-switch"&gt;Setting Up a New Cisco Switch&lt;/h1&gt;
+&lt;p&gt;Step-by-step guide for configuring a brand new Cisco switch for basic switching operations.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="initial-connection"&gt;Initial Connection&lt;/h2&gt;
+&lt;p&gt;Connect to the switch via console cable:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Using screen (Linux/Mac)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;screen /dev/ttyUSB0 &lt;span style="color:#ae81ff"&gt;9600&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Using minicom (Linux)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;minicom -D /dev/ttyUSB0
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Using PuTTY (Windows)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Serial line: COM3 (check Device Manager)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Speed: 9600&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Console Settings:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Baud rate: 9600&lt;/li&gt;
+&lt;li&gt;Data bits: 8&lt;/li&gt;
+&lt;li&gt;Parity: None&lt;/li&gt;
+&lt;li&gt;Stop bits: 1&lt;/li&gt;
+&lt;li&gt;Flow control: None&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="initial-configuration-dialog"&gt;Initial Configuration Dialog&lt;/h2&gt;
+&lt;p&gt;On first boot, the switch will prompt:&lt;/p&gt;</description></item><item><title>Cisco Switch Hardening</title><link>https://rowstu.net/cisco/hardening/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/hardening/</guid><description>&lt;h1 id="cisco-switch-security-hardening"&gt;Cisco Switch Security Hardening&lt;/h1&gt;
+&lt;p&gt;Comprehensive guide to hardening Cisco switches against attacks and unauthorized access.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="security-hardening-overview"&gt;Security Hardening Overview&lt;/h2&gt;
+&lt;p&gt;Switch hardening involves multiple layers of security controls to protect against:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Unauthorized access&lt;/strong&gt; - Physical and remote&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Network attacks&lt;/strong&gt; - VLAN hopping, MAC flooding, ARP spoofing&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Layer 2 attacks&lt;/strong&gt; - STP manipulation, DHCP starvation&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Password attacks&lt;/strong&gt; - Brute force, dictionary attacks&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Denial of service&lt;/strong&gt; - Resource exhaustion&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="layer-1-physical-security"&gt;Layer 1: Physical Security&lt;/h2&gt;
+&lt;h3 id="disable-unused-ports"&gt;Disable Unused Ports&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;! Disable and assign to parking VLAN
+Switch(config)# vlan 999
+Switch(config-vlan)# name PARKING_LOT
+Switch(config-vlan)# exit
+
+Switch(config)# interface range gigabitethernet 0/10-24
+Switch(config-if-range)# description UNUSED - DISABLED
+Switch(config-if-range)# switchport mode access
+Switch(config-if-range)# switchport access vlan 999
+Switch(config-if-range)# shutdown
+Switch(config-if-range)# exit
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="port-security"&gt;Port Security&lt;/h3&gt;
+&lt;p&gt;Prevent unauthorized devices from connecting:&lt;/p&gt;</description></item><item><title>Console Port Security</title><link>https://rowstu.net/cisco/console-security/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/console-security/</guid><description>&lt;h1 id="cisco-console-port-security"&gt;Cisco Console Port Security&lt;/h1&gt;
+&lt;p&gt;Comprehensive guide to securing console access on Cisco switches and routers.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="why-console-security-matters"&gt;Why Console Security Matters&lt;/h2&gt;
+&lt;p&gt;The console port is often overlooked in security configurations, but represents a critical vulnerability:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Direct physical access&lt;/strong&gt; bypasses most security controls&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Password recovery&lt;/strong&gt; can be performed via console&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Full administrative access&lt;/strong&gt; available once logged in&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No network logging&lt;/strong&gt; for some attack vectors&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="basic-console-security"&gt;Basic Console Security&lt;/h2&gt;
+&lt;h3 id="set-console-password"&gt;Set Console Password&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch(config)# line console 0
+Switch(config-line)# password ConsolePass123!
+Switch(config-line)# login
+Switch(config-line)# exit
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Test:&lt;/strong&gt; Disconnect and reconnect - should prompt for password.&lt;/p&gt;</description></item><item><title>Reconfiguring a Cisco Switch</title><link>https://rowstu.net/cisco/reconfiguration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/reconfiguration/</guid><description>&lt;h1 id="reconfiguring-a-cisco-switch-from-scratch"&gt;Reconfiguring a Cisco Switch from Scratch&lt;/h1&gt;
+&lt;p&gt;How to completely reset and reconfigure a Cisco switch that has existing configuration.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="pre-reconfiguration-checklist"&gt;Pre-Reconfiguration Checklist&lt;/h2&gt;
+&lt;p&gt;Before wiping a switch, ensure:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You have console access&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You&amp;rsquo;ve backed up the current configuration (if needed)&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You understand the current network topology&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You have authorization to reset the device&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; You have the new configuration ready&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="option-1-delete-configuration-and-reload"&gt;Option 1: Delete Configuration and Reload&lt;/h2&gt;
+&lt;h3 id="step-1-backup-current-configuration-optional"&gt;Step 1: Backup Current Configuration (Optional)&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch# show running-config
+# Copy output to text file
+
+# Or via TFTP
+Switch# copy running-config tftp:
+# Enter TFTP server IP and filename
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="step-2-erase-startup-configuration"&gt;Step 2: Erase Startup Configuration&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch# write erase
+Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
+[OK]
+Erase of nvram: complete
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Alternative commands:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Remote Access Configuration</title><link>https://rowstu.net/cisco/remote-access/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/remote-access/</guid><description>&lt;h1 id="configuring-remote-access-to-cisco-switches"&gt;Configuring Remote Access to Cisco Switches&lt;/h1&gt;
+&lt;p&gt;Complete guide to setting up SSH and secure remote management access on Cisco switches.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
+&lt;p&gt;Remote management allows you to configure and monitor switches without physical console access. This guide covers:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Assigning management IP addresses&lt;/li&gt;
+&lt;li&gt;Configuring SSH (recommended)&lt;/li&gt;
+&lt;li&gt;Securing remote access&lt;/li&gt;
+&lt;li&gt;Troubleshooting connectivity&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;p&gt;Before configuring remote access:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Console access&lt;/strong&gt; to the switch&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Network connectivity&lt;/strong&gt; to the switch&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;IP address plan&lt;/strong&gt; for management interface&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DNS/hostname&lt;/strong&gt; (required for SSH)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="assigning-an-ip-address-to-a-switch"&gt;Assigning an IP Address to a Switch&lt;/h2&gt;
+&lt;h3 id="method-1-using-vlan-1-default-simple"&gt;Method 1: Using VLAN 1 (Default, Simple)&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch# configure terminal
+
+! Configure VLAN 1 interface
+Switch(config)# interface vlan 1
+Switch(config-if)# ip address 192.168.1.10 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# description Management Interface
+Switch(config-if)# exit
+
+! Set default gateway
+Switch(config)# ip default-gateway 192.168.1.1
+
+! Save configuration
+Switch(config)# exit
+Switch# write memory
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="method-2-using-dedicated-management-vlan-best-practice"&gt;Method 2: Using Dedicated Management VLAN (Best Practice)&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;! Create management VLAN
+Switch(config)# vlan 99
+Switch(config-vlan)# name MANAGEMENT
+Switch(config-vlan)# exit
+
+! Configure VLAN interface
+Switch(config)# interface vlan 99
+Switch(config-if)# ip address 192.168.99.10 255.255.255.0
+Switch(config-if)# no shutdown
+Switch(config-if)# description Management Interface
+Switch(config-if)# exit
+
+! Set default gateway
+Switch(config)# ip default-gateway 192.168.99.1
+
+! Assign a physical port to management VLAN (for connectivity)
+Switch(config)# interface gigabitethernet 0/24
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 99
+Switch(config-if)# description Management Port
+Switch(config-if)# exit
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id="verify-ip-configuration"&gt;Verify IP Configuration&lt;/h3&gt;
+&lt;pre tabindex="0"&gt;&lt;code class="language-cisco" data-lang="cisco"&gt;Switch# show ip interface brief
+Interface IP-Address OK? Method Status Protocol
+Vlan1 unassigned YES unset administratively down down
+Vlan99 192.168.99.10 YES manual up up
+
+! Test connectivity
+Switch# ping 192.168.99.1
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id="configuring-ssh-access"&gt;Configuring SSH Access&lt;/h2&gt;
+&lt;p&gt;SSH provides encrypted remote access. Telnet is &lt;strong&gt;not recommended&lt;/strong&gt; (unencrypted).&lt;/p&gt;</description></item><item><title>VLAN Configuration</title><link>https://rowstu.net/cisco/vlan-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/cisco/vlan-setup/</guid><description>&lt;h1 id="cisco-switch-vlan-setup"&gt;Cisco Switch VLAN Setup&lt;/h1&gt;
+&lt;p&gt;Complete guide to creating, configuring, and managing VLANs on Cisco switches.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="what-is-a-vlan"&gt;What is a VLAN?&lt;/h2&gt;
+&lt;p&gt;A &lt;strong&gt;Virtual Local Area Network (VLAN)&lt;/strong&gt; is a logical segmentation of a physical network:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Broadcast domain isolation&lt;/strong&gt; - Traffic contained within VLAN&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Security&lt;/strong&gt; - Separate traffic between departments/functions&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Performance&lt;/strong&gt; - Reduce broadcast traffic&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Flexibility&lt;/strong&gt; - Group users by function, not physical location&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="vlan-basics"&gt;VLAN Basics&lt;/h2&gt;
+&lt;h3 id="default-vlans"&gt;Default VLANs&lt;/h3&gt;
+&lt;p&gt;All Cisco switches come with these default VLANs:&lt;/p&gt;</description></item></channel></rss>
