@@ -1,0 +1,134 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Cisco Password Recovery // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Cisco Password Recovery</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/ciscopassword-recovery/>Ciscopassword Recovery</a></div><div class="card markdown-content"><h1 id=cisco-switch-password-recovery>Cisco Switch Password Recovery</h1><p>Complete guide to recovering access to a Cisco switch when passwords are unknown, including methods to decrypt stored passwords.</p><hr><h2 id=password-recovery-process>Password Recovery Process</h2><h3 id=prerequisites>Prerequisites</h3><ul><li><strong>Physical console access</strong> - You must have direct console connection</li><li><strong>Power control</strong> - Ability to power cycle the switch</li><li><strong>Time</strong> - Allow 15-30 minutes for the process</li></ul><hr><h2 id=standard-password-recovery-procedure>Standard Password Recovery Procedure</h2><h3 id=step-1-connect-to-console>Step 1: Connect to Console</h3><p>Connect via console cable (9600 baud, 8-N-1).</p><h3 id=step-2-power-cycle-and-interrupt-boot>Step 2: Power Cycle and Interrupt Boot</h3><p><strong>Method A: Power cycle</strong></p><ol><li>Unplug power cable</li><li>Wait 10 seconds</li><li>Plug power back in</li><li><strong>Immediately hold the Mode button</strong> (front of switch) for 10-15 seconds</li></ol><p><strong>Method B: Interrupt boot sequence</strong></p><ol><li>Power cycle the switch</li><li>Press and hold <strong>Ctrl+Break</strong> (or Break key) within first 60 seconds of boot</li><li>You should see ROMMON mode</li></ol><pre tabindex=0><code>switch:
+</code></pre><p><strong>Note:</strong> Timing is critical. If you miss it, power cycle and try again.</p><h3 id=step-3-initialize-flash-filesystem>Step 3: Initialize Flash Filesystem</h3><pre tabindex=0><code>switch: flash_init
+Initializing Flash...
+</code></pre><h3 id=step-4-rename-configuration-file>Step 4: Rename Configuration File</h3><p>This prevents the switch from loading the startup configuration:</p><pre tabindex=0><code>switch: rename flash:config.text flash:config.old
+</code></pre><p><strong>Alternative names on some models:</strong></p><ul><li><code>flash:config.text</code></li><li><code>flash:startup-config</code></li><li><code>flash:config.cfg</code></li></ul><p>To see available files:</p><pre tabindex=0><code>switch: dir flash:
+</code></pre><h3 id=step-5-boot-the-switch>Step 5: Boot the Switch</h3><pre tabindex=0><code>switch: boot
+</code></pre><p>The switch will boot without loading the configuration (no passwords).</p><h3 id=step-6-skip-initial-configuration>Step 6: Skip Initial Configuration</h3><pre tabindex=0><code>Would you like to enter the initial configuration dialog? [yes/no]: no
+</code></pre><h3 id=step-7-enter-privileged-mode>Step 7: Enter Privileged Mode</h3><pre tabindex=0><code>Switch&gt; enable
+Switch#
+</code></pre><p>No password required!</p><h3 id=step-8-restore-configuration>Step 8: Restore Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# rename flash:config.old flash:config.text
+</code></pre><h3 id=step-9-copy-to-running-configuration>Step 9: Copy to Running Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# copy flash:config.text system:running-config
+</code></pre><p><strong>Or:</strong></p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# copy startup-config running-config
+</code></pre><h3 id=step-10-change-the-password>Step 10: Change the Password</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# configure terminal
+Switch(config)# enable secret NewPassword123!
+Switch(config)# exit
+</code></pre><h3 id=step-11-save-configuration>Step 11: Save Configuration</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# copy running-config startup-config
+# Or
+Switch# write memory
+</code></pre><h3 id=step-12-reload-to-verify>Step 12: Reload to Verify</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# reload
+</code></pre><p>After reload, test the new password.</p><hr><h2 id=decrypting-cisco-type-7-passwords>Decrypting Cisco Type 7 Passwords</h2><p>Cisco Type 7 passwords are <strong>weakly encrypted</strong> and can be easily reversed.</p><h3 id=identifying-type-7-passwords>Identifying Type 7 Passwords</h3><p>In the configuration, look for:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>username admin password 7 094F471A1A0A
+enable password 7 06120A2E4348
+line console 0
+ password 7 05080F1C2243
+</code></pre><p>The <code>7</code> indicates Type 7 encryption.</p><h3 id=decryption-methods>Decryption Methods</h3><h4 id=method-1-online-tools>Method 1: Online Tools</h4><p>Several websites can decrypt Type 7:</p><ul><li><a href=https://www.ifm.net.nz/cookbooks/cisco-ios-enable-secret-password-cracker.html>https://www.ifm.net.nz/cookbooks/cisco-ios-enable-secret-password-cracker.html</a></li><li>Search for &ldquo;Cisco Type 7 decoder&rdquo;</li></ul><p><strong>Warning:</strong> Don&rsquo;t use online tools for sensitive production passwords.</p><h4 id=method-2-python-script>Method 2: Python Script</h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>decrypt_type7</span>(encrypted):
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;&#34;&#34;Decrypt Cisco Type 7 password&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>    xlat <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>        <span style=color:#ae81ff>0x64</span>, <span style=color:#ae81ff>0x73</span>, <span style=color:#ae81ff>0x66</span>, <span style=color:#ae81ff>0x64</span>, <span style=color:#ae81ff>0x3b</span>, <span style=color:#ae81ff>0x6b</span>, <span style=color:#ae81ff>0x66</span>, <span style=color:#ae81ff>0x6f</span>,
+</span></span><span style=display:flex><span>        <span style=color:#ae81ff>0x41</span>, <span style=color:#ae81ff>0x2c</span>, <span style=color:#ae81ff>0x2e</span>, <span style=color:#ae81ff>0x69</span>, <span style=color:#ae81ff>0x79</span>, <span style=color:#ae81ff>0x65</span>, <span style=color:#ae81ff>0x77</span>, <span style=color:#ae81ff>0x72</span>,
+</span></span><span style=display:flex><span>        <span style=color:#ae81ff>0x6b</span>, <span style=color:#ae81ff>0x6c</span>, <span style=color:#ae81ff>0x64</span>, <span style=color:#ae81ff>0x4a</span>, <span style=color:#ae81ff>0x4b</span>, <span style=color:#ae81ff>0x44</span>, <span style=color:#ae81ff>0x48</span>, <span style=color:#ae81ff>0x53</span>,
+</span></span><span style=display:flex><span>        <span style=color:#ae81ff>0x55</span>, <span style=color:#ae81ff>0x42</span>
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    index <span style=color:#f92672>=</span> int(encrypted[:<span style=color:#ae81ff>2</span>])
+</span></span><span style=display:flex><span>    encrypted <span style=color:#f92672>=</span> encrypted[<span style=color:#ae81ff>2</span>:]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    decrypted <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>0</span>, len(encrypted), <span style=color:#ae81ff>2</span>):
+</span></span><span style=display:flex><span>        decrypted <span style=color:#f92672>+=</span> chr(int(encrypted[i:i<span style=color:#f92672>+</span><span style=color:#ae81ff>2</span>], <span style=color:#ae81ff>16</span>) <span style=color:#f92672>^</span> xlat[index])
+</span></span><span style=display:flex><span>        index <span style=color:#f92672>=</span> (index <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>%</span> <span style=color:#ae81ff>26</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> decrypted
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Usage</span>
+</span></span><span style=display:flex><span>encrypted_password <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;094F471A1A0A&#34;</span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Decrypted: </span><span style=color:#e6db74>{</span>decrypt_type7(encrypted_password)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span></code></pre></div><h4 id=method-3-cisco-ios-command>Method 3: Cisco IOS Command</h4><p>If you have privileged access to <strong>another</strong> Cisco device:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Router# configure terminal
+Router(config)# key chain test
+Router(config-keychain)# key 1
+Router(config-keychain-key)# key-string 7 094F471A1A0A
+Router(config-keychain-key)# exit
+Router(config-keychain)# exit
+Router(config)# exit
+Router# show key chain test
+Key-chain test:
+    key 1 -- text &#34;decrypted_password&#34;
+</code></pre><hr><h2 id=decrypting-cisco-type-5-passwords>Decrypting Cisco Type 5 Passwords</h2><p>Type 5 passwords use <strong>MD5 hashing</strong> and are more secure.</p><h3 id=identifying-type-5-passwords>Identifying Type 5 Passwords</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>enable secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+username admin secret 5 $1$GzA4$QN4zT5sKCy.8PLt7gLDHp1
+</code></pre><p>The <code>5</code> indicates MD5 hash (Type 5).</p><h3 id=important-notes>Important Notes</h3><ul><li><strong>Type 5 cannot be decrypted</strong> - it&rsquo;s a one-way hash</li><li><strong>Can only be cracked</strong> using brute force or dictionary attacks</li><li><strong>Strength depends on password complexity</strong></li></ul><h3 id=cracking-type-5-for-authorized-testing-only>Cracking Type 5 (For Authorized Testing Only)</h3><h4 id=using-john-the-ripper>Using John the Ripper</h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Create a file with the hash</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;admin:$1$mERr$hx5rVt7rPNoS4wqbXKX7m0&#39;</span> &gt; hash.txt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run John the Ripper</span>
+</span></span><span style=display:flex><span>john --format<span style=color:#f92672>=</span>md5crypt hash.txt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show cracked password</span>
+</span></span><span style=display:flex><span>john --show hash.txt
+</span></span></code></pre></div><h4 id=using-hashcat>Using Hashcat</h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Type 500 = md5crypt</span>
+</span></span><span style=display:flex><span>hashcat -m <span style=color:#ae81ff>500</span> -a <span style=color:#ae81ff>0</span> hash.txt wordlist.txt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># With rules</span>
+</span></span><span style=display:flex><span>hashcat -m <span style=color:#ae81ff>500</span> -a <span style=color:#ae81ff>0</span> hash.txt wordlist.txt -r rules/best64.rule
+</span></span></code></pre></div><hr><h2 id=decrypting-cisco-type-15-passwords-scrypt>Decrypting Cisco Type 15 Passwords (SCRYPT)</h2><p>Type 15 passwords use <strong>SCRYPT hashing</strong> - very difficult to crack.</p><h3 id=identifying-type-15-passwords>Identifying Type 15 Passwords</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>enable secret 15 $15$salt$8Ry2YdlnnNAuiEF6lxGq5dKG3h56Tn0
+</code></pre><h3 id=cracking-type-15>Cracking Type 15</h3><ul><li><strong>Extremely difficult</strong> - designed to resist cracking</li><li><strong>Very time/resource intensive</strong></li><li><strong>Best option:</strong> Use password recovery procedure instead</li></ul><hr><h2 id=alternative-recovery-methods>Alternative Recovery Methods</h2><h3 id=method-1-social-engineering--documentation>Method 1: Social Engineering / Documentation</h3><ul><li>Check password management systems</li><li>Ask previous administrators</li><li>Check documented procedures</li><li>Review change tickets</li></ul><h3 id=method-2-tftp-configuration-backup>Method 2: TFTP Configuration Backup</h3><p>If you have a recent backup on TFTP server:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# copy tftp: flash:config.txt
+Switch# copy flash:config.txt system:running-config
+</code></pre><p>Then view passwords:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch# show running-config
+</code></pre><h3 id=method-3-snmp-community-string>Method 3: SNMP Community String</h3><p>If SNMP is enabled with RW community:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Change enable password via SNMP (if configured)</span>
+</span></span><span style=display:flex><span>snmpset -v2c -c private 192.168.1.10 enterprises.9.2.1.1.1.3.1 s newpassword
+</span></span></code></pre></div><p><strong>Note:</strong> This rarely works on modern IOS versions.</p><hr><h2 id=password-recovery-by-model>Password Recovery by Model</h2><h3 id=catalyst-2960-series>Catalyst 2960 Series</h3><pre tabindex=0><code>switch: flash_init
+switch: load_helper
+switch: dir flash:
+switch: rename flash:config.text flash:config.old
+switch: boot
+</code></pre><h3 id=catalyst-35603750-series>Catalyst 3560/3750 Series</h3><p>Same procedure as 2960 series.</p><h3 id=catalyst-2950-series>Catalyst 2950 Series</h3><pre tabindex=0><code>switch: flash_init
+switch: load_helper
+switch: rename flash:config.text flash:config.old
+switch: boot
+</code></pre><h3 id=catalyst-38509300-series>Catalyst 3850/9300 Series</h3><p>Newer switches with different process:</p><pre tabindex=0><code>switch: BOOT=flash:packages.conf
+switch: boot
+</code></pre><p>Then follow standard procedure.</p><hr><h2 id=preventing-lockout>Preventing Lockout</h2><h3 id=use-password-vault>Use Password Vault</h3><ul><li>Store all passwords in secure password manager</li><li>Document password location</li><li>Maintain offline backup</li></ul><h3 id=create-recovery-account>Create Recovery Account</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# username recovery privilege 15 secret RecoveryPass123!
+</code></pre><h3 id=document-everything>Document Everything</h3><p>Maintain documentation including:</p><ul><li>Current passwords</li><li>Configuration backups</li><li>Recovery procedures</li><li>Contact information</li></ul><h3 id=regular-backups>Regular Backups</h3><pre tabindex=0><code class=language-cisco data-lang=cisco>! Automated backup via script
+Switch# copy running-config tftp://192.168.1.100/switch-backup.cfg
+
+! Or via SCP (more secure)
+Switch# copy running-config scp://user@192.168.1.100/backup/switch.cfg
+</code></pre><hr><h2 id=security-considerations>Security Considerations</h2><h3 id=password-recovery-security-risk>Password Recovery Security Risk</h3><p>Password recovery procedure represents a <strong>physical security vulnerability</strong>:</p><ul><li>Anyone with console access can reset passwords</li><li>No authentication required in ROMMON mode</li><li>Physical security is critical</li></ul><h3 id=mitigations>Mitigations</h3><h4 id=1-physical-security>1. Physical Security</h4><ul><li>Lock network closets</li><li>Restrict console access</li><li>Use security cameras</li><li>Implement access logs</li></ul><h4 id=2-enable-password-recovery-disable>2. Enable Password Recovery Disable</h4><p><strong>Warning:</strong> This prevents password recovery but also locks you out permanently if you forget the password!</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# no service password-recovery
+</code></pre><p>When enabled, you&rsquo;ll see on boot:</p><pre tabindex=0><code>PASSWORD RECOVERY FUNCTIONALITY IS DISABLED
+</code></pre><p>To recover, you must erase the entire switch (factory reset).</p><h4 id=3-use-strong-passwords>3. Use Strong Passwords</h4><pre tabindex=0><code class=language-cisco data-lang=cisco>! Type 5 (MD5) - good
+Switch(config)# enable secret 5 ComplexP@ssw0rd!123
+
+! Type 15 (SCRYPT) - better (newer IOS)
+Switch(config)# enable algorithm-type scrypt secret VeryStr0ng!P@ssword#456
+</code></pre><h4 id=4-multi-factor-authentication>4. Multi-Factor Authentication</h4><p>For newer IOS versions:</p><pre tabindex=0><code class=language-cisco data-lang=cisco>Switch(config)# aaa new-model
+Switch(config)# aaa authentication login default group tacacs+ local
+Switch(config)# tacacs-server host 192.168.1.50
+</code></pre><hr><h2 id=troubleshooting-password-recovery>Troubleshooting Password Recovery</h2><h3 id=cant-enter-rommon-mode>Can&rsquo;t Enter ROMMON Mode</h3><p><strong>Problem:</strong> Ctrl+Break doesn&rsquo;t work</p><p><strong>Solutions:</strong></p><ul><li>Try different terminal emulator (PuTTY, SecureCRT, screen)</li><li>Check if Break key is mapped correctly</li><li>Try Ctrl+Pause/Break</li><li>Hold Mode button during boot (hardware method)</li><li>Try connecting from different computer</li></ul><h3 id=configtext-not-found>config.text Not Found</h3><p><strong>Problem:</strong> <code>flash:config.text</code> doesn&rsquo;t exist</p><p><strong>Solutions:</strong></p><pre tabindex=0><code>switch: dir flash:
+# Look for alternate names:
+# - config.cfg
+# - startup-config
+# - vlan.dat
+</code></pre><h3 id=switch-wont-boot-after-rename>Switch Won&rsquo;t Boot After Rename</h3><p><strong>Problem:</strong> Stuck at ROMMON</p><p><strong>Solution:</strong></p><pre tabindex=0><code>switch: dir flash:
+switch: boot flash:c2960-lanbasek9-mz.150-2.SE11.bin
+# Replace with actual IOS filename from dir output
+</code></pre><h3 id=lost-configuration-after-recovery>Lost Configuration After Recovery</h3><p><strong>Problem:</strong> Forgot to restore config.old</p><p><strong>Solution:</strong></p><ul><li>Restore from backup (if you have one)</li><li>Reconfigure from scratch (see <a href=basic-setup.md>Basic Setup</a>)</li></ul><hr><h2 id=password-comparison-table>Password Comparison Table</h2><table><thead><tr><th>Type</th><th>Algorithm</th><th>Reversible</th><th>Crackable</th><th>Security Level</th><th>Config Example</th></tr></thead><tbody><tr><td><strong>Type 0</strong></td><td>Plaintext</td><td>Yes (visible)</td><td>N/A</td><td>None</td><td><code>password cisco</code></td></tr><tr><td><strong>Type 7</strong></td><td>Vigenère</td><td>Yes (easily)</td><td>N/A</td><td>Very Low</td><td><code>password 7 094F471A1A0A</code></td></tr><tr><td><strong>Type 5</strong></td><td>MD5</td><td>No</td><td>Yes (moderate)</td><td>Medium</td><td><code>secret 5 $1$mERr$hx...</code></td></tr><tr><td><strong>Type 15</strong></td><td>SCRYPT</td><td>No</td><td>Very difficult</td><td>High</td><td><code>secret 15 $15$salt$8Ry...</code></td></tr><tr><td><strong>Type 8</strong></td><td>PBKDF2</td><td>No</td><td>Difficult</td><td>High</td><td><code>secret 8 $8$xyz$abc...</code></td></tr><tr><td><strong>Type 9</strong></td><td>SCRYPT</td><td>No</td><td>Very difficult</td><td>High</td><td><code>secret 9 $9$salt$hash...</code></td></tr></tbody></table><hr><h2 id=quick-reference-commands>Quick Reference Commands</h2><pre tabindex=0><code class=language-cisco data-lang=cisco>! Standard password recovery
+switch: flash_init
+switch: rename flash:config.text flash:config.old
+switch: boot
+
+! After boot
+Switch&gt; enable
+Switch# rename flash:config.old flash:config.text
+Switch# copy flash:config.text running-config
+Switch# configure terminal
+Switch(config)# enable secret NewPassword123!
+Switch(config)# exit
+Switch# write memory
+
+! View passwords in running config
+Switch# show running-config | include password
+Switch# show running-config | include secret
+
+! Check password encryption service
+Switch# show running-config | include service password
+</code></pre><hr><h2 id=legal-and-ethical-considerations>Legal and Ethical Considerations</h2><ul><li><strong>Only perform password recovery on devices you own or have authorization to access</strong></li><li><strong>Unauthorized access to network devices is illegal</strong></li><li><strong>Document all password recovery procedures</strong></li><li><strong>Maintain audit logs of administrative access</strong></li><li><strong>This guide is for legitimate recovery and authorized security testing only</strong></li></ul></div></div><script src=/assets/shared-nav.js></script></body></html>
