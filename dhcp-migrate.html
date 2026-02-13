@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ISC DHCP → dnsmasq Migration // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		/*
+		 * ISC DHCP → dnsmasq Migration Tool
+		 *
+		 * Converts ISC DHCP server (dhcpd.conf) configurations to dnsmasq format.
+		 * Handles subnets, ranges, static leases, host entries, and DHCP options.
+		 *
+		 * References:
+		 * - ISC DHCP: https://kb.isc.org/docs/isc-dhcp-44-manual-pages-dhcpdconf
+		 * - dnsmasq: https://thekelleys.org.uk/dnsmasq/docs/dnsmasq-man.html
+		 */
+
+		:root {
+			--bg: #0f1114;
+			--surface: #181b20;
+			--surface-alt: #1e2228;
+			--surface-hover: #272c34;
+			--border: #2e3440;
+			--border-focus: #d08770;
+			--text: #d8dee9;
+			--text-muted: #7b88a1;
+			--text-bright: #eceff4;
+			--accent: #d08770;
+			--accent-hover: #e09880;
+			--accent-dim: #bf6a50;
+			--success: #a3be8c;
+			--warning: #ebcb8b;
+			--danger: #bf616a;
+			--info: #5e81ac;
+			--teal: #8fbcbb;
+			--frost: #88c0d0;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			line-height: 1.6;
+		}
+
+		body::before {
+			content: '';
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-image:
+				radial-gradient(ellipse at 10% 20%, rgba(208, 135, 112, 0.04) 0%, transparent 50%),
+				radial-gradient(ellipse at 90% 80%, rgba(143, 188, 187, 0.03) 0%, transparent 50%);
+			pointer-events: none;
+			z-index: -1;
+		}
+
+		.container { max-width: 960px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.4rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		h1::before {
+			content: '~>';
+			color: var(--teal);
+			font-weight: 400;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.85rem; }
+
+		.version-badges {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+			flex-wrap: wrap;
+		}
+
+		.version-badge {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			padding: 0.2rem 0.5rem;
+			border-radius: 4px;
+			font-size: 0.65rem;
+			color: var(--text-muted);
+		}
+
+		.version-badge.from { border-color: var(--danger); color: var(--danger); }
+		.version-badge.to { border-color: var(--success); color: var(--success); }
+
+		/* Layout: split pane */
+		.split-pane {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		/* Panels */
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.85rem 1.1rem;
+			background: var(--surface-alt);
+			border-bottom: 1px solid var(--border);
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.panel-header:hover { background: var(--surface-hover); }
+
+		.panel-title {
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: var(--text-bright);
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.panel-title .arrow {
+			color: var(--accent);
+			font-size: 0.75rem;
+		}
+
+		.panel-toggle {
+			color: var(--text-muted);
+			transition: transform 0.2s ease;
+			font-size: 0.7rem;
+		}
+
+		.panel.collapsed .panel-toggle { transform: rotate(-90deg); }
+		.panel.collapsed .panel-body { display: none; }
+
+		.panel-body { padding: 1.1rem; }
+
+		/* Input area */
+		.input-area {
+			position: relative;
+		}
+
+		.input-area textarea {
+			width: 100%;
+			min-height: 350px;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 0.75rem;
+			color: var(--frost);
+			font-family: inherit;
+			font-size: 0.75rem;
+			line-height: 1.5;
+			resize: vertical;
+			transition: border-color 0.15s ease;
+		}
+
+		.input-area textarea:focus {
+			outline: none;
+			border-color: var(--border-focus);
+		}
+
+		.input-area textarea.invalid {
+			border-color: var(--danger);
+		}
+
+		.file-drop {
+			border: 2px dashed var(--border);
+			border-radius: 8px;
+			padding: 1.5rem;
+			text-align: center;
+			color: var(--text-muted);
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			margin-bottom: 0.75rem;
+		}
+
+		.file-drop:hover,
+		.file-drop.dragover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: rgba(208, 135, 112, 0.05);
+		}
+
+		.file-drop input { display: none; }
+
+		/* Stats bar */
+		.stats-bar {
+			display: flex;
+			gap: 1rem;
+			flex-wrap: wrap;
+			margin-bottom: 1rem;
+			padding: 0.75rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+		}
+
+		.stat {
+			display: flex;
+			align-items: center;
+			gap: 0.35rem;
+			font-size: 0.75rem;
+		}
+
+		.stat-label { color: var(--text-muted); }
+		.stat-value { color: var(--text-bright); font-weight: 500; }
+		.stat-value.warn { color: var(--warning); }
+		.stat-value.err { color: var(--danger); }
+
+		/* Validation */
+		.validation-errors {
+			background: rgba(191, 97, 106, 0.1);
+			border: 1px solid var(--danger);
+			border-radius: 6px;
+			padding: 0.85rem;
+			margin-bottom: 1rem;
+			display: none;
+		}
+
+		.validation-errors.show { display: block; }
+
+		.validation-errors h4 {
+			color: var(--danger);
+			font-size: 0.8rem;
+			margin-bottom: 0.4rem;
+		}
+
+		.validation-errors ul {
+			margin-left: 1.1rem;
+			font-size: 0.75rem;
+			color: var(--text);
+		}
+
+		.validation-errors li { margin-bottom: 0.2rem; }
+
+		.validation-warnings {
+			background: rgba(235, 203, 139, 0.1);
+			border: 1px solid var(--warning);
+			border-radius: 6px;
+			padding: 0.85rem;
+			margin-bottom: 1rem;
+			display: none;
+		}
+
+		.validation-warnings.show { display: block; }
+
+		.validation-warnings h4 {
+			color: var(--warning);
+			font-size: 0.8rem;
+			margin-bottom: 0.4rem;
+		}
+
+		.validation-warnings ul {
+			margin-left: 1.1rem;
+			font-size: 0.75rem;
+			color: var(--text);
+		}
+
+		/* Output */
+		.output-panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-top: 1rem;
+		}
+
+		.output-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.85rem 1.1rem;
+			background: var(--surface-alt);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.output-title {
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: var(--success);
+		}
+
+		.output-actions { display: flex; gap: 0.5rem; }
+
+		#dnsmasqOutput {
+			background: var(--bg);
+			color: var(--teal);
+			font-family: inherit;
+			font-size: 0.72rem;
+			line-height: 1.5;
+			padding: 0.85rem;
+			margin: 0;
+			overflow-x: auto;
+			white-space: pre;
+			max-height: 500px;
+			overflow-y: auto;
+		}
+
+		/* Buttons */
+		.btn {
+			background: var(--accent);
+			border: none;
+			color: var(--text-bright);
+			padding: 0.55rem 1.1rem;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 0.8rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+
+		.btn:hover { background: var(--accent-hover); }
+
+		.btn-secondary {
+			background: var(--surface-hover);
+			border: 1px solid var(--border);
+			color: var(--text);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+			background: var(--surface-hover);
+		}
+
+		.btn-success { background: var(--success); color: var(--bg); }
+		.btn-success:hover { background: #b3ce9c; }
+
+		.btn-small {
+			padding: 0.35rem 0.7rem;
+			font-size: 0.72rem;
+		}
+
+		.action-bar {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 1rem;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		/* Toast */
+		.toast {
+			position: fixed;
+			bottom: 2rem;
+			left: 50%;
+			transform: translateX(-50%) translateY(100px);
+			background: var(--success);
+			color: var(--bg);
+			padding: 0.65rem 1.25rem;
+			border-radius: 6px;
+			font-size: 0.8rem;
+			font-weight: 500;
+			opacity: 0;
+			transition: all 0.3s ease;
+			pointer-events: none;
+			z-index: 1000;
+		}
+
+		.toast.show {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0);
+		}
+
+		.toast.error { background: var(--danger); color: var(--text-bright); }
+
+		/* Verification panel */
+		.verify-panel {
+			background: rgba(143, 188, 187, 0.08);
+			border: 1px solid var(--teal);
+			border-radius: 8px;
+			padding: 1.1rem;
+			margin-top: 1rem;
+		}
+
+		.verify-panel h3 {
+			color: var(--teal);
+			font-size: 0.85rem;
+			margin-bottom: 0.6rem;
+		}
+
+		.verify-panel ol {
+			margin-left: 1.1rem;
+			font-size: 0.75rem;
+		}
+
+		.verify-panel li { margin-bottom: 0.4rem; }
+
+		.verify-panel code {
+			background: var(--surface);
+			padding: 0.1rem 0.35rem;
+			border-radius: 3px;
+			font-size: 0.7rem;
+			color: var(--frost);
+		}
+
+		/* Mapping reference */
+		.mapping-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.72rem;
+			margin-top: 0.5rem;
+		}
+
+		.mapping-table th {
+			background: var(--surface-alt);
+			color: var(--text-muted);
+			text-align: left;
+			padding: 0.45rem 0.65rem;
+			border: 1px solid var(--border);
+			font-weight: 500;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
+			font-size: 0.65rem;
+		}
+
+		.mapping-table td {
+			padding: 0.4rem 0.65rem;
+			border: 1px solid var(--border);
+			color: var(--text);
+		}
+
+		.mapping-table tr:hover td {
+			background: var(--surface-hover);
+		}
+
+		.mapping-table .isc { color: var(--danger); }
+		.mapping-table .dnm { color: var(--success); }
+		.mapping-table .note { color: var(--warning); font-style: italic; }
+
+		/* Options panel */
+		.form-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 0.85rem;
+		}
+
+		.form-group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.35rem;
+		}
+
+		label {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+		}
+
+		.help-text {
+			font-size: 0.65rem;
+			color: var(--text-muted);
+			margin-top: 0.2rem;
+		}
+
+		select, input[type="text"] {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 0.5rem 0.65rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			transition: border-color 0.15s ease;
+		}
+
+		select:focus, input[type="text"]:focus {
+			outline: none;
+			border-color: var(--border-focus);
+		}
+
+		.checkbox-group {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.35rem 0;
+		}
+
+		input[type="checkbox"] {
+			appearance: none;
+			width: 16px;
+			height: 16px;
+			background: var(--bg);
+			border: 2px solid var(--border);
+			border-radius: 3px;
+			cursor: pointer;
+			position: relative;
+			flex-shrink: 0;
+		}
+
+		input[type="checkbox"]:checked {
+			background: var(--accent);
+			border-color: var(--accent);
+		}
+
+		input[type="checkbox"]:checked::after {
+			content: '';
+			position: absolute;
+			top: 1px;
+			left: 4px;
+			width: 4px;
+			height: 7px;
+			border: solid var(--text-bright);
+			border-width: 0 2px 2px 0;
+			transform: rotate(45deg);
+		}
+
+		.checkbox-label {
+			font-size: 0.8rem;
+			color: var(--text);
+			cursor: pointer;
+		}
+
+		/* Responsive */
+		@media (max-width: 768px) {
+			body { padding: 1rem; }
+			.split-pane { grid-template-columns: 1fr; }
+			.form-grid { grid-template-columns: 1fr; }
+			.stats-bar { gap: 0.5rem; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>ISC DHCP → dnsmasq Migration</h1>
+			<p class="subtitle">Convert ISC DHCP server configurations to dnsmasq format with inline documentation</p>
+			<div class="version-badges">
+				<span class="version-badge from">ISC DHCP 4.x</span>
+				<span class="version-badge">→</span>
+				<span class="version-badge to">dnsmasq 2.80+</span>
+				<span class="version-badge">dhcpd.conf → dnsmasq.conf</span>
+			</div>
+		</header>
+
+		<!-- Options Panel -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title"><span class="arrow">&#9654;</span> Migration Options</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-grid">
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="optComments" checked>
+							<label class="checkbox-label" for="optComments">Include inline comments</label>
+						</div>
+						<span class="help-text">Adds ISC DHCP reference comments to each line</span>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="optGroupHosts" checked>
+							<label class="checkbox-label" for="optGroupHosts">Group static hosts together</label>
+						</div>
+						<span class="help-text">Organise dhcp-host entries in a block</span>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="optOrigComments" checked>
+							<label class="checkbox-label" for="optOrigComments">Preserve original comments</label>
+						</div>
+						<span class="help-text">Keep ISC DHCP inline comments as dnsmasq comments</span>
+					</div>
+					<div class="form-group">
+						<div class="checkbox-group">
+							<input type="checkbox" id="optUnsupported" checked>
+							<label class="checkbox-label" for="optUnsupported">Show unsupported directives</label>
+						</div>
+						<span class="help-text">Add commented-out warnings for unmappable options</span>
+					</div>
+					<div class="form-group">
+						<label for="optInterface">Listening Interface (optional)</label>
+						<input type="text" id="optInterface" placeholder="e.g., eth0, br0">
+						<span class="help-text">Set interface= in output if specified</span>
+					</div>
+					<div class="form-group">
+						<label for="optLeaseFile">Lease File Path</label>
+						<input type="text" id="optLeaseFile" value="/var/lib/misc/dnsmasq.leases" placeholder="/var/lib/misc/dnsmasq.leases">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Input Panel -->
+		<div class="panel">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title"><span class="arrow">&#9654;</span> ISC DHCP Configuration Input</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body">
+				<div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+					Drop a dhcpd.conf file here or click to browse
+					<input type="file" id="fileInput" accept=".conf,.cfg,.txt">
+				</div>
+				<div class="input-area">
+					<textarea id="dhcpInput" placeholder="Paste your ISC DHCP configuration (dhcpd.conf) here...
+
+Example:
+authoritative;
+option domain-name &quot;example.local&quot;;
+option domain-name-servers 192.168.1.10, 192.168.1.11;
+default-lease-time 3600;
+
+subnet 192.168.1.0 netmask 255.255.255.0 {
+  range 192.168.1.100 192.168.1.200;
+  option routers 192.168.1.1;
+}
+
+host myserver {
+  hardware ethernet aa:bb:cc:dd:ee:ff;
+  fixed-address 192.168.1.50;
+}"></textarea>
+				</div>
+			</div>
+		</div>
+
+		<!-- Validation -->
+		<div class="validation-errors" id="validationErrors">
+			<h4>Errors found in configuration:</h4>
+			<ul id="errorList"></ul>
+		</div>
+
+		<div class="validation-warnings" id="validationWarnings">
+			<h4>Warnings:</h4>
+			<ul id="warningList"></ul>
+		</div>
+
+		<!-- Action Bar -->
+		<div class="action-bar">
+			<button class="btn btn-success" onclick="convertConfig()">Convert to dnsmasq</button>
+			<button class="btn btn-secondary" onclick="loadExample()">Load Example</button>
+			<button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+		</div>
+
+		<!-- Stats Bar (shown after conversion) -->
+		<div class="stats-bar" id="statsBar" style="display: none;">
+			<div class="stat">
+				<span class="stat-label">Subnets:</span>
+				<span class="stat-value" id="statSubnets">0</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Ranges:</span>
+				<span class="stat-value" id="statRanges">0</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Static Hosts:</span>
+				<span class="stat-value" id="statHosts">0</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Options:</span>
+				<span class="stat-value" id="statOptions">0</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Warnings:</span>
+				<span class="stat-value" id="statWarnings">0</span>
+			</div>
+		</div>
+
+		<!-- Output Panel -->
+		<div class="output-panel" id="outputPanel" style="display: none;">
+			<div class="output-header">
+				<span class="output-title">dnsmasq.conf</span>
+				<div class="output-actions">
+					<button class="btn btn-secondary btn-small" onclick="copyOutput()">Copy</button>
+					<button class="btn btn-small" onclick="downloadOutput()">Download</button>
+				</div>
+			</div>
+			<div>
+				<pre id="dnsmasqOutput"></pre>
+			</div>
+		</div>
+
+		<!-- Verification Steps -->
+		<div class="verify-panel" id="verifyPanel" style="display: none;">
+			<h3>Post-Migration Verification Steps</h3>
+			<ol>
+				<li>Save the generated config as <code>/etc/dnsmasq.conf</code> or in <code>/etc/dnsmasq.d/dhcp.conf</code></li>
+				<li>Validate syntax: <code>dnsmasq --test</code></li>
+				<li>Stop the ISC DHCP server: <code>systemctl stop isc-dhcp-server</code></li>
+				<li>Disable ISC DHCP from starting at boot: <code>systemctl disable isc-dhcp-server</code></li>
+				<li>Start dnsmasq: <code>systemctl start dnsmasq</code></li>
+				<li>Check logs for errors: <code>journalctl -u dnsmasq -f</code></li>
+				<li>Test DHCP lease acquisition from a client: <code>dhclient -v eth0</code></li>
+				<li>Verify static leases by checking <code>/var/lib/misc/dnsmasq.leases</code></li>
+				<li>Confirm DNS resolution if dnsmasq is also handling DNS</li>
+				<li>Monitor for at least one full lease cycle before decommissioning ISC DHCP</li>
+			</ol>
+		</div>
+
+		<!-- Directive Mapping Reference -->
+		<div class="panel" style="margin-top: 1rem;">
+			<div class="panel-header" onclick="togglePanel(this)">
+				<span class="panel-title"><span class="arrow">&#9654;</span> Directive Mapping Reference</span>
+				<span class="panel-toggle">&#9660;</span>
+			</div>
+			<div class="panel-body" style="padding: 0;">
+				<table class="mapping-table">
+					<thead>
+						<tr>
+							<th>ISC DHCP (dhcpd.conf)</th>
+							<th>dnsmasq</th>
+							<th>Notes</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="isc">authoritative</td>
+							<td class="dnm">dhcp-authoritative</td>
+							<td>Equivalent behaviour</td>
+						</tr>
+						<tr>
+							<td class="isc">subnet ... netmask ... { range ... }</td>
+							<td class="dnm">dhcp-range=start,end,mask,lease</td>
+							<td>Combined into one directive</td>
+						</tr>
+						<tr>
+							<td class="isc">host { hardware ethernet ...; fixed-address ...; }</td>
+							<td class="dnm">dhcp-host=MAC,IP,hostname</td>
+							<td>Static lease assignment</td>
+						</tr>
+						<tr>
+							<td class="isc">option routers</td>
+							<td class="dnm">dhcp-option=3,IP</td>
+							<td>DHCP option 3 = gateway</td>
+						</tr>
+						<tr>
+							<td class="isc">option domain-name-servers</td>
+							<td class="dnm">dhcp-option=6,IP[,IP]</td>
+							<td>DHCP option 6 = DNS servers</td>
+						</tr>
+						<tr>
+							<td class="isc">option domain-name</td>
+							<td class="dnm">domain=name</td>
+							<td>Local domain name</td>
+						</tr>
+						<tr>
+							<td class="isc">option domain-search</td>
+							<td class="dnm">dhcp-option=119,domain</td>
+							<td>DHCP option 119 = search list</td>
+						</tr>
+						<tr>
+							<td class="isc">default-lease-time</td>
+							<td class="dnm">dhcp-lease-max (in dhcp-range)</td>
+							<td>Appended to dhcp-range as lease time</td>
+						</tr>
+						<tr>
+							<td class="isc">filename / next-server</td>
+							<td class="dnm">dhcp-boot=file,,server</td>
+							<td>PXE/TFTP boot configuration</td>
+						</tr>
+						<tr>
+							<td class="isc">log-facility</td>
+							<td class="dnm">log-facility=facility</td>
+							<td>Direct mapping</td>
+						</tr>
+						<tr>
+							<td class="isc">allow booting / allow bootp</td>
+							<td class="dnm">enable-tftp / dhcp-boot</td>
+							<td class="note">Enable if PXE boot is needed</td>
+						</tr>
+						<tr>
+							<td class="isc">ddns-update-style</td>
+							<td class="dnm">--</td>
+							<td class="note">No equivalent; dnsmasq does not support DDNS</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast">Copied to clipboard!</div>
+
+	<script>
+		/**
+		 * ISC DHCP → dnsmasq Migration Tool
+		 *
+		 * Parses ISC DHCP (dhcpd.conf) configurations and produces
+		 * equivalent dnsmasq configuration with inline documentation.
+		 */
+
+		// ============================================================
+		// FILE HANDLING
+		// ============================================================
+
+		const fileInput = document.getElementById('fileInput');
+		const fileDrop = document.getElementById('fileDrop');
+		const dhcpInput = document.getElementById('dhcpInput');
+
+		fileInput.addEventListener('change', function(e) {
+			const file = e.target.files[0];
+			if (file) readFile(file);
+		});
+
+		fileDrop.addEventListener('dragover', function(e) {
+			e.preventDefault();
+			this.classList.add('dragover');
+		});
+
+		fileDrop.addEventListener('dragleave', function() {
+			this.classList.remove('dragover');
+		});
+
+		fileDrop.addEventListener('drop', function(e) {
+			e.preventDefault();
+			this.classList.remove('dragover');
+			const file = e.dataTransfer.files[0];
+			if (file) readFile(file);
+		});
+
+		function readFile(file) {
+			const reader = new FileReader();
+			reader.onload = function(e) {
+				dhcpInput.value = e.target.result;
+				showToast('File loaded: ' + file.name);
+			};
+			reader.readAsText(file);
+		}
+
+		// ============================================================
+		// UI HELPERS
+		// ============================================================
+
+		function togglePanel(header) {
+			header.parentElement.classList.toggle('collapsed');
+		}
+
+		function showToast(message, isError = false) {
+			const toast = document.getElementById('toast');
+			toast.textContent = message;
+			toast.classList.toggle('error', isError);
+			toast.classList.add('show');
+			setTimeout(() => toast.classList.remove('show'), 2500);
+		}
+
+		// ============================================================
+		// PARSER: ISC DHCP CONFIGURATION
+		// ============================================================
+
+		/**
+		 * Parse an ISC DHCP configuration string into a structured object.
+		 *
+		 * @param {string} input - Raw dhcpd.conf content
+		 * @returns {Object} Parsed configuration with globals, subnets, hosts, errors, warnings
+		 */
+		function parseDhcpConfig(input) {
+			const result = {
+				globals: {},
+				subnets: [],
+				hosts: [],
+				errors: [],
+				warnings: [],
+				rawComments: []
+			};
+
+			// Normalise line endings and strip trailing whitespace
+			const lines = input.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+
+			let currentSubnet = null;
+			let currentHost = null;
+			let braceDepth = 0;
+			let hostComment = null;
+
+			for (let i = 0; i < lines.length; i++) {
+				const lineNum = i + 1;
+				let line = lines[i];
+				const trimmed = line.trim();
+
+				// Skip empty lines
+				if (trimmed === '') continue;
+
+				// Pure comment lines
+				if (trimmed.startsWith('#')) {
+					// If we're in a host block, attach comment to the host
+					if (currentHost) {
+						if (!currentHost.comments) currentHost.comments = [];
+						currentHost.comments.push(trimmed.substring(1).trim());
+					} else if (currentSubnet) {
+						// subnet-level comment
+					} else {
+						// Could be a comment before a host block
+						hostComment = trimmed.substring(1).trim();
+						result.rawComments.push(trimmed);
+					}
+					continue;
+				}
+
+				// Strip inline comments, preserving them
+				let inlineComment = '';
+				const commentIdx = trimmed.indexOf('#');
+				let effective = trimmed;
+				if (commentIdx > 0) {
+					inlineComment = trimmed.substring(commentIdx + 1).trim();
+					effective = trimmed.substring(0, commentIdx).trim();
+				}
+
+				// Handle opening/closing braces
+				const openBraces = (effective.match(/{/g) || []).length;
+				const closeBraces = (effective.match(/}/g) || []).length;
+
+				// Parse subnet declaration
+				const subnetMatch = effective.match(/^subnet\s+(\d+\.\d+\.\d+\.\d+)\s+netmask\s+(\d+\.\d+\.\d+\.\d+)\s*\{?/);
+				if (subnetMatch) {
+					currentSubnet = {
+						network: subnetMatch[1],
+						netmask: subnetMatch[2],
+						range: null,
+						options: {},
+						filename: null,
+						nextServer: null
+					};
+					braceDepth += openBraces;
+					continue;
+				}
+
+				// Parse host declaration
+				const hostMatch = effective.match(/^host\s+([\w._-]+)\s*\{?/);
+				if (hostMatch) {
+					currentHost = {
+						name: hostMatch[1],
+						mac: null,
+						ip: null,
+						comments: []
+					};
+					if (hostComment) {
+						currentHost.comments.push(hostComment);
+						hostComment = null;
+					}
+					if (inlineComment) {
+						currentHost.comments.push(inlineComment);
+					}
+					braceDepth += openBraces;
+					continue;
+				}
+
+				// Closing brace
+				if (effective.includes('}')) {
+					braceDepth -= closeBraces;
+					if (currentHost && braceDepth <= 1) {
+						// Validate host entry
+						if (!currentHost.mac) {
+							result.warnings.push(`Line ${lineNum}: Host "${currentHost.name}" has no MAC address (hardware ethernet)`);
+						}
+						if (!currentHost.ip) {
+							result.warnings.push(`Line ${lineNum}: Host "${currentHost.name}" has no fixed-address`);
+						}
+						result.hosts.push(currentHost);
+						currentHost = null;
+						if (braceDepth <= 0 && currentSubnet) {
+							result.subnets.push(currentSubnet);
+							currentSubnet = null;
+							braceDepth = 0;
+						}
+						continue;
+					}
+					if (currentSubnet && braceDepth <= 0) {
+						result.subnets.push(currentSubnet);
+						currentSubnet = null;
+						braceDepth = 0;
+						continue;
+					}
+					continue;
+				}
+
+				// Strip semicolons for directive parsing
+				const directive = effective.replace(/;+\s*$/, '').trim();
+
+				// Inside a host block
+				if (currentHost) {
+					const macMatch = directive.match(/hardware\s+ethernet\s+([\da-fA-F:]+)/);
+					if (macMatch) {
+						currentHost.mac = macMatch[1].toLowerCase();
+						continue;
+					}
+					const ipMatch = directive.match(/fixed-address\s+(\d+\.\d+\.\d+\.\d+)/);
+					if (ipMatch) {
+						currentHost.ip = ipMatch[1];
+						continue;
+					}
+					// Unknown directive inside host
+					if (directive && !directive.startsWith('}')) {
+						result.warnings.push(`Line ${lineNum}: Unknown host directive "${directive}" in host "${currentHost.name}"`);
+					}
+					continue;
+				}
+
+				// Inside a subnet block
+				if (currentSubnet) {
+					const rangeMatch = directive.match(/range\s+(\d+\.\d+\.\d+\.\d+)\s+(\d+\.\d+\.\d+\.\d+)/);
+					if (rangeMatch) {
+						currentSubnet.range = { start: rangeMatch[1], end: rangeMatch[2] };
+						continue;
+					}
+
+					const routerMatch = directive.match(/option\s+routers\s+(.+)/);
+					if (routerMatch) {
+						currentSubnet.options.routers = routerMatch[1].replace(/\s/g, '');
+						continue;
+					}
+
+					const dnsMatch = directive.match(/option\s+domain-name-servers\s+(.+)/);
+					if (dnsMatch) {
+						currentSubnet.options.dns = dnsMatch[1].replace(/\s/g, '');
+						continue;
+					}
+
+					const domainMatch = directive.match(/option\s+domain-name\s+"([^"]+)"/);
+					if (domainMatch) {
+						currentSubnet.options.domainName = domainMatch[1];
+						continue;
+					}
+
+					const searchMatch = directive.match(/option\s+domain-search\s+"([^"]+)"/);
+					if (searchMatch) {
+						currentSubnet.options.domainSearch = searchMatch[1];
+						continue;
+					}
+
+					const filenameMatch = directive.match(/filename\s+"([^"]+)"/);
+					if (filenameMatch) {
+						currentSubnet.filename = filenameMatch[1];
+						continue;
+					}
+
+					const nextServerMatch = directive.match(/next-server\s+(\S+)/);
+					if (nextServerMatch) {
+						currentSubnet.nextServer = nextServerMatch[1];
+						continue;
+					}
+
+					// ddns inside subnet
+					if (directive.match(/ddns-update-style/)) {
+						continue; // silently skip
+					}
+
+					// Unknown subnet option
+					const optMatch = directive.match(/option\s+(\S+)\s+(.+)/);
+					if (optMatch) {
+						currentSubnet.options[optMatch[1]] = optMatch[2].replace(/"/g, '');
+						continue;
+					}
+
+					continue;
+				}
+
+				// Global directives
+				if (directive === 'authoritative') {
+					result.globals.authoritative = true;
+					continue;
+				}
+
+				if (directive.match(/^allow\s+booting/)) {
+					result.globals.allowBooting = true;
+					continue;
+				}
+
+				if (directive.match(/^allow\s+bootp/)) {
+					result.globals.allowBootp = true;
+					continue;
+				}
+
+				if (directive.match(/^ddns-update-style/)) {
+					result.globals.ddnsUpdateStyle = directive.split(/\s+/)[1] || 'none';
+					continue;
+				}
+
+				const gDomainMatch = directive.match(/^option\s+domain-name\s+"([^"]+)"/);
+				if (gDomainMatch) {
+					result.globals.domainName = gDomainMatch[1];
+					continue;
+				}
+
+				const gSearchMatch = directive.match(/^option\s+domain-search\s+"([^"]+)"/);
+				if (gSearchMatch) {
+					result.globals.domainSearch = gSearchMatch[1];
+					continue;
+				}
+
+				const gDnsMatch = directive.match(/^option\s+domain-name-servers\s+(.+)/);
+				if (gDnsMatch) {
+					result.globals.dnsServers = gDnsMatch[1].replace(/\s/g, '');
+					continue;
+				}
+
+				const leaseMatch = directive.match(/^default-lease-time\s+(\d+)/);
+				if (leaseMatch) {
+					result.globals.defaultLeaseTime = parseInt(leaseMatch[1]);
+					continue;
+				}
+
+				const maxLeaseMatch = directive.match(/^max-lease-time\s+(\d+)/);
+				if (maxLeaseMatch) {
+					result.globals.maxLeaseTime = parseInt(maxLeaseMatch[1]);
+					continue;
+				}
+
+				const logMatch = directive.match(/^log-facility\s+(\S+)/);
+				if (logMatch) {
+					result.globals.logFacility = logMatch[1];
+					continue;
+				}
+
+				// Global filename / next-server
+				const gFilenameMatch = directive.match(/^filename\s+"([^"]+)"/);
+				if (gFilenameMatch) {
+					result.globals.filename = gFilenameMatch[1];
+					continue;
+				}
+
+				const gNextServerMatch = directive.match(/^next-server\s+(\S+)/);
+				if (gNextServerMatch) {
+					result.globals.nextServer = gNextServerMatch[1];
+					continue;
+				}
+
+				// Generic global option
+				const gOptMatch = directive.match(/^option\s+(\S+)\s+(.+)/);
+				if (gOptMatch) {
+					if (!result.globals.extraOptions) result.globals.extraOptions = {};
+					result.globals.extraOptions[gOptMatch[1]] = gOptMatch[2].replace(/"/g, '');
+					continue;
+				}
+
+				// If nothing matched and it's not empty/comment
+				if (directive && !directive.match(/^\s*$/)) {
+					result.warnings.push(`Line ${lineNum}: Unrecognised directive: "${directive}"`);
+				}
+			}
+
+			return result;
+		}
+
+		// ============================================================
+		// VALIDATION
+		// ============================================================
+
+		/**
+		 * Validate the parsed ISC DHCP configuration
+		 * @param {Object} parsed - Output from parseDhcpConfig
+		 * @returns {Object} { errors: [], warnings: [] }
+		 */
+		function validateParsed(parsed) {
+			const errors = [...parsed.errors];
+			const warnings = [...parsed.warnings];
+
+			// Check for at least one subnet or host
+			if (parsed.subnets.length === 0 && parsed.hosts.length === 0) {
+				errors.push('No subnets or host entries found. Check that the configuration is valid ISC DHCP format.');
+			}
+
+			// Validate subnet ranges
+			parsed.subnets.forEach((sub, i) => {
+				if (!sub.range) {
+					warnings.push(`Subnet ${sub.network}/${sub.netmask}: No range declaration found`);
+				}
+			});
+
+			// Check for duplicate host MACs
+			const macs = {};
+			parsed.hosts.forEach(host => {
+				if (host.mac) {
+					if (macs[host.mac]) {
+						warnings.push(`Duplicate MAC address ${host.mac} in hosts "${macs[host.mac]}" and "${host.name}"`);
+					}
+					macs[host.mac] = host.name;
+				}
+			});
+
+			// Check for duplicate host IPs
+			const ips = {};
+			parsed.hosts.forEach(host => {
+				if (host.ip) {
+					if (ips[host.ip]) {
+						warnings.push(`Duplicate IP address ${host.ip} in hosts "${ips[host.ip]}" and "${host.name}"`);
+					}
+					ips[host.ip] = host.name;
+				}
+			});
+
+			return { errors, warnings };
+		}
+
+		// ============================================================
+		// CONVERTER: GENERATE DNSMASQ CONFIG
+		// ============================================================
+
+		/**
+		 * Convert parsed ISC DHCP config to dnsmasq configuration string
+		 * @param {Object} parsed - Output from parseDhcpConfig
+		 * @param {Object} opts - Migration options
+		 * @returns {string} dnsmasq configuration file content
+		 */
+		function generateDnsmasq(parsed, opts) {
+			const lines = [];
+			const c = opts.comments; // include comments flag
+			let optCount = 0;
+
+			// Header
+			lines.push('# ============================================================================');
+			lines.push('# dnsmasq DHCP Configuration');
+			lines.push('# Converted from ISC DHCP (dhcpd.conf) by rowstu.net migration tool');
+			lines.push(`# Generated: ${new Date().toISOString()}`);
+			lines.push('# ============================================================================');
+			lines.push('');
+
+			// Interface
+			if (opts.iface) {
+				if (c) lines.push('# Bind to specific interface');
+				lines.push(`interface=${opts.iface}`);
+				lines.push('');
+			}
+
+			// Lease file
+			if (c) lines.push('# Lease file location');
+			lines.push(`dhcp-leasefile=${opts.leaseFile}`);
+			lines.push('');
+
+			// ---- Global settings ----
+			lines.push('# ============================================================================');
+			lines.push('# GLOBAL SETTINGS');
+			if (c) lines.push('# ISC DHCP global parameters converted to dnsmasq equivalents');
+			lines.push('# ============================================================================');
+			lines.push('');
+
+			// Authoritative
+			if (parsed.globals.authoritative) {
+				if (c) lines.push('# ISC: authoritative;');
+				lines.push('dhcp-authoritative');
+				lines.push('');
+				optCount++;
+			}
+
+			// Domain name
+			if (parsed.globals.domainName) {
+				if (c) lines.push(`# ISC: option domain-name "${parsed.globals.domainName}";`);
+				lines.push(`domain=${parsed.globals.domainName}`);
+				lines.push('');
+				optCount++;
+			}
+
+			// Domain search
+			if (parsed.globals.domainSearch) {
+				if (c) lines.push(`# ISC: option domain-search "${parsed.globals.domainSearch}";`);
+				lines.push(`# dnsmasq: domain-search maps to DHCP option 119`);
+				lines.push(`dhcp-option=119,${parsed.globals.domainSearch}`);
+				lines.push('');
+				optCount++;
+			}
+
+			// Global DNS servers
+			if (parsed.globals.dnsServers) {
+				if (c) lines.push(`# ISC: option domain-name-servers ${parsed.globals.dnsServers};`);
+				lines.push(`dhcp-option=6,${parsed.globals.dnsServers}`);
+				lines.push('');
+				optCount++;
+			}
+
+			// Log facility
+			if (parsed.globals.logFacility) {
+				if (c) lines.push(`# ISC: log-facility ${parsed.globals.logFacility};`);
+				lines.push(`log-facility=${parsed.globals.logFacility}`);
+				lines.push('');
+				optCount++;
+			}
+
+			// DDNS (unsupported)
+			if (parsed.globals.ddnsUpdateStyle && opts.unsupported) {
+				lines.push(`# WARNING: ISC DHCP "ddns-update-style ${parsed.globals.ddnsUpdateStyle}" has no dnsmasq equivalent`);
+				lines.push('# dnsmasq does not support dynamic DNS updates natively.');
+				lines.push('# Consider using a separate DDNS client (e.g., nsupdate) if needed.');
+				lines.push('');
+			}
+
+			// allow booting / bootp
+			if (parsed.globals.allowBooting || parsed.globals.allowBootp) {
+				if (c) lines.push('# ISC: allow booting; / allow bootp;');
+				lines.push('# Enable TFTP server if PXE booting is required');
+				lines.push('# enable-tftp');
+				lines.push('# tftp-root=/tftpboot');
+				lines.push('');
+				optCount++;
+			}
+
+			// Global PXE boot
+			if (parsed.globals.filename || parsed.globals.nextServer) {
+				if (c) {
+					if (parsed.globals.filename) lines.push(`# ISC: filename "${parsed.globals.filename}";`);
+					if (parsed.globals.nextServer) lines.push(`# ISC: next-server ${parsed.globals.nextServer};`);
+				}
+				const bootParts = [parsed.globals.filename || ''];
+				bootParts.push(''); // tag placeholder
+				if (parsed.globals.nextServer) bootParts.push(parsed.globals.nextServer);
+				lines.push(`dhcp-boot=${bootParts.join(',')}`);
+				lines.push('');
+				optCount++;
+			}
+
+			// Extra global options
+			if (parsed.globals.extraOptions && opts.unsupported) {
+				const known = {};
+				for (const [key, val] of Object.entries(parsed.globals.extraOptions)) {
+					lines.push(`# WARNING: ISC DHCP "option ${key} ${val}" - no automatic mapping`);
+					lines.push(`# Review the dnsmasq man page for equivalent dhcp-option number`);
+				}
+				lines.push('');
+			}
+
+			// ---- Subnets / Ranges ----
+			if (parsed.subnets.length > 0) {
+				lines.push('# ============================================================================');
+				lines.push('# DHCP RANGES (SUBNETS)');
+				if (c) lines.push('# ISC DHCP subnet/range declarations converted to dhcp-range directives');
+				lines.push('# ============================================================================');
+				lines.push('');
+
+				parsed.subnets.forEach((sub, idx) => {
+					if (c) lines.push(`# ISC: subnet ${sub.network} netmask ${sub.netmask} { ... }`);
+
+					if (sub.range) {
+						let rangeLine = `dhcp-range=${sub.range.start},${sub.range.end},${sub.netmask}`;
+						// Append lease time from global if available
+						if (parsed.globals.defaultLeaseTime) {
+							rangeLine += `,${parsed.globals.defaultLeaseTime}s`;
+							if (c) lines.push(`# Lease time: ${parsed.globals.defaultLeaseTime}s (ISC: default-lease-time ${parsed.globals.defaultLeaseTime})`);
+						}
+						lines.push(rangeLine);
+					} else {
+						lines.push(`# WARNING: Subnet ${sub.network}/${sub.netmask} has no range declaration`);
+						lines.push(`# dhcp-range=${sub.network},static,${sub.netmask}`);
+					}
+
+					// Subnet-specific options
+					if (sub.options.routers) {
+						if (c) lines.push(`# ISC: option routers ${sub.options.routers};`);
+						lines.push(`dhcp-option=3,${sub.options.routers}`);
+						optCount++;
+					}
+
+					if (sub.options.dns) {
+						if (c) lines.push(`# ISC: option domain-name-servers ${sub.options.dns};`);
+						lines.push(`dhcp-option=6,${sub.options.dns}`);
+						optCount++;
+					}
+
+					if (sub.options.domainName) {
+						if (c) lines.push(`# ISC: option domain-name "${sub.options.domainName}";`);
+						lines.push(`domain=${sub.options.domainName}`);
+						optCount++;
+					}
+
+					if (sub.options.domainSearch) {
+						if (c) lines.push(`# ISC: option domain-search "${sub.options.domainSearch}";`);
+						lines.push(`dhcp-option=119,${sub.options.domainSearch}`);
+						optCount++;
+					}
+
+					// PXE boot per-subnet
+					if (sub.filename || sub.nextServer) {
+						if (c) {
+							if (sub.filename) lines.push(`# ISC: filename "${sub.filename}";`);
+							if (sub.nextServer) lines.push(`# ISC: next-server ${sub.nextServer};`);
+						}
+						const bootParts = [sub.filename || ''];
+						bootParts.push('');
+						if (sub.nextServer) bootParts.push(sub.nextServer);
+						lines.push(`dhcp-boot=${bootParts.join(',')}`);
+						optCount++;
+					}
+
+					// Other subnet options
+					for (const [key, val] of Object.entries(sub.options)) {
+						if (['routers', 'dns', 'domainName', 'domainSearch'].includes(key)) continue;
+						if (opts.unsupported) {
+							lines.push(`# WARNING: Subnet option "${key} ${val}" - review manually`);
+							lines.push(`# Map to appropriate dhcp-option number from RFC 2132`);
+						}
+					}
+
+					lines.push('');
+				});
+			}
+
+			// ---- Static Hosts ----
+			if (parsed.hosts.length > 0) {
+				lines.push('# ============================================================================');
+				lines.push('# STATIC HOST ENTRIES (DHCP RESERVATIONS)');
+				if (c) lines.push('# ISC DHCP host {} blocks converted to dhcp-host directives');
+				lines.push(`# Total: ${parsed.hosts.length} hosts`);
+				lines.push('# ============================================================================');
+				lines.push('');
+
+				parsed.hosts.forEach(host => {
+					// Preserve original comments
+					if (opts.origComments && host.comments && host.comments.length > 0) {
+						host.comments.forEach(cm => {
+							lines.push(`# ${cm}`);
+						});
+					}
+
+					if (!host.mac) {
+						lines.push(`# WARNING: Host "${host.name}" skipped - no MAC address`);
+						if (host.ip) {
+							lines.push(`# fixed-address was: ${host.ip}`);
+						}
+						lines.push('');
+						return;
+					}
+
+					if (!host.ip) {
+						lines.push(`# WARNING: Host "${host.name}" (${host.mac}) - no fixed-address`);
+						lines.push('');
+						return;
+					}
+
+					if (c) lines.push(`# ISC: host ${host.name} { hardware ethernet ${host.mac}; fixed-address ${host.ip}; }`);
+					lines.push(`dhcp-host=${host.mac},${host.ip},${host.name}`);
+					lines.push('');
+				});
+			}
+
+			// ---- Footer ----
+			lines.push('# ============================================================================');
+			lines.push('# END OF CONVERTED CONFIGURATION');
+			lines.push('# ============================================================================');
+			lines.push('# Review this configuration carefully before deploying.');
+			lines.push('# Test with: dnsmasq --test');
+			lines.push('#');
+			if (parsed.globals.maxLeaseTime) {
+				lines.push(`# Note: ISC DHCP max-lease-time was ${parsed.globals.maxLeaseTime}s`);
+				lines.push('# dnsmasq does not distinguish default vs max lease time.');
+				lines.push('# The lease time in dhcp-range is the maximum lease time offered.');
+			}
+			lines.push('# ============================================================================');
+
+			return { output: lines.join('\n'), optCount };
+		}
+
+		// ============================================================
+		// MAIN CONVERSION FUNCTION
+		// ============================================================
+
+		function convertConfig() {
+			const input = dhcpInput.value.trim();
+
+			// Clear previous state
+			document.getElementById('validationErrors').classList.remove('show');
+			document.getElementById('validationWarnings').classList.remove('show');
+			document.getElementById('statsBar').style.display = 'none';
+			document.getElementById('outputPanel').style.display = 'none';
+			document.getElementById('verifyPanel').style.display = 'none';
+			dhcpInput.classList.remove('invalid');
+
+			if (!input) {
+				dhcpInput.classList.add('invalid');
+				showToast('Please paste or load an ISC DHCP configuration', true);
+				return;
+			}
+
+			// Parse
+			const parsed = parseDhcpConfig(input);
+
+			// Validate
+			const validation = validateParsed(parsed);
+
+			// Show errors
+			if (validation.errors.length > 0) {
+				const errorList = document.getElementById('errorList');
+				errorList.innerHTML = validation.errors.map(e => `<li>${escapeHtml(e)}</li>`).join('');
+				document.getElementById('validationErrors').classList.add('show');
+			}
+
+			// Show warnings
+			if (validation.warnings.length > 0) {
+				const warnList = document.getElementById('warningList');
+				warnList.innerHTML = validation.warnings.map(w => `<li>${escapeHtml(w)}</li>`).join('');
+				document.getElementById('validationWarnings').classList.add('show');
+			}
+
+			// Don't block on errors - still generate what we can
+			// (only block if there's literally nothing to convert)
+			if (parsed.subnets.length === 0 && parsed.hosts.length === 0 &&
+				!parsed.globals.authoritative && !parsed.globals.domainName) {
+				showToast('No convertible directives found', true);
+				return;
+			}
+
+			// Gather options
+			const opts = {
+				comments: document.getElementById('optComments').checked,
+				groupHosts: document.getElementById('optGroupHosts').checked,
+				origComments: document.getElementById('optOrigComments').checked,
+				unsupported: document.getElementById('optUnsupported').checked,
+				iface: document.getElementById('optInterface').value.trim(),
+				leaseFile: document.getElementById('optLeaseFile').value.trim() || '/var/lib/misc/dnsmasq.leases'
+			};
+
+			// Generate
+			const { output, optCount } = generateDnsmasq(parsed, opts);
+
+			// Display output
+			document.getElementById('dnsmasqOutput').textContent = output;
+			document.getElementById('outputPanel').style.display = 'block';
+
+			// Update stats
+			document.getElementById('statSubnets').textContent = parsed.subnets.length;
+			document.getElementById('statRanges').textContent = parsed.subnets.filter(s => s.range).length;
+			document.getElementById('statHosts').textContent = parsed.hosts.filter(h => h.mac && h.ip).length;
+			document.getElementById('statOptions').textContent = optCount;
+
+			const warnCount = validation.warnings.length;
+			const warnEl = document.getElementById('statWarnings');
+			warnEl.textContent = warnCount;
+			warnEl.className = 'stat-value' + (warnCount > 0 ? ' warn' : '');
+
+			document.getElementById('statsBar').style.display = 'flex';
+
+			// Show verification panel
+			document.getElementById('verifyPanel').style.display = 'block';
+
+			// Scroll to output
+			document.getElementById('statsBar').scrollIntoView({ behavior: 'smooth' });
+
+			showToast('Conversion complete!');
+		}
+
+		// ============================================================
+		// UTILITY FUNCTIONS
+		// ============================================================
+
+		function escapeHtml(str) {
+			const div = document.createElement('div');
+			div.textContent = str;
+			return div.innerHTML;
+		}
+
+		function copyOutput() {
+			const output = document.getElementById('dnsmasqOutput').textContent;
+			navigator.clipboard.writeText(output).then(() => {
+				showToast('Copied to clipboard!');
+			}).catch(() => {
+				showToast('Failed to copy', true);
+			});
+		}
+
+		function downloadOutput() {
+			const output = document.getElementById('dnsmasqOutput').textContent;
+			const blob = new Blob([output], { type: 'text/plain' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'dnsmasq.conf';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+			showToast('Downloaded dnsmasq.conf');
+		}
+
+		function clearAll() {
+			dhcpInput.value = '';
+			dhcpInput.classList.remove('invalid');
+			document.getElementById('validationErrors').classList.remove('show');
+			document.getElementById('validationWarnings').classList.remove('show');
+			document.getElementById('statsBar').style.display = 'none';
+			document.getElementById('outputPanel').style.display = 'none';
+			document.getElementById('verifyPanel').style.display = 'none';
+			showToast('Cleared');
+		}
+
+		function loadExample() {
+			dhcpInput.value = `authoritative;
+allow booting;
+allow bootp;
+
+ddns-update-style none;
+option domain-name "rownet.local";
+option domain-search "rownet.local";
+option domain-name-servers ns1.rownet.local, ns2.rownet.local;
+
+default-lease-time 3600;
+#default-lease-time 86400;
+
+log-facility local7;
+
+subnet 192.168.200.0 netmask 255.255.255.0 {
+  ddns-update-style none;
+  range 192.168.200.130 192.168.200.180;
+  option routers 192.168.200.1;
+  option domain-name "rownet.local";
+  option domain-search "rownet.local";
+  option domain-name-servers 192.168.200.10;
+  filename "/tftpboot/pxelinux.0";
+  next-server 192.168.200.1;
+}
+
+host lily {
+  hardware ethernet 48:02:2a:40:f2:4c;
+  fixed-address 192.168.200.60;
+}
+
+host tp-link-tc60 {
+  hardware ethernet 28:87:ba:b1:7e:2d;
+  fixed-address 192.168.200.63;
+}
+
+host eufy-camera{
+  hardware ethernet 02:df:0b:9b:ab:76;
+  fixed-address 192.168.200.64;
+}
+
+host ubiquiti-ap {
+  hardware ethernet;
+  fixed-address 192.168.200.130;
+}
+
+host tinyxp-vm{
+  hardware ethernet 08:00:27:84:59:c1;
+  fixed-address 192.168.200.133;
+}
+
+host ansiblelabvm {
+  hardware ethernet B6:89:57:93:0E:75;
+  fixed-address 192.168.200.4;
+}
+
+host alfie{
+# not sure what this is
+  hardware ethernet 14:10:9f:d8:73:2d;
+  fixed-address 192.168.200.136;
+}
+
+host elite {
+# Helen Desktop PC - Camera picassa library
+  hardware ethernet 2c:44:fd:25:87:2d;
+  fixed-address 192.168.200.230;
+}
+
+host beast {
+# Row's old Desktop Beast
+  hardware ethernet f4:6d:04:3c:46:7d;
+  fixed-address 192.168.200.250;
+}
+
+host switch {
+# DLink 24 port gig switch
+  hardware ethernet 1c:7e:e5:27:0e:2d;
+  fixed-address 192.168.200.2;
+}
+
+host pihole {
+# pi hole dns server
+  hardware ethernet b8:27:eb:68:89:de;
+  fixed-address 192.168.200.8;
+}
+
+host bob {
+# new dell desktop
+  hardware ethernet e4:54:e8:8b:72:4d;
+  fixed-address 192.168.200.6;
+}
+
+host docker-host {
+# debian docker host on pve
+  hardware ethernet 7E:49:5F:32:CB:89;
+  fixed-address 192.168.200.5;
+}
+
+host lappy {
+# new dell 7300 everyday laptop
+  hardware ethernet 60:f2:62:a2:40:22;
+  fixed-address 192.168.200.252;
+}
+
+host epson-printer {
+# new fancy epson printer
+ hardware ethernet f8:25:51:e6:35:7d;
+ fixed-address 192.168.200.82;
+}`;
+			showToast('Example configuration loaded');
+		}
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>
