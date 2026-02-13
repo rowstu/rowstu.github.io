@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Android Notes on rowstu.net</title><link>https://rowstu.net/android/</link><description>Recent content in Android Notes on rowstu.net</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://rowstu.net/android/index.xml" rel="self" type="application/rss+xml"/><item><title>Amazon Fire Stick 4K - ADB Debloat Guide</title><link>https://rowstu.net/android/firestick-4k-debloat/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/android/firestick-4k-debloat/</guid><description>&lt;h1 id="amazon-fire-stick-4k---debloat-remove-telemetry--advertising"&gt;Amazon Fire Stick 4K - Debloat, Remove Telemetry &amp;amp; Advertising&lt;/h1&gt;
+&lt;p&gt;Strip Amazon telemetry, tracking, advertising, and bloatware from a Fire Stick 4K over ADB on port 5555. No root required. All changes are recoverable.&lt;/p&gt;
+&lt;h2 id="key-principles"&gt;Key Principles&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Fire OS is a heavily modified Android fork. Amazon layers advertising, telemetry, and shopping on top of the OS.&lt;/li&gt;
+&lt;li&gt;ADB connects over the network on port 5555 (not USB like phones).&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;pm uninstall -k --user 0&lt;/code&gt; to remove apps. The &lt;code&gt;-k&lt;/code&gt; flag keeps data/cache.&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;pm disable-user --user 0&lt;/code&gt; for system-critical packages you want to silence but not remove.&lt;/li&gt;
+&lt;li&gt;Everything is recoverable via &lt;code&gt;cmd package install-existing&lt;/code&gt; or &lt;code&gt;pm enable&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Do NOT remove settings or launcher core&lt;/strong&gt; - you will lose the ability to navigate the device.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;h3 id="enable-adb-on-the-fire-stick"&gt;Enable ADB on the Fire Stick&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Settings &amp;gt; My Fire TV &amp;gt; Developer Options&lt;/li&gt;
+&lt;li&gt;Turn on &lt;strong&gt;ADB Debugging&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Note the Fire Stick&amp;rsquo;s IP address: Settings &amp;gt; My Fire TV &amp;gt; About &amp;gt; Network&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="connect-from-your-pc"&gt;Connect from your PC&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;adb connect &amp;lt;FIRESTICK_IP&amp;gt;:5555
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;adb devices
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Accept the authorisation prompt on the TV screen.&lt;/p&gt;</description></item><item><title>Google Pixel 8a - ADB Debloat Guide</title><link>https://rowstu.net/android/pixel-8a-debloat/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/android/pixel-8a-debloat/</guid><description>&lt;h1 id="google-pixel-8a---stock-firmware-debloat--privacy-hardening"&gt;Google Pixel 8a - Stock Firmware Debloat &amp;amp; Privacy Hardening&lt;/h1&gt;
+&lt;p&gt;Conservative debloat and privacy guide for the Pixel 8a on stock firmware. The Pixel is already close to &amp;ldquo;stock Android&amp;rdquo; so this is really about stripping Google user apps, reducing telemetry, and tightening battery life.&lt;/p&gt;
+&lt;h2 id="key-principles"&gt;Key Principles&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Pixel is already stock AOSP - you&amp;rsquo;re removing Google&amp;rsquo;s own apps, not OEM bloat.&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;pm uninstall -k --user 0&lt;/code&gt; to remove apps for your user only. The &lt;code&gt;-k&lt;/code&gt; flag keeps data/cache.&lt;/li&gt;
+&lt;li&gt;Everything is recoverable via &lt;code&gt;cmd package install-existing&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;SafetyNet/Play Integrity stays intact, banking apps keep working, OTA updates still apply.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;p&gt;Enable Developer options &amp;gt; USB debugging on the device.&lt;/p&gt;</description></item><item><title>Sony Xperia XZ2 Compact - ADB Debloat Guide</title><link>https://rowstu.net/android/xperia-xz2-compact-debloat/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/android/xperia-xz2-compact-debloat/</guid><description>&lt;h1 id="sony-xperia-xz2-compact---stock-firmware-debloat"&gt;Sony Xperia XZ2 Compact - Stock Firmware Debloat&lt;/h1&gt;
+&lt;p&gt;Conservative, banking-app-safe debloat guide for the Sony Xperia XZ2 Compact (xz2c) on stock firmware with locked bootloader.&lt;/p&gt;
+&lt;h2 id="key-principles"&gt;Key Principles&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Do not unlock the bootloader&lt;/strong&gt; if banking apps are a hard requirement. Play Integrity / hardware attestation will fail on an unlocked bootloader with a custom ROM.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Use &lt;code&gt;pm uninstall --user 0&lt;/code&gt;&lt;/strong&gt; instead of deleting system APKs. This keeps you recoverable and avoids bootloops.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Disable before uninstall&lt;/strong&gt; for anything you&amp;rsquo;re unsure about. Test for a day, then uninstall if stable.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Reboot and test after every batch&lt;/strong&gt; - check calls, SMS, camera, Wi-Fi, Bluetooth, fingerprint, Play Store updates, and banking apps.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;p&gt;Enable Developer options &amp;gt; USB debugging on the device.&lt;/p&gt;</description></item></channel></rss>

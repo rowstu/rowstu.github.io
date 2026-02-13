@@ -279,7 +279,26 @@ From: nvidia/cuda:12.2.0-runtime-ubuntu22.04
 &lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
 &lt;h2 id="bind-mounts-and-file-access"&gt;Bind Mounts and File Access&lt;/h2&gt;
 &lt;h3 id="automatic-bind-mounts"&gt;Automatic Bind Mounts&lt;/h3&gt;
-&lt;p&gt;By default, Apptainer binds:&lt;/p&gt;</description></item><item><title>ArchLinux - Does your system need a reboot?</title><link>https://rowstu.net/linux/arch-needs-reboot/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/arch-needs-reboot/</guid><description>&lt;p&gt;Under RHEL, there&amp;rsquo;s an application called &lt;strong&gt;needs-restarting&lt;/strong&gt;. It checks if the system needs a reboot after installing packages, ensuring the latest kernel, systemd, and libraries are in use.&lt;/p&gt;
+&lt;p&gt;By default, Apptainer binds:&lt;/p&gt;</description></item><item><title>Arch Linux System Cleanup – Practical Maintenance Commands</title><link>https://rowstu.net/linux/archlinux-cleanup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/archlinux-cleanup/</guid><description>&lt;h2 id="remove-orphaned-packages"&gt;Remove Orphaned Packages&lt;/h2&gt;
+&lt;p&gt;List them:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;pacman -Qtdq
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Remove them safely:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo pacman -Rns &lt;span style="color:#66d9ef"&gt;$(&lt;/span&gt;pacman -Qtdq&lt;span style="color:#66d9ef"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Run this after system upgrades or uninstalling packages.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="clean-pacman-package-cache"&gt;Clean Pacman Package Cache&lt;/h2&gt;
+&lt;p&gt;Check current size:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;du -sh /var/cache/pacman/pkg/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo paccache -r
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;More aggressive (keep 1 version):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo paccache -rk1
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Full wipe (only if disk space is critical):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo pacman -Scc
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="clean-systemd-journal-logs"&gt;Clean systemd Journal Logs&lt;/h2&gt;
+&lt;p&gt;Check size:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;journalctl --disk-usage
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Remove logs older than two weeks:&lt;/p&gt;</description></item><item><title>ArchLinux - Does your system need a reboot?</title><link>https://rowstu.net/linux/arch-needs-reboot/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/arch-needs-reboot/</guid><description>&lt;p&gt;Under RHEL, there&amp;rsquo;s an application called &lt;strong&gt;needs-restarting&lt;/strong&gt;. It checks if the system needs a reboot after installing packages, ensuring the latest kernel, systemd, and libraries are in use.&lt;/p&gt;
 &lt;p&gt;In ArchLinux, there&amp;rsquo;s no built-in equivalent, but you can use an AUR application called &lt;strong&gt;reboot-arch-btw&lt;/strong&gt; or you can roll your own with the following BASH script:&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;#!/bin/bash
 #

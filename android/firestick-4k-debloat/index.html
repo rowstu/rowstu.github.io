@@ -1,0 +1,111 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Amazon Fire Stick 4K - ADB Debloat Guide // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Amazon Fire Stick 4K - ADB Debloat Guide</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/androidfirestick-4k-debloat/>Androidfirestick 4k Debloat</a></div><div class="card markdown-content"><h1 id=amazon-fire-stick-4k---debloat-remove-telemetry--advertising>Amazon Fire Stick 4K - Debloat, Remove Telemetry & Advertising</h1><p>Strip Amazon telemetry, tracking, advertising, and bloatware from a Fire Stick 4K over ADB on port 5555. No root required. All changes are recoverable.</p><h2 id=key-principles>Key Principles</h2><ul><li>Fire OS is a heavily modified Android fork. Amazon layers advertising, telemetry, and shopping on top of the OS.</li><li>ADB connects over the network on port 5555 (not USB like phones).</li><li>Use <code>pm uninstall -k --user 0</code> to remove apps. The <code>-k</code> flag keeps data/cache.</li><li>Use <code>pm disable-user --user 0</code> for system-critical packages you want to silence but not remove.</li><li>Everything is recoverable via <code>cmd package install-existing</code> or <code>pm enable</code>.</li><li><strong>Do NOT remove settings or launcher core</strong> - you will lose the ability to navigate the device.</li></ul><h2 id=prerequisites>Prerequisites</h2><h3 id=enable-adb-on-the-fire-stick>Enable ADB on the Fire Stick</h3><ol><li>Settings > My Fire TV > Developer Options</li><li>Turn on <strong>ADB Debugging</strong></li><li>Note the Fire Stick&rsquo;s IP address: Settings > My Fire TV > About > Network</li></ol><h3 id=connect-from-your-pc>Connect from your PC</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>adb connect &lt;FIRESTICK_IP&gt;:5555
+</span></span><span style=display:flex><span>adb devices
+</span></span></code></pre></div><p>Accept the authorisation prompt on the TV screen.</p><h2 id=make-an-inventory-first>Make an Inventory First</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># All packages</span>
+</span></span><span style=display:flex><span>adb shell pm list packages &gt; firestick_packages_all.txt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Amazon-specific</span>
+</span></span><span style=display:flex><span>adb shell pm list packages | grep -i amazon &gt; firestick_packages_amazon.txt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Currently disabled</span>
+</span></span><span style=display:flex><span>adb shell pm list packages -d &gt; firestick_packages_disabled.txt
+</span></span></code></pre></div><h2 id=core-adb-commands>Core ADB Commands</h2><h3 id=remove-an-app>Remove an app</h3><pre tabindex=0><code>adb shell pm uninstall -k --user 0 &lt;package.name&gt;
+</code></pre><h3 id=disable-an-app>Disable an app</h3><pre tabindex=0><code>adb shell pm disable-user --user 0 &lt;package.name&gt;
+</code></pre><h3 id=restore-a-removed-app>Restore a removed app</h3><pre tabindex=0><code>adb shell cmd package install-existing &lt;package.name&gt;
+</code></pre><h3 id=re-enable-a-disabled-app>Re-enable a disabled app</h3><pre tabindex=0><code>adb shell pm enable &lt;package.name&gt;
+</code></pre><hr><h2 id=safe-to-remove---advertising--shopping>Safe to Remove - Advertising & Shopping</h2><p>These are the primary revenue/tracking components Amazon layers onto the device.</p><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.advertisingidsettings
+adb shell pm uninstall -k --user 0 com.amazon.videoads.app
+adb shell pm uninstall -k --user 0 com.amazon.shoptv.client
+adb shell pm uninstall -k --user 0 com.amazon.alexashopping
+adb shell pm uninstall -k --user 0 com.amazon.avod
+</code></pre><h2 id=safe-to-remove---telemetry-metrics--data-collection>Safe to Remove - Telemetry, Metrics & Data Collection</h2><p>These phone home to Amazon with usage data, crash reports, and device profiling.</p><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.client.metrics
+adb shell pm uninstall -k --user 0 com.amazon.client.metrics.api
+adb shell pm uninstall -k --user 0 com.amazon.tv.fw.metrics
+adb shell pm uninstall -k --user 0 com.amazon.dp.logger
+adb shell pm uninstall -k --user 0 com.amazon.device.crashmanager
+adb shell pm uninstall -k --user 0 com.amazon.device.logmanager
+adb shell pm uninstall -k --user 0 com.amazon.precog
+adb shell pm uninstall -k --user 0 com.amazon.connectivitydiag
+adb shell pm uninstall -k --user 0 com.amazon.webview.metrics.service
+</code></pre><h2 id=safe-to-remove---amazon-apps--content>Safe to Remove - Amazon Apps & Content</h2><p>Remove Amazon apps you don&rsquo;t use.</p><h3 id=amazon-media-apps>Amazon Media Apps</h3><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.bueller.music
+adb shell pm uninstall -k --user 0 com.amazon.bueller.photos
+adb shell pm uninstall -k --user 0 com.amazon.kindle.cms
+adb shell pm uninstall -k --user 0 com.amazon.kindle.devicecontrols
+adb shell pm uninstall -k --user 0 com.amazon.ods.kindleconnect
+adb shell pm uninstall -k --user 0 com.amazon.bueller.notification
+</code></pre><h3 id=amazon-services-you-probably-dont-need>Amazon Services You Probably Don&rsquo;t Need</h3><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.tahoe
+adb shell pm uninstall -k --user 0 com.amazon.recess
+adb shell pm uninstall -k --user 0 com.amazon.ags.app
+adb shell pm uninstall -k --user 0 com.amazon.tmm.tutorial
+adb shell pm uninstall -k --user 0 com.amazon.tv.legal.notices
+adb shell pm uninstall -k --user 0 com.amazon.tv.support
+adb shell pm uninstall -k --user 0 com.amazon.tv.releasenotes
+adb shell pm uninstall -k --user 0 com.amazon.hedwig
+adb shell pm uninstall -k --user 0 com.amazon.tv.csapp
+</code></pre><h3 id=amazon-shopping--marketplace>Amazon Shopping & Marketplace</h3><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.android.marketplace
+adb shell pm uninstall -k --user 0 com.amazon.venezia
+</code></pre><h2 id=safe-to-remove---alexa-if-you-dont-use-voice>Safe to Remove - Alexa (if you don&rsquo;t use voice)</h2><p>If you don&rsquo;t use Alexa voice commands, remove the entire voice stack:</p><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.vizzini
+adb shell pm uninstall -k --user 0 com.amazon.avl.ftv
+adb shell pm uninstall -k --user 0 com.amazon.alexa.externalmediaplayer.fireos
+adb shell pm uninstall -k --user 0 com.amazon.tv.alexanotifications
+adb shell pm uninstall -k --user 0 com.amazon.tv.alexaalerts
+adb shell pm uninstall -k --user 0 com.amazon.cardinal
+</code></pre><h2 id=safe-to-remove---sync-messaging--communication>Safe to Remove - Sync, Messaging & Communication</h2><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.device.sync
+adb shell pm uninstall -k --user 0 com.amazon.device.sync.sdk.internal
+adb shell pm uninstall -k --user 0 com.amazon.sync.provider.ipc
+adb shell pm uninstall -k --user 0 com.amazon.sync.service
+adb shell pm uninstall -k --user 0 com.amazon.device.messaging
+adb shell pm uninstall -k --user 0 com.amazon.device.messaging.sdk.internal.library
+adb shell pm uninstall -k --user 0 com.amazon.device.messaging.sdk.library
+adb shell pm uninstall -k --user 0 com.amazon.tcomm
+adb shell pm uninstall -k --user 0 com.amazon.tcomm.client
+adb shell pm uninstall -k --user 0 com.amazon.communication.discovery
+</code></pre><h2 id=safe-to-remove---connectivity--casting>Safe to Remove - Connectivity & Casting</h2><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.bluetoothdfu
+adb shell pm uninstall -k --user 0 com.amazon.device.bluetoothdfu
+adb shell pm uninstall -k --user 0 com.amazon.awvflingreceiver
+adb shell pm uninstall -k --user 0 com.amazon.dialservice
+adb shell pm uninstall -k --user 0 com.amazon.ssdpservice
+adb shell pm uninstall -k --user 0 com.amazon.wifilocker
+adb shell pm uninstall -k --user 0 com.amazon.cast.sink
+adb shell pm uninstall -k --user 0 com.amazon.whisperjoin.middleware.np
+</code></pre><h2 id=safe-to-remove---misc-fireos-bloat>Safe to Remove - Misc FireOS Bloat</h2><pre tabindex=0><code>adb shell pm uninstall -k --user 0 com.amazon.aca
+adb shell pm uninstall -k --user 0 com.amazon.ale
+adb shell pm uninstall -k --user 0 com.amazon.aria
+adb shell pm uninstall -k --user 0 com.amazon.ceviche
+adb shell pm uninstall -k --user 0 com.amazon.dpcclient
+adb shell pm uninstall -k --user 0 com.amazon.firebat
+adb shell pm uninstall -k --user 0 com.amazon.firerestapiframework
+adb shell pm uninstall -k --user 0 com.amazon.ftv.xpicker
+adb shell pm uninstall -k --user 0 com.amazon.ftv.glorialist
+adb shell pm uninstall -k --user 0 com.amazon.gloria.graphiq
+adb shell pm uninstall -k --user 0 com.amazon.katoch
+adb shell pm uninstall -k --user 0 com.amazon.naatyam
+adb shell pm uninstall -k --user 0 com.amazon.logan
+adb shell pm uninstall -k --user 0 com.amazon.kso.blackbird
+adb shell pm uninstall -k --user 0 com.amazon.appaccesskeyprovider
+adb shell pm uninstall -k --user 0 com.amazon.tifobserver
+adb shell pm uninstall -k --user 0 com.amazon.dcp
+adb shell pm uninstall -k --user 0 com.amazon.dcp.contracts.framework.library
+adb shell pm uninstall -k --user 0 com.amazon.alta.h2clientservice
+adb shell pm uninstall -k --user 0 com.amazon.device.sale.service
+adb shell pm uninstall -k --user 0 com.amznfuse.operatorredirection
+</code></pre><hr><h2 id=disable-only---ota-updates>Disable Only - OTA Updates</h2><p>Disable to prevent Amazon pushing updates that re-enable bloatware and may break ADB access. <strong>Be aware this means no security patches.</strong></p><pre tabindex=0><code>adb shell pm disable-user --user 0 com.amazon.device.software.ota
+adb shell pm disable-user --user 0 com.amazon.device.software.ota.override
+adb shell pm disable-user --user 0 com.amazon.settings.systemupdates
+adb shell pm disable-user --user 0 com.amazon.tv.forcedotaupdater.v2
+</code></pre><h2 id=disable-only---security--auth-services>Disable Only - Security & Auth Services</h2><p>These tie into the Amazon account/DRM flow. Disable rather than remove.</p><pre tabindex=0><code>adb shell pm disable-user --user 0 com.amazon.securitysyncclient
+adb shell pm disable-user --user 0 com.amazon.sharingservice.android.client.proxy
+</code></pre><h2 id=disable-only---parental-controls>Disable Only - Parental Controls</h2><p>Remove if you don&rsquo;t need them, but disable is safer:</p><pre tabindex=0><code>adb shell pm disable-user --user 0 com.amazon.parentalcontrols
+adb shell pm disable-user --user 0 com.amazon.tv.parentalcontrols
+</code></pre><hr><h2 id=do-not-touch---red-line-packages>DO NOT TOUCH - Red Line Packages</h2><p>Removing these will brick navigation, prevent factory reset, or break core functionality:</p><ul><li><code>com.amazon.tv.settings.core</code> - Settings core (cannot navigate without this)</li><li><code>com.amazon.device.settings</code> - Device settings</li><li><code>com.amazon.device.settings.sdk.internal.library</code> - Settings SDK</li><li><code>com.amazon.tv.launcher</code> - <strong>Only remove if you have an alternative launcher installed and set as default first</strong></li><li><code>com.amazon.webview.chromium</code> - System WebView (apps need this to render)</li><li><code>com.amazon.providers</code> - Content providers</li><li><code>com.amazon.acos.providers.UnifiedSettingsProvider</code> - Settings provider</li><li><code>com.amazon.identity.auth.device.authorization</code> - Device auth (Amazon account)</li><li><code>com.amazon.platform.fdrw</code> - Factory reset (removing = no recovery)</li></ul><hr><h2 id=optional---disable-amazon-launcher-ads>Optional - Disable Amazon Launcher Ads</h2><p>If you want to replace the ad-heavy Fire TV home screen, install an alternative launcher first (e.g., Wolf Launcher, FLauncher from the Downloader app), then:</p><pre tabindex=0><code>adb shell pm disable-user --user 0 com.amazon.tv.launcher
+adb shell pm disable-user --user 0 com.amazon.firehomestarter
+</code></pre><p><strong>Important:</strong> Only do this AFTER confirming your alternative launcher works. If you lose the launcher with no replacement, you&rsquo;ll need to factory reset.</p><hr><h2 id=network-level-blocking-optional>Network-Level Blocking (Optional)</h2><p>For additional privacy, block Amazon telemetry domains at your router or Pi-hole:</p><pre tabindex=0><code># Amazon telemetry / advertising domains
+device-metrics-us.amazon.com
+device-metrics-us-2.amazon.com
+mads-adx.amazon.com
+aax-us-east.amazon-adsystem.com
+fls-na.amazon.com
+unagi.amazon.com
+unagi-na.amazon.com
+</code></pre><p>Or set a Private DNS on the device via ADB:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>adb shell settings put global private_dns_mode hostname
+</span></span><span style=display:flex><span>adb shell settings put global private_dns_specifier dns.adguard.com
+</span></span></code></pre></div><hr><h2 id=post-debloat-notes>Post-Debloat Notes</h2><ul><li><strong>OTA updates may re-enable packages.</strong> If you disabled OTA, this won&rsquo;t happen. If you allow updates, re-run the debloat script after each update.</li><li><strong>Some packages may not exist</strong> on your specific Fire Stick model/firmware version. The script handles this gracefully (returns &ldquo;not installed&rdquo;).</li><li><strong>Prime Video should still work</strong> after debloating - the core video player packages are not in the remove list. If it breaks, restore <code>com.amazon.avod</code> and <code>com.amazon.venezia</code>.</li><li><strong>ADB access can be revoked</strong> by Amazon in firmware updates. Some newer FireOS versions (8.1.5.3+) have patched local ADB exploits. Keep ADB enabled and avoid updating if this is critical for you.</li></ul><h2 id=companion-script>Companion Script</h2><p>A comprehensive debloat script is available at: <a href=/firestick-debloat.sh>firestick-debloat.sh</a></p><h2 id=sources>Sources</h2><ul><li><a href=https://xdaforums.com/t/fire-tv-stick-4k-packages-to-disable-and-debloat-on-firmware-6-2-6-8-test-in-progress.4060645/>XDA - Fire TV Stick 4K packages to disable and debloat</a></li><li><a href=https://xdaforums.com/t/how-to-freeze-fire-tv-stick-4k-system-apps-no-root-no-app-required.4113343/>XDA - How To Freeze Fire TV Stick 4K System Apps</a></li><li><a href=https://xdaforums.com/t/guide-no-root-disable-bloatware-on-2nd-gen-fire-tv-stick.3674629/>XDA - Disable Bloatware on 2nd Gen Fire TV Stick</a></li><li><a href=https://github.com/esc0rtd3w/firestick-loader/blob/master/scripts/debloat/full-debloat.sh>GitHub - firestick-loader debloat scripts</a></li><li><a href=https://www.techdoctoruk.com/firestick-debloat-tool/>TechDoctorUK - Firestick Debloat Tool</a></li></ul></div></div><script src=/assets/shared-nav.js></script></body></html>
