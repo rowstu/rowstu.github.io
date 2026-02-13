@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>yt-dlp Command Builder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1d23;
+			--surface: #252932;
+			--surface-hover: #2d323d;
+			--border: #3d4351;
+			--text: #e4e7eb;
+			--text-muted: #9ca3af;
+			--accent: #d97706;
+			--accent-hover: #b45309;
+			--accent-dim: rgba(217, 119, 6, 0.15);
+			--success: #10b981;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--info: #3b82f6;
+			--cmd-bg: #0d1117;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+		/* Command output display */
+		.cmd-display {
+			background: var(--cmd-bg);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1.25rem;
+			overflow: hidden;
+		}
+
+		.cmd-bar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.cmd-bar-left {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.cmd-dot {
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+			background: var(--accent);
+		}
+
+		.cmd-bar-title {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+		}
+
+		.cmd-bar-actions {
+			display: flex;
+			gap: 0.4rem;
+		}
+
+		.cmd-body {
+			padding: 1.25rem;
+			overflow-x: auto;
+		}
+
+		.cmd-body pre {
+			font-family: inherit;
+			font-size: 0.85rem;
+			line-height: 1.7;
+			color: var(--text);
+			white-space: pre-wrap;
+			word-break: break-all;
+		}
+
+		.cmd-body .cmd-bin { color: var(--success); font-weight: 600; }
+		.cmd-body .cmd-flag { color: var(--info); }
+		.cmd-body .cmd-val { color: var(--accent); }
+		.cmd-body .cmd-url { color: #c084fc; }
+		.cmd-body .cmd-cont { color: var(--text-muted); }
+
+		/* Buttons */
+		button, .btn {
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: all 0.15s;
+		}
+
+		button:hover, .btn:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		button.primary {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #000;
+			font-weight: 500;
+		}
+
+		button.primary:hover { opacity: 0.9; }
+
+		button.small {
+			padding: 0.3rem 0.65rem;
+			font-size: 0.7rem;
+		}
+
+		/* Panels */
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.panel-title {
+			font-size: 0.8rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.panel-body { padding: 1rem; }
+
+		/* URL input */
+		.url-row {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1.25rem;
+		}
+
+		input[type="text"] {
+			flex: 1;
+			padding: 0.6rem 0.85rem;
+			background: var(--cmd-bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.85rem;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+
+		input[type="text"]::placeholder { color: var(--text-muted); }
+		input[type="text"]:focus { border-color: var(--accent); }
+
+		/* Presets */
+		.presets {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-bottom: 1.25rem;
+		}
+
+		.preset-btn {
+			padding: 0.4rem 0.85rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s;
+		}
+
+		.preset-btn:hover {
+			border-color: var(--accent);
+			color: var(--text);
+		}
+
+		.preset-btn.active {
+			background: var(--accent-dim);
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		/* Option groups */
+		.opt-group {
+			margin-bottom: 1rem;
+		}
+
+		.opt-group:last-child { margin-bottom: 0; }
+
+		.opt-group-title {
+			font-size: 0.78rem;
+			color: var(--accent);
+			margin-bottom: 0.6rem;
+			font-weight: 500;
+		}
+
+		.opt-row {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			margin-bottom: 0.6rem;
+			flex-wrap: wrap;
+		}
+
+		.opt-row label {
+			font-size: 0.82rem;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.opt-row select {
+			background: var(--cmd-bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.4rem 0.6rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.8rem;
+			outline: none;
+		}
+
+		.opt-row select:focus { border-color: var(--accent); }
+
+		.opt-row input[type="text"].opt-input {
+			flex: unset;
+			width: 220px;
+			padding: 0.4rem 0.6rem;
+			font-size: 0.8rem;
+		}
+
+		.opt-hint {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-left: 1.75rem;
+			margin-top: -0.3rem;
+			margin-bottom: 0.5rem;
+		}
+
+		/* Checkboxes */
+		input[type="checkbox"] {
+			appearance: none;
+			-webkit-appearance: none;
+			width: 16px;
+			height: 16px;
+			border: 1px solid var(--border);
+			border-radius: 3px;
+			background: var(--cmd-bg);
+			cursor: pointer;
+			position: relative;
+			flex-shrink: 0;
+		}
+
+		input[type="checkbox"]:checked {
+			background: var(--accent);
+			border-color: var(--accent);
+		}
+
+		input[type="checkbox"]:checked::after {
+			content: '\2713';
+			position: absolute;
+			top: -1px;
+			left: 2px;
+			color: #000;
+			font-size: 12px;
+			font-weight: 700;
+		}
+
+		/* Export command box */
+		.export-cmd {
+			background: var(--cmd-bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			margin-top: 0.6rem;
+			overflow: hidden;
+		}
+
+		.export-cmd-bar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.4rem 0.75rem;
+			background: rgba(255,255,255,0.03);
+			border-bottom: 1px solid var(--border);
+			font-size: 0.7rem;
+			color: var(--text-muted);
+		}
+
+		.export-cmd pre {
+			padding: 0.75rem;
+			font-family: inherit;
+			font-size: 0.82rem;
+			line-height: 1.6;
+			color: var(--text);
+			margin: 0;
+			white-space: pre-wrap;
+			word-break: break-all;
+		}
+
+		/* Dividers */
+		.opt-divider {
+			border: none;
+			border-top: 1px solid var(--border);
+			margin: 1rem 0;
+		}
+
+		/* Toggle format */
+		.format-toggle {
+			display: flex;
+			gap: 0.25rem;
+			background: var(--cmd-bg);
+			padding: 0.25rem;
+			border-radius: 4px;
+			margin-left: auto;
+		}
+
+		.format-toggle button {
+			padding: 0.3rem 0.7rem;
+			background: transparent;
+			border: none;
+			color: var(--text-muted);
+			font-size: 0.72rem;
+			cursor: pointer;
+			border-radius: 3px;
+		}
+
+		.format-toggle button.active {
+			background: var(--surface);
+			color: var(--accent);
+		}
+
+		/* Toast */
+		.toast {
+			position: fixed;
+			bottom: 2rem;
+			left: 50%;
+			transform: translateX(-50%) translateY(100%);
+			background: var(--surface);
+			border: 1px solid var(--accent);
+			color: var(--text);
+			padding: 0.5rem 1.25rem;
+			border-radius: 4px;
+			font-size: 0.8rem;
+			font-family: inherit;
+			opacity: 0;
+			transition: all 0.3s ease;
+			z-index: 100;
+		}
+
+		.toast.show {
+			transform: translateX(-50%) translateY(0);
+			opacity: 1;
+		}
+
+		.back-link {
+			display: inline-block;
+			margin-top: 1rem;
+			color: var(--text-muted);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+
+		.back-link:hover { color: var(--accent); }
+
+		@media (max-width: 600px) {
+			.url-row { flex-direction: column; }
+			.opt-row input[type="text"].opt-input { width: 100%; }
+			.cmd-bar-actions { gap: 0.25rem; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>yt-dlp Command Builder</h1>
+			<p class="subtitle">Build yt-dlp commands with the options you need</p>
+		</header>
+
+		<!-- URL input -->
+		<div class="url-row">
+			<input type="text" id="urlInput" placeholder="https://www.youtube.com/watch?v=..." oninput="buildCommand()">
+			<button onclick="clearUrl()">Clear</button>
+		</div>
+
+		<!-- Presets -->
+		<div class="presets" id="presets">
+			<button class="preset-btn" onclick="applyPreset('mp4-browser')">MP4 1080p + Browser Cookies</button>
+			<button class="preset-btn" onclick="applyPreset('mp4-cookiefile')">MP4 1080p + Cookie File</button>
+			<button class="preset-btn" onclick="applyPreset('mp4-android')">MP4 1080p + Android Client</button>
+			<button class="preset-btn" onclick="applyPreset('audio')">Audio Only (MP3)</button>
+			<button class="preset-btn" onclick="applyPreset('best')">Best Quality</button>
+			<button class="preset-btn" onclick="applyPreset('subs')">MP4 + Subtitles</button>
+		</div>
+
+		<!-- Command output -->
+		<div class="cmd-display">
+			<div class="cmd-bar">
+				<div class="cmd-bar-left">
+					<span class="cmd-dot"></span>
+					<span class="cmd-bar-title">command</span>
+				</div>
+				<div class="cmd-bar-actions">
+					<div class="format-toggle">
+						<button class="active" onclick="setFormat('multi', this)">Multi-line</button>
+						<button onclick="setFormat('single', this)">One-liner</button>
+					</div>
+					<button class="small primary" onclick="copyCommand()">Copy</button>
+				</div>
+			</div>
+			<div class="cmd-body">
+				<pre id="cmdOutput"></pre>
+			</div>
+		</div>
+
+		<!-- Options -->
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Format & Quality</span>
+			</div>
+			<div class="panel-body">
+				<div class="opt-group">
+					<div class="opt-row">
+						<label><input type="checkbox" id="optFormat" checked onchange="buildCommand()"> Format selection (-f)</label>
+						<select id="formatSelect" onchange="buildCommand()">
+							<option value='bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]'>MP4 video + M4A audio (recommended)</option>
+							<option value="bv*+ba/b">Best video + best audio</option>
+							<option value="bv*[ext=webm]+ba[ext=webm]/b[ext=webm]">WebM video + audio</option>
+							<option value="best">Best single file</option>
+							<option value="worst">Worst quality (smallest)</option>
+							<option value="custom">Custom...</option>
+						</select>
+					</div>
+					<div class="opt-row" id="customFormatRow" style="display:none;">
+						<label style="min-width: 100px;"></label>
+						<input type="text" class="opt-input" id="customFormat" placeholder='e.g. bv*[height<=720]+ba' oninput="buildCommand()">
+					</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optRes" checked onchange="buildCommand()"> Resolution sort (-S)</label>
+						<select id="resSelect" onchange="buildCommand()">
+							<option value="res:2160">4K (2160p)</option>
+							<option value="res:1440">1440p</option>
+							<option value="res:1080" selected>1080p</option>
+							<option value="res:720">720p</option>
+							<option value="res:480">480p</option>
+							<option value="res:360">360p</option>
+						</select>
+					</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optMerge" checked onchange="buildCommand()"> Merge format (--merge-output-format)</label>
+						<select id="mergeSelect" onchange="buildCommand()">
+							<option value="mp4" selected>mp4</option>
+							<option value="mkv">mkv</option>
+							<option value="webm">webm</option>
+						</select>
+					</div>
+				</div>
+
+				<hr class="opt-divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">Audio Only</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optAudioOnly" onchange="toggleAudioOnly(); buildCommand()"> Extract audio only (-x)</label>
+						<select id="audioFormat" onchange="buildCommand()" disabled>
+							<option value="mp3">mp3</option>
+							<option value="m4a">m4a</option>
+							<option value="opus">opus</option>
+							<option value="flac">flac</option>
+							<option value="wav">wav</option>
+							<option value="best">best</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Authentication & Workarounds</span>
+			</div>
+			<div class="panel-body">
+				<div class="opt-group">
+					<div class="opt-group-title">Cookies</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optCookieBrowser" onchange="toggleCookieMode('browser'); buildCommand()"> Browser cookies (--cookies-from-browser)</label>
+						<select id="cookieBrowser" onchange="buildCommand()" disabled>
+							<option value="firefox">firefox</option>
+							<option value="chrome">chrome</option>
+							<option value="chromium">chromium</option>
+							<option value="brave">brave</option>
+							<option value="opera">opera</option>
+							<option value="edge">edge</option>
+							<option value="vivaldi">vivaldi</option>
+							<option value="safari">safari</option>
+						</select>
+					</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optCookieFile" onchange="toggleCookieMode('file'); buildCommand()"> Cookie file (--cookies)</label>
+						<input type="text" class="opt-input" id="cookieFile" value="~/yt_cookies.txt" oninput="buildCommand()" disabled>
+					</div>
+					<div class="opt-hint">Export cookies with a browser extension or use the export command below</div>
+
+				</div>
+
+				<hr class="opt-divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">Export Cookie File</div>
+					<div class="opt-hint" style="margin-left:0; margin-bottom:0.6rem;">Generate a cookie file from a logged-in browser session using yt-dlp itself. Run this once, then use <code>--cookies</code> above.</div>
+					<div class="opt-row">
+						<label>Browser</label>
+						<select id="exportBrowser" onchange="buildExportCmd()">
+							<option value="firefox">firefox</option>
+							<option value="chrome">chrome</option>
+							<option value="chromium">chromium</option>
+							<option value="brave">brave</option>
+							<option value="edge">edge</option>
+							<option value="vivaldi">vivaldi</option>
+						</select>
+					</div>
+					<div class="opt-row">
+						<label>Output path</label>
+						<input type="text" class="opt-input" id="exportPath" value="~/yt_cookies.txt" oninput="buildExportCmd()">
+					</div>
+					<div class="export-cmd">
+						<div class="export-cmd-bar">
+							<span>cookie export command</span>
+							<button class="small" onclick="copyExportCmd()">Copy</button>
+						</div>
+						<pre id="exportCmdOutput"></pre>
+					</div>
+				</div>
+
+				<hr class="opt-divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">Anti-bot Workarounds</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optJsRuntime" onchange="buildCommand()"> JS runtime (--js-runtimes)</label>
+						<select id="jsRuntime" onchange="buildCommand()">
+							<option value="node">node</option>
+							<option value="node:/usr/bin/nodejs">node:/usr/bin/nodejs</option>
+							<option value="deno">deno</option>
+							<option value="phantomjs">phantomjs</option>
+						</select>
+					</div>
+					<div class="opt-hint">Needed for some extractors that require JavaScript execution</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optExtractorArgs" onchange="buildCommand()"> Extractor args (--extractor-args)</label>
+						<select id="extractorArgs" onchange="buildCommand()">
+							<option value="youtube:player_client=android">android client</option>
+							<option value="youtube:player_client=ios">ios client</option>
+							<option value="youtube:player_client=web">web client</option>
+							<option value="youtube:player_client=mweb">mobile web client</option>
+							<option value="youtube:player_client=tv">tv client</option>
+							<option value="custom">custom...</option>
+						</select>
+					</div>
+					<div class="opt-row" id="customExtractorRow" style="display:none;">
+						<label style="min-width: 100px;"></label>
+						<input type="text" class="opt-input" id="customExtractor" placeholder='e.g. youtube:player_client=android' oninput="buildCommand()">
+					</div>
+					<div class="opt-hint">Use alternative player clients to bypass restrictions</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optUserAgent" onchange="buildCommand()"> Custom user agent (--user-agent)</label>
+					</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optGeo" onchange="buildCommand()"> Geo bypass (--geo-bypass)</label>
+					</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optSleep" onchange="buildCommand()"> Rate limit (--sleep-interval)</label>
+						<input type="text" class="opt-input" id="sleepVal" value="1" oninput="buildCommand()" style="width:60px;" disabled>
+						<span style="font-size:0.8rem; color:var(--text-muted);">seconds</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Output & Metadata</span>
+			</div>
+			<div class="panel-body">
+				<div class="opt-group">
+					<div class="opt-group-title">Output</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optOutputDir" onchange="buildCommand()"> Output directory (-P)</label>
+						<input type="text" class="opt-input" id="outputDir" value="~/Videos" oninput="buildCommand()" disabled>
+					</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optOutputTpl" onchange="buildCommand()"> Output template (-o)</label>
+						<select id="outputTpl" onchange="buildCommand()" disabled>
+							<option value="%(title)s.%(ext)s">Title.ext (default)</option>
+							<option value="%(uploader)s/%(title)s.%(ext)s">Uploader/Title.ext</option>
+							<option value="%(upload_date)s - %(title)s.%(ext)s">Date - Title.ext</option>
+							<option value="%(playlist_title)s/%(playlist_index)03d - %(title)s.%(ext)s">Playlist/001 - Title.ext</option>
+							<option value="custom">Custom...</option>
+						</select>
+					</div>
+					<div class="opt-row" id="customOutputRow" style="display:none;">
+						<label style="min-width: 100px;"></label>
+						<input type="text" class="opt-input" id="customOutput" placeholder='%(title)s [%(id)s].%(ext)s' oninput="buildCommand()">
+					</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optRestrict" onchange="buildCommand()"> Restrict filenames (--restrict-filenames)</label>
+					</div>
+				</div>
+
+				<hr class="opt-divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">Embed</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optEmbedMeta" onchange="buildCommand()"> Embed metadata (--embed-metadata)</label>
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optEmbedThumb" onchange="buildCommand()"> Embed thumbnail (--embed-thumbnail)</label>
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optEmbedSubs" onchange="buildCommand()"> Embed subtitles (--embed-subs)</label>
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optEmbedChapters" onchange="buildCommand()"> Embed chapters (--embed-chapters)</label>
+					</div>
+				</div>
+
+				<hr class="opt-divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">Subtitles</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optWriteSubs" onchange="buildCommand()"> Write subtitles (--write-subs)</label>
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optAutoSubs" onchange="buildCommand()"> Auto-generated subs (--write-auto-subs)</label>
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optSubLang" onchange="buildCommand()"> Subtitle languages (--sub-langs)</label>
+						<input type="text" class="opt-input" id="subLangs" value="en" oninput="buildCommand()" style="width:120px;" disabled>
+					</div>
+					<div class="opt-hint">Comma-separated: en,es,fr or "all"</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Advanced</span>
+			</div>
+			<div class="panel-body">
+				<div class="opt-group">
+					<div class="opt-group-title">Playlist & Selection</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optNoPlaylist" onchange="buildCommand()"> No playlist (--no-playlist)</label>
+					</div>
+					<div class="opt-hint">Download only the video, not the whole playlist</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optPlaylistItems" onchange="buildCommand()"> Playlist items (--playlist-items)</label>
+						<input type="text" class="opt-input" id="playlistItems" value="1-5" oninput="buildCommand()" style="width:120px;" disabled>
+					</div>
+					<div class="opt-hint">e.g. 1-5, 1,3,5, 1:3 (start:end)</div>
+				</div>
+
+				<hr class="opt-divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">Download Behaviour</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optArchive" onchange="buildCommand()"> Download archive (--download-archive)</label>
+						<input type="text" class="opt-input" id="archiveFile" value="~/.ytdlp-archive.txt" oninput="buildCommand()" disabled>
+					</div>
+					<div class="opt-hint">Skip previously downloaded videos</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optRateLimit" onchange="buildCommand()"> Rate limit (-r)</label>
+						<input type="text" class="opt-input" id="rateLimit" value="5M" oninput="buildCommand()" style="width:80px;" disabled>
+					</div>
+					<div class="opt-hint">e.g. 500K, 5M</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optRetries" onchange="buildCommand()"> Retries (-R)</label>
+						<input type="text" class="opt-input" id="retries" value="10" oninput="buildCommand()" style="width:60px;" disabled>
+					</div>
+
+					<div class="opt-row">
+						<label><input type="checkbox" id="optProxy" onchange="buildCommand()"> Proxy (--proxy)</label>
+						<input type="text" class="opt-input" id="proxyUrl" placeholder="socks5://127.0.0.1:1080" oninput="buildCommand()" disabled>
+					</div>
+				</div>
+
+				<hr class="opt-divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">SponsorBlock</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optSponsorRemove" onchange="buildCommand()"> Remove sponsor segments (--sponsorblock-remove)</label>
+						<select id="sponsorRemove" onchange="buildCommand()" disabled>
+							<option value="sponsor">sponsor</option>
+							<option value="all">all</option>
+							<option value="sponsor,intro,outro">sponsor,intro,outro</option>
+						</select>
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optSponsorMark" onchange="buildCommand()"> Mark as chapters (--sponsorblock-mark)</label>
+						<select id="sponsorMark" onchange="buildCommand()" disabled>
+							<option value="sponsor">sponsor</option>
+							<option value="all">all</option>
+						</select>
+					</div>
+				</div>
+
+				<hr class="opt-divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">Misc</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optVerbose" onchange="buildCommand()"> Verbose output (-v)</label>
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="optListFormats" onchange="buildCommand()"> List formats only (-F)</label>
+					</div>
+					<div class="opt-hint">Don't download, just show available formats</div>
+				</div>
+			</div>
+		</div>
+
+		<a href="/" class="back-link">&larr; Back to home</a>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		let cmdFormat = 'multi'; // 'multi' or 'single'
+
+		// --- Toggle helpers ---
+		function enableWhen(checkboxId, ...targetIds) {
+			const on = document.getElementById(checkboxId).checked;
+			targetIds.forEach(id => { document.getElementById(id).disabled = !on; });
+		}
+
+		// Wire up all checkbox-to-input enablement
+		document.querySelectorAll('.panel-body input[type="checkbox"]').forEach(cb => {
+			cb.addEventListener('change', () => {
+				// Enable/disable associated controls
+				enableWhen('optCookieBrowser', 'cookieBrowser');
+				enableWhen('optCookieFile', 'cookieFile');
+				enableWhen('optOutputDir', 'outputDir');
+				enableWhen('optOutputTpl', 'outputTpl');
+				enableWhen('optSubLang', 'subLangs');
+				enableWhen('optPlaylistItems', 'playlistItems');
+				enableWhen('optArchive', 'archiveFile');
+				enableWhen('optRateLimit', 'rateLimit');
+				enableWhen('optRetries', 'retries');
+				enableWhen('optProxy', 'proxyUrl');
+				enableWhen('optSponsorRemove', 'sponsorRemove');
+				enableWhen('optSponsorMark', 'sponsorMark');
+				enableWhen('optAudioOnly', 'audioFormat');
+				enableWhen('optSleep', 'sleepVal');
+			});
+		});
+
+		// Show/hide custom inputs
+		document.getElementById('formatSelect').addEventListener('change', function() {
+			document.getElementById('customFormatRow').style.display = this.value === 'custom' ? 'flex' : 'none';
+		});
+		document.getElementById('extractorArgs').addEventListener('change', function() {
+			document.getElementById('customExtractorRow').style.display = this.value === 'custom' ? 'flex' : 'none';
+		});
+		document.getElementById('outputTpl').addEventListener('change', function() {
+			document.getElementById('customOutputRow').style.display = this.value === 'custom' ? 'flex' : 'none';
+		});
+
+		function toggleAudioOnly() {
+			const on = document.getElementById('optAudioOnly').checked;
+			// When audio-only, disable video format options
+			['optFormat', 'optRes', 'optMerge'].forEach(id => {
+				const el = document.getElementById(id);
+				if (on) {
+					el.checked = false;
+					el.disabled = true;
+				} else {
+					el.disabled = false;
+				}
+			});
+		}
+
+		function toggleCookieMode(mode) {
+			const ids = ['optCookieBrowser', 'optCookieFile'];
+			const active = { browser: 'optCookieBrowser', file: 'optCookieFile' }[mode];
+			if (document.getElementById(active).checked) {
+				ids.filter(id => id !== active).forEach(id => {
+					document.getElementById(id).checked = false;
+				});
+			}
+			enableWhen('optCookieBrowser', 'cookieBrowser');
+			enableWhen('optCookieFile', 'cookieFile');
+		}
+
+		// --- Cookie export command ---
+		function buildExportCmd() {
+			const browser = document.getElementById('exportBrowser').value;
+			const path = document.getElementById('exportPath').value || '~/yt_cookies.txt';
+			const out = document.getElementById('exportCmdOutput');
+			out.innerHTML =
+				`<span class="cmd-bin">yt-dlp</span> <span class="cmd-flag">--cookies-from-browser</span> <span class="cmd-val">${esc(browser)}</span> <span class="cmd-flag">--cookies</span> <span class="cmd-val">${esc(path)}</span> <span class="cmd-flag">--skip-download</span> <span class="cmd-url">"https://www.youtube.com"</span>`;
+		}
+
+		function copyExportCmd() {
+			const el = document.getElementById('exportCmdOutput');
+			const tmp = document.createElement('div');
+			tmp.innerHTML = el.innerHTML;
+			navigator.clipboard.writeText(tmp.textContent).then(() => showToast('Copied!'));
+		}
+
+		// --- Command builder ---
+		function buildCommand() {
+			const parts = [];
+
+			// Authentication
+			if (document.getElementById('optCookieBrowser').checked) {
+				parts.push({ flag: '--cookies-from-browser', val: document.getElementById('cookieBrowser').value });
+			}
+			if (document.getElementById('optCookieFile').checked) {
+				parts.push({ flag: '--cookies', val: document.getElementById('cookieFile').value });
+			}
+			// JS runtime
+			if (document.getElementById('optJsRuntime').checked) {
+				parts.push({ flag: '--js-runtimes', val: document.getElementById('jsRuntime').value });
+			}
+
+			// Extractor args
+			if (document.getElementById('optExtractorArgs').checked) {
+				const sel = document.getElementById('extractorArgs').value;
+				const val = sel === 'custom' ? document.getElementById('customExtractor').value : sel;
+				if (val) parts.push({ flag: '--extractor-args', val: `"${val}"` });
+			}
+
+			// User agent
+			if (document.getElementById('optUserAgent').checked) {
+				parts.push({ flag: '--user-agent', val: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"' });
+			}
+
+			// Geo bypass
+			if (document.getElementById('optGeo').checked) {
+				parts.push({ flag: '--geo-bypass' });
+			}
+
+			// Sleep interval
+			if (document.getElementById('optSleep').checked) {
+				parts.push({ flag: '--sleep-interval', val: document.getElementById('sleepVal').value });
+			}
+
+			// Verbose
+			if (document.getElementById('optVerbose').checked) {
+				parts.push({ flag: '-v' });
+			}
+
+			// List formats
+			if (document.getElementById('optListFormats').checked) {
+				parts.push({ flag: '-F' });
+			}
+
+			// Audio only
+			if (document.getElementById('optAudioOnly').checked) {
+				parts.push({ flag: '-x' });
+				const af = document.getElementById('audioFormat').value;
+				if (af !== 'best') parts.push({ flag: '--audio-format', val: af });
+			}
+
+			// Format
+			if (document.getElementById('optFormat').checked && !document.getElementById('optAudioOnly').checked) {
+				const sel = document.getElementById('formatSelect').value;
+				const val = sel === 'custom' ? document.getElementById('customFormat').value : sel;
+				if (val) parts.push({ flag: '-f', val: `"${val}"` });
+			}
+
+			// Resolution
+			if (document.getElementById('optRes').checked && !document.getElementById('optAudioOnly').checked) {
+				parts.push({ flag: '-S', val: `"${document.getElementById('resSelect').value}"` });
+			}
+
+			// Merge format
+			if (document.getElementById('optMerge').checked && !document.getElementById('optAudioOnly').checked) {
+				parts.push({ flag: '--merge-output-format', val: document.getElementById('mergeSelect').value });
+			}
+
+			// Output dir
+			if (document.getElementById('optOutputDir').checked) {
+				parts.push({ flag: '-P', val: document.getElementById('outputDir').value });
+			}
+
+			// Output template
+			if (document.getElementById('optOutputTpl').checked) {
+				const sel = document.getElementById('outputTpl').value;
+				const val = sel === 'custom' ? document.getElementById('customOutput').value : sel;
+				if (val) parts.push({ flag: '-o', val: `"${val}"` });
+			}
+
+			// Restrict filenames
+			if (document.getElementById('optRestrict').checked) {
+				parts.push({ flag: '--restrict-filenames' });
+			}
+
+			// Embed options
+			if (document.getElementById('optEmbedMeta').checked) parts.push({ flag: '--embed-metadata' });
+			if (document.getElementById('optEmbedThumb').checked) parts.push({ flag: '--embed-thumbnail' });
+			if (document.getElementById('optEmbedSubs').checked) parts.push({ flag: '--embed-subs' });
+			if (document.getElementById('optEmbedChapters').checked) parts.push({ flag: '--embed-chapters' });
+
+			// Subtitles
+			if (document.getElementById('optWriteSubs').checked) parts.push({ flag: '--write-subs' });
+			if (document.getElementById('optAutoSubs').checked) parts.push({ flag: '--write-auto-subs' });
+			if (document.getElementById('optSubLang').checked) {
+				parts.push({ flag: '--sub-langs', val: document.getElementById('subLangs').value });
+			}
+
+			// Playlist
+			if (document.getElementById('optNoPlaylist').checked) parts.push({ flag: '--no-playlist' });
+			if (document.getElementById('optPlaylistItems').checked) {
+				parts.push({ flag: '--playlist-items', val: document.getElementById('playlistItems').value });
+			}
+
+			// Archive
+			if (document.getElementById('optArchive').checked) {
+				parts.push({ flag: '--download-archive', val: document.getElementById('archiveFile').value });
+			}
+
+			// Rate limit
+			if (document.getElementById('optRateLimit').checked) {
+				parts.push({ flag: '-r', val: document.getElementById('rateLimit').value });
+			}
+
+			// Retries
+			if (document.getElementById('optRetries').checked) {
+				parts.push({ flag: '-R', val: document.getElementById('retries').value });
+			}
+
+			// Proxy
+			if (document.getElementById('optProxy').checked && document.getElementById('proxyUrl').value) {
+				parts.push({ flag: '--proxy', val: document.getElementById('proxyUrl').value });
+			}
+
+			// SponsorBlock
+			if (document.getElementById('optSponsorRemove').checked) {
+				parts.push({ flag: '--sponsorblock-remove', val: document.getElementById('sponsorRemove').value });
+			}
+			if (document.getElementById('optSponsorMark').checked) {
+				parts.push({ flag: '--sponsorblock-mark', val: document.getElementById('sponsorMark').value });
+			}
+
+			renderCommand(parts);
+		}
+
+		function renderCommand(parts) {
+			const url = document.getElementById('urlInput').value.trim();
+			const out = document.getElementById('cmdOutput');
+
+			if (cmdFormat === 'multi') {
+				let lines = [`<span class="cmd-bin">yt-dlp</span> <span class="cmd-cont">\\</span>`];
+				parts.forEach(p => {
+					let line = `  <span class="cmd-flag">${esc(p.flag)}</span>`;
+					if (p.val) line += ` <span class="cmd-val">${esc(p.val)}</span>`;
+					line += ` <span class="cmd-cont">\\</span>`;
+					lines.push(line);
+				});
+				// URL as last line (no backslash)
+				if (url) {
+					lines.push(`  <span class="cmd-url">${esc(url)}</span>`);
+				} else {
+					// remove trailing backslash from last option line
+					if (lines.length > 1) {
+						lines[lines.length - 1] = lines[lines.length - 1].replace(/ <span class="cmd-cont">\\<\/span>$/, '');
+					}
+				}
+				out.innerHTML = lines.join('\n');
+			} else {
+				let cmd = `<span class="cmd-bin">yt-dlp</span>`;
+				parts.forEach(p => {
+					cmd += ` <span class="cmd-flag">${esc(p.flag)}</span>`;
+					if (p.val) cmd += ` <span class="cmd-val">${esc(p.val)}</span>`;
+				});
+				if (url) cmd += ` <span class="cmd-url">${esc(url)}</span>`;
+				out.innerHTML = cmd;
+			}
+		}
+
+		function esc(s) {
+			return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		}
+
+		function getPlainCommand() {
+			const url = document.getElementById('urlInput').value.trim();
+			// Rebuild parts as plain text
+			const el = document.getElementById('cmdOutput');
+			// Parse from the rendered output by stripping HTML
+			const tmp = document.createElement('div');
+			tmp.innerHTML = el.innerHTML;
+			const text = tmp.textContent;
+			return text.replace(/ \\\n/g, cmdFormat === 'multi' ? ' \\\n' : ' ');
+		}
+
+		function copyCommand() {
+			const el = document.getElementById('cmdOutput');
+			const tmp = document.createElement('div');
+			tmp.innerHTML = el.innerHTML;
+			const text = tmp.textContent;
+			navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+		}
+
+		function setFormat(fmt, btn) {
+			cmdFormat = fmt;
+			document.querySelectorAll('.format-toggle button').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			buildCommand();
+		}
+
+		function clearUrl() {
+			document.getElementById('urlInput').value = '';
+			buildCommand();
+		}
+
+		function showToast(msg) {
+			const toast = document.getElementById('toast');
+			toast.textContent = msg;
+			toast.classList.add('show');
+			setTimeout(() => toast.classList.remove('show'), 1500);
+		}
+
+		// --- Presets ---
+		function applyPreset(name) {
+			// Reset all checkboxes
+			document.querySelectorAll('.panel-body input[type="checkbox"]').forEach(cb => {
+				cb.checked = false;
+				cb.disabled = false;
+			});
+
+			// Reset selects to defaults
+			document.getElementById('formatSelect').value = 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]';
+			document.getElementById('resSelect').value = 'res:1080';
+			document.getElementById('mergeSelect').value = 'mp4';
+			document.getElementById('cookieBrowser').value = 'firefox';
+			document.getElementById('cookieFile').value = '~/yt_cookies.txt';
+			document.getElementById('jsRuntime').value = 'node';
+			document.getElementById('audioFormat').value = 'mp3';
+			document.getElementById('extractorArgs').value = 'youtube:player_client=android';
+			document.getElementById('customFormatRow').style.display = 'none';
+			document.getElementById('customExtractorRow').style.display = 'none';
+			document.getElementById('customOutputRow').style.display = 'none';
+
+			switch (name) {
+				case 'mp4-browser':
+					check('optFormat', 'optRes', 'optMerge', 'optCookieBrowser', 'optJsRuntime');
+					document.getElementById('jsRuntime').value = 'node:/usr/bin/nodejs';
+					break;
+				case 'mp4-cookiefile':
+					check('optFormat', 'optRes', 'optMerge', 'optCookieFile', 'optJsRuntime');
+					break;
+				case 'mp4-android':
+					check('optFormat', 'optRes', 'optMerge', 'optCookieFile', 'optJsRuntime', 'optExtractorArgs');
+					break;
+				case 'audio':
+					check('optAudioOnly');
+					document.getElementById('audioFormat').value = 'mp3';
+					toggleAudioOnly();
+					break;
+				case 'best':
+					check('optFormat', 'optMerge');
+					document.getElementById('formatSelect').value = 'bv*+ba/b';
+					document.getElementById('mergeSelect').value = 'mkv';
+					break;
+				case 'subs':
+					check('optFormat', 'optRes', 'optMerge', 'optWriteSubs', 'optAutoSubs', 'optSubLang', 'optEmbedSubs');
+					break;
+			}
+
+			// Enable/disable associated controls
+			enableWhen('optCookieBrowser', 'cookieBrowser');
+			enableWhen('optCookieFile', 'cookieFile');
+			enableWhen('optOutputDir', 'outputDir');
+			enableWhen('optOutputTpl', 'outputTpl');
+			enableWhen('optSubLang', 'subLangs');
+			enableWhen('optPlaylistItems', 'playlistItems');
+			enableWhen('optArchive', 'archiveFile');
+			enableWhen('optRateLimit', 'rateLimit');
+			enableWhen('optRetries', 'retries');
+			enableWhen('optProxy', 'proxyUrl');
+			enableWhen('optSponsorRemove', 'sponsorRemove');
+			enableWhen('optSponsorMark', 'sponsorMark');
+			enableWhen('optAudioOnly', 'audioFormat');
+			enableWhen('optSleep', 'sleepVal');
+
+			// Highlight active preset button
+			document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+			event.target.classList.add('active');
+
+			buildCommand();
+		}
+
+		function check(...ids) {
+			ids.forEach(id => { document.getElementById(id).checked = true; });
+		}
+
+		// Initial build
+		buildCommand();
+		buildExportCmd();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>
