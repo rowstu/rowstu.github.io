@@ -790,13 +790,15 @@
 		speedTimer: null,
 		speedTimeLeft: 60,
 		used: new Set(),
-		prefs: { theme:'dark', bestStreak:0, speedBest:0, findCorrect:0, findTotal:0, nameCorrect:0, nameTotal:0, learned:[] },
+		prefs: { theme:'dark', mode:'learn', bestStreak:0, speedBest:0, findCorrect:0, findTotal:0, nameCorrect:0, nameTotal:0, learned:[] },
 
 		init() {
 			this.loadPrefs();
 			this.buildLegend();
 			this.bindEvents();
-			this.setMode('learn');
+			const savedMode = this.prefs.mode || 'learn';
+			document.getElementById('mode-select').value = savedMode;
+			this.setMode(savedMode);
 			this.updateThemeBtn();
 			if (this.prefs.theme === 'light') document.body.classList.add('light-theme');
 		},
@@ -937,6 +939,8 @@
 
 		setMode(mode) {
 			this.mode = mode;
+			this.prefs.mode = mode;
+			this.savePrefs();
 			this.score = 0;
 			this.total = 0;
 			this.streak = 0;
