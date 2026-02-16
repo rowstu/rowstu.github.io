@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>US States Quiz // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg-primary: #0f1318;
+			--bg-surface: #171c24;
+			--bg-elevated: #1e2530;
+			--text-primary: #e2e8f0;
+			--text-secondary: #8896a8;
+			--text-muted: #5a6778;
+			--border: #2a3444;
+			--border-light: #3d4f66;
+			--region-default: #2a3444;
+			--region-hover: #3d4f66;
+			--region-stroke: #0f1318;
+			--region-active: #4a90d9;
+			--region-correct: #2dd4a0;
+			--region-wrong: #f0665c;
+			--region-learned: #3b82c4;
+			--accent: #c44d3f;
+			--accent-hover: #a83d32;
+			--accent-secondary: #3a6fa0;
+			--modal-bg: rgba(0,0,0,0.7);
+			--rg-ne: #5ba3cf;
+			--rg-se: #e8a44a;
+			--rg-mw: #7ec87e;
+			--rg-sw: #d4789c;
+			--rg-w: #6bc5b8;
+			--topo-line: rgba(42, 52, 68, 0.12);
+		}
+
+		.light-theme {
+			--bg-primary: #f0f2f5;
+			--bg-surface: #ffffff;
+			--bg-elevated: #e8ebef;
+			--text-primary: #1a1d23;
+			--text-secondary: #5f6672;
+			--text-muted: #8b949e;
+			--border: #d0d7de;
+			--border-light: #b8bfc7;
+			--region-default: #d0d7de;
+			--region-hover: #b8c4d0;
+			--region-stroke: #f0f2f5;
+			--region-active: #3a7bc8;
+			--region-correct: #1aab84;
+			--region-wrong: #d94f45;
+			--region-learned: #2d6da8;
+			--accent: #b03a2e;
+			--accent-hover: #8e2e24;
+			--accent-secondary: #3a7bc8;
+			--modal-bg: rgba(0,0,0,0.4);
+			--rg-ne: #3a7bc8;
+			--rg-se: #c47c28;
+			--rg-mw: #4aaa4a;
+			--rg-sw: #c05a7a;
+			--rg-w: #3aaa9a;
+			--topo-line: rgba(42, 52, 68, 0.06);
+		}
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'DM Sans', sans-serif;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			min-height: 100vh;
+			background-image:
+				repeating-linear-gradient(0deg, transparent, transparent 40px, var(--topo-line) 40px, var(--topo-line) 41px),
+				repeating-linear-gradient(90deg, transparent, transparent 40px, var(--topo-line) 40px, var(--topo-line) 41px);
+		}
+
+		h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+		.app-header {
+			padding: 1rem 1.5rem;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			flex-wrap: wrap;
+			border-bottom: 1px solid var(--border);
+			background: var(--bg-surface);
+		}
+
+		.app-title {
+			font-size: 1.5rem;
+			font-weight: 800;
+			color: var(--accent);
+			letter-spacing: -0.02em;
+		}
+
+		.app-title span { color: var(--text-secondary); font-weight: 400; font-size: 0.9rem; }
+
+		.header-controls {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.mode-select {
+			background: var(--bg-elevated);
+			color: var(--text-primary);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 0.5rem 0.75rem;
+			font-family: 'DM Sans', sans-serif;
+			font-size: 0.85rem;
+			cursor: pointer;
+			outline: none;
+		}
+
+		.mode-select:focus { border-color: var(--accent); }
+
+		.theme-btn, .reset-btn {
+			background: var(--bg-elevated);
+			color: var(--text-secondary);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 0.45rem 0.65rem;
+			font-size: 1rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.theme-btn:hover, .reset-btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.stats-bar {
+			display: flex;
+			gap: 1.5rem;
+			padding: 0.6rem 1.5rem;
+			background: var(--bg-surface);
+			border-bottom: 1px solid var(--border);
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+			flex-wrap: wrap;
+		}
+
+		.stat-item { display: flex; gap: 0.4rem; align-items: center; }
+		.stat-value { color: var(--accent); font-weight: 600; }
+		.stat-label { color: var(--text-muted); }
+
+		.app-layout {
+			display: flex;
+			min-height: calc(100vh - 130px);
+		}
+
+		.map-panel {
+			flex: 3;
+			position: relative;
+			padding: 0;
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.map-container {
+			min-width: 100%;
+			display: flex;
+			justify-content: center;
+		}
+
+		#quiz-map {
+			width: 100%;
+			min-width: 300px;
+			height: auto;
+			transition: width 0.2s ease;
+		}
+
+		#quiz-map path {
+			fill: var(--region-default);
+			stroke: var(--region-stroke);
+			stroke-width: 0.8;
+			cursor: pointer;
+			transition: fill 0.2s, opacity 0.2s;
+		}
+
+		#quiz-map path:hover {
+			fill: var(--region-hover);
+			filter: brightness(1.15);
+		}
+
+		#quiz-map path.highlighted {
+			fill: var(--region-active);
+			animation: regionPulse 1.5s ease-in-out infinite;
+		}
+
+		#quiz-map path.correct {
+			fill: var(--region-correct) !important;
+			animation: correctFlash 0.5s ease;
+		}
+
+		#quiz-map path.wrong {
+			fill: var(--region-wrong) !important;
+			animation: wrongShake 0.4s ease;
+		}
+
+		#quiz-map path.learned {
+			fill: var(--region-learned);
+			opacity: 0.6;
+		}
+
+		#quiz-map path.dimmed {
+			opacity: 0.3;
+		}
+
+		#quiz-map path.group-colored {
+			stroke: var(--region-stroke);
+			stroke-width: 0.8;
+		}
+
+		@keyframes regionPulse {
+			0%, 100% { opacity: 0.75; }
+			50% { opacity: 1; filter: brightness(1.25); }
+		}
+
+		@keyframes correctFlash {
+			0% { fill: #fff; }
+			100% { fill: var(--region-correct); }
+		}
+
+		@keyframes wrongShake {
+			0%, 100% { transform: translateX(0); }
+			20% { transform: translateX(-2px); }
+			40% { transform: translateX(2px); }
+			60% { transform: translateX(-2px); }
+			80% { transform: translateX(2px); }
+		}
+
+		.quiz-panel {
+			flex: 2;
+			padding: 1.5rem;
+			border-left: 1px solid var(--border);
+			background: var(--bg-surface);
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+			max-width: 400px;
+		}
+
+		.quiz-question {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.3rem;
+			font-weight: 700;
+			color: var(--text-primary);
+			min-height: 2.5rem;
+		}
+
+		.quiz-instruction {
+			font-size: 0.85rem;
+			color: var(--text-muted);
+			font-style: italic;
+		}
+
+		.quiz-options {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.6rem;
+		}
+
+		.quiz-option {
+			background: var(--bg-elevated);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 0.75rem;
+			color: var(--text-primary);
+			font-family: 'DM Sans', sans-serif;
+			font-size: 0.85rem;
+			cursor: pointer;
+			transition: all 0.2s;
+			text-align: center;
+		}
+
+		.quiz-option:hover {
+			border-color: var(--accent);
+			background: var(--bg-surface);
+		}
+
+		.quiz-option.correct {
+			background: rgba(45, 212, 160, 0.15);
+			border-color: var(--region-correct);
+			color: var(--region-correct);
+		}
+
+		.quiz-option.wrong {
+			background: rgba(240, 102, 92, 0.15);
+			border-color: var(--region-wrong);
+			color: var(--region-wrong);
+		}
+
+		.quiz-option:disabled { cursor: default; }
+
+		.quiz-feedback {
+			font-size: 0.9rem;
+			font-weight: 500;
+			min-height: 1.4rem;
+			transition: opacity 0.2s;
+		}
+
+		.quiz-feedback.success { color: var(--region-correct); }
+		.quiz-feedback.error { color: var(--region-wrong); }
+
+		.quiz-next-btn {
+			background: var(--accent);
+			color: #0f1318;
+			border: none;
+			border-radius: 8px;
+			padding: 0.7rem 1.5rem;
+			font-family: 'DM Sans', sans-serif;
+			font-size: 0.9rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background 0.2s;
+			align-self: flex-start;
+		}
+
+		.quiz-next-btn:hover { background: var(--accent-hover); }
+
+		.info-card {
+			background: var(--bg-elevated);
+			border: 1px solid var(--border);
+			border-radius: 10px;
+			padding: 1.25rem;
+		}
+
+		.info-card h3 {
+			font-size: 1.1rem;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.info-card .info-row {
+			display: flex;
+			justify-content: space-between;
+			padding: 0.3rem 0;
+			font-size: 0.85rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.info-card .info-row:last-child { border-bottom: none; }
+		.info-card .info-label { color: var(--text-muted); }
+		.info-card .info-value { color: var(--text-primary); font-weight: 500; }
+
+		.info-card .info-fact {
+			margin-top: 0.75rem;
+			font-size: 0.85rem;
+			color: var(--text-secondary);
+			line-height: 1.5;
+			font-style: italic;
+		}
+
+		.progress-bar {
+			width: 100%;
+			height: 6px;
+			background: var(--bg-elevated);
+			border-radius: 3px;
+			overflow: hidden;
+		}
+
+		.progress-fill {
+			height: 100%;
+			background: var(--accent);
+			border-radius: 3px;
+			transition: width 0.3s ease;
+		}
+
+		.timer-display {
+			font-family: 'Playfair Display', serif;
+			font-size: 2.5rem;
+			font-weight: 800;
+			text-align: center;
+			color: var(--accent);
+			transition: color 0.3s;
+		}
+
+		.timer-display.warning { color: var(--rg-sw); }
+		.timer-display.danger { color: var(--region-wrong); }
+
+		.speed-score {
+			font-size: 3rem;
+			font-weight: 800;
+			font-family: 'Playfair Display', serif;
+			text-align: center;
+			color: var(--accent);
+		}
+
+		.score-float {
+			position: absolute;
+			font-size: 1.2rem;
+			font-weight: 700;
+			color: var(--region-correct);
+			pointer-events: none;
+			animation: floatUp 0.8s ease-out forwards;
+			z-index: 10;
+		}
+
+		@keyframes floatUp {
+			0% { opacity: 1; transform: translateY(0); }
+			100% { opacity: 0; transform: translateY(-30px); }
+		}
+
+		.legend {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			padding: 0.75rem;
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 0.35rem;
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			cursor: pointer;
+			padding: 0.2rem 0.4rem;
+			border-radius: 4px;
+			transition: background 0.2s;
+		}
+
+		.legend-item:hover { background: var(--bg-elevated); }
+
+		.legend-swatch {
+			width: 10px;
+			height: 10px;
+			border-radius: 2px;
+		}
+
+		.start-screen {
+			text-align: center;
+			padding: 2rem;
+		}
+
+		.start-screen h2 {
+			font-size: 1.5rem;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.start-screen p {
+			color: var(--text-secondary);
+			margin-bottom: 1.5rem;
+		}
+
+		.start-btn {
+			background: var(--accent);
+			color: #0f1318;
+			border: none;
+			border-radius: 8px;
+			padding: 0.8rem 2rem;
+			font-family: 'DM Sans', sans-serif;
+			font-size: 1rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background 0.2s;
+		}
+
+		.start-btn:hover { background: var(--accent-hover); }
+
+		.zoom-controls {
+			position: absolute;
+			bottom: 1rem;
+			right: 1rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.3rem;
+			z-index: 5;
+		}
+
+		.zoom-btn {
+			background: var(--bg-surface);
+			border: 1px solid var(--border);
+			color: var(--text-secondary);
+			width: 32px;
+			height: 32px;
+			border-radius: 6px;
+			font-size: 1rem;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.2s;
+		}
+
+		.zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+		.map-tooltip {
+			position: absolute;
+			background: var(--bg-surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 0.4rem 0.7rem;
+			font-size: 0.75rem;
+			color: var(--text-primary);
+			pointer-events: none;
+			opacity: 0;
+			transition: opacity 0.15s;
+			z-index: 10;
+			white-space: nowrap;
+		}
+
+		.map-tooltip.visible { opacity: 1; }
+
+		.end-screen {
+			text-align: center;
+			padding: 2rem 1rem;
+		}
+
+		.end-screen h2 {
+			font-size: 1.8rem;
+			color: var(--accent);
+			margin-bottom: 0.5rem;
+		}
+
+		.end-stats {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.75rem;
+			margin: 1.5rem 0;
+		}
+
+		.end-stat {
+			background: var(--bg-elevated);
+			border-radius: 8px;
+			padding: 0.75rem;
+		}
+
+		.end-stat-value {
+			font-size: 1.5rem;
+			font-weight: 700;
+			font-family: 'Playfair Display', serif;
+			color: var(--accent);
+		}
+
+		.end-stat-label {
+			font-size: 0.75rem;
+			color: var(--text-muted);
+			margin-top: 0.25rem;
+		}
+
+		@media (max-width: 768px) {
+			.app-layout { flex-direction: column; }
+			.quiz-panel {
+				max-width: none;
+				border-left: none;
+				border-top: 1px solid var(--border);
+			}
+			.map-panel { min-height: 40vh; max-height: 55vh; }
+			.app-title { font-size: 1.2rem; }
+			.app-header { padding: 0.75rem 1rem; }
+		}
+
+		@media (max-width: 480px) {
+			.quiz-options { grid-template-columns: 1fr; }
+			.stats-bar { gap: 0.75rem; font-size: 0.75rem; padding: 0.5rem 1rem; }
+			.quiz-question { font-size: 1.1rem; }
+			.header-controls { gap: 0.5rem; }
+			.mode-select { font-size: 0.8rem; padding: 0.4rem 0.5rem; }
+		}
+	</style>
+</head>
+<body>
+	<div class="app-header">
+		<h1 class="app-title">US States Quiz <span>// 50 states</span></h1>
+		<div class="header-controls">
+			<select class="mode-select" id="mode-select">
+				<option value="learn">Learn</option>
+				<option value="find">Find It</option>
+				<option value="name">Name It</option>
+				<option value="speed">Speed Round</option>
+			</select>
+			<button class="theme-btn" id="theme-btn" title="Toggle theme">&#9790;</button>
+		</div>
+	</div>
+
+	<div class="stats-bar" id="stats-bar">
+		<div class="stat-item"><span class="stat-label">Score:</span> <span class="stat-value" id="stat-score">0</span></div>
+		<div class="stat-item"><span class="stat-label">Streak:</span> <span class="stat-value" id="stat-streak">0</span></div>
+		<div class="stat-item"><span class="stat-label">Best:</span> <span class="stat-value" id="stat-best">0</span></div>
+		<div class="stat-item"><span class="stat-label">Accuracy:</span> <span class="stat-value" id="stat-accuracy">-</span></div>
+	</div>
+
+	<div class="app-layout">
+		<div class="map-panel" id="map-panel">
+			<div class="map-container" id="map-container">
+				<svg id="quiz-map" viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg">
+					<!-- Inset boxes for Alaska and Hawaii -->
+					<rect x="28" y="420" width="320" height="145" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3" rx="3"/>
+					<rect x="390" y="487" width="75" height="70" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3" rx="3"/>
+					<path id="alabama" d="M582.3,296.9L608.2,297.2L614.4,336.4L617.7,344.5L617.1,346.3L618.8,347.5L616.3,349.8L615.1,355.2L616.5,360.8L615.5,365.7L617.1,370.7L578.8,370.8L578.3,373.2L581.6,376.8L581.1,379.8L582.2,381.3L578.0,384.7L574.3,381.6L573.9,377.1L572.7,376.6L570.9,383.4L567.1,382.4L566.0,354.2L571.4,298.9L569.9,297.0L582.3,296.9Z"/>
+					<path id="alaska" d="M319.5,524.7L327.5,535.3L320.2,532.0L319.5,524.7Z M317.9,520.9L324.5,522.6L317.9,520.9Z M314.1,525.1L308.7,518.1L313.0,517.8L314.1,525.1Z M313.7,512.6L317.9,515.2L314.8,520.3L313.7,512.6Z M305.6,512.7L313.1,517.2L307.6,517.8L305.6,512.7Z M249.9,499.8L245.8,502.5L249.9,499.8Z M247.4,497.3L245.4,499.6L247.4,497.3Z M246.2,434.9L281.3,438.7L281.3,499.1L291.1,498.8L299.6,508.1L309.7,502.4L328.5,523.0L337.5,526.2L338.1,531.6L334.5,535.2L326.8,529.6L326.2,522.5L310.8,506.3L311.8,512.7L302.5,507.8L306.8,511.5L304.0,512.6L287.7,504.3L288.7,500.8L252.3,499.5L255.7,497.3L244.2,494.6L245.2,501.1L224.6,505.9L229.0,503.2L225.2,502.5L227.6,496.4L236.1,494.5L231.4,492.7L213.6,505.2L217.8,508.4L213.4,512.6L190.9,527.1L158.2,537.2L173.9,527.6L181.8,528.4L198.3,509.4L174.2,510.4L171.7,500.5L161.7,501.9L151.7,491.4L160.4,480.3L179.3,476.3L177.3,469.3L157.4,472.4L141.5,465.0L160.5,458.6L177.4,460.1L148.7,447.2L151.1,443.7L200.9,427.7L246.2,434.9Z M219.6,513.8L224.1,512.0L219.6,513.8Z M214.4,517.0L223.7,516.4L214.1,522.1L210.3,518.7L214.4,517.0Z M183.8,531.6L181.9,534.1L183.8,531.6Z M150.4,498.8L154.1,501.1L144.9,499.7L150.4,498.8Z M150.3,539.8L143.0,544.1L150.3,539.8Z M137.8,545.3L142.7,543.8L137.8,545.3Z M122.6,477.1L138.4,479.8L122.6,477.1Z M112.9,551.8L115.6,552.3L112.9,551.8Z M109.3,551.0L106.0,552.5L109.3,551.0Z M43.3,546.4L34.0,547.8L43.3,546.4Z"/>
+					<path id="arizona" d="M262.6,260.0L262.6,364.6L232.7,364.6L177.5,343.2L178.9,339.1L181.8,338.4L182.6,336.7L181.8,333.3L179.8,333.2L178.8,326.3L181.8,323.7L181.7,316.6L187.6,309.7L184.6,307.1L180.2,299.2L181.1,294.4L178.7,276.6L184.1,275.9L185.9,278.1L187.3,278.0L188.8,274.9L188.8,260.0L262.6,260.0Z"/>
+					<path id="arkansas" d="M477.5,269.2L541.2,269.3L542.5,272.8L537.9,278.5L547.4,278.5L546.9,281.9L544.7,282.9L544.2,285.8L541.5,288.8L541.7,293.3L540.3,296.5L538.8,297.0L539.7,298.6L534.8,304.0L535.0,307.6L532.4,308.6L529.4,312.9L530.3,314.9L527.6,317.8L525.3,323.5L527.8,325.9L526.5,327.4L527.4,331.3L526.2,333.8L483.8,333.5L483.8,323.7L478.8,323.8L477.3,322.1L478.1,289.6L475.4,269.2L477.5,269.2Z"/>
+					<path id="california" d="M53.4,167.6L101.1,167.8L101.1,223.1L138.0,256.0L180.2,296.9L180.2,299.2L184.6,307.1L187.6,309.7L181.7,316.6L181.8,323.7L178.8,326.3L179.8,333.2L181.8,333.3L182.6,336.7L181.8,338.4L143.5,342.4L141.7,340.0L140.5,331.6L138.4,328.3L127.9,319.8L126.7,320.9L124.5,320.2L124.8,318.3L122.2,314.6L118.7,315.4L112.6,312.7L111.7,310.5L107.6,307.7L94.1,307.1L91.5,304.7L91.8,295.1L87.9,292.4L87.7,288.6L82.2,284.5L73.1,272.6L72.6,266.7L73.7,267.2L74.7,263.6L72.6,260.4L70.1,260.8L65.5,255.5L64.0,245.5L66.7,245.5L65.6,238.8L64.4,239.5L64.2,242.8L61.3,243.5L57.8,241.0L57.2,236.6L55.0,233.2L46.0,223.9L46.7,222.5L44.7,216.3L45.6,212.9L44.3,207.7L36.8,199.8L36.1,196.5L39.8,188.4L41.1,178.0L39.9,172.9L38.3,171.7L39.0,167.7L53.4,167.6Z"/>
+					<path id="colorado" d="M279.2,186.1L365.7,186.1L365.9,260.1L262.6,260.0L262.6,186.2L279.2,186.1Z"/>
+					<path id="connecticut" d="M793.3,167.0L811.8,167.3L811.8,178.5L810.9,180.2L795.5,180.9L784.4,186.4L783.3,184.3L787.0,182.2L785.9,180.7L786.9,166.8L793.3,167.0Z"/>
+					<path id="delaware" d="M758.5,208.2L755.6,211.7L755.9,214.6L758.1,217.3L758.6,221.9L761.8,226.6L763.2,226.8L763.9,233.2L754.4,233.0L753.0,209.7L755.5,207.7L758.5,208.2Z"/>
+					<path id="florida" d="M609.8,370.8L617.1,370.7L619.1,376.1L658.2,378.7L658.9,382.6L660.7,382.5L660.8,375.4L662.1,373.9L669.6,376.2L672.3,393.2L676.6,405.0L683.1,417.6L682.2,418.5L682.5,424.4L690.4,448.4L688.7,467.9L687.3,468.2L686.4,474.5L683.5,477.9L682.4,477.1L675.0,479.3L670.9,466.4L668.3,464.8L666.1,466.0L663.8,457.7L660.8,453.5L660.5,446.9L658.8,446.1L659.2,448.5L657.7,449.1L651.1,436.5L655.6,429.2L652.7,429.6L650.7,431.9L648.8,428.2L651.4,418.1L651.9,409.7L649.5,405.0L646.7,404.4L640.7,398.1L640.6,395.4L637.2,391.3L631.5,387.3L626.6,388.2L626.8,391.0L612.5,394.8L611.2,390.3L598.0,382.5L593.1,381.9L580.0,384.1L582.2,381.3L581.1,379.8L581.6,376.8L578.3,373.2L578.8,370.8L609.8,370.8Z"/>
+					<path id="georgia" d="M645.0,296.9L641.6,302.8L646.5,306.7L648.1,306.4L653.2,316.4L662.5,325.3L662.3,327.4L664.9,330.9L668.8,333.7L670.0,340.7L672.0,342.0L674.3,347.0L674.4,350.1L677.8,351.7L674.2,358.0L671.8,367.0L670.2,368.3L669.6,376.2L662.1,373.9L660.8,375.4L660.7,382.5L658.9,382.6L658.2,378.7L619.1,376.1L615.5,365.7L616.5,360.8L615.1,355.2L616.3,349.8L618.8,347.5L617.1,346.3L617.7,344.5L614.4,336.4L608.2,297.2L645.0,296.9Z"/>
+					<path id="hawaii" transform="translate(120, 10)" d="M325.1,533.4L322.2,532.1L322.1,527.5L320.0,521.8L322.8,517.4L322.2,513.9L329.2,517.5L331.5,519.8L331.5,521.7L334.8,524.9L332.8,527.5L326.5,530.6L325.1,533.4Z M313.8,502.6L315.2,504.7L316.9,503.8L320.8,506.1L320.2,508.2L315.5,508.9L315.3,506.3L313.3,505.7L312.5,504.3L313.8,502.6Z M309.2,500.0L308.0,501.5L305.3,501.5L306.2,499.8L309.2,500.0Z M297.8,492.8L299.0,496.3L298.4,498.3L295.9,498.6L294.2,494.5L297.8,492.8Z M279.9,484.9L281.2,485.1L281.9,486.6L281.5,488.8L280.1,490.2L276.4,488.5L276.8,486.1L279.9,484.9Z"/>
+					<path id="idaho" d="M159.4,38.5L159.4,57.4L164.1,62.5L164.2,67.6L170.0,70.6L176.5,78.9L180.4,80.8L180.5,82.0L184.8,81.9L182.3,93.2L183.8,96.0L181.2,98.0L182.2,99.9L181.5,102.0L184.6,103.9L189.7,99.3L192.4,101.1L193.4,106.2L197.6,111.3L197.6,114.8L202.3,116.5L204.3,122.5L206.0,123.5L207.5,121.8L212.1,121.9L215.5,120.3L224.7,120.7L228.1,116.8L233.1,122.0L233.1,167.7L144.9,167.7L144.9,133.9L146.9,127.8L142.8,126.0L141.8,123.5L144.8,116.9L147.8,113.6L147.6,111.9L153.2,100.9L152.0,98.4L148.5,97.1L144.5,87.5L144.8,38.5L159.4,38.5Z"/>
+					<path id="illinois" d="M534.0,158.3L575.8,158.6L575.3,162.1L579.9,173.0L579.8,216.6L578.2,220.0L580.3,227.1L575.3,236.1L573.6,236.4L572.5,245.2L570.6,247.9L571.9,251.1L565.9,252.8L565.3,254.7L566.7,257.2L564.8,258.7L557.7,256.1L555.5,259.3L556.2,260.3L553.8,260.1L550.5,254.8L551.7,253.6L550.5,247.3L545.8,243.3L544.2,243.7L538.2,237.5L538.3,234.6L541.8,225.9L536.5,223.8L534.8,225.5L533.7,224.4L532.7,218.3L523.2,209.6L521.4,204.0L522.8,194.3L526.9,192.2L527.3,189.4L529.2,187.6L529.5,184.4L527.0,181.7L528.0,178.5L538.3,175.3L538.8,172.4L540.8,171.2L540.9,165.4L537.6,163.5L534.0,158.3Z"/>
+					<path id="indiana" d="M602.5,172.1L620.0,172.1L619.8,221.2L618.7,222.0L619.9,227.0L614.6,228.9L610.8,228.0L610.9,231.7L608.4,233.2L607.5,235.5L604.9,236.4L603.5,241.1L601.8,242.3L598.5,240.6L597.9,238.5L594.7,240.8L594.9,242.8L591.6,243.5L590.7,241.7L585.7,245.4L578.8,242.0L573.9,243.5L572.5,245.2L573.6,236.4L575.3,236.1L580.3,227.1L578.2,220.0L579.8,216.6L579.9,173.0L585.9,174.3L590.3,172.1L602.5,172.1Z"/>
+					<path id="iowa" d="M523.2,140.0L525.5,140.0L525.7,142.7L527.8,144.5L526.1,146.7L527.7,153.8L532.9,156.0L537.6,163.5L540.9,165.4L541.3,167.7L540.8,171.2L538.8,172.4L538.3,175.3L528.0,178.5L527.0,181.7L529.5,184.4L529.2,187.6L527.3,189.4L526.9,192.2L522.8,194.3L522.5,197.6L517.9,193.3L458.4,193.8L456.7,191.3L457.5,186.6L456.1,182.4L456.1,177.8L453.5,176.2L454.0,171.4L453.1,168.2L451.0,167.0L448.4,158.7L445.6,154.6L448.5,147.0L446.7,145.1L446.4,140.4L448.3,140.0L523.2,140.0Z"/>
+					<path id="kansas" d="M367.9,204.6L465.2,204.6L471.4,207.7L468.1,213.1L472.3,219.2L475.4,220.2L475.4,260.0L365.9,260.1L365.7,204.6L367.9,204.6Z"/>
+					<path id="kentucky" d="M633.3,227.3L636.6,229.9L639.0,228.5L644.5,230.0L648.2,227.5L648.9,230.7L652.6,233.7L652.2,239.3L654.0,242.8L657.0,247.7L661.8,250.1L650.7,257.8L648.4,262.0L645.6,262.7L644.6,264.7L636.5,267.7L571.9,266.0L572.1,269.3L552.0,269.3L552.8,267.0L555.0,267.8L556.2,260.3L555.5,259.3L557.7,256.1L564.8,258.7L566.7,257.2L565.3,254.7L565.9,252.8L571.9,251.1L570.6,247.9L573.9,243.5L578.8,242.0L585.7,245.4L590.7,241.7L591.6,243.5L594.9,242.8L594.7,240.8L597.9,238.5L598.5,240.6L601.8,242.3L603.5,241.1L604.9,236.4L607.5,235.5L608.4,233.2L610.9,231.7L610.8,228.0L614.6,228.9L619.9,227.0L618.7,222.0L619.8,221.2L625.5,221.2L628.7,226.6L633.3,227.3Z"/>
+					<path id="louisiana" d="M490.2,333.5L526.2,333.8L527.6,335.9L526.5,336.7L526.4,340.5L528.6,342.8L528.9,348.3L527.1,352.5L523.6,355.1L522.8,359.3L521.3,358.9L521.1,365.7L519.3,365.9L520.3,369.5L519.3,370.8L547.1,370.8L545.7,376.9L550.5,385.9L546.1,388.4L545.8,390.2L549.3,391.4L550.9,388.5L553.9,391.4L553.7,393.8L551.9,394.8L548.6,393.9L547.9,398.2L550.7,400.5L555.2,401.2L558.1,404.4L555.8,407.5L553.2,406.9L551.0,403.7L545.6,402.0L545.6,398.8L542.9,399.8L541.9,404.9L540.0,405.3L538.5,402.6L535.1,402.5L533.9,405.3L531.6,406.1L527.3,404.2L525.4,399.6L520.8,397.9L519.5,394.1L515.6,394.6L515.6,392.3L511.8,394.5L512.3,396.2L509.3,397.8L495.9,393.4L486.8,395.0L485.5,393.2L489.0,386.6L487.9,383.0L488.9,381.1L488.4,378.6L491.4,371.9L491.2,368.0L487.1,360.5L487.1,356.5L483.8,352.4L483.8,333.5L490.2,333.5Z"/>
+					<path id="maine" d="M827.9,148.2L824.0,142.9L822.3,106.7L828.7,104.2L827.7,102.9L832.6,98.7L832.1,97.6L834.5,95.9L833.7,92.7L835.2,87.8L837.4,86.2L838.3,81.0L849.7,66.9L852.4,67.5L852.5,70.9L854.5,72.1L864.3,68.8L868.5,71.7L870.9,74.1L870.7,99.8L875.8,101.1L875.1,103.3L876.4,105.3L875.3,107.1L877.4,109.9L880.2,109.3L882.8,115.9L879.8,118.8L878.0,117.7L876.5,119.8L874.4,119.2L874.2,121.0L871.4,120.8L867.1,124.7L866.0,122.0L864.5,121.8L865.2,124.7L861.8,126.1L861.0,123.8L855.6,125.0L855.5,122.3L853.3,122.9L852.0,130.0L849.2,132.2L846.5,131.4L840.8,135.9L838.5,135.5L837.8,133.5L834.5,136.7L835.4,138.8L833.0,139.5L827.9,148.2Z"/>
+					<path id="maryland" d="M698.6,209.7L753.0,209.7L754.4,233.0L763.9,233.2L761.0,241.0L751.5,243.2L751.6,240.2L750.4,239.0L752.1,237.6L749.8,234.6L749.1,235.9L746.0,235.6L745.0,232.3L746.0,232.3L747.0,226.2L745.7,220.4L747.3,216.9L749.8,216.3L750.2,212.8L744.4,217.3L741.6,227.3L742.2,231.6L744.2,234.5L744.5,240.5L741.1,237.5L736.3,236.1L734.8,233.3L732.1,234.9L731.0,232.7L736.4,225.0L734.6,223.2L733.4,224.3L728.3,221.7L728.3,218.9L724.5,217.1L722.8,212.0L717.8,210.2L714.0,211.6L713.4,213.6L709.0,212.3L706.1,215.0L704.2,214.4L698.4,219.2L698.6,209.7Z"/>
+					<path id="massachusetts" d="M824.8,151.3L826.2,151.6L826.8,154.8L823.8,159.9L823.7,162.7L826.9,163.1L830.3,171.1L834.5,172.9L839.2,171.2L838.2,173.7L831.1,176.0L828.6,176.1L827.0,174.4L821.8,177.0L818.7,171.7L817.9,167.4L786.6,166.1L790.1,153.9L819.2,154.8L824.8,151.3Z"/>
+					<path id="michigan" d="M639.9,172.6L590.3,172.1L593.2,169.7L597.1,163.0L599.3,154.4L599.0,149.0L594.6,138.3L596.0,134.2L595.0,129.4L598.4,124.4L598.7,118.0L601.1,117.1L601.4,114.1L605.2,113.3L608.1,109.9L607.9,116.6L609.4,116.9L611.3,113.6L611.4,107.9L616.7,105.6L615.4,101.7L618.0,98.3L628.7,100.5L630.5,103.2L639.4,105.7L641.9,109.6L639.9,111.8L642.6,117.6L641.7,124.5L638.7,126.2L638.0,129.8L634.4,131.0L632.5,135.2L633.2,136.8L636.8,138.4L642.8,131.3L647.8,129.5L651.9,133.5L655.3,149.7L653.7,156.4L651.3,157.4L651.2,154.9L649.6,155.6L647.8,161.2L644.8,163.3L643.9,167.6L639.9,172.6Z M609.6,98.8L609.9,101.0L607.9,101.5L608.8,98.3L609.6,98.8Z M579.0,110.6L576.7,108.6L578.1,106.0L574.6,105.6L576.1,99.8L571.4,95.3L541.6,87.6L540.0,84.5L537.3,83.4L545.6,79.2L552.1,78.3L558.2,75.5L570.2,67.0L573.5,68.3L566.4,75.9L566.4,79.3L569.3,76.7L574.4,77.1L578.3,78.9L581.9,84.0L592.1,85.8L600.0,81.5L616.2,79.8L616.7,85.0L622.6,84.9L623.8,86.1L630.0,84.1L630.1,90.5L632.0,93.3L634.9,94.0L635.2,92.1L638.1,92.1L639.6,94.1L638.3,95.5L630.2,94.3L626.4,95.1L622.2,92.9L620.9,94.9L621.5,96.6L616.9,93.7L609.7,92.0L607.4,94.5L599.3,94.6L597.6,95.6L597.2,97.6L592.6,99.3L592.8,96.9L590.8,96.4L590.0,98.9L585.1,100.1L579.0,110.6Z M561.0,57.4L555.4,60.0L555.5,58.1L564.8,53.7L563.0,56.8L561.0,57.4Z"/>
+					<path id="minnesota" d="M513.7,80.8L512.6,80.0L509.6,81.5L509.6,92.5L504.5,95.1L501.1,99.0L500.9,101.7L504.4,104.2L502.7,107.0L502.0,116.9L505.9,120.3L508.9,120.6L515.0,124.6L515.7,127.0L522.3,130.9L525.1,134.9L525.5,140.0L448.3,140.0L448.3,106.8L442.3,101.1L446.4,97.2L446.1,87.7L443.1,81.7L442.3,64.1L438.3,54.3L437.8,46.8L438.8,44.3L436.8,38.5L467.4,38.5L467.4,31.4L470.3,31.6L472.3,33.0L474.2,42.6L475.8,43.7L486.8,45.3L487.5,47.4L496.1,45.0L499.4,45.4L503.2,47.0L504.3,48.9L506.4,48.7L508.5,52.8L509.4,51.1L513.1,50.3L513.8,52.0L518.2,53.2L518.2,54.8L520.3,56.2L531.1,52.5L532.4,55.2L541.3,54.8L545.3,57.2L549.1,56.8L543.8,60.1L532.5,63.8L512.6,79.3L513.7,80.8Z"/>
+					<path id="mississippi" d="M566.0,297.0L569.9,297.0L571.4,298.9L566.0,354.2L567.1,382.4L561.9,382.8L560.5,381.6L550.5,385.9L545.7,376.9L547.1,370.8L519.3,370.8L520.3,369.5L519.3,365.9L521.1,365.7L521.3,358.9L522.8,359.3L523.6,355.1L527.1,352.5L528.9,348.3L528.6,342.8L526.4,340.5L526.5,336.7L527.6,335.9L526.2,333.8L527.4,331.3L526.5,327.4L527.8,325.9L525.3,323.5L527.6,317.8L530.3,314.9L529.4,312.9L532.4,308.6L535.0,307.6L534.8,304.0L539.7,298.6L538.8,297.0L566.0,297.0Z"/>
+					<path id="missouri" d="M516.4,193.4L517.9,193.3L522.5,197.6L521.2,200.2L521.4,204.0L523.2,209.6L532.7,218.3L533.7,224.4L534.8,225.5L536.5,223.8L541.8,225.9L538.3,234.6L538.2,237.5L544.2,243.7L545.8,243.3L550.5,247.3L551.7,253.6L550.5,254.8L553.8,260.1L556.2,260.3L555.0,267.8L552.8,267.0L552.0,269.3L550.2,269.3L550.3,273.8L547.4,278.5L537.9,278.5L542.5,272.8L541.2,269.3L475.4,269.2L475.4,220.2L472.3,219.2L468.1,213.1L471.4,207.7L466.6,206.3L458.4,193.8L516.4,193.4Z"/>
+					<path id="montana" d="M336.3,38.5L336.4,112.4L233.0,112.3L233.1,122.0L228.1,116.8L224.7,120.7L215.5,120.3L212.1,121.9L207.5,121.8L206.0,123.5L204.3,122.5L202.3,116.5L197.6,114.8L197.6,111.3L193.4,106.2L192.4,101.1L189.7,99.3L184.6,103.9L181.5,102.0L182.2,99.9L181.2,98.0L183.8,96.0L182.3,93.2L184.8,81.9L180.5,82.0L180.4,80.8L176.5,78.9L170.0,70.6L164.2,67.6L164.1,62.5L159.4,57.4L159.4,38.5L336.3,38.5Z"/>
+					<path id="nebraska" d="M347.0,149.2L418.1,149.3L426.2,153.5L427.9,151.7L437.0,152.1L444.7,155.5L445.7,158.2L448.4,158.7L451.0,167.0L453.1,168.2L454.0,171.4L453.5,176.2L456.1,177.8L456.1,182.4L457.5,186.6L456.7,191.3L465.2,204.6L365.7,204.6L365.7,186.1L336.2,186.1L336.2,149.2L347.0,149.2Z"/>
+					<path id="nevada" d="M144.9,167.7L188.9,167.8L188.8,274.9L187.3,278.0L185.9,278.1L184.1,275.9L178.7,276.6L181.1,294.4L180.2,296.9L138.0,256.0L101.1,223.1L101.1,167.8L144.9,167.7Z"/>
+					<path id="new-hampshire" d="M822.3,106.7L824.0,142.9L827.9,148.2L826.2,151.6L819.2,154.8L802.1,154.2L800.8,152.8L800.9,150.1L802.2,149.1L803.2,138.7L808.4,129.4L808.3,124.8L813.2,123.1L815.6,120.0L814.3,116.9L818.2,107.3L821.6,107.8L822.3,106.7Z"/>
+					<path id="new-jersey" d="M775.8,183.6L780.8,186.2L779.0,191.5L776.6,192.8L775.3,195.6L779.3,197.0L777.8,209.0L767.6,223.2L766.2,220.2L756.7,214.6L756.3,211.5L758.5,208.2L762.4,206.7L767.9,200.6L763.7,196.9L763.6,194.6L761.7,194.0L761.5,191.8L763.8,188.6L762.6,186.7L769.0,179.5L775.8,183.6Z"/>
+					<path id="new-mexico" d="M286.6,260.0L351.7,260.0L350.8,352.3L298.4,352.3L298.0,354.1L299.7,356.3L274.9,356.3L274.9,364.6L262.6,364.6L262.6,260.0L286.6,260.0Z"/>
+					<path id="new-york" d="M789.0,112.1L788.3,119.3L789.7,122.7L787.6,130.0L788.9,135.0L788.1,136.5L790.4,139.6L790.1,153.9L786.6,166.1L785.9,180.7L787.0,182.2L783.3,184.3L784.4,186.4L790.7,187.9L800.1,186.2L804.7,183.3L805.0,185.4L807.3,186.3L790.5,193.1L780.3,194.6L779.0,191.5L780.8,186.2L768.4,178.2L766.1,178.1L763.5,175.0L763.8,172.2L759.3,167.7L694.4,167.7L694.4,162.7L703.4,157.5L707.8,153.2L705.4,149.5L704.5,144.4L713.2,142.3L723.9,142.9L727.2,144.9L739.6,142.9L743.7,139.6L746.4,139.5L746.4,134.4L747.8,131.5L744.5,129.5L745.2,127.1L751.1,124.0L760.4,115.1L767.1,112.0L789.0,112.1Z"/>
+					<path id="north-carolina" d="M676.4,268.1L751.8,268.3L753.5,275.7L749.3,275.0L739.7,278.3L739.9,279.6L748.9,278.6L750.4,280.3L753.1,279.6L754.0,284.1L747.6,290.9L742.7,291.1L741.9,294.3L745.7,298.0L742.6,303.2L732.0,304.2L722.9,312.4L720.8,318.2L717.7,316.9L712.4,318.1L695.6,300.5L679.1,300.2L679.3,298.1L677.1,295.0L675.5,296.1L675.5,294.2L657.3,293.3L645.0,296.9L627.2,297.1L627.6,292.8L630.5,292.4L631.6,289.3L635.2,286.6L639.3,286.5L646.7,282.6L652.0,277.3L652.4,279.1L658.2,275.6L660.8,276.3L662.7,272.8L665.4,271.9L666.1,267.6L676.4,268.1Z"/>
+					<path id="north-dakota" d="M436.8,38.5L438.8,44.3L437.8,46.8L438.3,54.3L442.3,64.1L443.1,81.7L446.1,87.7L446.7,95.1L336.3,94.9L336.3,38.5L436.8,38.5Z"/>
+					<path id="ohio" d="M683.2,168.1L683.2,192.9L681.0,193.9L682.0,198.7L678.6,209.9L672.9,215.9L671.0,216.7L669.4,215.5L667.7,218.1L666.0,218.0L664.2,221.6L664.6,223.7L663.0,225.4L660.8,222.6L658.1,227.0L658.8,229.9L657.0,230.9L656.5,233.3L652.6,233.7L648.9,230.7L648.2,227.5L644.5,230.0L639.0,228.5L636.6,229.9L633.3,227.3L628.7,226.6L625.5,221.2L619.8,221.2L620.0,173.3L639.9,172.6L647.6,176.7L649.0,175.3L654.3,179.1L661.2,176.7L665.2,177.2L675.9,170.4L683.2,168.1Z"/>
+					<path id="oklahoma" d="M394.7,260.0L475.4,260.0L475.4,269.2L478.1,289.6L477.3,322.1L471.6,320.1L466.4,316.1L465.4,317.7L460.8,316.6L457.3,318.4L455.9,317.4L452.7,318.3L449.8,321.2L445.6,318.2L442.4,318.2L441.4,316.1L437.6,320.3L436.4,317.9L434.7,318.6L430.0,315.7L427.4,318.1L426.3,315.6L424.2,315.3L422.9,313.3L420.1,312.5L418.3,314.2L417.0,312.7L407.9,311.5L406.9,307.9L400.4,308.3L396.0,305.0L396.0,269.2L351.7,269.2L351.7,260.0L394.7,260.0Z"/>
+					<path id="oregon" d="M53.7,90.6L58.3,92.4L60.4,100.1L68.0,102.2L74.4,99.2L78.5,98.9L83.1,99.9L83.6,101.1L91.7,98.5L98.0,98.9L116.0,93.9L146.5,94.0L148.5,97.1L152.0,98.4L153.2,100.9L147.6,111.9L147.8,113.6L144.8,116.9L141.8,123.5L142.8,126.0L146.9,127.8L144.9,133.9L144.9,167.7L39.0,167.7L36.9,165.6L36.0,155.4L34.0,152.2L39.6,134.3L42.4,109.6L42.2,94.9L42.9,91.7L48.8,89.0L51.4,91.1L53.7,90.6Z"/>
+					<path id="pennsylvania" d="M694.4,163.0L694.4,167.7L759.3,167.7L763.8,172.2L763.5,175.0L769.0,179.5L762.6,186.7L763.8,188.6L761.5,191.8L761.7,194.0L763.6,194.6L763.7,196.9L767.9,200.6L762.4,206.7L758.5,208.2L755.5,207.7L753.0,209.7L683.2,209.7L683.2,168.1L694.4,163.0Z"/>
+					<path id="rhode-island" d="M820.6,173.6L821.8,177.0L818.9,177.4L820.6,173.6Z M815.7,167.4L817.9,167.4L818.7,171.7L820.2,173.0L818.5,172.7L816.4,179.3L810.9,180.2L811.8,178.5L811.8,167.6L815.7,167.4Z"/>
+					<path id="south-carolina" d="M650.1,295.7L657.3,293.3L675.5,294.2L675.5,296.1L677.1,295.0L679.3,298.1L679.1,300.2L695.6,300.5L712.4,318.1L706.5,322.1L700.3,333.7L697.0,333.7L696.3,335.9L681.1,347.8L677.8,351.7L674.4,350.1L674.3,347.0L672.0,342.0L670.0,340.7L668.8,333.7L664.9,330.9L662.3,327.4L662.5,325.3L653.2,316.4L648.1,306.4L646.5,306.7L641.6,302.8L645.0,296.9L650.1,295.7Z"/>
+					<path id="south-dakota" d="M336.3,94.9L446.7,95.1L446.4,97.2L442.3,101.1L448.3,106.8L448.3,140.0L446.4,140.4L446.7,145.1L448.5,147.0L445.6,154.6L448.4,158.7L445.7,158.2L444.7,155.5L437.0,152.1L427.9,151.7L426.2,153.5L418.1,149.3L336.2,149.2L336.3,94.9Z"/>
+					<path id="tennessee" d="M572.1,269.3L571.9,266.0L666.1,267.6L665.4,271.9L662.7,272.8L660.8,276.3L658.2,275.6L652.4,279.1L652.0,277.3L646.7,282.6L639.3,286.5L635.2,286.6L631.6,289.3L630.5,292.4L627.6,292.8L627.2,297.1L538.8,297.0L540.3,296.5L541.7,293.3L541.5,288.8L544.2,285.8L544.7,282.9L546.9,281.9L547.4,278.5L550.3,273.8L550.2,269.3L572.1,269.3Z"/>
+					<path id="texas" d="M369.2,269.2L396.0,269.2L396.0,305.0L400.4,308.3L406.9,307.9L407.9,311.5L417.0,312.7L418.3,314.2L420.1,312.5L422.9,313.3L424.2,315.3L426.3,315.6L427.4,318.1L430.0,315.7L434.7,318.6L436.4,317.9L437.6,320.3L441.4,316.1L442.4,318.2L445.6,318.2L449.8,321.2L452.7,318.3L455.9,317.4L457.3,318.4L460.8,316.6L465.4,317.7L466.4,316.1L478.8,323.8L483.8,323.7L483.8,352.4L487.1,356.5L487.1,360.5L491.2,368.0L491.4,371.9L488.4,378.6L488.9,381.1L487.9,383.0L489.0,386.6L485.5,393.2L486.8,395.0L476.7,397.6L474.0,396.2L473.5,393.2L471.6,395.3L470.2,394.8L469.5,397.4L471.0,398.5L471.2,402.0L464.0,410.1L455.2,415.0L447.9,415.1L446.2,412.8L445.2,413.3L449.0,418.0L446.2,419.6L443.5,418.6L443.1,422.0L439.8,425.4L434.2,438.5L432.6,438.0L432.2,440.4L433.9,439.8L431.9,447.6L433.3,449.1L433.7,454.6L435.3,456.6L437.0,463.2L432.5,465.2L430.6,462.7L422.5,462.0L408.2,453.1L406.8,447.6L404.1,444.2L403.6,435.7L397.7,429.9L396.9,426.5L391.6,421.0L386.0,405.8L380.3,399.2L377.4,397.8L375.1,393.8L361.5,391.6L360.8,393.6L357.2,394.2L354.5,398.0L352.9,404.2L350.0,407.9L347.6,408.0L334.8,400.6L329.5,395.9L323.8,378.7L316.4,373.4L308.2,364.0L304.5,362.1L301.9,357.3L298.0,354.1L298.4,352.3L350.8,352.3L351.2,269.2L369.2,269.2Z"/>
+					<path id="utah" d="M216.6,167.8L233.1,167.7L233.1,186.2L262.6,186.2L262.6,260.0L188.8,260.0L188.9,167.8L216.6,167.8Z"/>
+					<path id="vermont" d="M816.1,112.1L816.3,113.9L814.3,116.9L815.6,120.0L813.2,123.1L808.3,124.8L808.4,129.4L803.2,138.7L802.2,149.1L800.9,150.1L800.8,152.8L802.1,154.2L790.1,153.9L790.4,139.6L788.1,136.5L788.9,135.0L787.6,130.0L789.7,122.7L788.3,119.3L789.0,112.1L816.1,112.1Z"/>
+					<path id="virginia" d="M758.7,241.3L761.0,241.0L757.0,245.2L752.7,256.4L750.2,257.8L749.4,255.2L750.7,249.6L754.7,242.4L758.7,241.3Z M715.2,214.5L722.9,220.7L724.5,217.1L726.7,217.4L728.3,218.9L728.3,221.7L733.4,224.3L734.5,226.9L730.3,233.3L730.9,235.2L734.9,234.6L735.6,237.5L740.8,238.8L746.4,243.6L744.5,248.8L746.2,252.8L744.2,254.7L743.9,257.1L745.8,258.5L743.8,260.7L740.7,257.8L740.0,258.8L742.6,260.9L749.9,261.4L751.8,268.3L636.7,267.4L644.6,264.7L645.6,262.7L648.4,262.0L650.7,257.8L661.8,250.1L661.6,251.6L663.6,254.7L666.1,256.3L670.8,253.7L672.8,255.6L676.6,254.6L686.4,250.6L686.5,247.3L694.9,234.8L696.0,230.6L701.0,233.9L705.7,225.8L707.5,227.4L714.4,220.0L715.2,214.5Z"/>
+					<path id="washington" d="M144.8,38.5L144.5,87.5L146.4,90.7L146.5,94.0L116.0,93.9L98.0,98.9L91.7,98.5L83.6,101.1L83.1,99.9L78.5,98.9L68.0,102.2L60.4,100.1L58.3,92.4L55.1,90.4L51.4,91.1L48.8,89.0L46.2,88.3L44.0,89.4L41.1,87.8L41.7,85.3L43.6,84.0L40.7,80.1L35.8,61.7L32.9,59.0L31.7,53.5L33.3,49.9L42.4,53.9L54.5,53.8L56.3,55.4L59.8,55.3L62.2,59.4L64.0,59.1L65.4,69.5L66.8,69.0L65.4,64.7L65.8,60.6L68.2,56.4L66.3,54.6L64.4,43.0L59.9,40.5L60.4,38.5L144.8,38.5Z M61.0,51.2L62.9,50.4L62.6,54.1L60.3,52.7L61.0,51.2Z M56.5,46.1L58.1,43.7L60.3,46.6L59.6,49.2L56.2,48.5L56.5,46.1Z"/>
+					<path id="west-virginia" d="M683.2,192.9L683.2,209.7L698.6,209.7L698.4,219.2L704.2,214.4L706.1,215.0L709.0,212.3L713.4,213.6L714.0,211.6L717.8,210.2L722.8,212.0L724.5,217.1L722.9,220.7L715.2,214.5L714.4,220.0L707.5,227.4L705.7,225.8L701.0,233.9L696.0,230.6L694.9,234.8L686.5,247.3L686.4,250.6L676.6,254.6L672.8,255.6L670.8,253.7L666.1,256.3L663.6,254.7L661.6,251.6L661.8,250.1L657.0,247.7L654.0,242.8L652.2,239.3L652.6,233.7L656.5,233.3L657.0,230.9L658.8,229.9L658.1,227.0L660.8,222.6L663.0,225.4L664.6,223.7L664.2,221.6L666.0,218.0L667.7,218.1L669.4,215.5L671.0,216.7L672.9,215.9L678.6,209.9L682.0,198.7L681.0,193.9L683.2,192.9Z"/>
+					<path id="wisconsin" d="M537.3,83.4L540.0,84.5L541.6,87.6L571.4,95.3L576.1,99.8L574.6,105.6L578.1,106.0L576.7,108.6L579.0,110.6L578.4,112.8L575.6,113.2L572.3,120.4L573.9,120.9L578.6,115.3L581.7,113.9L584.1,109.2L587.2,108.2L587.0,110.7L580.7,120.6L579.7,127.8L578.1,128.9L576.8,133.0L577.3,136.5L574.2,144.6L576.4,153.2L575.8,158.6L534.0,158.3L532.9,156.0L527.7,153.8L526.1,146.7L527.8,144.5L525.7,142.7L525.1,134.9L522.3,130.9L515.7,127.0L515.0,124.6L508.9,120.6L505.9,120.3L502.0,116.9L502.7,107.0L504.4,104.2L500.9,101.7L501.1,99.0L504.5,95.1L509.6,92.5L509.6,81.5L512.6,80.0L517.0,81.0L531.1,76.2L532.4,77.5L530.3,79.9L537.3,83.4Z"/>
+					<path id="wyoming" d="M262.1,112.3L336.1,112.4L336.2,186.1L233.1,186.2L233.0,112.3L262.1,112.3Z"/>
+				</svg>
+			</div>
+			<div class="map-tooltip" id="map-tooltip"></div>
+			<div class="zoom-controls">
+				<button class="zoom-btn" id="zoom-in" title="Zoom in">+</button>
+				<button class="zoom-btn" id="zoom-out" title="Zoom out">&minus;</button>
+				<button class="zoom-btn" id="zoom-reset" title="Reset zoom">&#8634;</button>
+			</div>
+		</div>
+
+		<div class="quiz-panel" id="quiz-panel">
+			<div id="quiz-content"></div>
+			<div class="legend" id="legend"></div>
+		</div>
+	</div>
+
+	<script src="assets/shared-nav.js"></script>
+	<script>
+	'use strict';
+
+	const REGIONS = [
+		{ id:'alabama', name:'Alabama', capital:'Montgomery', group:'se', fact:'Known as the Heart of Dixie. Rosa Parks\' refusal to give up her bus seat here sparked the Civil Rights Movement.' },
+		{ id:'alaska', name:'Alaska', capital:'Juneau', group:'w', fact:'The largest US state by area. You could fit Texas into Alaska over twice. Purchased from Russia in 1867 for $7.2 million.' },
+		{ id:'arizona', name:'Arizona', capital:'Phoenix', group:'sw', fact:'Home to the Grand Canyon, one of the Seven Natural Wonders of the World, carved over 6 million years.' },
+		{ id:'arkansas', name:'Arkansas', capital:'Little Rock', group:'se', fact:'The only US state where diamonds are naturally found. Crater of Diamonds State Park lets visitors keep what they find.' },
+		{ id:'california', name:'California', capital:'Sacramento', group:'w', fact:'If California were a country, its economy would be the 5th largest in the world. Home to Silicon Valley and Hollywood.' },
+		{ id:'colorado', name:'Colorado', capital:'Denver', group:'sw', fact:'Has the highest average elevation of any US state. Denver is called the Mile High City at exactly 5,280 feet.' },
+		{ id:'connecticut', name:'Connecticut', capital:'Hartford', group:'ne', fact:'Home to the first hamburger, Frisbee, and helicopter. Yale University was founded here in 1701.' },
+		{ id:'delaware', name:'Delaware', capital:'Dover', group:'ne', fact:'The first state to ratify the US Constitution (1787). Despite being the 2nd smallest state, it\'s home to most Fortune 500 companies.' },
+		{ id:'florida', name:'Florida', capital:'Tallahassee', group:'se', fact:'Known as the Sunshine State. St. Augustine (founded 1565) is the oldest continuously occupied European settlement in the US.' },
+		{ id:'georgia', name:'Georgia', capital:'Atlanta', group:'se', fact:'The Peach State produces more pecans than peaches. Martin Luther King Jr. was born in Atlanta in 1929.' },
+		{ id:'hawaii', name:'Hawaii', capital:'Honolulu', group:'w', fact:'The only US state made entirely of islands and the only one in Oceania. Mauna Kea is taller than Everest from base to peak.' },
+		{ id:'idaho', name:'Idaho', capital:'Boise', group:'w', fact:'Produces about one-third of all potatoes grown in the United States. Hells Canyon is deeper than the Grand Canyon.' },
+		{ id:'illinois', name:'Illinois', capital:'Springfield', group:'mw', fact:'Chicago\'s Willis Tower was the world\'s tallest building for 25 years. Abraham Lincoln began his political career here.' },
+		{ id:'indiana', name:'Indiana', capital:'Indianapolis', group:'mw', fact:'Home to the Indianapolis 500, the world\'s largest single-day sporting event, held annually since 1911.' },
+		{ id:'iowa', name:'Iowa', capital:'Des Moines', group:'mw', fact:'Produces more corn and pork than any other state. The Iowa caucuses traditionally begin the presidential nomination process.' },
+		{ id:'kansas', name:'Kansas', capital:'Topeka', group:'mw', fact:'The geographic center of the contiguous 48 states is near Lebanon, Kansas. Dodge City is one of the windiest cities in the US.' },
+		{ id:'kentucky', name:'Kentucky', capital:'Frankfort', group:'se', fact:'Home to Fort Knox, which holds over 4,580 tons of gold bullion. The Kentucky Derby has run annually since 1875.' },
+		{ id:'louisiana', name:'Louisiana', capital:'Baton Rouge', group:'se', fact:'New Orleans hosts the famous Mardi Gras. Louisiana is the only state with parishes instead of counties.' },
+		{ id:'maine', name:'Maine', capital:'Augusta', group:'ne', fact:'Easternmost state in the US. Produces 90% of the nation\'s lobster supply.' },
+		{ id:'maryland', name:'Maryland', capital:'Annapolis', group:'ne', fact:'The US National Anthem was written here during the Battle of Baltimore in 1814. Home to the Chesapeake Bay.' },
+		{ id:'massachusetts', name:'Massachusetts', capital:'Boston', group:'ne', fact:'The Pilgrims landed at Plymouth Rock in 1620. Harvard (1636) is the oldest university in the US.' },
+		{ id:'michigan', name:'Michigan', capital:'Lansing', group:'mw', fact:'Surrounded by the Great Lakes, Michigan has more freshwater coastline than any other state. Detroit is the Motor City.' },
+		{ id:'minnesota', name:'Minnesota', capital:'Saint Paul', group:'mw', fact:'Known as the Land of 10,000 Lakes (it actually has 11,842). The Mall of America is the largest mall in the US.' },
+		{ id:'mississippi', name:'Mississippi', capital:'Jackson', group:'se', fact:'Named after the Mississippi River, the largest river system in North America. Blues music originated in the Delta region.' },
+		{ id:'missouri', name:'Missouri', capital:'Jefferson City', group:'mw', fact:'The Gateway Arch in St. Louis is the tallest man-made monument in the US at 630 feet.' },
+		{ id:'montana', name:'Montana', capital:'Helena', group:'w', fact:'Known as Big Sky Country. Glacier National Park contains 25 active glaciers and over 700 miles of hiking trails.' },
+		{ id:'nebraska', name:'Nebraska', capital:'Lincoln', group:'mw', fact:'Home to the world\'s largest indoor rainforest (Lied Jungle) and Chimney Rock, a landmark on the Oregon Trail.' },
+		{ id:'nevada', name:'Nevada', capital:'Carson City', group:'w', fact:'Las Vegas is the entertainment capital of the world. Nevada is the driest state, receiving only about 7 inches of rain per year.' },
+		{ id:'new-hampshire', name:'New Hampshire', capital:'Concord', group:'ne', fact:'The first state to declare independence from Britain (1776). Its motto \"Live Free or Die\" is on every license plate.' },
+		{ id:'new-jersey', name:'New Jersey', capital:'Trenton', group:'ne', fact:'The most densely populated state. Thomas Edison\'s laboratory in Menlo Park produced the phonograph and light bulb.' },
+		{ id:'new-mexico', name:'New Mexico', capital:'Santa Fe', group:'sw', fact:'Santa Fe is the oldest state capital (founded 1610). The first atomic bomb was tested at Trinity Site in 1945.' },
+		{ id:'new-york', name:'New York', capital:'Albany', group:'ne', fact:'The Statue of Liberty was a gift from France in 1886. New York City is the most populous city in the US.' },
+		{ id:'north-carolina', name:'North Carolina', capital:'Raleigh', group:'se', fact:'The Wright Brothers made the first powered flight at Kitty Hawk in 1903. Home to the Blue Ridge Mountains.' },
+		{ id:'north-dakota', name:'North Dakota', capital:'Bismarck', group:'mw', fact:'Produces more sunflowers than any other state. The geographic center of North America is near Rugby, ND.' },
+		{ id:'ohio', name:'Ohio', capital:'Columbus', group:'mw', fact:'The birthplace of aviation (Wright Brothers) and 7 US Presidents. The Rock and Roll Hall of Fame is in Cleveland.' },
+		{ id:'oklahoma', name:'Oklahoma', capital:'Oklahoma City', group:'sw', fact:'Has more man-made lakes than any other state (over 200). The state capitol building has a working oil well beneath it.' },
+		{ id:'oregon', name:'Oregon', capital:'Salem', group:'w', fact:'Crater Lake is the deepest lake in the US at 1,943 feet. Oregon has no sales tax.' },
+		{ id:'pennsylvania', name:'Pennsylvania', capital:'Harrisburg', group:'ne', fact:'The Declaration of Independence and Constitution were both signed in Philadelphia. Home to Hershey, the Chocolate Capital.' },
+		{ id:'rhode-island', name:'Rhode Island', capital:'Providence', group:'ne', fact:'The smallest US state by area. Despite its name, it\'s not an island. Founded on principles of religious freedom.' },
+		{ id:'south-carolina', name:'South Carolina', capital:'Columbia', group:'se', fact:'The first state to secede from the Union. Charleston is one of America\'s oldest and most beautiful cities.' },
+		{ id:'south-dakota', name:'South Dakota', capital:'Pierre', group:'mw', fact:'Mount Rushmore features the 60-foot carved faces of four US Presidents. The Crazy Horse Memorial is still being carved.' },
+		{ id:'tennessee', name:'Tennessee', capital:'Nashville', group:'se', fact:'Nashville is the Country Music Capital of the World. Memphis is home to Graceland, Elvis Presley\'s estate.' },
+		{ id:'texas', name:'Texas', capital:'Austin', group:'sw', fact:'The second largest state by both area and population. Texas was an independent republic for 9 years before joining the US.' },
+		{ id:'utah', name:'Utah', capital:'Salt Lake City', group:'w', fact:'Has five national parks (the Mighty Five) and the Great Salt Lake, the largest saltwater lake in the Western Hemisphere.' },
+		{ id:'vermont', name:'Vermont', capital:'Montpelier', group:'ne', fact:'The top producer of maple syrup in the US. Montpelier is the smallest state capital by population.' },
+		{ id:'virginia', name:'Virginia', capital:'Richmond', group:'se', fact:'Eight US Presidents were born in Virginia, more than any other state. Jamestown (1607) was the first permanent English settlement.' },
+		{ id:'washington', name:'Washington', capital:'Olympia', group:'w', fact:'Named after George Washington, the only state named after a president. Home to Mount Rainier and tech giants Microsoft and Amazon.' },
+		{ id:'west-virginia', name:'West Virginia', capital:'Charleston', group:'se', fact:'Split from Virginia during the Civil War in 1863. Known as the Mountain State, it\'s the only state entirely within Appalachia.' },
+		{ id:'wisconsin', name:'Wisconsin', capital:'Madison', group:'mw', fact:'America\'s Dairyland produces more cheese than any other state. The first ice cream sundae was created in Two Rivers in 1881.' },
+		{ id:'wyoming', name:'Wyoming', capital:'Cheyenne', group:'w', fact:'The least populous US state. Yellowstone (1872) was the world\'s first national park.' },
+	];
+
+	const GROUPS = {
+		ne:  { label: 'Northeast', color: 'var(--rg-ne)' },
+		se:  { label: 'Southeast', color: 'var(--rg-se)' },
+		mw:  { label: 'Midwest',   color: 'var(--rg-mw)' },
+		sw:  { label: 'Southwest', color: 'var(--rg-sw)' },
+		w:   { label: 'West',      color: 'var(--rg-w)' },
+	};
+
+	const App = {
+		mode: 'learn',
+		current: null,
+		answered: false,
+		score: 0,
+		total: 0,
+		streak: 0,
+		speedScore: 0,
+		speedTimer: null,
+		speedTimeLeft: 60,
+		used: new Set(),
+		prefs: { theme:'dark', mode:'learn', bestStreak:0, speedBest:0, findCorrect:0, findTotal:0, nameCorrect:0, nameTotal:0, learned:[] },
+
+		init() {
+			this.loadPrefs();
+			this.buildLegend();
+			this.bindEvents();
+			const savedMode = this.prefs.mode || 'learn';
+			document.getElementById('mode-select').value = savedMode;
+			this.setMode(savedMode);
+			this.updateThemeBtn();
+			if (this.prefs.theme === 'light') document.body.classList.add('light-theme');
+		},
+
+		loadPrefs() {
+			try {
+				const s = localStorage.getItem('geoQuizUS');
+				if (s) Object.assign(this.prefs, JSON.parse(s));
+			} catch {}
+		},
+
+		savePrefs() {
+			try { localStorage.setItem('geoQuizUS', JSON.stringify(this.prefs)); } catch {}
+		},
+
+		bindEvents() {
+			document.getElementById('mode-select').addEventListener('change', (e) => this.setMode(e.target.value));
+			document.getElementById('theme-btn').addEventListener('click', () => this.toggleTheme());
+
+			const svg = document.getElementById('quiz-map');
+			svg.addEventListener('mousemove', (e) => this.handleMapHover(e));
+			svg.addEventListener('mouseleave', () => this.hideTooltip());
+			svg.addEventListener('click', (e) => this.handleMapClick(e));
+
+			// Zoom: change SVG CSS width. Pan: native browser scroll on .map-panel.
+			const mapPanel = document.getElementById('map-panel');
+			let zoomLevel = 100;
+
+			const applyZoom = () => {
+				svg.style.width = zoomLevel + '%';
+				svg.style.minWidth = zoomLevel <= 100 ? '300px' : (zoomLevel * 3) + 'px';
+			};
+
+			document.getElementById('zoom-in').addEventListener('click', () => {
+				zoomLevel = Math.min(zoomLevel + 50, 400);
+				applyZoom();
+			});
+			document.getElementById('zoom-out').addEventListener('click', () => {
+				zoomLevel = Math.max(zoomLevel - 50, 100);
+				applyZoom();
+				if (zoomLevel <= 100) mapPanel.scrollTo(0, 0);
+			});
+			document.getElementById('zoom-reset').addEventListener('click', () => {
+				zoomLevel = 100;
+				applyZoom();
+				mapPanel.scrollTo(0, 0);
+			});
+
+			svg.addEventListener('wheel', (e) => {
+				e.preventDefault();
+				zoomLevel = e.deltaY > 0
+					? Math.max(zoomLevel - 20, 100)
+					: Math.min(zoomLevel + 20, 400);
+				applyZoom();
+				if (zoomLevel <= 100) mapPanel.scrollTo(0, 0);
+			}, { passive: false });
+		},
+
+		toggleTheme() {
+			this.prefs.theme = this.prefs.theme === 'dark' ? 'light' : 'dark';
+			document.body.classList.toggle('light-theme', this.prefs.theme === 'light');
+			this.updateThemeBtn();
+			this.savePrefs();
+		},
+
+		updateThemeBtn() {
+			document.getElementById('theme-btn').innerHTML = this.prefs.theme === 'dark' ? '&#9790;' : '&#9788;';
+		},
+
+		setMode(mode) {
+			this.mode = mode;
+			this.prefs.mode = mode;
+			this.savePrefs();
+			this.score = 0;
+			this.total = 0;
+			this.streak = 0;
+			this.used.clear();
+			this.clearMapStates();
+			this.stopSpeed();
+
+			if (mode === 'learn') this.showLearn();
+			else if (mode === 'find') this.showFindStart();
+			else if (mode === 'name') this.showNameStart();
+			else if (mode === 'speed') this.showSpeedStart();
+
+			this.updateStats();
+			if (mode === 'learn') this.colorByGroup();
+		},
+
+		clearMapStates() {
+			document.querySelectorAll('#quiz-map path').forEach(p => {
+				p.classList.remove('highlighted', 'correct', 'wrong', 'learned', 'dimmed', 'group-colored');
+				p.style.fill = '';
+			});
+		},
+
+		colorByGroup() {
+			document.querySelectorAll('#quiz-map path').forEach(el => {
+				const r = REGIONS.find(r => r.id === el.id);
+				if (r && GROUPS[r.group]) {
+					el.style.fill = GROUPS[r.group].color;
+					el.classList.add('group-colored');
+					if (this.prefs.learned.includes(r.id)) {
+						el.style.opacity = '1';
+					} else {
+						el.style.opacity = '0.55';
+					}
+				}
+			});
+		},
+
+		buildLegend() {
+			const legend = document.getElementById('legend');
+			legend.innerHTML = '';
+			for (const [key, g] of Object.entries(GROUPS)) {
+				const item = document.createElement('div');
+				item.className = 'legend-item';
+				item.innerHTML = `<span class="legend-swatch" style="background:${g.color}"></span>${g.label}`;
+				legend.appendChild(item);
+			}
+		},
+
+		// --- TOOLTIP ---
+		handleMapHover(e) {
+			if (this.mode !== 'learn') { this.hideTooltip(); return; }
+			if (e.target.tagName !== 'path') { this.hideTooltip(); return; }
+			const r = REGIONS.find(r => r.id === e.target.id);
+			if (!r) { this.hideTooltip(); return; }
+
+			const tip = document.getElementById('map-tooltip');
+			tip.textContent = r.name;
+			tip.classList.add('visible');
+
+			const panel = document.getElementById('map-panel');
+			const rect = panel.getBoundingClientRect();
+			tip.style.left = (e.clientX - rect.left + 12) + 'px';
+			tip.style.top = (e.clientY - rect.top - 10) + 'px';
+		},
+
+		hideTooltip() {
+			document.getElementById('map-tooltip').classList.remove('visible');
+		},
+
+		// --- MAP CLICK ---
+		handleMapClick(e) {
+			if (e.target.tagName !== 'path') return;
+			const r = REGIONS.find(r => r.id === e.target.id);
+			if (!r) return;
+
+			if (this.mode === 'learn') this.learnClick(r);
+			else if (this.mode === 'find' && !this.answered) this.findClick(r);
+			else if (this.mode === 'speed' && this.speedTimer) this.speedClick(r);
+		},
+
+		// --- LEARN MODE ---
+		showLearn() {
+			const explored = this.prefs.learned.length;
+			const pct = Math.round((explored / REGIONS.length) * 100);
+			document.getElementById('quiz-content').innerHTML = `
+				<h2 style="font-size:1.2rem;color:var(--accent)">Learn Mode</h2>
+				<p class="quiz-instruction">Click any state on the map to learn about it.</p>
+				<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+				<p style="font-size:0.8rem;color:var(--text-muted)">${explored}/${REGIONS.length} explored (${pct}%)</p>
+				<div id="learn-info"></div>
+			`;
+		},
+
+		learnClick(r) {
+			if (!this.prefs.learned.includes(r.id)) {
+				this.prefs.learned.push(r.id);
+				this.savePrefs();
+			}
+
+			this.colorByGroup();
+
+			const el = document.getElementById(r.id);
+			if (el) { el.style.opacity = '1'; el.style.filter = 'brightness(1.3)'; setTimeout(() => el.style.filter = '', 300); }
+
+			const explored = this.prefs.learned.length;
+			const pct = Math.round((explored / REGIONS.length) * 100);
+
+			document.getElementById('learn-info').innerHTML = `
+				<div class="info-card" style="margin-top:0.75rem">
+					<h3>${r.name}</h3>
+					<div class="info-row"><span class="info-label">Capital</span><span class="info-value">${r.capital}</span></div>
+					<div class="info-row"><span class="info-label">Region</span><span class="info-value">${GROUPS[r.group].label}</span></div>
+					<div class="info-fact">${r.fact}</div>
+				</div>
+			`;
+
+			const bar = document.querySelector('.progress-fill');
+			if (bar) bar.style.width = pct + '%';
+			const counter = document.querySelector('.progress-bar + p');
+			if (counter) counter.textContent = `${explored}/${REGIONS.length} explored (${pct}%)`;
+		},
+
+		// --- FIND IT MODE ---
+		showFindStart() {
+			document.getElementById('quiz-content').innerHTML = `
+				<div class="start-screen">
+					<h2>Find It</h2>
+					<p>A state name will appear. Click it on the map!</p>
+					<button class="start-btn" onclick="App.nextFind()">Start</button>
+				</div>
+			`;
+		},
+
+		nextFind() {
+			this.answered = false;
+			this.clearMapStates();
+
+			if (this.used.size >= REGIONS.length) this.used.clear();
+			let r;
+			do { r = REGIONS[Math.floor(Math.random() * REGIONS.length)]; } while (this.used.has(r.id));
+			this.used.add(r.id);
+			this.current = r;
+
+			document.getElementById('quiz-content').innerHTML = `
+				<div class="quiz-question">Find: ${r.name}</div>
+				<p class="quiz-instruction">Click the correct state on the map</p>
+				<div class="quiz-feedback" id="quiz-feedback"></div>
+			`;
+		},
+
+		findClick(r) {
+			this.answered = true;
+			this.total++;
+			this.prefs.findTotal++;
+			const correct = r.id === this.current.id;
+
+			if (correct) {
+				this.score++;
+				this.streak++;
+				this.prefs.findCorrect++;
+				if (this.streak > this.prefs.bestStreak) this.prefs.bestStreak = this.streak;
+				document.getElementById(r.id).classList.add('correct');
+				document.getElementById('quiz-feedback').className = 'quiz-feedback success';
+				document.getElementById('quiz-feedback').textContent = this.streak > 1 ? `Correct! ${this.streak} streak` : 'Correct!';
+				this.showFloatingScore(r.id);
+			} else {
+				this.streak = 0;
+				document.getElementById(r.id).classList.add('wrong');
+				document.getElementById(this.current.id).classList.add('correct');
+				document.getElementById('quiz-feedback').className = 'quiz-feedback error';
+				document.getElementById('quiz-feedback').textContent = `That was ${r.name}. The answer was ${this.current.name}.`;
+			}
+
+			this.savePrefs();
+			this.updateStats();
+
+			setTimeout(() => {
+				const content = document.getElementById('quiz-content');
+				if (!content.querySelector('.quiz-next-btn')) {
+					const btn = document.createElement('button');
+					btn.className = 'quiz-next-btn';
+					btn.textContent = 'Next';
+					btn.onclick = () => this.nextFind();
+					content.appendChild(btn);
+				}
+			}, 300);
+		},
+
+		// --- NAME IT MODE ---
+		showNameStart() {
+			document.getElementById('quiz-content').innerHTML = `
+				<div class="start-screen">
+					<h2>Name It</h2>
+					<p>A state will be highlighted. Pick its name!</p>
+					<button class="start-btn" onclick="App.nextName()">Start</button>
+				</div>
+			`;
+		},
+
+		nextName() {
+			this.answered = false;
+			this.clearMapStates();
+
+			if (this.used.size >= REGIONS.length) this.used.clear();
+			let r;
+			do { r = REGIONS[Math.floor(Math.random() * REGIONS.length)]; } while (this.used.has(r.id));
+			this.used.add(r.id);
+			this.current = r;
+
+			document.getElementById(r.id).classList.add('highlighted');
+
+			const wrongs = this.pickWrong(r, 3);
+			const options = this.shuffle([r, ...wrongs]);
+
+			document.getElementById('quiz-content').innerHTML = `
+				<div class="quiz-question">Name this state</div>
+				<p class="quiz-instruction">The highlighted state on the map is...</p>
+				<div class="quiz-options" id="quiz-options">
+					${options.map(o => `<button class="quiz-option" data-id="${o.id}">${o.name}</button>`).join('')}
+				</div>
+				<div class="quiz-feedback" id="quiz-feedback"></div>
+			`;
+
+			document.querySelectorAll('.quiz-option').forEach(btn => {
+				btn.addEventListener('click', () => this.nameAnswer(btn));
+			});
+		},
+
+		nameAnswer(btn) {
+			if (this.answered) return;
+			this.answered = true;
+			this.total++;
+			this.prefs.nameTotal++;
+			const correct = btn.dataset.id === this.current.id;
+
+			document.querySelectorAll('.quiz-option').forEach(b => {
+				b.disabled = true;
+				if (b.dataset.id === this.current.id) b.classList.add('correct');
+			});
+
+			if (correct) {
+				this.score++;
+				this.streak++;
+				this.prefs.nameCorrect++;
+				if (this.streak > this.prefs.bestStreak) this.prefs.bestStreak = this.streak;
+				document.getElementById(this.current.id).classList.remove('highlighted');
+				document.getElementById(this.current.id).classList.add('correct');
+				document.getElementById('quiz-feedback').className = 'quiz-feedback success';
+				document.getElementById('quiz-feedback').textContent = this.streak > 1 ? `Correct! ${this.streak} streak` : 'Correct!';
+			} else {
+				this.streak = 0;
+				btn.classList.add('wrong');
+				document.getElementById(this.current.id).classList.remove('highlighted');
+				document.getElementById(this.current.id).classList.add('correct');
+				document.getElementById('quiz-feedback').className = 'quiz-feedback error';
+				document.getElementById('quiz-feedback').textContent = `The answer was ${this.current.name}`;
+			}
+
+			this.savePrefs();
+			this.updateStats();
+
+			setTimeout(() => {
+				const nextBtn = document.createElement('button');
+				nextBtn.className = 'quiz-next-btn';
+				nextBtn.textContent = 'Next';
+				nextBtn.onclick = () => this.nextName();
+				document.getElementById('quiz-content').appendChild(nextBtn);
+			}, 300);
+		},
+
+		// --- SPEED ROUND ---
+		showSpeedStart() {
+			document.getElementById('quiz-content').innerHTML = `
+				<div class="start-screen">
+					<h2>Speed Round</h2>
+					<p>60 seconds. Find as many states as you can!</p>
+					<p style="font-size:0.85rem;color:var(--text-muted)">Best: ${this.prefs.speedBest}</p>
+					<button class="start-btn" onclick="App.startSpeed()">Go!</button>
+				</div>
+			`;
+		},
+
+		startSpeed() {
+			this.speedScore = 0;
+			this.speedTimeLeft = 60;
+			this.used.clear();
+			this.clearMapStates();
+			this.nextSpeedQuestion();
+
+			this.speedTimer = setInterval(() => {
+				this.speedTimeLeft--;
+				this.updateSpeedDisplay();
+				if (this.speedTimeLeft <= 0) this.endSpeed();
+			}, 1000);
+		},
+
+		nextSpeedQuestion() {
+			if (this.used.size >= REGIONS.length) this.used.clear();
+			let r;
+			do { r = REGIONS[Math.floor(Math.random() * REGIONS.length)]; } while (this.used.has(r.id));
+			this.used.add(r.id);
+			this.current = r;
+			this.updateSpeedDisplay();
+		},
+
+		updateSpeedDisplay() {
+			const cls = this.speedTimeLeft <= 10 ? 'danger' : this.speedTimeLeft <= 20 ? 'warning' : '';
+			document.getElementById('quiz-content').innerHTML = `
+				<div class="timer-display ${cls}">${this.speedTimeLeft}s</div>
+				<div class="quiz-question" style="text-align:center;margin:1rem 0">Find: ${this.current.name}</div>
+				<div style="text-align:center;font-size:2rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--accent)">${this.speedScore}</div>
+				<p style="text-align:center;font-size:0.8rem;color:var(--text-muted)">correct answers</p>
+			`;
+		},
+
+		speedClick(r) {
+			if (r.id === this.current.id) {
+				this.speedScore++;
+				document.getElementById(r.id).classList.add('correct');
+				this.showFloatingScore(r.id);
+				setTimeout(() => {
+					document.getElementById(r.id).classList.remove('correct');
+				}, 400);
+				this.nextSpeedQuestion();
+			} else {
+				document.getElementById(r.id).classList.add('wrong');
+				setTimeout(() => document.getElementById(r.id).classList.remove('wrong'), 400);
+			}
+		},
+
+		endSpeed() {
+			this.stopSpeed();
+			if (this.speedScore > this.prefs.speedBest) {
+				this.prefs.speedBest = this.speedScore;
+				this.savePrefs();
+			}
+
+			document.getElementById('quiz-content').innerHTML = `
+				<div class="end-screen">
+					<h2>Time\'s Up!</h2>
+					<div class="end-stats">
+						<div class="end-stat"><div class="end-stat-value">${this.speedScore}</div><div class="end-stat-label">Score</div></div>
+						<div class="end-stat"><div class="end-stat-value">${this.prefs.speedBest}</div><div class="end-stat-label">Best</div></div>
+					</div>
+					${this.speedScore >= this.prefs.speedBest ? '<p style="color:var(--region-correct);font-weight:600;margin-bottom:1rem">New personal best!</p>' : ''}
+					<button class="start-btn" onclick="App.startSpeed()">Play Again</button>
+				</div>
+			`;
+		},
+
+		stopSpeed() {
+			if (this.speedTimer) { clearInterval(this.speedTimer); this.speedTimer = null; }
+		},
+
+		// --- UTILITIES ---
+		pickWrong(correct, count) {
+			const pool = REGIONS.filter(r => r.id !== correct.id);
+			const result = [];
+			while (result.length < count && pool.length > 0) {
+				const idx = Math.floor(Math.random() * pool.length);
+				result.push(pool.splice(idx, 1)[0]);
+			}
+			return result;
+		},
+
+		shuffle(arr) {
+			const a = [...arr];
+			for (let i = a.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[a[i], a[j]] = [a[j], a[i]];
+			}
+			return a;
+		},
+
+		showFloatingScore(regionId) {
+			const el = document.getElementById(regionId);
+			if (!el) return;
+			const rect = el.getBoundingClientRect();
+			const panel = document.getElementById('map-panel').getBoundingClientRect();
+			const float = document.createElement('div');
+			float.className = 'score-float';
+			float.textContent = '+1';
+			float.style.left = (rect.left - panel.left + rect.width / 2) + 'px';
+			float.style.top = (rect.top - panel.top) + 'px';
+			document.getElementById('map-panel').appendChild(float);
+			setTimeout(() => float.remove(), 800);
+		},
+
+		updateStats() {
+			document.getElementById('stat-score').textContent = this.score;
+			document.getElementById('stat-streak').textContent = this.streak;
+			document.getElementById('stat-best').textContent = this.prefs.bestStreak;
+			const acc = this.total > 0 ? Math.round((this.score / this.total) * 100) + '%' : '-';
+			document.getElementById('stat-accuracy').textContent = acc;
+		},
+	};
+
+	document.addEventListener('DOMContentLoaded', () => App.init());
+	</script>
+</body>
+</html>

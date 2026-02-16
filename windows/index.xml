@@ -23,7 +23,21 @@ Start-Service -Name &amp;#34;ServiceName&amp;#34;
 Stop-Service -Name &amp;#34;ServiceName&amp;#34;
 Restart-Service -Name &amp;#34;ServiceName&amp;#34;
 Get-Service -Name &amp;#34;ServiceName&amp;#34;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;logs&lt;/p&gt;</description></item><item><title>Windows11</title><link>https://rowstu.net/windows/windows11/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/windows/windows11/</guid><description>&lt;h1 id="windows-11-notes"&gt;Windows 11 notes&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;logs&lt;/p&gt;</description></item><item><title>Reset Passwords</title><link>https://rowstu.net/windows/reset_passwords/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/windows/reset_passwords/</guid><description>&lt;h3 id="using-usb-windows-boot-media"&gt;Using USB Windows boot media&lt;/h3&gt;
+&lt;p&gt;Boot USB to recover and choose command prompt, then:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;cd c:\windows\system32
+rename utilman.exe utilman.exe.orig
+copy cmd.exe utilman.exe
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The reboot and press Ease of Access button which will open the command prompt instead of accessibility.
+Then enter&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# net user &amp;lt;account name&amp;gt; &amp;lt;new password&amp;gt;
+net user user newpassword
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Once logged back in move utilman.exe back to system32.&lt;/p&gt;
+&lt;h3 id="kali"&gt;Kali&lt;/h3&gt;
+&lt;p&gt;Open a terminal window in /Windows/System32/Config&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# list users
+chntpw -l SAM
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Perform action on the account&lt;/p&gt;</description></item><item><title>Windows11</title><link>https://rowstu.net/windows/windows11/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/windows/windows11/</guid><description>&lt;h1 id="windows-11-notes"&gt;Windows 11 notes&lt;/h1&gt;
 &lt;p&gt;Bypass network requirement on setup. Press Shift+F10 to bring up the command prompt and enter:&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;oobe\bypassnro
 &lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>

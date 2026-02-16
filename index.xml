@@ -5697,7 +5697,21 @@ Switch# ping 192.168.99.1
 &lt;/pre&gt;
 &lt;hr&gt;
 &lt;h2 id="example-2-simplify-2--46"&gt;Example 2: Simplify 2 / 4√6&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;1. Simplify 2/4:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Resources</title><link>https://rowstu.net/osint/resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/osint/resources/</guid><description>&lt;h1 id="osint-recon-sites"&gt;OSINT Recon sites&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;1. Simplify 2/4:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Reset Passwords</title><link>https://rowstu.net/windows/reset_passwords/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/windows/reset_passwords/</guid><description>&lt;h3 id="using-usb-windows-boot-media"&gt;Using USB Windows boot media&lt;/h3&gt;
+&lt;p&gt;Boot USB to recover and choose command prompt, then:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;cd c:\windows\system32
+rename utilman.exe utilman.exe.orig
+copy cmd.exe utilman.exe
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The reboot and press Ease of Access button which will open the command prompt instead of accessibility.
+Then enter&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# net user &amp;lt;account name&amp;gt; &amp;lt;new password&amp;gt;
+net user user newpassword
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Once logged back in move utilman.exe back to system32.&lt;/p&gt;
+&lt;h3 id="kali"&gt;Kali&lt;/h3&gt;
+&lt;p&gt;Open a terminal window in /Windows/System32/Config&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# list users
+chntpw -l SAM
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Perform action on the account&lt;/p&gt;</description></item><item><title>Resources</title><link>https://rowstu.net/osint/resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/osint/resources/</guid><description>&lt;h1 id="osint-recon-sites"&gt;OSINT Recon sites&lt;/h1&gt;
 &lt;h3 id="resources"&gt;Resources&lt;/h3&gt;
 &lt;p&gt;inteltechniques.com
 Google Dorks Database: &lt;a href="https://www.exploit-db.com/google-hac"&gt;https://www.exploit-db.com/google-hac&lt;/a&gt;&amp;hellip;&lt;/p&gt;
