@@ -169,31 +169,22 @@
 		.map-panel {
 			flex: 3;
 			position: relative;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 1rem;
-			overflow: hidden;
+			padding: 0;
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
 		}
 
 		.map-container {
-			width: 100%;
-			max-width: 500px;
-			position: relative;
+			min-width: 100%;
+			display: flex;
+			justify-content: center;
 		}
 
 		#quiz-map {
 			width: 100%;
+			min-width: 300px;
 			height: auto;
-		}
-
-		.touch-overlay {
-			position: absolute;
-			inset: 0;
-			z-index: 2;
-			touch-action: none;
-			-webkit-user-select: none;
-			user-select: none;
+			transition: width 0.2s ease;
 		}
 
 		#quiz-map path {
@@ -574,7 +565,7 @@
 				border-left: none;
 				border-top: 1px solid var(--border);
 			}
-			.map-panel { min-height: 40vh; }
+			.map-panel { min-height: 40vh; max-height: 55vh; }
 			.app-title { font-size: 1.2rem; }
 			.app-header { padding: 0.75rem 1rem; }
 		}
@@ -681,7 +672,6 @@
 					<path id="south-glamorgan" d="M260.0,785.2L253.3,786.2L247.0,784.9L242.3,779.1L246.3,777.1L247.4,778.0L247.1,777.2L247.5,776.4L249.0,775.5L253.4,776.6L254.5,775.5L256.5,775.8L256.2,773.6L257.7,772.5L259.2,772.3L259.9,773.4L261.0,772.2L264.5,771.6L268.9,774.9L267.9,775.7L268.2,776.4L265.9,777.2L266.4,777.3L265.8,779.2L264.4,780.5L264.2,784.2L260.0,785.2Z"/>
 					<path id="gwent" d="M259.6,770.3L258.6,769.0L257.5,764.7L258.3,763.1L258.9,763.3L259.4,761.6L258.1,757.2L257.4,757.5L256.6,752.7L257.7,752.4L258.9,749.9L263.2,750.9L265.4,750.3L266.6,748.8L267.4,749.3L267.6,748.1L269.0,746.8L268.7,745.8L270.0,745.3L270.3,744.3L268.4,741.7L267.9,739.6L268.3,739.2L267.8,738.4L268.9,736.9L270.9,739.1L271.7,741.5L273.2,741.5L273.4,743.4L277.9,741.0L279.3,741.9L278.5,742.6L279.4,742.3L282.8,745.4L282.3,746.6L284.2,748.9L285.1,747.9L288.3,749.8L287.0,751.7L287.4,752.4L286.9,754.5L287.7,755.7L286.6,757.6L287.4,759.6L286.7,760.1L287.9,762.2L286.6,763.2L287.5,763.1L286.9,764.6L287.9,766.5L285.5,769.7L276.5,773.9L275.7,773.6L276.1,773.0L274.5,773.6L272.9,772.8L273.9,772.3L272.8,770.9L273.3,770.0L272.4,769.1L272.5,767.6L274.3,767.7L272.4,767.6L272.3,769.0L273.2,770.2L272.7,770.9L273.5,771.9L272.6,772.5L271.9,771.6L272.5,772.6L272.3,773.5L268.2,776.4L267.9,775.7L268.9,774.9L266.9,772.7L264.5,771.6L261.5,772.4L259.6,770.3Z"/>
 				</svg>
-			<div class="touch-overlay" id="touch-overlay"></div>
 			</div>
 			<div class="map-tooltip" id="map-tooltip"></div>
 			<div class="zoom-controls">
@@ -833,164 +823,39 @@
 			svg.addEventListener('mouseleave', () => this.hideTooltip());
 			svg.addEventListener('click', (e) => this.handleMapClick(e));
 
-			// On desktop, let mouse events pass through overlay to SVG
-			overlay.style.pointerEvents = 'ontouchstart' in window ? 'auto' : 'none';
+			// Zoom: change SVG CSS width. Pan: native browser scroll on .map-panel.
+			const mapPanel = document.getElementById('map-panel');
+			let zoomLevel = 100; // percentage
 
-			// ViewBox-based pan & zoom
-			// Uses a transparent HTML overlay div for touch gestures (most reliable on mobile)
-			// SVG handles mouse events directly on desktop
-			const baseVB = { x: 0, y: 0, w: 502, h: 920 };
-			let vb = { ...baseVB };
-
-			const applyViewBox = () => {
-				svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+			const applyZoom = () => {
+				svg.style.width = zoomLevel + '%';
+				svg.style.minWidth = zoomLevel <= 100 ? '300px' : (zoomLevel * 3) + 'px';
 			};
 
-			const clampViewBox = () => {
-				const minW = baseVB.w / 5, minH = baseVB.h / 5;
-				vb.w = Math.max(minW, Math.min(baseVB.w, vb.w));
-				vb.h = Math.max(minH, Math.min(baseVB.h, vb.h));
-				vb.x = Math.max(0, Math.min(baseVB.w - vb.w, vb.x));
-				vb.y = Math.max(0, Math.min(baseVB.h - vb.h, vb.y));
-			};
-
-			const screenToSvg = () => {
-				const rect = svg.getBoundingClientRect();
-				return { sx: vb.w / rect.width, sy: vb.h / rect.height };
-			};
-
-			// Touch gestures on the overlay div (HTML div, not SVG — most reliable on Android)
-			let touches = {};
-			let touchMoved = false;
-			let touchTime = 0;
-			let vbStart = { ...vb };
-			let startDist = 0, startMidX = 0, startMidY = 0;
-
-			overlay.addEventListener('touchstart', (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				touchMoved = false;
-				touchTime = Date.now();
-				vbStart = { ...vb };
-				for (const t of e.changedTouches) {
-					touches[t.identifier] = { x: t.clientX, y: t.clientY };
-				}
-				const ids = Object.keys(touches);
-				if (ids.length >= 2) {
-					const a = touches[ids[0]], b = touches[ids[1]];
-					startDist = Math.hypot(a.x - b.x, a.y - b.y);
-					startMidX = (a.x + b.x) / 2;
-					startMidY = (a.y + b.y) / 2;
-				} else if (ids.length === 1) {
-					const t = touches[ids[0]];
-					startMidX = t.x;
-					startMidY = t.y;
-				}
-			}, { passive: false });
-
-			overlay.addEventListener('touchmove', (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				for (const t of e.changedTouches) {
-					touches[t.identifier] = { x: t.clientX, y: t.clientY };
-				}
-				const ids = Object.keys(touches);
-				const s = screenToSvg();
-
-				if (ids.length >= 2) {
-					touchMoved = true;
-					const a = touches[ids[0]], b = touches[ids[1]];
-					const dist = Math.hypot(a.x - b.x, a.y - b.y);
-					const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
-					const ratio = startDist / dist;
-					vb.w = vbStart.w * ratio;
-					vb.h = vbStart.h * ratio;
-					vb.x = vbStart.x - (midX - startMidX) * s.sx;
-					vb.y = vbStart.y - (midY - startMidY) * s.sy;
-					clampViewBox();
-					applyViewBox();
-				} else if (ids.length === 1) {
-					const t = touches[ids[0]];
-					const dx = (t.x - startMidX) * s.sx;
-					const dy = (t.y - startMidY) * s.sy;
-					if (Math.abs(dx) > 2 || Math.abs(dy) > 2) touchMoved = true;
-					vb.x = vbStart.x - dx;
-					vb.y = vbStart.y - dy;
-					clampViewBox();
-					applyViewBox();
-				}
-			}, { passive: false });
-
-			const onTouchEnd = (e) => {
-				e.preventDefault();
-				for (const t of e.changedTouches) {
-					delete touches[t.identifier];
-				}
-				const remaining = Object.keys(touches).length;
-				// Tap detection: no movement, quick, no remaining fingers
-				if (remaining === 0 && !touchMoved && (Date.now() - touchTime) < 300) {
-					const t = e.changedTouches[0];
-					// Temporarily hide overlay so elementFromPoint hits the SVG path
-					overlay.style.display = 'none';
-					const target = document.elementFromPoint(t.clientX, t.clientY);
-					overlay.style.display = '';
-					if (target && target.tagName === 'path') {
-						this.handleMapClick({ target });
-					}
-				}
-				// Reset for remaining fingers
-				if (remaining > 0) {
-					vbStart = { ...vb };
-					const ids = Object.keys(touches);
-					if (ids.length >= 2) {
-						const a = touches[ids[0]], b = touches[ids[1]];
-						startDist = Math.hypot(a.x - b.x, a.y - b.y);
-						startMidX = (a.x + b.x) / 2;
-						startMidY = (a.y + b.y) / 2;
-					} else if (ids.length === 1) {
-						startMidX = touches[ids[0]].x;
-						startMidY = touches[ids[0]].y;
-					}
-				}
-			};
-			overlay.addEventListener('touchend', onTouchEnd, { passive: false });
-			overlay.addEventListener('touchcancel', onTouchEnd, { passive: false });
-
-			// Mouse wheel zoom (desktop — on SVG directly)
-			svg.addEventListener('wheel', (e) => {
-				e.preventDefault();
-				const s = screenToSvg();
-				const rect = svg.getBoundingClientRect();
-				const mx = (e.clientX - rect.left) * s.sx + vb.x;
-				const my = (e.clientY - rect.top) * s.sy + vb.y;
-				const factor = e.deltaY > 0 ? 1.15 : 0.85;
-				vb.w *= factor;
-				vb.h *= factor;
-				vb.x = mx - (mx - vb.x) * factor;
-				vb.y = my - (my - vb.y) * factor;
-				clampViewBox();
-				applyViewBox();
-			}, { passive: false });
-
-			// Button zoom
 			document.getElementById('zoom-in').addEventListener('click', () => {
-				const cx = vb.x + vb.w / 2, cy = vb.y + vb.h / 2;
-				vb.w *= 0.7; vb.h *= 0.7;
-				vb.x = cx - vb.w / 2; vb.y = cy - vb.h / 2;
-				clampViewBox();
-				applyViewBox();
+				zoomLevel = Math.min(zoomLevel + 50, 400);
+				applyZoom();
 			});
 			document.getElementById('zoom-out').addEventListener('click', () => {
-				const cx = vb.x + vb.w / 2, cy = vb.y + vb.h / 2;
-				vb.w *= 1.4; vb.h *= 1.4;
-				vb.x = cx - vb.w / 2; vb.y = cy - vb.h / 2;
-				clampViewBox();
-				applyViewBox();
+				zoomLevel = Math.max(zoomLevel - 50, 100);
+				applyZoom();
+				if (zoomLevel <= 100) mapPanel.scrollTo(0, 0);
 			});
 			document.getElementById('zoom-reset').addEventListener('click', () => {
-				vb = { ...baseVB };
-				applyViewBox();
+				zoomLevel = 100;
+				applyZoom();
+				mapPanel.scrollTo(0, 0);
 			});
+
+			// Mouse wheel zoom on desktop
+			svg.addEventListener('wheel', (e) => {
+				e.preventDefault();
+				zoomLevel = e.deltaY > 0
+					? Math.max(zoomLevel - 20, 100)
+					: Math.min(zoomLevel + 20, 400);
+				applyZoom();
+				if (zoomLevel <= 100) mapPanel.scrollTo(0, 0);
+			}, { passive: false });
 		},
 
 		toggleTheme() {
