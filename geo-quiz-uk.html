@@ -180,14 +180,14 @@
 			width: 100%;
 			max-width: 500px;
 			position: relative;
-			touch-action: none;
-			-webkit-user-select: none;
-			user-select: none;
 		}
 
 		#quiz-map {
 			width: 100%;
 			height: auto;
+			touch-action: none;
+			-webkit-user-select: none;
+			user-select: none;
 		}
 
 		#quiz-map path {
@@ -825,10 +825,16 @@
 			svg.addEventListener('mouseleave', () => this.hideTooltip());
 			svg.addEventListener('click', (e) => this.handleMapClick(e));
 
-			// ViewBox-based pan & zoom (works reliably on all mobile browsers)
-			const container = document.getElementById('map-container');
+			// ViewBox-based pan & zoom using Pointer Events
 			const baseVB = { x: 0, y: 0, w: 502, h: 920 };
 			let vb = { ...baseVB };
+			const pointers = new Map(); // active pointers
+			let pointerMoved = false;
+			let pointerDownTime = 0;
+			let lastPointerTarget = null;
+			let vbStart = { ...vb };
+			let startDist = 0;
+			let startMidX = 0, startMidY = 0;
 
 			const applyViewBox = () => {
 				svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
@@ -842,90 +848,100 @@
 				vb.y = Math.max(0, Math.min(baseVB.h - vb.h, vb.y));
 			};
 
-			// Convert screen pixel delta to SVG coordinate delta
-			const screenToSvgScale = () => {
+			const screenToSvg = () => {
 				const rect = svg.getBoundingClientRect();
 				return { sx: vb.w / rect.width, sy: vb.h / rect.height };
 			};
 
-			// Touch state
-			let touchStartTime = 0, touchMoved = false, isPinching = false;
-			let touchStartX = 0, touchStartY = 0;
-			let touchStartDist = 0;
-			let vbStart = { ...vb };
+			const getPointerList = () => [...pointers.values()];
+			const getDist = (pts) => Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+			const getMid = (pts) => ({ x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 });
 
-			const getTouchDist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-			const getTouchMid = (t) => ({ x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 });
-
-			container.addEventListener('touchstart', (e) => {
-				e.preventDefault();
-				touchMoved = false;
+			svg.addEventListener('pointerdown', (e) => {
+				svg.setPointerCapture(e.pointerId);
+				pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+				pointerMoved = false;
+				pointerDownTime = Date.now();
+				lastPointerTarget = e.target;
 				vbStart = { ...vb };
-				isPinching = e.touches.length >= 2;
-				if (isPinching) {
-					touchStartDist = getTouchDist(e.touches);
-					const mid = getTouchMid(e.touches);
-					touchStartX = mid.x;
-					touchStartY = mid.y;
-				} else {
-					touchStartX = e.touches[0].clientX;
-					touchStartY = e.touches[0].clientY;
-					touchStartTime = Date.now();
-				}
-			}, { passive: false });
-
-			container.addEventListener('touchmove', (e) => {
-				e.preventDefault();
-				const s = screenToSvgScale();
-				if (e.touches.length >= 2) {
-					isPinching = true;
-					touchMoved = true;
-					const dist = getTouchDist(e.touches);
-					const mid = getTouchMid(e.touches);
-					const ratio = touchStartDist / dist;
-					// Zoom: scale viewBox dimensions
-					vb.w = vbStart.w * ratio;
-					vb.h = vbStart.h * ratio;
-					// Pan: shift viewBox origin based on finger movement
-					const dx = (mid.x - touchStartX) * s.sx;
-					const dy = (mid.y - touchStartY) * s.sy;
-					vb.x = vbStart.x - dx;
-					vb.y = vbStart.y - dy;
-					clampViewBox();
-					applyViewBox();
-				} else if (!isPinching) {
-					const dx = (e.touches[0].clientX - touchStartX) * s.sx;
-					const dy = (e.touches[0].clientY - touchStartY) * s.sy;
-					if (Math.abs(dx) > 2 || Math.abs(dy) > 2) touchMoved = true;
-					vb.x = vbStart.x - dx;
-					vb.y = vbStart.y - dy;
-					clampViewBox();
-					applyViewBox();
-				}
-			}, { passive: false });
-
-			container.addEventListener('touchend', (e) => {
-				if (e.touches.length < 2) isPinching = false;
-				if (e.touches.length === 0 && !touchMoved && (Date.now() - touchStartTime) < 300) {
-					const touch = e.changedTouches[0];
-					const target = document.elementFromPoint(touch.clientX, touch.clientY);
-					if (target && target.tagName === 'path') {
-						this.handleMapClick({ target });
-					}
+				const pts = getPointerList();
+				if (pts.length === 2) {
+					startDist = getDist(pts);
+					const mid = getMid(pts);
+					startMidX = mid.x;
+					startMidY = mid.y;
+				} else if (pts.length === 1) {
+					startMidX = pts[0].x;
+					startMidY = pts[0].y;
 				}
 			});
 
+			svg.addEventListener('pointermove', (e) => {
+				if (!pointers.has(e.pointerId)) return;
+				pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+				const pts = getPointerList();
+				const s = screenToSvg();
+
+				if (pts.length >= 2) {
+					// Pinch zoom + pan
+					pointerMoved = true;
+					const dist = getDist(pts);
+					const mid = getMid(pts);
+					const ratio = startDist / dist;
+					vb.w = vbStart.w * ratio;
+					vb.h = vbStart.h * ratio;
+					const dx = (mid.x - startMidX) * s.sx;
+					const dy = (mid.y - startMidY) * s.sy;
+					vb.x = vbStart.x - dx;
+					vb.y = vbStart.y - dy;
+					clampViewBox();
+					applyViewBox();
+				} else if (pts.length === 1) {
+					// Single finger pan
+					const dx = (pts[0].x - startMidX) * s.sx;
+					const dy = (pts[0].y - startMidY) * s.sy;
+					if (Math.abs(dx) > 2 || Math.abs(dy) > 2) pointerMoved = true;
+					vb.x = vbStart.x - dx;
+					vb.y = vbStart.y - dy;
+					clampViewBox();
+					applyViewBox();
+				}
+			});
+
+			const onPointerUp = (e) => {
+				pointers.delete(e.pointerId);
+				// If no more pointers and it was a quick tap (no drag), treat as click
+				if (pointers.size === 0 && !pointerMoved && (Date.now() - pointerDownTime) < 300) {
+					if (lastPointerTarget && lastPointerTarget.tagName === 'path') {
+						this.handleMapClick({ target: lastPointerTarget });
+					}
+				}
+				// Reset start state for remaining pointers
+				if (pointers.size > 0) {
+					vbStart = { ...vb };
+					const pts = getPointerList();
+					if (pts.length === 2) {
+						startDist = getDist(pts);
+						const mid = getMid(pts);
+						startMidX = mid.x; startMidY = mid.y;
+					} else if (pts.length === 1) {
+						startMidX = pts[0].x; startMidY = pts[0].y;
+					}
+				}
+			};
+			svg.addEventListener('pointerup', onPointerUp);
+			svg.addEventListener('pointercancel', onPointerUp);
+
 			// Mouse wheel zoom (desktop)
-			container.addEventListener('wheel', (e) => {
+			svg.addEventListener('wheel', (e) => {
 				e.preventDefault();
-				const s = screenToSvgScale();
+				const s = screenToSvg();
 				const rect = svg.getBoundingClientRect();
 				const mx = (e.clientX - rect.left) * s.sx + vb.x;
 				const my = (e.clientY - rect.top) * s.sy + vb.y;
 				const factor = e.deltaY > 0 ? 1.15 : 0.85;
 				vb.w *= factor;
 				vb.h *= factor;
-				// Zoom toward mouse position
 				vb.x = mx - (mx - vb.x) * factor;
 				vb.y = my - (my - vb.y) * factor;
 				clampViewBox();
