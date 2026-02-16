@@ -174,14 +174,16 @@
 			justify-content: center;
 			padding: 1rem;
 			overflow: hidden;
+			touch-action: none;
+			-webkit-user-select: none;
+			user-select: none;
 		}
 
 		.map-container {
 			width: 100%;
 			max-width: 500px;
 			position: relative;
-			transform-origin: 0 0;
-			touch-action: none;
+			transform-origin: center center;
 		}
 
 		#quiz-map {
@@ -834,12 +836,11 @@
 			};
 
 			const clampPan = () => {
-				if (scale <= 1) { panX = 0; panY = 0; return; }
 				const rect = mapPanel.getBoundingClientRect();
 				const cw = container.offsetWidth * scale;
 				const ch = container.offsetHeight * scale;
-				const maxX = (cw - rect.width) / 2;
-				const maxY = (ch - rect.height) / 2;
+				const maxX = Math.max(0, (cw - rect.width) / 2);
+				const maxY = Math.max(0, (ch - rect.height) / 2);
 				panX = Math.max(-maxX, Math.min(maxX, panX));
 				panY = Math.max(-maxY, Math.min(maxY, panY));
 			};
@@ -857,6 +858,7 @@
 			const getTouchMid = (t) => ({ x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 });
 
 			mapPanel.addEventListener('touchstart', (e) => {
+				e.preventDefault();
 				touchMoved = false;
 				isPinching = e.touches.length >= 2;
 				if (isPinching) {
@@ -872,7 +874,7 @@
 				}
 				touchStartPanX = panX;
 				touchStartPanY = panY;
-			}, { passive: true });
+			}, { passive: false });
 
 			mapPanel.addEventListener('touchmove', (e) => {
 				e.preventDefault();
@@ -887,7 +889,7 @@
 					clampPan();
 					applyTransform();
 					touchMoved = true;
-				} else if (scale > 1 && !isPinching) {
+				} else if (!isPinching) {
 					const dx = e.touches[0].clientX - touchStartX;
 					const dy = e.touches[0].clientY - touchStartY;
 					if (Math.abs(dx) > 3 || Math.abs(dy) > 3) touchMoved = true;
