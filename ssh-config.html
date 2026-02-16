@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>SSH Config Builder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0b0e17;
+			--surface: #131a2a;
+			--surface-hover: #1a2236;
+			--border: #1e2d4a;
+			--border-bright: #2a3f66;
+			--text: #d4dae6;
+			--text-muted: #6b7a94;
+			--accent: #00e5c7;
+			--accent-hover: #00c4aa;
+			--accent-dim: rgba(0, 229, 199, 0.1);
+			--accent-glow: rgba(0, 229, 199, 0.25);
+			--warning: #f0a030;
+			--danger: #e05555;
+			--keyword: #7aa2f7;
+			--value: #9ece6a;
+			--comment: #565f89;
+			--host: #ff9e64;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Martian Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image:
+				radial-gradient(ellipse at 10% 0%, rgba(0, 229, 199, 0.04) 0%, transparent 50%),
+				radial-gradient(ellipse at 90% 100%, rgba(122, 162, 247, 0.03) 0%, transparent 50%);
+		}
+
+		.container { max-width: 960px; margin: 0 auto; }
+
+		header { margin-bottom: 1.5rem; }
+
+		h1 {
+			font-size: 1.4rem;
+			font-weight: 700;
+			color: var(--accent);
+			margin-bottom: 0.4rem;
+			letter-spacing: -0.02em;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.78rem; font-weight: 300; }
+
+		/* Config preview */
+		.config-display {
+			background: #080c14;
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1.25rem;
+			overflow: hidden;
+		}
+
+		.config-bar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.5rem 1rem;
+			background: var(--surface);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.config-bar-left {
+			display: flex;
+			align-items: center;
+			gap: 0.6rem;
+		}
+
+		.config-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: var(--accent);
+			box-shadow: 0 0 6px var(--accent-glow);
+		}
+
+		.config-bar-title {
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			font-weight: 400;
+		}
+
+		.config-bar-actions {
+			display: flex;
+			gap: 0.4rem;
+		}
+
+		.config-body {
+			padding: 1.25rem;
+			overflow-x: auto;
+			max-height: 400px;
+			overflow-y: auto;
+		}
+
+		.config-body pre {
+			font-family: inherit;
+			font-size: 0.78rem;
+			line-height: 1.65;
+			color: var(--text);
+			white-space: pre;
+			margin: 0;
+		}
+
+		.config-body .ssh-comment { color: var(--comment); }
+		.config-body .ssh-host { color: var(--host); font-weight: 600; }
+		.config-body .ssh-keyword { color: var(--keyword); }
+		.config-body .ssh-value { color: var(--value); }
+
+		.config-empty {
+			color: var(--text-muted);
+			font-size: 0.78rem;
+			font-style: italic;
+		}
+
+		/* Buttons */
+		button, .btn {
+			padding: 0.45rem 0.9rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.72rem;
+			cursor: pointer;
+			transition: all 0.15s;
+			font-weight: 400;
+		}
+
+		button:hover, .btn:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+		}
+
+		button.primary {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: #080c14;
+			font-weight: 600;
+		}
+
+		button.primary:hover { opacity: 0.9; }
+
+		button.small {
+			padding: 0.28rem 0.6rem;
+			font-size: 0.65rem;
+		}
+
+		button.danger {
+			color: var(--danger);
+			border-color: var(--danger);
+		}
+
+		button.danger:hover {
+			background: rgba(224, 85, 85, 0.15);
+		}
+
+		/* Panels */
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.65rem 1rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.panel-title {
+			font-size: 0.72rem;
+			font-weight: 500;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+		}
+
+		.panel-body { padding: 1rem; }
+
+		/* Presets */
+		.presets {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-bottom: 1.25rem;
+		}
+
+		.preset-btn {
+			padding: 0.4rem 0.8rem;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.68rem;
+			cursor: pointer;
+			transition: all 0.15s;
+		}
+
+		.preset-btn:hover {
+			border-color: var(--accent);
+			color: var(--text);
+		}
+
+		.preset-btn.active {
+			background: var(--accent-dim);
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		/* Form elements */
+		.opt-group { margin-bottom: 1rem; }
+		.opt-group:last-child { margin-bottom: 0; }
+
+		.opt-group-title {
+			font-size: 0.7rem;
+			color: var(--accent);
+			margin-bottom: 0.55rem;
+			font-weight: 500;
+		}
+
+		.opt-row {
+			display: flex;
+			align-items: center;
+			gap: 0.6rem;
+			margin-bottom: 0.55rem;
+			flex-wrap: wrap;
+		}
+
+		.opt-row label {
+			font-size: 0.75rem;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			gap: 0.45rem;
+			min-width: 170px;
+			color: var(--text);
+			font-weight: 400;
+		}
+
+		.opt-hint {
+			font-size: 0.64rem;
+			color: var(--text-muted);
+			margin-left: 0;
+			margin-top: -0.2rem;
+			margin-bottom: 0.5rem;
+		}
+
+		input[type="text"], input[type="number"], select {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.4rem 0.6rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.75rem;
+			outline: none;
+			transition: border-color 0.15s;
+		}
+
+		input[type="text"]:focus, input[type="number"]:focus, select:focus {
+			border-color: var(--accent);
+		}
+
+		input[type="text"]::placeholder { color: var(--text-muted); }
+
+		input[type="text"].wide {
+			flex: 1;
+			min-width: 160px;
+		}
+
+		input[type="text"].medium {
+			width: 180px;
+		}
+
+		input[type="number"].narrow {
+			width: 70px;
+		}
+
+		/* Checkboxes */
+		input[type="checkbox"] {
+			appearance: none;
+			-webkit-appearance: none;
+			width: 15px;
+			height: 15px;
+			border: 1px solid var(--border-bright);
+			border-radius: 3px;
+			background: var(--bg);
+			cursor: pointer;
+			position: relative;
+			flex-shrink: 0;
+		}
+
+		input[type="checkbox"]:checked {
+			background: var(--accent);
+			border-color: var(--accent);
+		}
+
+		input[type="checkbox"]:checked::after {
+			content: '\2713';
+			position: absolute;
+			top: -1px;
+			left: 2px;
+			color: #080c14;
+			font-size: 11px;
+			font-weight: 700;
+		}
+
+		/* Host entries */
+		.host-entry {
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			margin-bottom: 0.75rem;
+			background: var(--surface);
+			overflow: hidden;
+		}
+
+		.host-entry-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.55rem 0.85rem;
+			background: rgba(0, 229, 199, 0.03);
+			border-bottom: 1px solid var(--border);
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.host-entry-header:hover {
+			background: rgba(0, 229, 199, 0.06);
+		}
+
+		.host-entry-name {
+			font-size: 0.78rem;
+			font-weight: 600;
+			color: var(--host);
+		}
+
+		.host-entry-controls {
+			display: flex;
+			gap: 0.3rem;
+			align-items: center;
+		}
+
+		.host-entry-toggle {
+			color: var(--text-muted);
+			font-size: 0.7rem;
+			transition: transform 0.2s;
+		}
+
+		.host-entry-toggle.collapsed {
+			transform: rotate(-90deg);
+		}
+
+		.host-entry-body {
+			padding: 0.85rem;
+		}
+
+		.host-entry-body.hidden {
+			display: none;
+		}
+
+		.field-row {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.field-label {
+			font-size: 0.72rem;
+			color: var(--keyword);
+			min-width: 155px;
+			font-weight: 500;
+		}
+
+		.field-label.required::after {
+			content: '*';
+			color: var(--danger);
+			margin-left: 2px;
+		}
+
+		hr.divider {
+			border: none;
+			border-top: 1px solid var(--border);
+			margin: 0.75rem 0;
+		}
+
+		/* Add host button */
+		.add-host-btn {
+			width: 100%;
+			padding: 0.7rem;
+			background: var(--surface);
+			border: 1px dashed var(--border-bright);
+			border-radius: 6px;
+			color: var(--accent);
+			font-family: inherit;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.15s;
+			margin-bottom: 1rem;
+		}
+
+		.add-host-btn:hover {
+			border-color: var(--accent);
+			background: var(--accent-dim);
+		}
+
+		/* Import panel */
+		.import-area {
+			width: 100%;
+			min-height: 120px;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 0.75rem;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.75rem;
+			resize: vertical;
+			outline: none;
+		}
+
+		.import-area:focus { border-color: var(--accent); }
+
+		.import-actions {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 0.6rem;
+		}
+
+		/* Toast */
+		.toast {
+			position: fixed;
+			bottom: 2rem;
+			left: 50%;
+			transform: translateX(-50%) translateY(100%);
+			background: var(--surface);
+			border: 1px solid var(--accent);
+			color: var(--text);
+			padding: 0.45rem 1.1rem;
+			border-radius: 4px;
+			font-size: 0.72rem;
+			font-family: inherit;
+			opacity: 0;
+			transition: all 0.3s ease;
+			z-index: 100;
+		}
+
+		.toast.show {
+			transform: translateX(-50%) translateY(0);
+			opacity: 1;
+		}
+
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+
+			h1 { font-size: 1.15rem; }
+
+			.opt-row label { min-width: 130px; }
+
+			.field-label { min-width: 120px; font-size: 0.68rem; }
+
+			input[type="text"].medium { width: 140px; }
+
+			.presets { gap: 0.35rem; }
+
+			.config-bar-actions { gap: 0.25rem; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>SSH Config Builder</h1>
+			<p class="subtitle">Visually build ~/.ssh/config files</p>
+		</header>
+
+		<!-- Config preview -->
+		<div class="config-display">
+			<div class="config-bar">
+				<div class="config-bar-left">
+					<span class="config-dot"></span>
+					<span class="config-bar-title">~/.ssh/config</span>
+				</div>
+				<div class="config-bar-actions">
+					<button class="small" onclick="downloadConfig()">Download</button>
+					<button class="small primary" onclick="copyConfig()">Copy</button>
+				</div>
+			</div>
+			<div class="config-body">
+				<pre id="configOutput"><span class="config-empty">Add a host entry or use a preset to get started</span></pre>
+			</div>
+		</div>
+
+		<!-- Presets -->
+		<div class="presets">
+			<button class="preset-btn" onclick="applyPreset('basic')">Basic Server</button>
+			<button class="preset-btn" onclick="applyPreset('bastion')">Bastion / Jump Host</button>
+			<button class="preset-btn" onclick="applyPreset('github')">GitHub</button>
+			<button class="preset-btn" onclick="applyPreset('gitlab')">GitLab</button>
+			<button class="preset-btn" onclick="applyPreset('tunnel')">Port Forward Tunnel</button>
+			<button class="preset-btn" onclick="applyPreset('multi')">Multi-host Example</button>
+		</div>
+
+		<!-- Global defaults (Host *) -->
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Global Defaults (Host *)</span>
+				<label style="font-size: 0.7rem; display:flex; align-items:center; gap:0.4rem; cursor:pointer;">
+					<input type="checkbox" id="enableGlobals" onchange="buildConfig()"> Enable
+				</label>
+			</div>
+			<div class="panel-body" id="globalsBody" style="display:none;">
+				<div class="opt-group">
+					<div class="field-row">
+						<span class="field-label">ServerAliveInterval</span>
+						<input type="number" class="narrow" id="globalAliveInterval" value="60" min="0" oninput="buildConfig()">
+					</div>
+					<div class="field-row">
+						<span class="field-label">ServerAliveCountMax</span>
+						<input type="number" class="narrow" id="globalAliveCount" value="3" min="0" oninput="buildConfig()">
+					</div>
+					<div class="field-row">
+						<span class="field-label">AddKeysToAgent</span>
+						<select id="globalAddKeys" onchange="buildConfig()">
+							<option value="">--</option>
+							<option value="yes">yes</option>
+							<option value="no">no</option>
+							<option value="confirm">confirm</option>
+						</select>
+					</div>
+					<div class="field-row">
+						<span class="field-label">IdentitiesOnly</span>
+						<select id="globalIdentitiesOnly" onchange="buildConfig()">
+							<option value="">--</option>
+							<option value="yes">yes</option>
+							<option value="no">no</option>
+						</select>
+					</div>
+					<div class="field-row">
+						<span class="field-label">Compression</span>
+						<select id="globalCompression" onchange="buildConfig()">
+							<option value="">--</option>
+							<option value="yes">yes</option>
+							<option value="no">no</option>
+						</select>
+					</div>
+					<div class="field-row">
+						<span class="field-label">StrictHostKeyChecking</span>
+						<select id="globalStrictKey" onchange="buildConfig()">
+							<option value="">--</option>
+							<option value="ask">ask</option>
+							<option value="yes">yes</option>
+							<option value="no">no</option>
+							<option value="accept-new">accept-new</option>
+						</select>
+					</div>
+					<div class="field-row">
+						<span class="field-label">LogLevel</span>
+						<select id="globalLogLevel" onchange="buildConfig()">
+							<option value="">--</option>
+							<option value="QUIET">QUIET</option>
+							<option value="FATAL">FATAL</option>
+							<option value="ERROR">ERROR</option>
+							<option value="INFO">INFO</option>
+							<option value="VERBOSE">VERBOSE</option>
+							<option value="DEBUG">DEBUG</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Host entries container -->
+		<div id="hostEntries"></div>
+
+		<button class="add-host-btn" onclick="addHost()">+ Add Host Entry</button>
+
+		<!-- Import -->
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Import Existing Config</span>
+			</div>
+			<div class="panel-body">
+				<textarea class="import-area" id="importArea" placeholder="Paste your existing ~/.ssh/config here..."></textarea>
+				<div class="import-actions">
+					<button onclick="importConfig()">Import</button>
+					<button onclick="document.getElementById('importArea').value=''">Clear</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		let hosts = [];
+		let hostIdCounter = 0;
+
+		// Toggle globals visibility
+		document.getElementById('enableGlobals').addEventListener('change', function() {
+			document.getElementById('globalsBody').style.display = this.checked ? 'block' : 'none';
+		});
+
+		function createHostData(overrides = {}) {
+			return {
+				id: hostIdCounter++,
+				collapsed: false,
+				host: overrides.host || '',
+				hostname: overrides.hostname || '',
+				user: overrides.user || '',
+				port: overrides.port || '',
+				identityFile: overrides.identityFile || '',
+				identitiesOnly: overrides.identitiesOnly || '',
+				addKeysToAgent: overrides.addKeysToAgent || '',
+				proxyJump: overrides.proxyJump || '',
+				proxyCommand: overrides.proxyCommand || '',
+				forwardAgent: overrides.forwardAgent || '',
+				localForward: overrides.localForward || '',
+				remoteForward: overrides.remoteForward || '',
+				serverAliveInterval: overrides.serverAliveInterval || '',
+				serverAliveCountMax: overrides.serverAliveCountMax || '',
+				compression: overrides.compression || '',
+				strictHostKeyChecking: overrides.strictHostKeyChecking || '',
+				logLevel: overrides.logLevel || '',
+				requestTTY: overrides.requestTTY || '',
+				userKnownHostsFile: overrides.userKnownHostsFile || '',
+			};
+		}
+
+		function addHost(data) {
+			const h = data || createHostData();
+			if (!data) hosts.push(h);
+			renderHosts();
+			buildConfig();
+		}
+
+		function removeHost(id) {
+			hosts = hosts.filter(h => h.id !== id);
+			renderHosts();
+			buildConfig();
+		}
+
+		function toggleHost(id) {
+			const h = hosts.find(x => x.id === id);
+			if (h) h.collapsed = !h.collapsed;
+			renderHosts();
+		}
+
+		function moveHost(id, dir) {
+			const idx = hosts.findIndex(h => h.id === id);
+			const newIdx = idx + dir;
+			if (newIdx < 0 || newIdx >= hosts.length) return;
+			[hosts[idx], hosts[newIdx]] = [hosts[newIdx], hosts[idx]];
+			renderHosts();
+			buildConfig();
+		}
+
+		function syncHostData(id) {
+			const h = hosts.find(x => x.id === id);
+			if (!h) return;
+			const el = (name) => document.getElementById(`h${id}_${name}`);
+			h.host = el('host')?.value || '';
+			h.hostname = el('hostname')?.value || '';
+			h.user = el('user')?.value || '';
+			h.port = el('port')?.value || '';
+			h.identityFile = el('identityFile')?.value || '';
+			h.identitiesOnly = el('identitiesOnly')?.value || '';
+			h.addKeysToAgent = el('addKeysToAgent')?.value || '';
+			h.proxyJump = el('proxyJump')?.value || '';
+			h.proxyCommand = el('proxyCommand')?.value || '';
+			h.forwardAgent = el('forwardAgent')?.value || '';
+			h.localForward = el('localForward')?.value || '';
+			h.remoteForward = el('remoteForward')?.value || '';
+			h.serverAliveInterval = el('serverAliveInterval')?.value || '';
+			h.serverAliveCountMax = el('serverAliveCountMax')?.value || '';
+			h.compression = el('compression')?.value || '';
+			h.strictHostKeyChecking = el('strictHostKeyChecking')?.value || '';
+			h.logLevel = el('logLevel')?.value || '';
+			h.requestTTY = el('requestTTY')?.value || '';
+			h.userKnownHostsFile = el('userKnownHostsFile')?.value || '';
+			buildConfig();
+		}
+
+		function renderHosts() {
+			const container = document.getElementById('hostEntries');
+			container.innerHTML = hosts.map(h => {
+				const displayName = h.host || 'Untitled Host';
+				const isCollapsed = h.collapsed;
+				return `
+				<div class="host-entry">
+					<div class="host-entry-header" onclick="toggleHost(${h.id})">
+						<span class="host-entry-name">${esc(displayName)}</span>
+						<div class="host-entry-controls">
+							<button class="small" onclick="event.stopPropagation(); moveHost(${h.id}, -1)" title="Move up">&uarr;</button>
+							<button class="small" onclick="event.stopPropagation(); moveHost(${h.id}, 1)" title="Move down">&darr;</button>
+							<button class="small danger" onclick="event.stopPropagation(); removeHost(${h.id})" title="Remove">&times;</button>
+							<span class="host-entry-toggle ${isCollapsed ? 'collapsed' : ''}">&darr;</span>
+						</div>
+					</div>
+					<div class="host-entry-body ${isCollapsed ? 'hidden' : ''}">
+						<div class="opt-group">
+							<div class="opt-group-title">Connection</div>
+							<div class="field-row">
+								<span class="field-label required">Host</span>
+								<input type="text" class="medium" id="h${h.id}_host" value="${esc(h.host)}" placeholder="my-server" oninput="syncHostData(${h.id}); updateHostName(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label required">HostName</span>
+								<input type="text" class="medium" id="h${h.id}_hostname" value="${esc(h.hostname)}" placeholder="192.168.1.100 or example.com" oninput="syncHostData(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label">User</span>
+								<input type="text" class="medium" id="h${h.id}_user" value="${esc(h.user)}" placeholder="root" oninput="syncHostData(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label">Port</span>
+								<input type="number" class="narrow" id="h${h.id}_port" value="${esc(h.port)}" placeholder="22" min="1" max="65535" oninput="syncHostData(${h.id})">
+							</div>
+						</div>
+
+						<hr class="divider">
+
+						<div class="opt-group">
+							<div class="opt-group-title">Authentication</div>
+							<div class="field-row">
+								<span class="field-label">IdentityFile</span>
+								<input type="text" class="medium" id="h${h.id}_identityFile" value="${esc(h.identityFile)}" placeholder="~/.ssh/id_ed25519" oninput="syncHostData(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label">IdentitiesOnly</span>
+								<select id="h${h.id}_identitiesOnly" onchange="syncHostData(${h.id})">
+									<option value="">--</option>
+									<option value="yes" ${h.identitiesOnly === 'yes' ? 'selected' : ''}>yes</option>
+									<option value="no" ${h.identitiesOnly === 'no' ? 'selected' : ''}>no</option>
+								</select>
+							</div>
+							<div class="field-row">
+								<span class="field-label">AddKeysToAgent</span>
+								<select id="h${h.id}_addKeysToAgent" onchange="syncHostData(${h.id})">
+									<option value="">--</option>
+									<option value="yes" ${h.addKeysToAgent === 'yes' ? 'selected' : ''}>yes</option>
+									<option value="no" ${h.addKeysToAgent === 'no' ? 'selected' : ''}>no</option>
+									<option value="confirm" ${h.addKeysToAgent === 'confirm' ? 'selected' : ''}>confirm</option>
+								</select>
+							</div>
+							<div class="field-row">
+								<span class="field-label">ForwardAgent</span>
+								<select id="h${h.id}_forwardAgent" onchange="syncHostData(${h.id})">
+									<option value="">--</option>
+									<option value="yes" ${h.forwardAgent === 'yes' ? 'selected' : ''}>yes</option>
+									<option value="no" ${h.forwardAgent === 'no' ? 'selected' : ''}>no</option>
+								</select>
+							</div>
+						</div>
+
+						<hr class="divider">
+
+						<div class="opt-group">
+							<div class="opt-group-title">Proxy / Jump</div>
+							<div class="field-row">
+								<span class="field-label">ProxyJump</span>
+								<input type="text" class="medium" id="h${h.id}_proxyJump" value="${esc(h.proxyJump)}" placeholder="bastion-host" oninput="syncHostData(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label">ProxyCommand</span>
+								<input type="text" class="wide" id="h${h.id}_proxyCommand" value="${esc(h.proxyCommand)}" placeholder="ssh -W %h:%p bastion" oninput="syncHostData(${h.id})">
+							</div>
+						</div>
+
+						<hr class="divider">
+
+						<div class="opt-group">
+							<div class="opt-group-title">Port Forwarding</div>
+							<div class="field-row">
+								<span class="field-label">LocalForward</span>
+								<input type="text" class="medium" id="h${h.id}_localForward" value="${esc(h.localForward)}" placeholder="8080 localhost:80" oninput="syncHostData(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label">RemoteForward</span>
+								<input type="text" class="medium" id="h${h.id}_remoteForward" value="${esc(h.remoteForward)}" placeholder="9090 localhost:3000" oninput="syncHostData(${h.id})">
+							</div>
+						</div>
+
+						<hr class="divider">
+
+						<div class="opt-group">
+							<div class="opt-group-title">Keep-alive & Behaviour</div>
+							<div class="field-row">
+								<span class="field-label">ServerAliveInterval</span>
+								<input type="number" class="narrow" id="h${h.id}_serverAliveInterval" value="${esc(h.serverAliveInterval)}" placeholder="60" min="0" oninput="syncHostData(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label">ServerAliveCountMax</span>
+								<input type="number" class="narrow" id="h${h.id}_serverAliveCountMax" value="${esc(h.serverAliveCountMax)}" placeholder="3" min="0" oninput="syncHostData(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label">Compression</span>
+								<select id="h${h.id}_compression" onchange="syncHostData(${h.id})">
+									<option value="">--</option>
+									<option value="yes" ${h.compression === 'yes' ? 'selected' : ''}>yes</option>
+									<option value="no" ${h.compression === 'no' ? 'selected' : ''}>no</option>
+								</select>
+							</div>
+							<div class="field-row">
+								<span class="field-label">RequestTTY</span>
+								<select id="h${h.id}_requestTTY" onchange="syncHostData(${h.id})">
+									<option value="">--</option>
+									<option value="yes" ${h.requestTTY === 'yes' ? 'selected' : ''}>yes</option>
+									<option value="no" ${h.requestTTY === 'no' ? 'selected' : ''}>no</option>
+									<option value="force" ${h.requestTTY === 'force' ? 'selected' : ''}>force</option>
+									<option value="auto" ${h.requestTTY === 'auto' ? 'selected' : ''}>auto</option>
+								</select>
+							</div>
+							<div class="field-row">
+								<span class="field-label">StrictHostKeyChecking</span>
+								<select id="h${h.id}_strictHostKeyChecking" onchange="syncHostData(${h.id})">
+									<option value="">--</option>
+									<option value="ask" ${h.strictHostKeyChecking === 'ask' ? 'selected' : ''}>ask</option>
+									<option value="yes" ${h.strictHostKeyChecking === 'yes' ? 'selected' : ''}>yes</option>
+									<option value="no" ${h.strictHostKeyChecking === 'no' ? 'selected' : ''}>no</option>
+									<option value="accept-new" ${h.strictHostKeyChecking === 'accept-new' ? 'selected' : ''}>accept-new</option>
+								</select>
+							</div>
+							<div class="field-row">
+								<span class="field-label">UserKnownHostsFile</span>
+								<input type="text" class="medium" id="h${h.id}_userKnownHostsFile" value="${esc(h.userKnownHostsFile)}" placeholder="/dev/null" oninput="syncHostData(${h.id})">
+							</div>
+							<div class="field-row">
+								<span class="field-label">LogLevel</span>
+								<select id="h${h.id}_logLevel" onchange="syncHostData(${h.id})">
+									<option value="">--</option>
+									<option value="QUIET" ${h.logLevel === 'QUIET' ? 'selected' : ''}>QUIET</option>
+									<option value="FATAL" ${h.logLevel === 'FATAL' ? 'selected' : ''}>FATAL</option>
+									<option value="ERROR" ${h.logLevel === 'ERROR' ? 'selected' : ''}>ERROR</option>
+									<option value="INFO" ${h.logLevel === 'INFO' ? 'selected' : ''}>INFO</option>
+									<option value="VERBOSE" ${h.logLevel === 'VERBOSE' ? 'selected' : ''}>VERBOSE</option>
+									<option value="DEBUG" ${h.logLevel === 'DEBUG' ? 'selected' : ''}>DEBUG</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>`;
+			}).join('');
+		}
+
+		function updateHostName(id) {
+			const h = hosts.find(x => x.id === id);
+			if (!h) return;
+			const nameEl = document.querySelector(`.host-entry:nth-child(${hosts.indexOf(h) + 1}) .host-entry-name`);
+			if (nameEl) nameEl.textContent = h.host || 'Untitled Host';
+		}
+
+		function buildConfig() {
+			const lines = [];
+
+			// Global defaults
+			if (document.getElementById('enableGlobals').checked) {
+				lines.push('Host *');
+				const globals = [
+					['ServerAliveInterval', document.getElementById('globalAliveInterval').value],
+					['ServerAliveCountMax', document.getElementById('globalAliveCount').value],
+					['AddKeysToAgent', document.getElementById('globalAddKeys').value],
+					['IdentitiesOnly', document.getElementById('globalIdentitiesOnly').value],
+					['Compression', document.getElementById('globalCompression').value],
+					['StrictHostKeyChecking', document.getElementById('globalStrictKey').value],
+					['LogLevel', document.getElementById('globalLogLevel').value],
+				];
+				globals.forEach(([key, val]) => {
+					if (val) lines.push(`    ${key} ${val}`);
+				});
+				lines.push('');
+			}
+
+			// Host entries
+			hosts.forEach((h, idx) => {
+				if (!h.host) return;
+				lines.push(`Host ${h.host}`);
+
+				const opts = [
+					['HostName', h.hostname],
+					['User', h.user],
+					['Port', h.port],
+					['IdentityFile', h.identityFile],
+					['IdentitiesOnly', h.identitiesOnly],
+					['AddKeysToAgent', h.addKeysToAgent],
+					['ForwardAgent', h.forwardAgent],
+					['ProxyJump', h.proxyJump],
+					['ProxyCommand', h.proxyCommand],
+					['LocalForward', h.localForward],
+					['RemoteForward', h.remoteForward],
+					['ServerAliveInterval', h.serverAliveInterval],
+					['ServerAliveCountMax', h.serverAliveCountMax],
+					['Compression', h.compression],
+					['RequestTTY', h.requestTTY],
+					['StrictHostKeyChecking', h.strictHostKeyChecking],
+					['UserKnownHostsFile', h.userKnownHostsFile],
+					['LogLevel', h.logLevel],
+				];
+
+				opts.forEach(([key, val]) => {
+					if (val) lines.push(`    ${key} ${val}`);
+				});
+
+				if (idx < hosts.length - 1) lines.push('');
+			});
+
+			const output = document.getElementById('configOutput');
+			if (lines.length === 0 || (lines.length === 1 && lines[0] === '')) {
+				output.innerHTML = '<span class="config-empty">Add a host entry or use a preset to get started</span>';
+				return;
+			}
+
+			output.innerHTML = lines.map(line => {
+				if (!line.trim()) return '';
+				if (line.startsWith('Host ')) {
+					const parts = line.split(' ');
+					return `<span class="ssh-keyword">${esc(parts[0])}</span> <span class="ssh-host">${esc(parts.slice(1).join(' '))}</span>`;
+				}
+				if (line.startsWith('    ')) {
+					const trimmed = line.trim();
+					const spaceIdx = trimmed.indexOf(' ');
+					if (spaceIdx > 0) {
+						const key = trimmed.substring(0, spaceIdx);
+						const val = trimmed.substring(spaceIdx + 1);
+						return `    <span class="ssh-keyword">${esc(key)}</span> <span class="ssh-value">${esc(val)}</span>`;
+					}
+				}
+				return esc(line);
+			}).join('\n');
+		}
+
+		function getPlainConfig() {
+			const lines = [];
+
+			if (document.getElementById('enableGlobals').checked) {
+				lines.push('Host *');
+				const globals = [
+					['ServerAliveInterval', document.getElementById('globalAliveInterval').value],
+					['ServerAliveCountMax', document.getElementById('globalAliveCount').value],
+					['AddKeysToAgent', document.getElementById('globalAddKeys').value],
+					['IdentitiesOnly', document.getElementById('globalIdentitiesOnly').value],
+					['Compression', document.getElementById('globalCompression').value],
+					['StrictHostKeyChecking', document.getElementById('globalStrictKey').value],
+					['LogLevel', document.getElementById('globalLogLevel').value],
+				];
+				globals.forEach(([key, val]) => {
+					if (val) lines.push(`    ${key} ${val}`);
+				});
+				lines.push('');
+			}
+
+			hosts.forEach((h, idx) => {
+				if (!h.host) return;
+				lines.push(`Host ${h.host}`);
+				const opts = [
+					['HostName', h.hostname],
+					['User', h.user],
+					['Port', h.port],
+					['IdentityFile', h.identityFile],
+					['IdentitiesOnly', h.identitiesOnly],
+					['AddKeysToAgent', h.addKeysToAgent],
+					['ForwardAgent', h.forwardAgent],
+					['ProxyJump', h.proxyJump],
+					['ProxyCommand', h.proxyCommand],
+					['LocalForward', h.localForward],
+					['RemoteForward', h.remoteForward],
+					['ServerAliveInterval', h.serverAliveInterval],
+					['ServerAliveCountMax', h.serverAliveCountMax],
+					['Compression', h.compression],
+					['RequestTTY', h.requestTTY],
+					['StrictHostKeyChecking', h.strictHostKeyChecking],
+					['UserKnownHostsFile', h.userKnownHostsFile],
+					['LogLevel', h.logLevel],
+				];
+				opts.forEach(([key, val]) => {
+					if (val) lines.push(`    ${key} ${val}`);
+				});
+				if (idx < hosts.length - 1) lines.push('');
+			});
+
+			return lines.join('\n');
+		}
+
+		function copyConfig() {
+			const text = getPlainConfig();
+			if (!text.trim()) { showToast('Nothing to copy'); return; }
+			navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+		}
+
+		function downloadConfig() {
+			const text = getPlainConfig();
+			if (!text.trim()) { showToast('Nothing to download'); return; }
+			const blob = new Blob([text + '\n'], { type: 'text/plain' });
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = 'config';
+			a.click();
+			URL.revokeObjectURL(a.href);
+			showToast('Downloaded!');
+		}
+
+		function esc(s) {
+			if (s === undefined || s === null) return '';
+			return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+		}
+
+		function showToast(msg) {
+			const toast = document.getElementById('toast');
+			toast.textContent = msg;
+			toast.classList.add('show');
+			setTimeout(() => toast.classList.remove('show'), 1500);
+		}
+
+		// --- Presets ---
+		function clearAll() {
+			hosts = [];
+			hostIdCounter = 0;
+			document.getElementById('enableGlobals').checked = false;
+			document.getElementById('globalsBody').style.display = 'none';
+			document.getElementById('globalAliveInterval').value = '60';
+			document.getElementById('globalAliveCount').value = '3';
+			document.getElementById('globalAddKeys').value = '';
+			document.getElementById('globalIdentitiesOnly').value = '';
+			document.getElementById('globalCompression').value = '';
+			document.getElementById('globalStrictKey').value = '';
+			document.getElementById('globalLogLevel').value = '';
+		}
+
+		function applyPreset(name) {
+			clearAll();
+
+			document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+			if (event && event.target) event.target.classList.add('active');
+
+			switch (name) {
+				case 'basic':
+					hosts.push(createHostData({
+						host: 'my-server',
+						hostname: '192.168.1.100',
+						user: 'admin',
+						port: '22',
+						identityFile: '~/.ssh/id_ed25519',
+					}));
+					break;
+
+				case 'bastion':
+					hosts.push(createHostData({
+						host: 'bastion',
+						hostname: 'bastion.example.com',
+						user: 'jump-user',
+						port: '22',
+						identityFile: '~/.ssh/id_bastion',
+						forwardAgent: 'no',
+					}));
+					hosts.push(createHostData({
+						host: 'internal-server',
+						hostname: '10.0.1.50',
+						user: 'admin',
+						proxyJump: 'bastion',
+						identityFile: '~/.ssh/id_internal',
+					}));
+					break;
+
+				case 'github':
+					hosts.push(createHostData({
+						host: 'github.com',
+						hostname: 'github.com',
+						user: 'git',
+						identityFile: '~/.ssh/id_github',
+						identitiesOnly: 'yes',
+						addKeysToAgent: 'yes',
+					}));
+					break;
+
+				case 'gitlab':
+					hosts.push(createHostData({
+						host: 'gitlab.com',
+						hostname: 'gitlab.com',
+						user: 'git',
+						identityFile: '~/.ssh/id_gitlab',
+						identitiesOnly: 'yes',
+						addKeysToAgent: 'yes',
+						port: '22',
+					}));
+					break;
+
+				case 'tunnel':
+					hosts.push(createHostData({
+						host: 'db-tunnel',
+						hostname: 'remote-server.example.com',
+						user: 'tunnel-user',
+						identityFile: '~/.ssh/id_tunnel',
+						localForward: '5432 localhost:5432',
+						serverAliveInterval: '60',
+						serverAliveCountMax: '3',
+						requestTTY: 'no',
+						compression: 'yes',
+					}));
+					break;
+
+				case 'multi':
+					document.getElementById('enableGlobals').checked = true;
+					document.getElementById('globalsBody').style.display = 'block';
+					document.getElementById('globalAliveInterval').value = '60';
+					document.getElementById('globalAliveCount').value = '3';
+					document.getElementById('globalAddKeys').value = 'yes';
+
+					hosts.push(createHostData({
+						host: 'github.com',
+						hostname: 'github.com',
+						user: 'git',
+						identityFile: '~/.ssh/id_github',
+						identitiesOnly: 'yes',
+					}));
+					hosts.push(createHostData({
+						host: 'prod',
+						hostname: 'prod.example.com',
+						user: 'deploy',
+						port: '2222',
+						identityFile: '~/.ssh/id_prod',
+						identitiesOnly: 'yes',
+					}));
+					hosts.push(createHostData({
+						host: 'staging',
+						hostname: 'staging.example.com',
+						user: 'deploy',
+						port: '2222',
+						identityFile: '~/.ssh/id_staging',
+						proxyJump: 'prod',
+					}));
+					break;
+			}
+
+			renderHosts();
+			buildConfig();
+		}
+
+		// --- Import ---
+		function importConfig() {
+			const text = document.getElementById('importArea').value.trim();
+			if (!text) { showToast('Nothing to import'); return; }
+
+			clearAll();
+			let currentHost = null;
+
+			const lines = text.split('\n');
+			for (const raw of lines) {
+				const line = raw.trim();
+				if (!line || line.startsWith('#')) continue;
+
+				if (line.toLowerCase().startsWith('host ')) {
+					const hostVal = line.substring(5).trim();
+					if (hostVal === '*') {
+						// Global defaults
+						document.getElementById('enableGlobals').checked = true;
+						document.getElementById('globalsBody').style.display = 'block';
+						currentHost = 'globals';
+						continue;
+					}
+					currentHost = createHostData({ host: hostVal });
+					hosts.push(currentHost);
+					continue;
+				}
+
+				if (!currentHost) continue;
+
+				// Parse key-value
+				const match = line.match(/^(\S+)\s+(.+)$/);
+				if (!match) continue;
+				const key = match[1];
+				const val = match[2].trim();
+
+				if (currentHost === 'globals') {
+					// Map to global fields
+					const globalMap = {
+						'serveraliveinterval': 'globalAliveInterval',
+						'serveralivecountmax': 'globalAliveCount',
+						'addkeystoagent': 'globalAddKeys',
+						'identitiesonly': 'globalIdentitiesOnly',
+						'compression': 'globalCompression',
+						'stricthostkeychecking': 'globalStrictKey',
+						'loglevel': 'globalLogLevel',
+					};
+					const elId = globalMap[key.toLowerCase()];
+					if (elId) {
+						const el = document.getElementById(elId);
+						if (el) el.value = val;
+					}
+					continue;
+				}
+
+				// Map to host fields
+				const hostMap = {
+					'hostname': 'hostname',
+					'user': 'user',
+					'port': 'port',
+					'identityfile': 'identityFile',
+					'identitiesonly': 'identitiesOnly',
+					'addkeystoagent': 'addKeysToAgent',
+					'proxyjump': 'proxyJump',
+					'proxycommand': 'proxyCommand',
+					'forwardagent': 'forwardAgent',
+					'localforward': 'localForward',
+					'remoteforward': 'remoteForward',
+					'serveraliveinterval': 'serverAliveInterval',
+					'serveralivecountmax': 'serverAliveCountMax',
+					'compression': 'compression',
+					'stricthostkeychecking': 'strictHostKeyChecking',
+					'loglevel': 'logLevel',
+					'requesttty': 'requestTTY',
+					'userknownhostsfile': 'userKnownHostsFile',
+				};
+
+				const field = hostMap[key.toLowerCase()];
+				if (field) currentHost[field] = val;
+			}
+
+			renderHosts();
+			buildConfig();
+			document.getElementById('importArea').value = '';
+			showToast(`Imported ${hosts.length} host(s)`);
+		}
+
+		// Initial state
+		buildConfig();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>
