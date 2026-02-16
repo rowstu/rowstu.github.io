@@ -170,21 +170,25 @@
 			flex: 3;
 			position: relative;
 			padding: 0;
-			overflow: auto;
-			-webkit-overflow-scrolling: touch;
+			overflow: hidden;
+		}
+
+		.map-panel.dragging {
+			cursor: grabbing;
+			user-select: none;
 		}
 
 		.map-container {
-			min-width: 100%;
+			width: 100%;
+			height: 100%;
 			display: flex;
 			justify-content: center;
+			align-items: center;
 		}
 
 		#quiz-map {
 			width: 100%;
-			min-width: 300px;
-			height: auto;
-			transition: width 0.2s ease;
+			height: 100%;
 		}
 
 		#quiz-map path {
@@ -602,8 +606,8 @@
 
 	<div class="app-layout">
 		<div class="map-panel" id="map-panel">
-			<div class="map-container" id="map-container">
-				<svg id="quiz-map" viewBox="0 0 502 920" xmlns="http://www.w3.org/2000/svg">
+				<div class="map-container" id="map-container">
+					<svg id="quiz-map" viewBox="0 0 502 920" xmlns="http://www.w3.org/2000/svg">
 					<path id="greater-london" d="M415.0,774.2L415.7,775.3L414.6,776.5L412.4,776.7L411.5,775.7L410.5,777.7L409.8,775.9L406.1,775.6L405.3,777.5L402.7,778.4L402.5,779.3L403.1,778.2L405.3,777.7L406.2,775.8L409.5,775.9L410.4,778.0L411.3,777.3L411.2,776.2L414.0,776.9L417.2,775.4L418.9,776.1L419.9,778.1L421.3,778.1L420.6,780.3L418.5,782.2L418.1,784.0L418.7,785.3L418.1,785.3L418.3,787.3L417.6,789.3L416.7,789.3L416.7,790.5L415.2,791.6L415.5,793.2L413.9,793.8L412.8,792.3L411.9,793.6L411.3,790.5L409.5,789.7L405.5,794.0L403.9,792.5L403.7,790.4L402.1,789.3L401.3,790.4L400.6,789.9L401.1,789.3L400.7,787.8L399.8,787.4L399.9,786.3L398.0,787.6L396.2,790.7L396.0,788.6L396.9,786.7L396.5,785.2L393.2,783.8L393.1,782.9L390.1,781.6L390.0,780.1L387.6,779.0L388.8,776.0L388.2,773.4L389.1,771.6L388.0,768.4L388.2,765.7L390.0,767.3L393.3,767.0L396.5,765.0L399.4,764.8L399.7,763.7L402.0,762.6L402.4,763.1L403.6,761.1L410.7,761.7L410.7,764.5L412.3,765.0L412.2,766.0L414.1,767.8L421.6,765.7L423.4,767.6L423.0,768.2L423.7,768.4L424.7,771.2L425.7,771.1L426.7,773.0L423.5,773.9L423.4,775.0L422.9,774.2L421.9,776.6L419.9,777.5L419.5,776.1L415.9,775.3L415.0,774.2Z"/>
 					<path id="greater-manchester" d="M296.5,603.2L297.4,602.7L298.1,600.8L299.0,602.6L301.3,602.0L301.6,600.0L301.2,599.0L303.8,600.0L304.6,599.1L305.3,602.9L306.5,603.2L305.9,600.8L308.0,598.7L310.0,600.6L309.9,601.4L311.0,601.2L311.7,597.8L314.4,598.7L316.1,597.7L317.4,603.2L322.5,608.5L322.6,609.6L321.9,611.0L322.1,611.9L319.7,612.5L319.1,616.5L317.2,618.3L317.4,619.2L318.8,619.7L318.2,622.0L315.6,624.3L312.0,623.6L311.0,626.8L309.5,625.9L310.1,625.5L309.9,624.8L306.6,624.1L304.5,625.8L304.7,625.1L302.7,623.6L301.5,623.9L297.7,621.3L296.6,621.5L296.3,621.2L297.6,619.6L297.5,618.7L296.3,617.4L295.4,614.3L292.8,615.4L291.7,617.1L289.9,615.7L290.1,614.3L288.5,614.3L287.5,612.7L284.6,611.0L285.8,607.7L285.1,606.5L286.3,605.4L286.5,604.2L288.9,603.9L289.4,605.1L290.8,603.7L291.8,605.0L294.7,602.3L296.5,603.2Z"/>
 					<path id="merseyside" d="M282.4,622.5L281.9,624.5L280.9,624.6L279.7,626.9L273.5,622.9L272.0,620.0L271.7,617.8L270.1,615.5L269.1,612.3L269.1,610.2L268.8,611.0L267.4,609.4L267.4,607.0L270.6,600.6L273.7,596.5L273.4,597.0L274.6,598.1L274.2,597.8L274.5,597.3L274.8,599.7L270.6,604.7L271.0,607.0L270.2,607.4L269.9,609.2L273.2,611.5L273.8,610.7L273.1,609.2L274.5,609.1L275.6,610.7L277.6,611.1L277.1,611.8L278.1,613.1L280.2,614.1L280.6,611.7L282.2,610.2L282.8,611.6L284.6,611.0L287.5,612.7L288.5,614.3L290.1,614.3L289.9,615.7L291.7,617.1L290.7,616.8L289.4,618.1L287.0,616.6L286.8,617.7L287.7,618.5L287.1,621.9L283.9,620.7L283.3,622.5L282.4,622.5Z M271.5,620.8L272.3,623.5L275.4,628.4L270.7,629.2L268.7,627.8L267.7,628.8L263.2,623.5L262.8,621.9L270.2,617.4L271.5,620.8Z M267.7,628.8L266.9,629.4L266.4,627.3L267.7,628.8Z"/>
@@ -671,8 +675,8 @@
 					<path id="mid-glamorgan" d="M241.8,772.6L241.7,771.2L239.9,768.6L240.7,768.2L240.7,766.1L241.4,764.6L245.9,764.6L244.7,761.8L245.2,758.7L244.5,755.8L250.0,751.2L250.3,749.6L251.5,750.6L252.7,749.1L253.4,750.8L255.5,751.4L255.4,752.7L256.6,752.7L257.4,757.5L258.1,757.2L259.4,761.6L258.9,763.3L258.3,763.1L257.5,764.7L258.0,767.1L259.9,771.1L261.1,771.8L259.9,773.4L259.2,772.3L256.2,773.6L256.5,775.8L254.5,775.5L253.4,776.6L249.0,775.5L247.5,776.4L247.1,777.2L247.4,778.0L246.3,777.1L242.4,779.0L238.7,778.2L237.3,776.2L236.7,773.5L239.4,774.3L241.8,772.6Z"/>
 					<path id="south-glamorgan" d="M260.0,785.2L253.3,786.2L247.0,784.9L242.3,779.1L246.3,777.1L247.4,778.0L247.1,777.2L247.5,776.4L249.0,775.5L253.4,776.6L254.5,775.5L256.5,775.8L256.2,773.6L257.7,772.5L259.2,772.3L259.9,773.4L261.0,772.2L264.5,771.6L268.9,774.9L267.9,775.7L268.2,776.4L265.9,777.2L266.4,777.3L265.8,779.2L264.4,780.5L264.2,784.2L260.0,785.2Z"/>
 					<path id="gwent" d="M259.6,770.3L258.6,769.0L257.5,764.7L258.3,763.1L258.9,763.3L259.4,761.6L258.1,757.2L257.4,757.5L256.6,752.7L257.7,752.4L258.9,749.9L263.2,750.9L265.4,750.3L266.6,748.8L267.4,749.3L267.6,748.1L269.0,746.8L268.7,745.8L270.0,745.3L270.3,744.3L268.4,741.7L267.9,739.6L268.3,739.2L267.8,738.4L268.9,736.9L270.9,739.1L271.7,741.5L273.2,741.5L273.4,743.4L277.9,741.0L279.3,741.9L278.5,742.6L279.4,742.3L282.8,745.4L282.3,746.6L284.2,748.9L285.1,747.9L288.3,749.8L287.0,751.7L287.4,752.4L286.9,754.5L287.7,755.7L286.6,757.6L287.4,759.6L286.7,760.1L287.9,762.2L286.6,763.2L287.5,763.1L286.9,764.6L287.9,766.5L285.5,769.7L276.5,773.9L275.7,773.6L276.1,773.0L274.5,773.6L272.9,772.8L273.9,772.3L272.8,770.9L273.3,770.0L272.4,769.1L272.5,767.6L274.3,767.7L272.4,767.6L272.3,769.0L273.2,770.2L272.7,770.9L273.5,771.9L272.6,772.5L271.9,771.6L272.5,772.6L272.3,773.5L268.2,776.4L267.9,775.7L268.9,774.9L266.9,772.7L264.5,771.6L261.5,772.4L259.6,770.3Z"/>
-				</svg>
-			</div>
+					</svg>
+				</div>
 			<div class="map-tooltip" id="map-tooltip"></div>
 			<div class="zoom-controls">
 				<button class="zoom-btn" id="zoom-in" title="Zoom in">+</button>
@@ -816,46 +820,78 @@
 			document.getElementById('mode-select').addEventListener('change', (e) => this.setMode(e.target.value));
 			document.getElementById('theme-btn').addEventListener('click', () => this.toggleTheme());
 
-			// Map hover + click (desktop mouse events go through overlay via pointer-events:none on hover)
 			const svg = document.getElementById('quiz-map');
-			const overlay = document.getElementById('touch-overlay');
+			const mapPanel = document.getElementById('map-panel');
 			svg.addEventListener('mousemove', (e) => this.handleMapHover(e));
 			svg.addEventListener('mouseleave', () => this.hideTooltip());
 			svg.addEventListener('click', (e) => this.handleMapClick(e));
 
-			// Zoom: change SVG CSS width. Pan: native browser scroll on .map-panel.
-			const mapPanel = document.getElementById('map-panel');
-			let zoomLevel = 100; // percentage
+			// Zoom & pan via SVG viewBox manipulation
+			const origVB = svg.getAttribute('viewBox').split(' ').map(Number);
+			let vb = { x: origVB[0], y: origVB[1], w: origVB[2], h: origVB[3] };
 
-			const applyZoom = () => {
-				svg.style.width = zoomLevel + '%';
-				svg.style.minWidth = zoomLevel <= 100 ? '300px' : (zoomLevel * 3) + 'px';
+			const applyViewBox = () => {
+				svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+			};
+
+			const zoomBy = (factor, cx, cy) => {
+				const newW = Math.max(origVB[2] * 0.1, Math.min(origVB[2] * 3, vb.w * factor));
+				const newH = Math.max(origVB[3] * 0.1, Math.min(origVB[3] * 3, vb.h * factor));
+				vb.x = cx - (cx - vb.x) * (newW / vb.w);
+				vb.y = cy - (cy - vb.y) * (newH / vb.h);
+				vb.w = newW;
+				vb.h = newH;
+				applyViewBox();
+			};
+
+			const svgPoint = (clientX, clientY) => {
+				const rect = svg.getBoundingClientRect();
+				return {
+					x: vb.x + (clientX - rect.left) / rect.width * vb.w,
+					y: vb.y + (clientY - rect.top) / rect.height * vb.h
+				};
 			};
 
 			document.getElementById('zoom-in').addEventListener('click', () => {
-				zoomLevel = Math.min(zoomLevel + 50, 400);
-				applyZoom();
+				zoomBy(0.7, vb.x + vb.w / 2, vb.y + vb.h / 2);
 			});
 			document.getElementById('zoom-out').addEventListener('click', () => {
-				zoomLevel = Math.max(zoomLevel - 50, 100);
-				applyZoom();
-				if (zoomLevel <= 100) mapPanel.scrollTo(0, 0);
+				zoomBy(1.4, vb.x + vb.w / 2, vb.y + vb.h / 2);
 			});
 			document.getElementById('zoom-reset').addEventListener('click', () => {
-				zoomLevel = 100;
-				applyZoom();
-				mapPanel.scrollTo(0, 0);
+				vb = { x: origVB[0], y: origVB[1], w: origVB[2], h: origVB[3] };
+				applyViewBox();
 			});
 
-			// Mouse wheel zoom on desktop
-			svg.addEventListener('wheel', (e) => {
+			mapPanel.addEventListener('wheel', (e) => {
 				e.preventDefault();
-				zoomLevel = e.deltaY > 0
-					? Math.max(zoomLevel - 20, 100)
-					: Math.min(zoomLevel + 20, 400);
-				applyZoom();
-				if (zoomLevel <= 100) mapPanel.scrollTo(0, 0);
+				const pt = svgPoint(e.clientX, e.clientY);
+				const factor = e.deltaY > 0 ? 1.15 : 0.85;
+				zoomBy(factor, pt.x, pt.y);
 			}, { passive: false });
+
+			let isDragging = false, dragStart = { x: 0, y: 0 }, vbStart = { x: 0, y: 0 };
+			mapPanel.addEventListener('mousedown', (e) => {
+				if (e.target.closest('.zoom-controls')) return;
+				isDragging = true;
+				dragStart = { x: e.clientX, y: e.clientY };
+				vbStart = { x: vb.x, y: vb.y };
+				mapPanel.classList.add('dragging');
+				e.preventDefault();
+			});
+			window.addEventListener('mousemove', (e) => {
+				if (!isDragging) return;
+				const rect = svg.getBoundingClientRect();
+				const dx = (e.clientX - dragStart.x) / rect.width * vb.w;
+				const dy = (e.clientY - dragStart.y) / rect.height * vb.h;
+				vb.x = vbStart.x - dx;
+				vb.y = vbStart.y - dy;
+				applyViewBox();
+			});
+			window.addEventListener('mouseup', () => {
+				isDragging = false;
+				mapPanel.classList.remove('dragging');
+			});
 		},
 
 		toggleTheme() {

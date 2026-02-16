@@ -157,21 +157,25 @@
 			flex: 3;
 			position: relative;
 			padding: 0;
-			overflow: auto;
-			-webkit-overflow-scrolling: touch;
+			overflow: hidden;
+		}
+
+		.map-panel.dragging {
+			cursor: grabbing;
+			user-select: none;
 		}
 
 		.map-container {
-			min-width: 100%;
+			width: 100%;
+			height: 100%;
 			display: flex;
 			justify-content: center;
+			align-items: center;
 		}
 
 		#quiz-map {
 			width: 100%;
-			min-width: 300px;
-			height: auto;
-			transition: width 0.2s ease;
+			height: 100%;
 		}
 
 		#quiz-map path {
@@ -765,42 +769,77 @@
 			document.getElementById('theme-btn').addEventListener('click', () => this.toggleTheme());
 
 			const svg = document.getElementById('quiz-map');
+			const mapPanel = document.getElementById('map-panel');
 			svg.addEventListener('mousemove', (e) => this.handleMapHover(e));
 			svg.addEventListener('mouseleave', () => this.hideTooltip());
 			svg.addEventListener('click', (e) => this.handleMapClick(e));
 
-			// Zoom: change SVG CSS width. Pan: native browser scroll on .map-panel.
-			const mapPanel = document.getElementById('map-panel');
-			let zoomLevel = 100;
+			// Zoom & pan via SVG viewBox manipulation
+			const origVB = svg.getAttribute('viewBox').split(' ').map(Number);
+			let vb = { x: origVB[0], y: origVB[1], w: origVB[2], h: origVB[3] };
 
-			const applyZoom = () => {
-				svg.style.width = zoomLevel + '%';
-				svg.style.minWidth = zoomLevel <= 100 ? '300px' : (zoomLevel * 3) + 'px';
+			const applyViewBox = () => {
+				svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+			};
+
+			const zoomBy = (factor, cx, cy) => {
+				const newW = Math.max(origVB[2] * 0.1, Math.min(origVB[2] * 3, vb.w * factor));
+				const newH = Math.max(origVB[3] * 0.1, Math.min(origVB[3] * 3, vb.h * factor));
+				vb.x = cx - (cx - vb.x) * (newW / vb.w);
+				vb.y = cy - (cy - vb.y) * (newH / vb.h);
+				vb.w = newW;
+				vb.h = newH;
+				applyViewBox();
+			};
+
+			const svgPoint = (clientX, clientY) => {
+				const rect = svg.getBoundingClientRect();
+				return {
+					x: vb.x + (clientX - rect.left) / rect.width * vb.w,
+					y: vb.y + (clientY - rect.top) / rect.height * vb.h
+				};
 			};
 
 			document.getElementById('zoom-in').addEventListener('click', () => {
-				zoomLevel = Math.min(zoomLevel + 50, 400);
-				applyZoom();
+				zoomBy(0.7, vb.x + vb.w / 2, vb.y + vb.h / 2);
 			});
 			document.getElementById('zoom-out').addEventListener('click', () => {
-				zoomLevel = Math.max(zoomLevel - 50, 100);
-				applyZoom();
-				if (zoomLevel <= 100) mapPanel.scrollTo(0, 0);
+				zoomBy(1.4, vb.x + vb.w / 2, vb.y + vb.h / 2);
 			});
 			document.getElementById('zoom-reset').addEventListener('click', () => {
-				zoomLevel = 100;
-				applyZoom();
-				mapPanel.scrollTo(0, 0);
+				vb = { x: origVB[0], y: origVB[1], w: origVB[2], h: origVB[3] };
+				applyViewBox();
 			});
 
-			svg.addEventListener('wheel', (e) => {
+			mapPanel.addEventListener('wheel', (e) => {
 				e.preventDefault();
-				zoomLevel = e.deltaY > 0
-					? Math.max(zoomLevel - 20, 100)
-					: Math.min(zoomLevel + 20, 400);
-				applyZoom();
-				if (zoomLevel <= 100) mapPanel.scrollTo(0, 0);
+				const pt = svgPoint(e.clientX, e.clientY);
+				const factor = e.deltaY > 0 ? 1.15 : 0.85;
+				zoomBy(factor, pt.x, pt.y);
 			}, { passive: false });
+
+			let isDragging = false, dragStart = { x: 0, y: 0 }, vbStart = { x: 0, y: 0 };
+			mapPanel.addEventListener('mousedown', (e) => {
+				if (e.target.closest('.zoom-controls')) return;
+				isDragging = true;
+				dragStart = { x: e.clientX, y: e.clientY };
+				vbStart = { x: vb.x, y: vb.y };
+				mapPanel.classList.add('dragging');
+				e.preventDefault();
+			});
+			window.addEventListener('mousemove', (e) => {
+				if (!isDragging) return;
+				const rect = svg.getBoundingClientRect();
+				const dx = (e.clientX - dragStart.x) / rect.width * vb.w;
+				const dy = (e.clientY - dragStart.y) / rect.height * vb.h;
+				vb.x = vbStart.x - dx;
+				vb.y = vbStart.y - dy;
+				applyViewBox();
+			});
+			window.addEventListener('mouseup', () => {
+				isDragging = false;
+				mapPanel.classList.remove('dragging');
+			});
 		},
 
 		toggleTheme() {
