@@ -180,6 +180,8 @@
 			width: 100%;
 			max-width: 500px;
 			position: relative;
+			transform-origin: 0 0;
+			touch-action: none;
 		}
 
 		#quiz-map {
@@ -820,13 +822,83 @@
 			svg.addEventListener('mouseleave', () => this.hideTooltip());
 			svg.addEventListener('click', (e) => this.handleMapClick(e));
 
-			// Touch handling
+			// Pan & zoom state
+			const container = document.getElementById('map-container');
+			const mapPanel = document.getElementById('map-panel');
+			let scale = 1, panX = 0, panY = 0;
+
+			const applyTransform = () => {
+				container.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+			};
+
+			const clampPan = () => {
+				if (scale <= 1) { panX = 0; panY = 0; return; }
+				const rect = mapPanel.getBoundingClientRect();
+				const cw = container.offsetWidth * scale;
+				const ch = container.offsetHeight * scale;
+				const maxX = (cw - rect.width) / 2;
+				const maxY = (ch - rect.height) / 2;
+				panX = Math.max(-maxX, Math.min(maxX, panX));
+				panY = Math.max(-maxY, Math.min(maxY, panY));
+			};
+
+			// Touch: tap detection, one-finger pan, two-finger pinch-zoom
+			let touchStartTime = 0;
+			let touchStartDist = 0;
+			let touchStartScale = 1;
+			let touchStartPanX = 0, touchStartPanY = 0;
+			let touchStartX = 0, touchStartY = 0;
 			let touchMoved = false;
-			svg.addEventListener('touchstart', () => { touchMoved = false; });
-			svg.addEventListener('touchmove', () => { touchMoved = true; });
-			svg.addEventListener('touchend', (e) => {
-				if (!touchMoved) {
-					e.preventDefault();
+			let isPinching = false;
+
+			const getTouchDist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+			const getTouchMid = (t) => ({ x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 });
+
+			mapPanel.addEventListener('touchstart', (e) => {
+				touchMoved = false;
+				isPinching = e.touches.length >= 2;
+				if (isPinching) {
+					touchStartDist = getTouchDist(e.touches);
+					touchStartScale = scale;
+					const mid = getTouchMid(e.touches);
+					touchStartX = mid.x;
+					touchStartY = mid.y;
+				} else {
+					touchStartX = e.touches[0].clientX;
+					touchStartY = e.touches[0].clientY;
+					touchStartTime = Date.now();
+				}
+				touchStartPanX = panX;
+				touchStartPanY = panY;
+			}, { passive: true });
+
+			mapPanel.addEventListener('touchmove', (e) => {
+				e.preventDefault();
+				if (e.touches.length >= 2) {
+					isPinching = true;
+					const dist = getTouchDist(e.touches);
+					const newScale = Math.max(1, Math.min(5, touchStartScale * (dist / touchStartDist)));
+					const mid = getTouchMid(e.touches);
+					panX = touchStartPanX + (mid.x - touchStartX);
+					panY = touchStartPanY + (mid.y - touchStartY);
+					scale = newScale;
+					clampPan();
+					applyTransform();
+					touchMoved = true;
+				} else if (scale > 1 && !isPinching) {
+					const dx = e.touches[0].clientX - touchStartX;
+					const dy = e.touches[0].clientY - touchStartY;
+					if (Math.abs(dx) > 3 || Math.abs(dy) > 3) touchMoved = true;
+					panX = touchStartPanX + dx;
+					panY = touchStartPanY + dy;
+					clampPan();
+					applyTransform();
+				}
+			}, { passive: false });
+
+			mapPanel.addEventListener('touchend', (e) => {
+				if (e.touches.length < 2) isPinching = false;
+				if (e.touches.length === 0 && !touchMoved && (Date.now() - touchStartTime) < 300) {
 					const touch = e.changedTouches[0];
 					const target = document.elementFromPoint(touch.clientX, touch.clientY);
 					if (target && target.tagName === 'path') {
@@ -835,17 +907,16 @@
 				}
 			});
 
-			// Zoom
-			let scale = 1, panX = 0, panY = 0;
-			const container = document.getElementById('map-container');
+			// Button zoom (still useful on desktop)
 			document.getElementById('zoom-in').addEventListener('click', () => {
 				scale = Math.min(scale * 1.3, 5);
-				container.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
+				clampPan();
+				applyTransform();
 			});
 			document.getElementById('zoom-out').addEventListener('click', () => {
 				scale = Math.max(scale / 1.3, 1);
-				if (scale === 1) { panX = 0; panY = 0; }
-				container.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
+				clampPan();
+				applyTransform();
 			});
 			document.getElementById('zoom-reset').addEventListener('click', () => {
 				scale = 1; panX = 0; panY = 0;
