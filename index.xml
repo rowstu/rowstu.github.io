@@ -4808,7 +4808,20 @@ greedy_match = re.search(r&amp;#39;&amp;lt;.*&amp;gt;&amp;#39;, html) # Greedy
 nongreedy_match = re.search(r&amp;#39;&amp;lt;.*?&amp;gt;&amp;#39;, html) # Non-greedy
 print(&amp;#34;Greedy:&amp;#34;, greedy_match.group()) # Output: &amp;lt;div&amp;gt;Welcome to &amp;lt;b&amp;gt;Python&amp;lt;/b&amp;gt;!&amp;lt;/div&amp;gt;
 print(&amp;#34;Non-greedy:&amp;#34;, nongreedy_match.group()) # Output: &amp;lt;div&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Namespaces</title><link>https://rowstu.net/linux/namespaces/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/namespaces/</guid><description>&lt;h1 id="isolating-nginx-in-a-linux-namespace-with-cpu-memory-limits-and-custom-networking"&gt;Isolating NGINX in a Linux Namespace with CPU, Memory Limits, and Custom Networking&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>Mutt – Terminal Email Client</title><link>https://rowstu.net/linux/mutt/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/mutt/</guid><description>&lt;p&gt;Mutt is a powerful text-based email client for Linux. It handles IMAP, POP3, and SMTP natively, and with the right configuration can connect to Gmail, Outlook/Exchange (via OAuth2 or app passwords), and any standard mail server. NeoMutt is a maintained fork with extra features — everything here works with both.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="installation"&gt;Installation&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Debian/Ubuntu&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install mutt
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# or NeoMutt (recommended)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install neomutt
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Arch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo pacman -S neomutt
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Fedora&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo dnf install neomutt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;For Exchange/Office 365, you&amp;rsquo;ll also want:&lt;/p&gt;</description></item><item><title>Namespaces</title><link>https://rowstu.net/linux/namespaces/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/namespaces/</guid><description>&lt;h1 id="isolating-nginx-in-a-linux-namespace-with-cpu-memory-limits-and-custom-networking"&gt;Isolating NGINX in a Linux Namespace with CPU, Memory Limits, and Custom Networking&lt;/h1&gt;
 &lt;p&gt;Based on: &lt;a href="https://blog.nginx.org/blog/what-are-namespaces-cgroups-how-do-they-work"&gt;https://blog.nginx.org/blog/what-are-namespaces-cgroups-how-do-they-work&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id="1-create-a-directory-for-the-static-hello-world-page"&gt;1. Create a Directory for the Static &amp;ldquo;Hello World&amp;rdquo; Page&lt;/h3&gt;
 &lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;mkdir -p /tmp/hello-world

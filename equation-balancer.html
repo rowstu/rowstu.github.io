@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chemical Equation Balancer</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0d0c;
+    --surface: #121a17;
+    --surface2: #182420;
+    --border: #1e332c;
+    --accent: #34d399;
+    --accent2: #6ee7b7;
+    --accent-dim: #134e3a;
+    --text: #e2e8f0;
+    --text-dim: #7a8f8a;
+    --error: #f87171;
+    --warn: #fbbf24;
+    --font: 'Chakra Petch', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-top: 60px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Input Section */
+  .input-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .input-section label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .input-row input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 1.1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-row input:focus {
+    border-color: var(--accent);
+  }
+
+  .input-row input::placeholder {
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+
+  .btn {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.8rem 1.5rem;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+
+  /* Presets */
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .presets label {
+    margin-bottom: 0.3rem;
+  }
+
+  .preset-btn {
+    background: var(--surface2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35rem 0.7rem;
+    font-family: var(--font);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Result Section */
+  .result-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+
+  .result-section.visible { display: block; }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .result-header h2 {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-balanced {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+  }
+
+  .status-error {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--error);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+  }
+
+  /* Equation Display */
+  .equation-display {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .eq-coeff {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .eq-formula {
+    color: var(--text);
+  }
+
+  .eq-element {
+    color: var(--text);
+  }
+
+  .eq-subscript {
+    color: var(--warn);
+    font-size: 0.75em;
+    vertical-align: sub;
+  }
+
+  .eq-arrow {
+    color: var(--text-dim);
+    margin: 0 0.5rem;
+  }
+
+  .eq-plus {
+    color: var(--text-dim);
+    margin: 0 0.3rem;
+  }
+
+  /* Working Section */
+  .working-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+
+  .working-section.visible { display: block; }
+
+  .working-section h2 {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  .step {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .step-num {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .step p {
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .step .highlight {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Atom Count Table */
+  .atom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .atom-table th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+  }
+
+  .atom-table td {
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid rgba(30, 51, 44, 0.4);
+  }
+
+  .atom-table .element-cell {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .count-match {
+    color: var(--accent);
+  }
+
+  .count-mismatch {
+    color: var(--error);
+  }
+
+  /* Info Section */
+  .info-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .info-section h2 {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .info-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+  }
+
+  .info-card h3 {
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+
+  .info-card p {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* Error */
+  .error-box {
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--error);
+    font-size: 0.85rem;
+    display: none;
+  }
+
+  .error-box.visible { display: block; }
+
+  @media (max-width: 600px) {
+    .container { padding: 1rem; }
+    h1 { font-size: 1.4rem; }
+    .input-row { flex-direction: column; }
+    .equation-display { font-size: 1.1rem; padding: 1rem; }
+    .info-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<script src="/assets/shared-nav.js"></script>
+
+<div class="container">
+  <h1>CHEMICAL EQUATION BALANCER</h1>
+  <p class="subtitle">Enter an unbalanced equation and see it balanced with full working</p>
+
+  <div class="input-section">
+    <label>Chemical Equation</label>
+    <div class="input-row">
+      <input type="text" id="eqInput" placeholder="e.g. H2 + O2 -> H2O" spellcheck="false" autocomplete="off">
+      <button class="btn" onclick="balance()">Balance</button>
+    </div>
+
+    <div class="presets">
+      <label>Try an example:</label>
+      <button class="preset-btn" onclick="loadPreset('H2 + O2 -> H2O')">Hydrogen + Oxygen</button>
+      <button class="preset-btn" onclick="loadPreset('Fe + O2 -> Fe2O3')">Iron Rusting</button>
+      <button class="preset-btn" onclick="loadPreset('CH4 + O2 -> CO2 + H2O')">Methane Combustion</button>
+      <button class="preset-btn" onclick="loadPreset('N2 + H2 -> NH3')">Haber Process</button>
+      <button class="preset-btn" onclick="loadPreset('Na + H2O -> NaOH + H2')">Sodium + Water</button>
+      <button class="preset-btn" onclick="loadPreset('CaCO3 -> CaO + CO2')">Thermal Decomposition</button>
+      <button class="preset-btn" onclick="loadPreset('C2H6 + O2 -> CO2 + H2O')">Ethane Combustion</button>
+      <button class="preset-btn" onclick="loadPreset('Al + HCl -> AlCl3 + H2')">Aluminium + HCl</button>
+      <button class="preset-btn" onclick="loadPreset('Mg + HCl -> MgCl2 + H2')">Magnesium + HCl</button>
+      <button class="preset-btn" onclick="loadPreset('NaOH + H2SO4 -> Na2SO4 + H2O')">Neutralisation</button>
+      <button class="preset-btn" onclick="loadPreset('KMnO4 + HCl -> KCl + MnCl2 + Cl2 + H2O')">KMnO4 + HCl</button>
+      <button class="preset-btn" onclick="loadPreset('C6H12O6 + O2 -> CO2 + H2O')">Glucose Respiration</button>
+      <button class="preset-btn" onclick="loadPreset('Fe2O3 + CO -> Fe + CO2')">Iron Extraction</button>
+      <button class="preset-btn" onclick="loadPreset('C3H8 + O2 -> CO2 + H2O')">Propane Combustion</button>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="result-section" id="resultSection">
+    <div class="result-header">
+      <h2>Balanced Equation</h2>
+      <span class="status-badge status-balanced" id="statusBadge">Balanced</span>
+    </div>
+    <div class="equation-display" id="equationDisplay"></div>
+  </div>
+
+  <div class="working-section" id="workingSection">
+    <h2>Working &amp; Verification</h2>
+    <div id="workingSteps"></div>
+  </div>
+
+  <div class="info-section">
+    <h2>Tips</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Syntax</h3>
+        <p>Use element symbols with numbers: H2O, CO2, Ca(OH)2. Separate compounds with + and sides with -> or = or &rarr;</p>
+      </div>
+      <div class="info-card">
+        <h3>Brackets</h3>
+        <p>Parentheses are supported: Ca(OH)2 means 1 Ca, 2 O, 2 H. Nested brackets like Mg3(PO4)2 also work.</p>
+      </div>
+      <div class="info-card">
+        <h3>Balancing</h3>
+        <p>The law of conservation of mass says atoms can't be created or destroyed — both sides must have equal atoms of each element.</p>
+      </div>
+      <div class="info-card">
+        <h3>Coefficients</h3>
+        <p>Only coefficients (numbers in front) are changed when balancing. Subscripts inside formulas are never altered.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Parse a chemical formula like "Ca(OH)2" into {Ca:1, O:2, H:2}
+function parseFormula(formula) {
+  const atoms = {};
+  let i = 0;
+
+  function parse(multiplier) {
+    while (i < formula.length) {
+      if (formula[i] === '(') {
+        i++; // skip (
+        parse(1);
+        // read number after )
+        let num = '';
+        while (i < formula.length && /\d/.test(formula[i])) {
+          num += formula[i]; i++;
+        }
+        const factor = num ? parseInt(num) : 1;
+        // multiply last group — we handle this differently
+        // Actually, let's use a stack-based approach
+      } else if (formula[i] === ')') {
+        i++; // skip )
+        return;
+      } else if (/[A-Z]/.test(formula[i])) {
+        let elem = formula[i]; i++;
+        while (i < formula.length && /[a-z]/.test(formula[i])) {
+          elem += formula[i]; i++;
+        }
+        let num = '';
+        while (i < formula.length && /\d/.test(formula[i])) {
+          num += formula[i]; i++;
+        }
+        const count = num ? parseInt(num) : 1;
+        atoms[elem] = (atoms[elem] || 0) + count * multiplier;
+      } else {
+        i++;
+      }
+    }
+  }
+
+  // Better stack-based parser
+  function parseStack() {
+    const stack = [{}];
+
+    while (i < formula.length) {
+      if (formula[i] === '(') {
+        i++;
+        stack.push({});
+      } else if (formula[i] === ')') {
+        i++;
+        let num = '';
+        while (i < formula.length && /\d/.test(formula[i])) {
+          num += formula[i]; i++;
+        }
+        const mult = num ? parseInt(num) : 1;
+        const top = stack.pop();
+        const parent = stack[stack.length - 1];
+        for (const [elem, count] of Object.entries(top)) {
+          parent[elem] = (parent[elem] || 0) + count * mult;
+        }
+      } else if (/[A-Z]/.test(formula[i])) {
+        let elem = formula[i]; i++;
+        while (i < formula.length && /[a-z]/.test(formula[i])) {
+          elem += formula[i]; i++;
+        }
+        let num = '';
+        while (i < formula.length && /\d/.test(formula[i])) {
+          num += formula[i]; i++;
+        }
+        const count = num ? parseInt(num) : 1;
+        const top = stack[stack.length - 1];
+        top[elem] = (top[elem] || 0) + count;
+      } else {
+        i++;
+      }
+    }
+    return stack[0];
+  }
+
+  i = 0;
+  return parseStack();
+}
+
+// Parse equation string into { reactants: [{formula, atoms}], products: [{formula, atoms}] }
+function parseEquation(input) {
+  // Normalize arrow
+  const normalized = input.replace(/→|=>|=/, '->');
+  const sides = normalized.split('->');
+  if (sides.length !== 2) throw new Error('Use -> or = to separate reactants and products');
+
+  function parseSide(s) {
+    return s.split('+').map(t => t.trim()).filter(t => t.length > 0).map(formula => {
+      // Strip leading coefficient
+      let coeff = 1;
+      const m = formula.match(/^(\d+)\s*([A-Z].*)$/);
+      if (m) {
+        coeff = parseInt(m[1]);
+        formula = m[2];
+      }
+      const atoms = parseFormula(formula);
+      return { formula, atoms, origCoeff: coeff };
+    });
+  }
+
+  const reactants = parseSide(sides[0]);
+  const products = parseSide(sides[1]);
+
+  if (reactants.length === 0) throw new Error('No reactants found');
+  if (products.length === 0) throw new Error('No products found');
+
+  return { reactants, products };
+}
+
+// Get all unique elements in the equation
+function getElements(parsed) {
+  const elems = new Set();
+  [...parsed.reactants, ...parsed.products].forEach(c => {
+    Object.keys(c.atoms).forEach(e => elems.add(e));
+  });
+  return [...elems];
+}
+
+// Balance using matrix method (Gaussian elimination over integers)
+function balanceEquation(parsed) {
+  const elements = getElements(parsed);
+  const numCompounds = parsed.reactants.length + parsed.products.length;
+  const allCompounds = [...parsed.reactants, ...parsed.products];
+
+  // Build matrix: rows = elements, cols = compounds
+  // Reactants positive, products negative
+  const matrix = [];
+  for (const elem of elements) {
+    const row = [];
+    for (let j = 0; j < parsed.reactants.length; j++) {
+      row.push(parsed.reactants[j].atoms[elem] || 0);
+    }
+    for (let j = 0; j < parsed.products.length; j++) {
+      row.push(-(parsed.products[j].atoms[elem] || 0));
+    }
+    matrix.push(row);
+  }
+
+  // Gaussian elimination
+  const m = matrix.length;
+  const n = numCompounds;
+  const aug = matrix.map(r => [...r]);
+
+  let pivotRow = 0;
+  const pivotCols = [];
+
+  for (let col = 0; col < n && pivotRow < m; col++) {
+    // Find pivot
+    let maxRow = -1;
+    let maxVal = 0;
+    for (let r = pivotRow; r < m; r++) {
+      if (Math.abs(aug[r][col]) > maxVal) {
+        maxVal = Math.abs(aug[r][col]);
+        maxRow = r;
+      }
+    }
+    if (maxVal === 0) continue;
+
+    // Swap
+    [aug[pivotRow], aug[maxRow]] = [aug[maxRow], aug[pivotRow]];
+    pivotCols.push(col);
+
+    // Eliminate below and above
+    for (let r = 0; r < m; r++) {
+      if (r === pivotRow) continue;
+      if (aug[r][col] === 0) continue;
+      const factor = aug[r][col] / aug[pivotRow][col];
+      for (let c = 0; c < n; c++) {
+        aug[r][c] -= factor * aug[pivotRow][c];
+      }
+    }
+    pivotRow++;
+  }
+
+  // Find free variables (columns not pivot)
+  const freeVars = [];
+  for (let c = 0; c < n; c++) {
+    if (!pivotCols.includes(c)) freeVars.push(c);
+  }
+
+  if (freeVars.length === 0) {
+    // Only trivial solution — equation might already be balanced or invalid
+    return new Array(numCompounds).fill(1);
+  }
+
+  // Set free variables to 1, solve for pivot variables
+  const solution = new Array(n).fill(0);
+  for (const fv of freeVars) solution[fv] = 1;
+
+  for (let i = pivotCols.length - 1; i >= 0; i--) {
+    const pc = pivotCols[i];
+    let val = 0;
+    for (let c = 0; c < n; c++) {
+      if (c !== pc) val -= aug[i][c] * solution[c];
+    }
+    solution[pc] = val / aug[i][pc];
+  }
+
+  // Make all positive (flip signs if needed)
+  const hasNeg = solution.some(s => s < 0);
+  if (hasNeg) {
+    for (let i = 0; i < n; i++) solution[i] = -solution[i];
+  }
+
+  // Make integers: find LCD
+  // Convert to fractions, find LCM of denominators
+  function toFraction(x) {
+    const eps = 1e-9;
+    let best = { n: Math.round(x), d: 1, err: Math.abs(x - Math.round(x)) };
+    for (let d = 2; d <= 1000; d++) {
+      const n = Math.round(x * d);
+      const err = Math.abs(x - n / d);
+      if (err < best.err - eps) {
+        best = { n, d, err };
+      }
+      if (err < eps) break;
+    }
+    return best;
+  }
+
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; }
+  function lcm(a, b) { return (a / gcd(a, b)) * b; }
+
+  const fracs = solution.map(toFraction);
+  let denom = 1;
+  for (const f of fracs) denom = lcm(denom, f.d);
+
+  const intSolution = fracs.map(f => Math.round(f.n * (denom / f.d)));
+
+  // Reduce by GCD
+  let g = Math.abs(intSolution[0]);
+  for (let i = 1; i < intSolution.length; i++) g = gcd(g, Math.abs(intSolution[i]));
+  if (g > 1) {
+    for (let i = 0; i < intSolution.length; i++) intSolution[i] /= g;
+  }
+
+  // Ensure all positive
+  if (intSolution.some(s => s <= 0)) {
+    // Try negating
+    const flipped = intSolution.map(s => -s);
+    if (flipped.every(s => s > 0)) return flipped;
+    // Otherwise just use absolute values as fallback
+    return intSolution.map(s => Math.abs(s) || 1);
+  }
+
+  return intSolution;
+}
+
+// Format a formula with HTML subscripts
+function formatFormula(formula) {
+  let html = '';
+  let i = 0;
+  while (i < formula.length) {
+    if (/[A-Z]/.test(formula[i])) {
+      let elem = formula[i]; i++;
+      while (i < formula.length && /[a-z]/.test(formula[i])) {
+        elem += formula[i]; i++;
+      }
+      html += `<span class="eq-element">${elem}</span>`;
+    } else if (/\d/.test(formula[i])) {
+      let num = '';
+      while (i < formula.length && /\d/.test(formula[i])) {
+        num += formula[i]; i++;
+      }
+      html += `<span class="eq-subscript">${num}</span>`;
+    } else if (formula[i] === '(' || formula[i] === ')') {
+      html += formula[i]; i++;
+    } else {
+      html += formula[i]; i++;
+    }
+  }
+  return html;
+}
+
+// Count atoms in a compound multiplied by coefficient
+function countAtoms(atoms, coeff) {
+  const result = {};
+  for (const [elem, count] of Object.entries(atoms)) {
+    result[elem] = count * coeff;
+  }
+  return result;
+}
+
+function loadPreset(eq) {
+  document.getElementById('eqInput').value = eq;
+  balance();
+}
+
+function balance() {
+  const input = document.getElementById('eqInput').value.trim();
+  const errorBox = document.getElementById('errorBox');
+  const resultSection = document.getElementById('resultSection');
+  const workingSection = document.getElementById('workingSection');
+
+  errorBox.classList.remove('visible');
+  resultSection.classList.remove('visible');
+  workingSection.classList.remove('visible');
+
+  if (!input) return;
+
+  try {
+    const parsed = parseEquation(input);
+    const elements = getElements(parsed);
+    const coefficients = balanceEquation(parsed);
+
+    const reactantCoeffs = coefficients.slice(0, parsed.reactants.length);
+    const productCoeffs = coefficients.slice(parsed.reactants.length);
+
+    // Build display
+    let eqHtml = '';
+    parsed.reactants.forEach((r, i) => {
+      if (i > 0) eqHtml += '<span class="eq-plus"> + </span>';
+      if (reactantCoeffs[i] > 1) eqHtml += `<span class="eq-coeff">${reactantCoeffs[i]}</span>`;
+      eqHtml += formatFormula(r.formula);
+    });
+    eqHtml += '<span class="eq-arrow"> → </span>';
+    parsed.products.forEach((p, i) => {
+      if (i > 0) eqHtml += '<span class="eq-plus"> + </span>';
+      if (productCoeffs[i] > 1) eqHtml += `<span class="eq-coeff">${productCoeffs[i]}</span>`;
+      eqHtml += formatFormula(p.formula);
+    });
+
+    document.getElementById('equationDisplay').innerHTML = eqHtml;
+    resultSection.classList.add('visible');
+
+    // Verify balance
+    const leftCounts = {};
+    const rightCounts = {};
+    parsed.reactants.forEach((r, i) => {
+      const ca = countAtoms(r.atoms, reactantCoeffs[i]);
+      for (const [e, c] of Object.entries(ca)) leftCounts[e] = (leftCounts[e] || 0) + c;
+    });
+    parsed.products.forEach((p, i) => {
+      const ca = countAtoms(p.atoms, productCoeffs[i]);
+      for (const [e, c] of Object.entries(ca)) rightCounts[e] = (rightCounts[e] || 0) + c;
+    });
+
+    const isBalanced = elements.every(e => (leftCounts[e] || 0) === (rightCounts[e] || 0));
+    const badge = document.getElementById('statusBadge');
+    if (isBalanced) {
+      badge.className = 'status-badge status-balanced';
+      badge.textContent = 'Balanced ✓';
+    } else {
+      badge.className = 'status-badge status-error';
+      badge.textContent = 'Could not balance';
+    }
+
+    // Build working steps
+    let stepsHtml = '';
+
+    // Step 1: Identify compounds
+    stepsHtml += `<div class="step">
+      <div class="step-num">Step 1 — Identify compounds</div>
+      <p><strong>Reactants:</strong> ${parsed.reactants.map(r => r.formula).join(', ')}<br>
+      <strong>Products:</strong> ${parsed.products.map(p => p.formula).join(', ')}</p>
+    </div>`;
+
+    // Step 2: Unbalanced atom count
+    const unbalLeft = {};
+    const unbalRight = {};
+    parsed.reactants.forEach(r => {
+      for (const [e, c] of Object.entries(r.atoms)) unbalLeft[e] = (unbalLeft[e] || 0) + c;
+    });
+    parsed.products.forEach(p => {
+      for (const [e, c] of Object.entries(p.atoms)) unbalRight[e] = (unbalRight[e] || 0) + c;
+    });
+
+    stepsHtml += `<div class="step">
+      <div class="step-num">Step 2 — Count atoms (unbalanced)</div>
+      <table class="atom-table">
+        <tr><th>Element</th><th>Left side</th><th>Right side</th><th>Status</th></tr>
+        ${elements.map(e => {
+          const l = unbalLeft[e] || 0;
+          const r = unbalRight[e] || 0;
+          const match = l === r;
+          return `<tr>
+            <td class="element-cell">${e}</td>
+            <td>${l}</td>
+            <td>${r}</td>
+            <td class="${match ? 'count-match' : 'count-mismatch'}">${match ? 'Equal' : 'Unequal'}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>`;
+
+    // Step 3: Apply coefficients
+    let coeffDesc = '';
+    parsed.reactants.forEach((r, i) => {
+      if (reactantCoeffs[i] !== 1) {
+        coeffDesc += `<span class="highlight">${reactantCoeffs[i]}</span> × ${r.formula}, `;
+      }
+    });
+    parsed.products.forEach((p, i) => {
+      if (productCoeffs[i] !== 1) {
+        coeffDesc += `<span class="highlight">${productCoeffs[i]}</span> × ${p.formula}, `;
+      }
+    });
+    if (!coeffDesc) coeffDesc = 'No coefficients needed (already balanced)';
+    else coeffDesc = coeffDesc.slice(0, -2);
+
+    stepsHtml += `<div class="step">
+      <div class="step-num">Step 3 — Apply coefficients</div>
+      <p>Coefficients found: ${coeffDesc}</p>
+    </div>`;
+
+    // Step 4: Verification
+    stepsHtml += `<div class="step">
+      <div class="step-num">Step 4 — Verify atom counts</div>
+      <table class="atom-table">
+        <tr><th>Element</th><th>Left side</th><th>Right side</th><th>Status</th></tr>
+        ${elements.map(e => {
+          const l = leftCounts[e] || 0;
+          const r = rightCounts[e] || 0;
+          const match = l === r;
+          return `<tr>
+            <td class="element-cell">${e}</td>
+            <td>${l}</td>
+            <td>${r}</td>
+            <td class="${match ? 'count-match' : 'count-mismatch'}">${match ? '✓ Balanced' : '✗ Unbalanced'}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>`;
+
+    document.getElementById('workingSteps').innerHTML = stepsHtml;
+    workingSection.classList.add('visible');
+
+  } catch (err) {
+    errorBox.textContent = err.message;
+    errorBox.classList.add('visible');
+  }
+}
+
+// Handle Enter key
+document.getElementById('eqInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') balance();
+});
+</script>
+</body>
+</html>

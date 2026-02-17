@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Arithmetic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06080c;
+            --surface: #0d1117;
+            --surface2: #151c28;
+            --border: #1e2d42;
+            --accent: #58a6ff;
+            --accent-dim: #1a3a5c;
+            --carry: #f97316;
+            --result: #4ade80;
+            --overflow: #ef4444;
+            --text: #c9d1d9;
+            --text-dim: #546178;
+            --text-bright: #f0f6fc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Azeret Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image: radial-gradient(ellipse at 30% 0%, rgba(88,166,255,0.04) 0%, transparent 50%);
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        header h1 { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+        header h1 span { color: var(--text-dim); font-weight: 400; }
+        header p { color: var(--text-dim); font-size: 0.75rem; margin-top: 0.4rem; }
+
+        .tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .tab { background: var(--surface); border: none; border-right: 1px solid var(--border); color: var(--text-dim); font-family: inherit; font-size: 0.72rem; font-weight: 600; padding: 0.55rem 1rem; cursor: pointer; transition: all 0.15s; }
+        .tab:last-child { border-right: none; }
+        .tab:hover { color: var(--text); background: var(--surface2); }
+        .tab.active { background: var(--accent-dim); color: var(--accent); }
+
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.8rem; background: var(--surface2); border-bottom: 1px solid var(--border); }
+        .panel-header span { font-size: 0.7rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+        .panel-body { padding: 1rem; }
+
+        .input-row { display: flex; gap: 0.8rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 0.8rem; }
+        .input-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 150px; }
+        .input-group label { font-size: 0.65rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        input[type="text"] {
+            background: var(--bg); border: 1px solid var(--border); color: var(--text-bright);
+            font-family: inherit; font-size: 1rem; padding: 0.5rem 0.7rem; border-radius: 5px; outline: none;
+        }
+        input:focus { border-color: var(--accent); }
+        select {
+            background: var(--bg); border: 1px solid var(--border); color: var(--text);
+            font-family: inherit; font-size: 0.78rem; padding: 0.45rem 0.5rem; border-radius: 5px; outline: none;
+        }
+
+        .working { padding: 1rem; font-size: 0.8rem; line-height: 2; }
+        .work-row { display: flex; justify-content: flex-end; gap: 0; }
+        .work-cell { width: 28px; text-align: center; font-weight: 600; }
+        .work-cell.carry { color: var(--carry); font-size: 0.6rem; }
+        .work-cell.op { color: var(--text-dim); }
+        .work-cell.bit { color: var(--accent); }
+        .work-cell.result-bit { color: var(--result); }
+        .work-cell.overflow-bit { color: var(--overflow); }
+        .work-line { border-bottom: 2px solid var(--border); margin: 0.3rem 0; }
+        .work-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; margin-top: 0.6rem; margin-bottom: 0.3rem; }
+        .work-note { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.5rem; line-height: 1.6; }
+        .work-note strong { color: var(--accent); font-weight: 600; }
+        .work-note .warn { color: var(--overflow); }
+        .work-note .ok { color: var(--result); }
+
+        .result-bar {
+            display: flex; gap: 1.5rem; padding: 0.8rem 1rem; background: var(--surface2);
+            border-top: 1px solid var(--border); flex-wrap: wrap; align-items: center;
+        }
+        .result-item { font-size: 0.75rem; }
+        .result-item .lbl { color: var(--text-dim); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .result-item .val { color: var(--result); font-weight: 700; font-size: 1rem; }
+        .result-item .val.warn { color: var(--overflow); }
+
+        .shift-controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+        .shift-btn {
+            background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
+            font-family: inherit; font-size: 0.72rem; font-weight: 600; padding: 0.4rem 0.7rem;
+            border-radius: 5px; cursor: pointer; transition: all 0.15s;
+        }
+        .shift-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .bit-display { display: flex; gap: 3px; justify-content: center; margin: 0.8rem 0; flex-wrap: wrap; }
+        .bdisp {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border); border-radius: 4px; font-weight: 600; font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .bdisp.on { background: rgba(88,166,255,0.15); color: var(--accent); border-color: var(--accent-dim); }
+        .bdisp.off { background: var(--bg); color: var(--text-dim); }
+        .bdisp.shifted { background: rgba(249,115,22,0.15); color: var(--carry); border-color: rgba(249,115,22,0.3); }
+        .bdisp.new { background: rgba(74,222,128,0.12); color: var(--result); border-color: rgba(74,222,128,0.3); }
+        .bdisp.lost { background: rgba(239,68,68,0.12); color: var(--overflow); border-color: rgba(239,68,68,0.3); }
+        .bit-sep { width: 8px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1.5rem; }
+        .ref-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; }
+        .ref-card h4 { font-size: 0.72rem; color: var(--accent); margin-bottom: 0.3rem; font-weight: 700; }
+        .ref-card p { font-size: 0.68rem; color: var(--text-dim); line-height: 1.5; }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            header h1 { font-size: 1.2rem; }
+            .work-cell { width: 22px; font-size: 0.7rem; }
+            .bdisp { width: 26px; height: 26px; font-size: 0.75rem; }
+            .ref-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <script src="/assets/shared-nav.js"></script>
+    <div class="container">
+        <header>
+            <h1>Binary <span>Arithmetic</span></h1>
+            <p>Addition, subtraction, and shifts with full column-by-column working</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="add" onclick="switchTab('add')">Addition</button>
+            <button class="tab" data-tab="sub" onclick="switchTab('sub')">Subtraction</button>
+            <button class="tab" data-tab="shift" onclick="switchTab('shift')">Bit Shifts</button>
+            <button class="tab" data-tab="twos" onclick="switchTab('twos')">Two's Complement</button>
+        </div>
+
+        <!-- Addition -->
+        <div class="tab-content active" id="tab-add">
+            <div class="panel">
+                <div class="panel-header"><span>Binary Addition</span></div>
+                <div class="panel-body">
+                    <div class="input-row">
+                        <div class="input-group"><label>Number A (binary)</label><input type="text" id="add-a" value="10110" oninput="calcAdd()" placeholder="e.g. 1011"></div>
+                        <div class="input-group"><label>Number B (binary)</label><input type="text" id="add-b" value="1101" oninput="calcAdd()" placeholder="e.g. 1101"></div>
+                        <div class="input-group" style="flex:0;min-width:80px"><label>Bits</label>
+                            <select id="add-bits" onchange="calcAdd()"><option value="0">Auto</option><option value="8" selected>8-bit</option><option value="16">16-bit</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="add-working" class="working"></div>
+                <div id="add-result" class="result-bar"></div>
+            </div>
+        </div>
+
+        <!-- Subtraction -->
+        <div class="tab-content" id="tab-sub">
+            <div class="panel">
+                <div class="panel-header"><span>Binary Subtraction (Two's Complement)</span></div>
+                <div class="panel-body">
+                    <div class="input-row">
+                        <div class="input-group"><label>Number A (binary)</label><input type="text" id="sub-a" value="11010" oninput="calcSub()" placeholder="e.g. 11010"></div>
+                        <div class="input-group"><label>Number B (binary)</label><input type="text" id="sub-b" value="1011" oninput="calcSub()" placeholder="e.g. 1011"></div>
+                        <div class="input-group" style="flex:0;min-width:80px"><label>Bits</label>
+                            <select id="sub-bits" onchange="calcSub()"><option value="8" selected>8-bit</option><option value="16">16-bit</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="sub-working" class="working"></div>
+                <div id="sub-result" class="result-bar"></div>
+            </div>
+        </div>
+
+        <!-- Bit Shifts -->
+        <div class="tab-content" id="tab-shift">
+            <div class="panel">
+                <div class="panel-header"><span>Bit Shifts</span></div>
+                <div class="panel-body">
+                    <div class="input-row">
+                        <div class="input-group"><label>Number (binary)</label><input type="text" id="shift-val" value="00110100" oninput="calcShift()" placeholder="e.g. 00110100"></div>
+                    </div>
+                    <div class="shift-controls" style="margin-top:0.6rem">
+                        <button class="shift-btn" onclick="doShift('left',1)">&#x226A; Left 1</button>
+                        <button class="shift-btn" onclick="doShift('left',2)">&#x226A; Left 2</button>
+                        <button class="shift-btn" onclick="doShift('right',1)">Right 1 &#x226B;</button>
+                        <button class="shift-btn" onclick="doShift('right',2)">Right 2 &#x226B;</button>
+                    </div>
+                </div>
+                <div id="shift-working" class="working"></div>
+                <div id="shift-result" class="result-bar"></div>
+            </div>
+        </div>
+
+        <!-- Two's Complement -->
+        <div class="tab-content" id="tab-twos">
+            <div class="panel">
+                <div class="panel-header"><span>Two's Complement Converter</span></div>
+                <div class="panel-body">
+                    <div class="input-row">
+                        <div class="input-group"><label>Decimal number (positive or negative)</label><input type="text" id="twos-dec" value="-42" oninput="calcTwos()" placeholder="e.g. -42"></div>
+                        <div class="input-group" style="flex:0;min-width:80px"><label>Bits</label>
+                            <select id="twos-bits" onchange="calcTwos()"><option value="8" selected>8-bit</option><option value="16">16-bit</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="twos-working" class="working"></div>
+                <div id="twos-result" class="result-bar"></div>
+            </div>
+        </div>
+
+        <div class="ref-grid">
+            <div class="ref-card">
+                <h4>Binary Addition Rules</h4>
+                <p>0 + 0 = 0<br>0 + 1 = 1<br>1 + 0 = 1<br>1 + 1 = 10 (0 carry 1)<br>1 + 1 + 1 = 11 (1 carry 1)</p>
+            </div>
+            <div class="ref-card">
+                <h4>Two's Complement</h4>
+                <p>To negate: flip all bits (NOT), then add 1. The MSB is the sign bit: 0 = positive, 1 = negative. Range for 8-bit: -128 to +127.</p>
+            </div>
+            <div class="ref-card">
+                <h4>Left Shift (&laquo;)</h4>
+                <p>Shifts bits left, fills with 0 on the right. Each shift multiplies by 2. Bits that fall off the left are lost.</p>
+            </div>
+            <div class="ref-card">
+                <h4>Right Shift (&raquo;)</h4>
+                <p>Shifts bits right, fills with 0 on the left (logical) or sign bit (arithmetic). Each shift divides by 2 (integer division).</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${tab}`));
+    }
+
+    function clean(s) { return s.replace(/[^01]/g, ''); }
+
+    // ── Addition ──
+    function calcAdd() {
+        const a = clean(document.getElementById('add-a').value);
+        const b = clean(document.getElementById('add-b').value);
+        const bitsOpt = parseInt(document.getElementById('add-bits').value);
+        if (!a || !b) { document.getElementById('add-working').innerHTML = ''; document.getElementById('add-result').innerHTML = ''; return; }
+
+        const bits = bitsOpt || Math.max(a.length, b.length) + 1;
+        const pa = a.padStart(bits, '0');
+        const pb = b.padStart(bits, '0');
+
+        let carry = 0;
+        const carries = [];
+        const result = [];
+
+        for (let i = bits - 1; i >= 0; i--) {
+            const ba = parseInt(pa[i]);
+            const bb = parseInt(pb[i]);
+            const sum = ba + bb + carry;
+            result.unshift(sum % 2);
+            carries.unshift(carry);
+            carry = Math.floor(sum / 2);
+        }
+        carries.unshift(carry);
+
+        const overflow = carry === 1 && bitsOpt > 0;
+
+        let html = '';
+        // Carry row
+        html += '<div class="work-label">Carry</div>';
+        html += '<div class="work-row">';
+        html += '<div class="work-cell op"></div>';
+        for (let i = 0; i < bits; i++) {
+            html += `<div class="work-cell carry">${carries[i + 1] || ''}</div>`;
+            if ((bits - i) % 4 === 0 && i < bits - 1) html += '<div class="work-cell"></div>';
+        }
+        html += '</div>';
+
+        // Number A
+        html += '<div class="work-row">';
+        html += '<div class="work-cell op"></div>';
+        for (let i = 0; i < bits; i++) {
+            html += `<div class="work-cell bit">${pa[i]}</div>`;
+            if ((bits - i) % 4 === 0 && i < bits - 1) html += '<div class="work-cell"></div>';
+        }
+        html += '</div>';
+
+        // Number B
+        html += '<div class="work-row">';
+        html += '<div class="work-cell op">+</div>';
+        for (let i = 0; i < bits; i++) {
+            html += `<div class="work-cell bit">${pb[i]}</div>`;
+            if ((bits - i) % 4 === 0 && i < bits - 1) html += '<div class="work-cell"></div>';
+        }
+        html += '</div>';
+
+        // Line
+        html += '<div class="work-line"></div>';
+
+        // Result
+        html += '<div class="work-row">';
+        if (overflow) {
+            html += `<div class="work-cell overflow-bit">${carry}</div>`;
+        } else {
+            html += '<div class="work-cell op"></div>';
+        }
+        for (let i = 0; i < bits; i++) {
+            html += `<div class="work-cell result-bit">${result[i]}</div>`;
+            if ((bits - i) % 4 === 0 && i < bits - 1) html += '<div class="work-cell"></div>';
+        }
+        html += '</div>';
+
+        if (overflow) {
+            html += '<div class="work-note"><span class="warn">Overflow!</span> The result needs more than ' + bits + ' bits.</div>';
+        }
+
+        // Step explanation
+        html += '<div class="work-note" style="margin-top:1rem"><strong>Column-by-column (right to left):</strong></div>';
+        for (let i = bits - 1; i >= 0; i--) {
+            const ba = parseInt(pa[i]), bb = parseInt(pb[i]), c = carries[i + 1] || 0;
+            const sum = ba + bb + c;
+            const col = bits - i;
+            html += `<div class="work-note">Col ${col}: ${ba} + ${bb}${c ? ' + ' + c + ' (carry)' : ''} = ${sum}${sum >= 2 ? ' → write <strong>' + (sum % 2) + '</strong>, carry <strong>1</strong>' : ' → write <strong>' + sum + '</strong>'}</div>`;
+        }
+
+        document.getElementById('add-working').innerHTML = html;
+
+        const resultBin = result.join('');
+        const decA = parseInt(a, 2);
+        const decB = parseInt(b, 2);
+        const decR = parseInt(resultBin, 2);
+        document.getElementById('add-result').innerHTML = `
+            <div class="result-item"><div class="lbl">A (decimal)</div><div class="val">${decA}</div></div>
+            <div class="result-item"><div class="lbl">B (decimal)</div><div class="val">${decB}</div></div>
+            <div class="result-item"><div class="lbl">Result (binary)</div><div class="val ${overflow ? 'warn' : ''}">${resultBin}</div></div>
+            <div class="result-item"><div class="lbl">Result (decimal)</div><div class="val ${overflow ? 'warn' : ''}">${decR}${overflow ? ' (truncated)' : ''}</div></div>
+        `;
+    }
+
+    // ── Subtraction ──
+    function calcSub() {
+        const a = clean(document.getElementById('sub-a').value);
+        const b = clean(document.getElementById('sub-b').value);
+        const bits = parseInt(document.getElementById('sub-bits').value);
+        if (!a || !b) { document.getElementById('sub-working').innerHTML = ''; document.getElementById('sub-result').innerHTML = ''; return; }
+
+        const pa = a.padStart(bits, '0').slice(-bits);
+        const pb = b.padStart(bits, '0').slice(-bits);
+
+        // Step 1: Invert B
+        const invB = pb.split('').map(c => c === '0' ? '1' : '0').join('');
+
+        // Step 2: Add 1 to get two's complement
+        let twosB = addBin(invB, '1'.padStart(bits, '0').slice(-bits).replace(/^0+/, '') || '0', bits);
+
+        // Step 3: Add A + twosB
+        let result = addBin(pa, twosB, bits);
+
+        let html = '';
+        html += '<div class="work-note"><strong>Method: A - B = A + (two\'s complement of B)</strong></div>';
+
+        html += '<div class="work-label">Step 1: Write B in ' + bits + '-bit</div>';
+        html += `<div class="work-note">B = <strong>${pb}</strong></div>`;
+
+        html += '<div class="work-label">Step 2: Flip all bits (NOT)</div>';
+        html += `<div class="work-note">${pb} → <strong>${invB}</strong></div>`;
+
+        html += '<div class="work-label">Step 3: Add 1 (two\'s complement)</div>';
+        html += `<div class="work-note">${invB} + 1 = <strong>${twosB}</strong></div>`;
+
+        html += '<div class="work-label">Step 4: Add A + two\'s complement of B</div>';
+
+        // Show addition working
+        let carry = 0;
+        const carries = [];
+        const res = [];
+        for (let i = bits - 1; i >= 0; i--) {
+            const ba = parseInt(pa[i]), bb = parseInt(twosB[i]);
+            const sum = ba + bb + carry;
+            res.unshift(sum % 2);
+            carries.unshift(carry);
+            carry = Math.floor(sum / 2);
+        }
+
+        html += '<div class="work-row"><div class="work-cell op"></div>';
+        for (let i = 0; i < bits; i++) html += `<div class="work-cell bit">${pa[i]}</div>`;
+        html += '</div>';
+
+        html += '<div class="work-row"><div class="work-cell op">+</div>';
+        for (let i = 0; i < bits; i++) html += `<div class="work-cell bit">${twosB[i]}</div>`;
+        html += '</div>';
+
+        html += '<div class="work-line"></div>';
+        html += '<div class="work-row"><div class="work-cell op"></div>';
+        for (let i = 0; i < bits; i++) html += `<div class="work-cell result-bit">${res[i]}</div>`;
+        html += '</div>';
+
+        if (carry) {
+            html += `<div class="work-note"><span class="ok">Carry out of ${bits} bits is discarded</span> (expected for positive results)</div>`;
+        }
+
+        const decA = parseInt(a, 2);
+        const decB = parseInt(b, 2);
+        const resBin = res.join('');
+        const decR = decA - decB;
+
+        document.getElementById('sub-working').innerHTML = html;
+        document.getElementById('sub-result').innerHTML = `
+            <div class="result-item"><div class="lbl">A (decimal)</div><div class="val">${decA}</div></div>
+            <div class="result-item"><div class="lbl">B (decimal)</div><div class="val">${decB}</div></div>
+            <div class="result-item"><div class="lbl">Result (binary)</div><div class="val">${resBin}</div></div>
+            <div class="result-item"><div class="lbl">Result (decimal)</div><div class="val">${decR}</div></div>
+        `;
+    }
+
+    function addBin(a, b, bits) {
+        a = a.padStart(bits, '0');
+        b = b.padStart(bits, '0');
+        let carry = 0;
+        let result = [];
+        for (let i = bits - 1; i >= 0; i--) {
+            const sum = parseInt(a[i]) + parseInt(b[i]) + carry;
+            result.unshift(sum % 2);
+            carry = Math.floor(sum / 2);
+        }
+        return result.join('');
+    }
+
+    // ── Bit Shifts ──
+    function calcShift() {
+        const val = clean(document.getElementById('shift-val').value);
+        if (!val) { document.getElementById('shift-working').innerHTML = ''; document.getElementById('shift-result').innerHTML = ''; return; }
+        const dec = parseInt(val, 2);
+        const bits = val.length;
+
+        let html = '<div class="work-label">Current value</div>';
+        html += '<div class="bit-display">';
+        for (let i = 0; i < bits; i++) {
+            html += `<div class="bdisp ${val[i] === '1' ? 'on' : 'off'}">${val[i]}</div>`;
+            if ((bits - i) % 4 === 1 && i < bits - 1) html += '<div class="bit-sep"></div>';
+        }
+        html += '</div>';
+        html += `<div class="work-note" style="text-align:center">Decimal: <strong>${dec}</strong></div>`;
+
+        document.getElementById('shift-working').innerHTML = html;
+        document.getElementById('shift-result').innerHTML = '';
+    }
+
+    function doShift(dir, amount) {
+        const input = document.getElementById('shift-val');
+        let val = clean(input.value);
+        if (!val) return;
+        const bits = val.length;
+        const origDec = parseInt(val, 2);
+        const orig = val;
+
+        let shifted, lost, added;
+        if (dir === 'left') {
+            lost = val.slice(0, amount);
+            shifted = val.slice(amount) + '0'.repeat(amount);
+            added = 'right';
+        } else {
+            lost = val.slice(val.length - amount);
+            shifted = '0'.repeat(amount) + val.slice(0, val.length - amount);
+            added = 'left';
+        }
+
+        const newDec = parseInt(shifted, 2);
+        input.value = shifted;
+
+        let html = '<div class="work-label">Before shift</div>';
+        html += '<div class="bit-display">';
+        for (let i = 0; i < bits; i++) {
+            html += `<div class="bdisp ${orig[i] === '1' ? 'on' : 'off'}">${orig[i]}</div>`;
+            if ((bits - i) % 4 === 1 && i < bits - 1) html += '<div class="bit-sep"></div>';
+        }
+        html += '</div>';
+
+        html += `<div class="work-note" style="text-align:center">Shift <strong>${dir} by ${amount}</strong> → ${dir === 'left' ? 'multiply' : 'divide'} by ${Math.pow(2, amount)}</div>`;
+
+        html += '<div class="work-label">After shift</div>';
+        html += '<div class="bit-display">';
+        for (let i = 0; i < bits; i++) {
+            let cls = shifted[i] === '1' ? 'on' : 'off';
+            if (dir === 'left' && i >= bits - amount) cls = 'new';
+            if (dir === 'right' && i < amount) cls = 'new';
+            html += `<div class="bdisp ${cls}">${shifted[i]}</div>`;
+            if ((bits - i) % 4 === 1 && i < bits - 1) html += '<div class="bit-sep"></div>';
+        }
+        html += '</div>';
+
+        html += `<div class="work-note">Bits lost (fell off ${dir === 'left' ? 'left' : 'right'}): <span class="${parseInt(lost,2) > 0 ? 'warn' : 'ok'}">${lost}</span></div>`;
+        html += `<div class="work-note">New zeros added on the ${added}</div>`;
+
+        document.getElementById('shift-working').innerHTML = html;
+        document.getElementById('shift-result').innerHTML = `
+            <div class="result-item"><div class="lbl">Before (decimal)</div><div class="val">${origDec}</div></div>
+            <div class="result-item"><div class="lbl">After (decimal)</div><div class="val">${newDec}</div></div>
+            <div class="result-item"><div class="lbl">Operation</div><div class="val">${origDec} ${dir === 'left' ? '&times;' : '&divide;'} ${Math.pow(2, amount)} = ${newDec}</div></div>
+        `;
+    }
+
+    // ── Two's Complement ──
+    function calcTwos() {
+        const decStr = document.getElementById('twos-dec').value.trim();
+        const bits = parseInt(document.getElementById('twos-bits').value);
+        const dec = parseInt(decStr);
+        if (isNaN(dec)) { document.getElementById('twos-working').innerHTML = ''; document.getElementById('twos-result').innerHTML = ''; return; }
+
+        const min = -(1 << (bits - 1));
+        const max = (1 << (bits - 1)) - 1;
+
+        let html = '';
+
+        if (dec < min || dec > max) {
+            html += `<div class="work-note"><span class="warn">Out of range for ${bits}-bit two's complement (${min} to ${max})</span></div>`;
+            document.getElementById('twos-working').innerHTML = html;
+            document.getElementById('twos-result').innerHTML = '';
+            return;
+        }
+
+        if (dec >= 0) {
+            const bin = dec.toString(2).padStart(bits, '0');
+            html += '<div class="work-label">Positive number</div>';
+            html += `<div class="work-note">Convert ${dec} to binary: <strong>${bin}</strong></div>`;
+            html += `<div class="work-note">MSB is 0 (positive), so two's complement is the same as unsigned binary.</div>`;
+
+            html += '<div class="bit-display">';
+            for (let i = 0; i < bits; i++) {
+                html += `<div class="bdisp ${bin[i] === '1' ? 'on' : 'off'}">${bin[i]}</div>`;
+                if ((bits - i) % 4 === 1 && i < bits - 1) html += '<div class="bit-sep"></div>';
+            }
+            html += '</div>';
+
+            document.getElementById('twos-working').innerHTML = html;
+            document.getElementById('twos-result').innerHTML = `
+                <div class="result-item"><div class="lbl">Decimal</div><div class="val">${dec}</div></div>
+                <div class="result-item"><div class="lbl">Two's complement</div><div class="val">${bin}</div></div>
+            `;
+        } else {
+            const absDec = Math.abs(dec);
+            const absBin = absDec.toString(2).padStart(bits, '0');
+            const inverted = absBin.split('').map(c => c === '0' ? '1' : '0').join('');
+            const twos = addBin(inverted, '1'.padStart(bits, '0').replace(/^0+(?=.)/, ''), bits);
+
+            html += '<div class="work-label">Step 1: Convert absolute value to binary</div>';
+            html += `<div class="work-note">|${dec}| = ${absDec} → <strong>${absBin}</strong></div>`;
+
+            html += '<div class="work-label">Step 2: Flip all bits (NOT)</div>';
+            html += '<div class="bit-display">';
+            for (let i = 0; i < bits; i++) {
+                html += `<div class="bdisp ${absBin[i] === '1' ? 'on' : 'off'}">${absBin[i]}</div>`;
+                if ((bits - i) % 4 === 1 && i < bits - 1) html += '<div class="bit-sep"></div>';
+            }
+            html += '</div>';
+            html += `<div class="work-note" style="text-align:center">↓ flip ↓</div>`;
+            html += '<div class="bit-display">';
+            for (let i = 0; i < bits; i++) {
+                html += `<div class="bdisp shifted">${inverted[i]}</div>`;
+                if ((bits - i) % 4 === 1 && i < bits - 1) html += '<div class="bit-sep"></div>';
+            }
+            html += '</div>';
+
+            html += '<div class="work-label">Step 3: Add 1</div>';
+            html += `<div class="work-note">${inverted} + 1 = <strong>${twos}</strong></div>`;
+
+            html += '<div class="bit-display">';
+            for (let i = 0; i < bits; i++) {
+                html += `<div class="bdisp ${twos[i] === '1' ? 'on' : 'off'}">${twos[i]}</div>`;
+                if ((bits - i) % 4 === 1 && i < bits - 1) html += '<div class="bit-sep"></div>';
+            }
+            html += '</div>';
+
+            html += `<div class="work-note">MSB is <strong>1</strong> (negative) &#10003;</div>`;
+
+            document.getElementById('twos-working').innerHTML = html;
+            document.getElementById('twos-result').innerHTML = `
+                <div class="result-item"><div class="lbl">Decimal</div><div class="val">${dec}</div></div>
+                <div class="result-item"><div class="lbl">Two's complement</div><div class="val">${twos}</div></div>
+                <div class="result-item"><div class="lbl">Hex</div><div class="val">${parseInt(twos, 2).toString(16).toUpperCase()}</div></div>
+            `;
+        }
+    }
+
+    // Init
+    calcAdd();
+    calcShift();
+    calcTwos();
+    calcSub();
+    </script>
+</body>
+</html>

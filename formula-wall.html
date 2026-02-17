@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCSE Formula Wall</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #090a0f;
+    --surface: #11131a;
+    --surface2: #191c26;
+    --border: #252a38;
+    --text: #e4e8f0;
+    --text-dim: #6b738a;
+    --font: 'Inter Tight', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-top: 60px;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Filters */
+  .filter-bar {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    font-family: var(--font);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+  .filter-btn.active { background: rgba(96, 165, 250, 0.12); border-color: #60a5fa; color: #60a5fa; }
+
+  /* Search */
+  .search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-bar input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.55rem 1rem;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    width: 100%;
+    max-width: 400px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-bar input:focus { border-color: #60a5fa; }
+  .search-bar input::placeholder { color: var(--text-dim); opacity: 0.5; }
+
+  /* Formula grid */
+  .formula-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .formula-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    transition: all 0.2s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .formula-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .formula-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .card-subject {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .card-formula {
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 0.75rem 0;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .card-desc {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.5rem;
+  }
+
+  .card-vars {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 0.4rem;
+    line-height: 1.5;
+  }
+
+  .card-vars span {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* Subject colors */
+  .subject-physics .card-subject { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+  .subject-physics::before { background: #60a5fa; }
+  .subject-physics .card-formula { color: #93bbfc; }
+
+  .subject-chemistry .card-subject { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+  .subject-chemistry::before { background: #34d399; }
+  .subject-chemistry .card-formula { color: #6ee7b7; }
+
+  .subject-maths .card-subject { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
+  .subject-maths::before { background: #a78bfa; }
+  .subject-maths .card-formula { color: #c4b5fd; }
+
+  .subject-biology .card-subject { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+  .subject-biology::before { background: #f472b6; }
+  .subject-biology .card-formula { color: #f9a8d4; }
+
+  .hidden { display: none; }
+
+  .count-label {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 1rem; }
+    h1 { font-size: 1.4rem; }
+    .formula-grid { grid-template-columns: 1fr; }
+    .card-formula { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+<script src="/assets/shared-nav.js"></script>
+
+<div class="container">
+  <h1>GCSE FORMULA WALL</h1>
+  <p class="subtitle">Every equation you need for GCSE Science and Maths — all in one place</p>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" onclick="setFilter('physics')">Physics</button>
+    <button class="filter-btn" onclick="setFilter('chemistry')">Chemistry</button>
+    <button class="filter-btn" onclick="setFilter('maths')">Maths</button>
+    <button class="filter-btn" onclick="setFilter('biology')">Biology</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search formulas..." oninput="filterCards()">
+  </div>
+
+  <div class="count-label" id="countLabel"></div>
+
+  <div class="formula-grid" id="grid"></div>
+</div>
+
+<script>
+const FORMULAS = [
+  // === PHYSICS ===
+  { name: 'Speed', formula: 'v = s / t', subject: 'physics', desc: 'Speed equals distance divided by time.', vars: 'v = speed (m/s), s = distance (m), t = time (s)' },
+  { name: 'Acceleration', formula: 'a = (v − u) / t', subject: 'physics', desc: 'Acceleration is the change in velocity divided by time.', vars: 'a = acceleration (m/s²), v = final velocity, u = initial velocity, t = time (s)' },
+  { name: 'Force', formula: 'F = m × a', subject: 'physics', desc: 'Newton\'s second law: force equals mass times acceleration.', vars: 'F = force (N), m = mass (kg), a = acceleration (m/s²)' },
+  { name: 'Weight', formula: 'W = m × g', subject: 'physics', desc: 'Weight is the force of gravity on a mass.', vars: 'W = weight (N), m = mass (kg), g = gravitational field strength (N/kg)' },
+  { name: 'Momentum', formula: 'p = m × v', subject: 'physics', desc: 'Momentum is mass times velocity.', vars: 'p = momentum (kg·m/s), m = mass (kg), v = velocity (m/s)' },
+  { name: 'Work Done', formula: 'W = F × d', subject: 'physics', desc: 'Work done is force times distance moved in direction of force.', vars: 'W = work done (J), F = force (N), d = distance (m)' },
+  { name: 'Kinetic Energy', formula: 'KE = ½mv²', subject: 'physics', desc: 'Energy of a moving object.', vars: 'KE = kinetic energy (J), m = mass (kg), v = velocity (m/s)' },
+  { name: 'Gravitational PE', formula: 'GPE = mgh', subject: 'physics', desc: 'Energy stored due to height above ground.', vars: 'GPE = gravitational potential energy (J), m = mass (kg), g = grav. field strength (N/kg), h = height (m)' },
+  { name: 'Power', formula: 'P = W / t', subject: 'physics', desc: 'Power is the rate of energy transfer.', vars: 'P = power (W), W = work done (J), t = time (s)' },
+  { name: 'Efficiency', formula: 'η = useful output / total input × 100%', subject: 'physics', desc: 'How much input energy is usefully transferred.', vars: 'η = efficiency (%)' },
+  { name: 'Pressure', formula: 'p = F / A', subject: 'physics', desc: 'Pressure is force per unit area.', vars: 'p = pressure (Pa), F = force (N), A = area (m²)' },
+  { name: 'Fluid Pressure', formula: 'p = ρgh', subject: 'physics', desc: 'Pressure in a column of fluid.', vars: 'p = pressure (Pa), ρ = density (kg/m³), g = grav. field strength, h = height of column (m)' },
+  { name: 'Density', formula: 'ρ = m / V', subject: 'physics', desc: 'Density is mass per unit volume.', vars: 'ρ = density (kg/m³), m = mass (kg), V = volume (m³)' },
+  { name: 'Ohm\'s Law', formula: 'V = I × R', subject: 'physics', desc: 'Voltage equals current times resistance.', vars: 'V = potential difference (V), I = current (A), R = resistance (Ω)' },
+  { name: 'Electrical Power (IV)', formula: 'P = I × V', subject: 'physics', desc: 'Power in an electrical circuit.', vars: 'P = power (W), I = current (A), V = potential difference (V)' },
+  { name: 'Electrical Power (I²R)', formula: 'P = I²R', subject: 'physics', desc: 'Power in terms of current and resistance.', vars: 'P = power (W), I = current (A), R = resistance (Ω)' },
+  { name: 'Charge', formula: 'Q = I × t', subject: 'physics', desc: 'Charge is current times time.', vars: 'Q = charge (C), I = current (A), t = time (s)' },
+  { name: 'Energy Transferred', formula: 'E = Q × V', subject: 'physics', desc: 'Energy transferred by charge.', vars: 'E = energy (J), Q = charge (C), V = potential difference (V)' },
+  { name: 'Wave Speed', formula: 'v = f × λ', subject: 'physics', desc: 'Speed of a wave is frequency times wavelength.', vars: 'v = wave speed (m/s), f = frequency (Hz), λ = wavelength (m)' },
+  { name: 'Period', formula: 'T = 1 / f', subject: 'physics', desc: 'Period is the reciprocal of frequency.', vars: 'T = period (s), f = frequency (Hz)' },
+  { name: 'Specific Heat Capacity', formula: 'E = mcΔθ', subject: 'physics', desc: 'Energy needed to change temperature.', vars: 'E = energy (J), m = mass (kg), c = specific heat capacity (J/kg°C), Δθ = temperature change (°C)' },
+  { name: 'Specific Latent Heat', formula: 'E = mL', subject: 'physics', desc: 'Energy for a change of state.', vars: 'E = energy (J), m = mass (kg), L = specific latent heat (J/kg)' },
+  { name: 'Hooke\'s Law', formula: 'F = k × e', subject: 'physics', desc: 'Force on a spring is proportional to extension.', vars: 'F = force (N), k = spring constant (N/m), e = extension (m)' },
+  { name: 'Elastic PE', formula: 'EPE = ½ke²', subject: 'physics', desc: 'Energy stored in a stretched spring.', vars: 'EPE = elastic potential energy (J), k = spring constant (N/m), e = extension (m)' },
+  { name: 'SUVAT (v²)', formula: 'v² = u² + 2as', subject: 'physics', desc: 'Final velocity squared equation.', vars: 'v = final velocity, u = initial velocity, a = acceleration, s = distance' },
+
+  // === CHEMISTRY ===
+  { name: 'Moles (mass)', formula: 'n = m / Mᵣ', subject: 'chemistry', desc: 'Number of moles from mass and molar mass.', vars: 'n = moles (mol), m = mass (g), Mᵣ = relative formula mass (g/mol)' },
+  { name: 'Moles (concentration)', formula: 'n = c × V', subject: 'chemistry', desc: 'Moles in a solution.', vars: 'n = moles (mol), c = concentration (mol/dm³), V = volume (dm³)' },
+  { name: 'Concentration', formula: 'c = n / V', subject: 'chemistry', desc: 'Concentration of a solution.', vars: 'c = concentration (mol/dm³), n = moles (mol), V = volume (dm³)' },
+  { name: 'Atom Economy', formula: 'AE = (Mᵣ desired / Mᵣ total) × 100%', subject: 'chemistry', desc: 'Percentage of reactant atoms in the useful product.', vars: 'AE = atom economy (%), Mᵣ = relative formula mass' },
+  { name: 'Percentage Yield', formula: 'yield = (actual / theoretical) × 100%', subject: 'chemistry', desc: 'How much product was actually made vs. maximum possible.', vars: 'yield (%), actual mass (g), theoretical mass (g)' },
+  { name: 'Rf Value', formula: 'Rf = distance substance / distance solvent', subject: 'chemistry', desc: 'Retention factor in chromatography.', vars: 'Rf = retention factor (no units)' },
+  { name: 'Mean Rate of Reaction', formula: 'rate = quantity of product / time', subject: 'chemistry', desc: 'Average rate of reaction.', vars: 'rate (g/s or cm³/s), time (s)' },
+  { name: 'Relative Formula Mass', formula: 'Mᵣ = Σ Aᵣ', subject: 'chemistry', desc: 'Sum of relative atomic masses in a formula.', vars: 'Mᵣ = relative formula mass, Aᵣ = relative atomic mass' },
+
+  // === MATHS ===
+  { name: 'Pythagoras', formula: 'a² + b² = c²', subject: 'maths', desc: 'Relationship between sides of a right-angled triangle.', vars: 'a, b = shorter sides, c = hypotenuse' },
+  { name: 'Sine Rule', formula: 'a/sin A = b/sin B = c/sin C', subject: 'maths', desc: 'Relates sides and angles in any triangle.', vars: 'a, b, c = sides; A, B, C = opposite angles' },
+  { name: 'Cosine Rule', formula: 'a² = b² + c² − 2bc cos A', subject: 'maths', desc: 'Finds a side or angle in any triangle.', vars: 'a, b, c = sides; A = angle opposite side a' },
+  { name: 'Trig — SOH', formula: 'sin θ = opposite / hypotenuse', subject: 'maths', desc: 'Sine ratio in a right-angled triangle.', vars: 'θ = angle, sides relative to angle θ' },
+  { name: 'Trig — CAH', formula: 'cos θ = adjacent / hypotenuse', subject: 'maths', desc: 'Cosine ratio in a right-angled triangle.', vars: 'θ = angle, sides relative to angle θ' },
+  { name: 'Trig — TOA', formula: 'tan θ = opposite / adjacent', subject: 'maths', desc: 'Tangent ratio in a right-angled triangle.', vars: 'θ = angle, sides relative to angle θ' },
+  { name: 'Area of Triangle', formula: 'A = ½ × b × h', subject: 'maths', desc: 'Area of a triangle.', vars: 'A = area, b = base, h = perpendicular height' },
+  { name: 'Area of Triangle (trig)', formula: 'A = ½ab sin C', subject: 'maths', desc: 'Area using two sides and included angle.', vars: 'A = area, a, b = sides, C = included angle' },
+  { name: 'Area of Circle', formula: 'A = πr²', subject: 'maths', desc: 'Area of a circle.', vars: 'A = area, r = radius' },
+  { name: 'Circumference', formula: 'C = 2πr', subject: 'maths', desc: 'Circumference of a circle.', vars: 'C = circumference, r = radius' },
+  { name: 'Volume of Cylinder', formula: 'V = πr²h', subject: 'maths', desc: 'Volume of a cylinder.', vars: 'V = volume, r = radius, h = height' },
+  { name: 'Volume of Sphere', formula: 'V = ⁴⁄₃πr³', subject: 'maths', desc: 'Volume of a sphere.', vars: 'V = volume, r = radius' },
+  { name: 'Volume of Cone', formula: 'V = ⅓πr²h', subject: 'maths', desc: 'Volume of a cone.', vars: 'V = volume, r = radius, h = height' },
+  { name: 'Quadratic Formula', formula: 'x = (−b ± √(b²−4ac)) / 2a', subject: 'maths', desc: 'Solves ax² + bx + c = 0.', vars: 'a, b, c = coefficients; x = solution' },
+  { name: 'Gradient', formula: 'm = (y₂ − y₁) / (x₂ − x₁)', subject: 'maths', desc: 'Gradient (slope) between two points.', vars: 'm = gradient, (x₁,y₁), (x₂,y₂) = two points' },
+  { name: 'Straight Line', formula: 'y = mx + c', subject: 'maths', desc: 'Equation of a straight line.', vars: 'y = y-coordinate, m = gradient, x = x-coordinate, c = y-intercept' },
+  { name: 'Compound Interest', formula: 'A = P(1 + r/100)ⁿ', subject: 'maths', desc: 'Amount after compound interest.', vars: 'A = final amount, P = principal, r = rate (%), n = years' },
+  { name: 'Percentage Change', formula: 'change = (diff / original) × 100%', subject: 'maths', desc: 'Percentage increase or decrease.', vars: 'diff = difference, original = starting value' },
+  { name: 'Speed/Distance/Time', formula: 's = d / t', subject: 'maths', desc: 'Speed equals distance over time.', vars: 's = speed, d = distance, t = time' },
+  { name: 'Probability', formula: 'P(A) = favourable / total', subject: 'maths', desc: 'Probability of an event.', vars: 'P(A) = probability of event A' },
+
+  // === BIOLOGY ===
+  { name: 'Magnification', formula: 'M = image size / actual size', subject: 'biology', desc: 'How many times larger the image is compared to the object.', vars: 'M = magnification, image size and actual size in same units' },
+  { name: 'Cardiac Output', formula: 'CO = SV × HR', subject: 'biology', desc: 'Volume of blood pumped per minute.', vars: 'CO = cardiac output (cm³/min), SV = stroke volume (cm³), HR = heart rate (bpm)' },
+  { name: 'BMI', formula: 'BMI = mass / height²', subject: 'biology', desc: 'Body mass index.', vars: 'BMI (kg/m²), mass (kg), height (m)' },
+  { name: 'Photosynthesis', formula: '6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂', subject: 'biology', desc: 'Word equation: carbon dioxide + water → glucose + oxygen.', vars: 'Requires light energy and chlorophyll' },
+  { name: 'Aerobic Respiration', formula: 'C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O', subject: 'biology', desc: 'Glucose + oxygen → carbon dioxide + water (+ energy).', vars: 'Releases energy for cells' },
+  { name: 'Anaerobic Respiration', formula: 'C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂', subject: 'biology', desc: 'In yeast: glucose → ethanol + carbon dioxide. In animals: glucose → lactic acid.', vars: 'Less energy released than aerobic' },
+  { name: 'Population Size', formula: 'N = (n₁ × n₂) / n₃', subject: 'biology', desc: 'Lincoln index for capture-recapture.', vars: 'N = population estimate, n₁ = first capture, n₂ = second capture, n₃ = recaptured marked' },
+];
+
+let currentFilter = 'all';
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase() === f || (f === 'all' && b.textContent === 'All'));
+  });
+  filterCards();
+}
+
+function filterCards() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  let shown = 0;
+
+  document.querySelectorAll('.formula-card').forEach(card => {
+    const subj = card.dataset.subject;
+    const text = card.dataset.search;
+    const matchFilter = currentFilter === 'all' || subj === currentFilter;
+    const matchSearch = !search || text.includes(search);
+    const visible = matchFilter && matchSearch;
+    card.classList.toggle('hidden', !visible);
+    if (visible) shown++;
+  });
+
+  document.getElementById('countLabel').textContent = `Showing ${shown} of ${FORMULAS.length} formulas`;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = FORMULAS.map(f => `
+    <div class="formula-card subject-${f.subject}" data-subject="${f.subject}" data-search="${(f.name + ' ' + f.formula + ' ' + f.desc + ' ' + f.vars + ' ' + f.subject).toLowerCase()}">
+      <div class="card-header">
+        <div class="card-name">${f.name}</div>
+        <div class="card-subject">${f.subject}</div>
+      </div>
+      <div class="card-formula">${f.formula}</div>
+      <div class="card-desc">${f.desc}</div>
+      <div class="card-vars">${f.vars.split(', ').map(v => {
+        const parts = v.split(' = ');
+        return parts.length > 1 ? `<span>${parts[0]}</span> = ${parts.slice(1).join(' = ')}` : v;
+      }).join(' &nbsp;·&nbsp; ')}</div>
+    </div>
+  `).join('');
+  filterCards();
+}
+
+renderGrid();
+</script>
+</body>
+</html>

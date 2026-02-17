@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punnett Square Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0c0a10;
+    --surface: #15121c;
+    --surface2: #1e1a28;
+    --border: #2d2640;
+    --accent: #e879f9;
+    --accent2: #c084fc;
+    --accent-dim: #4a1d5e;
+    --dominant: rgba(232, 121, 249, 0.15);
+    --recessive: rgba(147, 130, 220, 0.12);
+    --text: #ede9f6;
+    --text-dim: #8a80a0;
+    --font: 'Nunito', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-top: 60px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .panel h2 {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  /* Input controls */
+  .cross-setup {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: end;
+  }
+
+  .parent-col h3 {
+    font-size: 0.9rem;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+  }
+
+  .trait-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .trait-row label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    width: 60px;
+    flex-shrink: 0;
+  }
+
+  .allele-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+    min-width: 90px;
+  }
+
+  .allele-select:focus { border-color: var(--accent); }
+
+  .cross-symbol {
+    font-size: 2rem;
+    color: var(--text-dim);
+    font-weight: 300;
+    align-self: center;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Trait name inputs */
+  .trait-config {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .trait-config label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+  }
+
+  .trait-config input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    outline: none;
+  }
+
+  .trait-config input:focus { border-color: var(--accent); }
+
+  /* Mode toggle */
+  .mode-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .mode-btn {
+    background: var(--surface2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-family: var(--font);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mode-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+  /* Presets */
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .preset-btn {
+    background: var(--bg);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35rem 0.65rem;
+    font-family: var(--font);
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: block;
+    margin: 1rem auto 0;
+  }
+
+  .btn:hover { background: var(--accent); color: var(--bg); }
+
+  /* Punnett Square */
+  .square-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+  }
+
+  .punnett {
+    border-collapse: collapse;
+  }
+
+  .punnett th, .punnett td {
+    width: 80px;
+    height: 70px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .punnett th {
+    color: var(--accent);
+    font-size: 1.1rem;
+  }
+
+  .punnett td {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: default;
+  }
+
+  .punnett td:hover {
+    border-color: var(--accent);
+    background: rgba(232, 121, 249, 0.08);
+  }
+
+  .punnett .corner { background: none; border: none; }
+
+  .punnett .parent-label {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--accent2);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+  }
+
+  .genotype {
+    display: block;
+    font-size: 1.2rem;
+  }
+
+  .allele-dom { color: var(--accent); }
+  .allele-rec { color: var(--accent2); }
+
+  .phenotype-label {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-top: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Results */
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .ratio-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .ratio-card h3 {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+  }
+
+  .ratio-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(45, 38, 64, 0.5);
+  }
+
+  .ratio-item:last-child { border-bottom: none; }
+
+  .ratio-genotype {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .ratio-bar-wrap {
+    flex: 1;
+    margin: 0 0.75rem;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .ratio-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .ratio-pct {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    min-width: 42px;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  /* Dihybrid extra */
+  .punnett-4x4 th, .punnett-4x4 td {
+    width: 70px;
+    height: 60px;
+    font-size: 1rem;
+  }
+
+  .punnett-4x4 .genotype { font-size: 1rem; }
+
+  @media (max-width: 600px) {
+    .container { padding: 1rem; }
+    h1 { font-size: 1.4rem; }
+    .cross-setup { grid-template-columns: 1fr; }
+    .cross-symbol { text-align: center; }
+    .trait-config { grid-template-columns: 1fr; }
+    .results-grid { grid-template-columns: 1fr; }
+    .punnett th, .punnett td { width: 65px; height: 58px; font-size: 1rem; }
+    .punnett-4x4 th, .punnett-4x4 td { width: 55px; height: 50px; font-size: 0.8rem; }
+    .punnett-4x4 .genotype { font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+<script src="/assets/shared-nav.js"></script>
+
+<div class="container">
+  <h1>PUNNETT SQUARE GENERATOR</h1>
+  <p class="subtitle">Predict genetic outcomes with monohybrid and dihybrid crosses</p>
+
+  <div class="panel">
+    <h2>Cross Type</h2>
+    <div class="mode-row">
+      <button class="mode-btn active" id="monoBtn" onclick="setMode('mono')">Monohybrid (1 trait)</button>
+      <button class="mode-btn" id="diBtn" onclick="setMode('di')">Dihybrid (2 traits)</button>
+    </div>
+
+    <h2>Examples</h2>
+    <div class="presets" id="presetArea"></div>
+  </div>
+
+  <div class="panel" id="traitPanel">
+    <!-- filled dynamically -->
+  </div>
+
+  <div class="panel" id="resultPanel" style="display:none;">
+    <h2>Punnett Square</h2>
+    <div class="square-container" id="squareArea"></div>
+
+    <h2>Predicted Ratios</h2>
+    <div class="results-grid" id="ratiosArea"></div>
+  </div>
+</div>
+
+<script>
+let mode = 'mono';
+
+const PRESETS = {
+  mono: [
+    { name: 'Tall × Short Pea', trait: 'Height', dom: 'T', domName: 'Tall', rec: 't', recName: 'Short', p1: 'Tt', p2: 'Tt' },
+    { name: 'Heterozygous × Heterozygous', trait: 'Colour', dom: 'B', domName: 'Brown', rec: 'b', recName: 'Blue', p1: 'Bb', p2: 'Bb' },
+    { name: 'Homozygous Dom × Recessive', trait: 'Colour', dom: 'B', domName: 'Brown', rec: 'b', recName: 'Blue', p1: 'BB', p2: 'bb' },
+    { name: 'Carrier × Carrier (CF)', trait: 'CF Status', dom: 'F', domName: 'Unaffected', rec: 'f', recName: 'Affected', p1: 'Ff', p2: 'Ff' },
+    { name: 'Het × Recessive', trait: 'Shape', dom: 'R', domName: 'Round', rec: 'r', recName: 'Wrinkled', p1: 'Rr', p2: 'rr' },
+    { name: 'Both Homozygous Dom', trait: 'Fur', dom: 'S', domName: 'Short', rec: 's', recName: 'Long', p1: 'SS', p2: 'SS' },
+  ],
+  di: [
+    { name: 'Classic Dihybrid', t1: 'Shape', d1: 'R', dn1: 'Round', r1: 'r', rn1: 'Wrinkled', t2: 'Colour', d2: 'Y', dn2: 'Yellow', r2: 'y', rn2: 'Green', p1: 'RrYy', p2: 'RrYy' },
+    { name: 'One Het, One Hom', t1: 'Height', d1: 'T', dn1: 'Tall', r1: 't', rn1: 'Short', t2: 'Flower', d2: 'P', dn2: 'Purple', r2: 'p', rn2: 'White', p1: 'TtPp', p2: 'TTpp' },
+    { name: 'Both Het × Rec/Rec', t1: 'Fur', d1: 'B', dn1: 'Black', r1: 'b', rn1: 'Brown', t2: 'Length', d2: 'S', dn2: 'Short', r2: 's', rn2: 'Long', p1: 'BbSs', p2: 'bbss' },
+  ]
+};
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('monoBtn').classList.toggle('active', m === 'mono');
+  document.getElementById('diBtn').classList.toggle('active', m === 'di');
+  renderPresets();
+  renderTraitPanel();
+  document.getElementById('resultPanel').style.display = 'none';
+}
+
+function renderPresets() {
+  const area = document.getElementById('presetArea');
+  const list = PRESETS[mode];
+  area.innerHTML = list.map((p, i) =>
+    `<button class="preset-btn" onclick="loadPreset(${i})">${p.name}</button>`
+  ).join('');
+}
+
+function renderTraitPanel() {
+  const panel = document.getElementById('traitPanel');
+  if (mode === 'mono') {
+    panel.innerHTML = `
+      <h2>Trait Configuration</h2>
+      <div class="trait-config">
+        <div><label>Trait Name</label><input id="traitName" value="Eye Colour" oninput="generate()"></div>
+        <div><label>Dominant Allele</label><input id="domAllele" value="B" maxlength="1" style="text-transform:uppercase" oninput="generate()"></div>
+        <div><label>Dominant Phenotype</label><input id="domName" value="Brown" oninput="generate()"></div>
+      </div>
+      <div class="trait-config" style="grid-template-columns: 1fr 1fr; max-width: 66%;">
+        <div><label>Recessive Allele</label><input id="recAllele" value="b" maxlength="1" oninput="generate()"></div>
+        <div><label>Recessive Phenotype</label><input id="recName" value="Blue" oninput="generate()"></div>
+      </div>
+
+      <h2 style="margin-top:1rem;">Parent Genotypes</h2>
+      <div class="cross-setup">
+        <div class="parent-col">
+          <h3>Parent 1</h3>
+          <div class="trait-row">
+            <label>Genotype</label>
+            <select class="allele-select" id="p1Geno" onchange="generate()">
+              <option value="BB">BB (Homozygous dominant)</option>
+              <option value="Bb" selected>Bb (Heterozygous)</option>
+              <option value="bb">bb (Homozygous recessive)</option>
+            </select>
+          </div>
+        </div>
+        <div class="cross-symbol">×</div>
+        <div class="parent-col">
+          <h3>Parent 2</h3>
+          <div class="trait-row">
+            <label>Genotype</label>
+            <select class="allele-select" id="p2Geno" onchange="generate()">
+              <option value="BB">BB (Homozygous dominant)</option>
+              <option value="Bb" selected>Bb (Heterozygous)</option>
+              <option value="bb">bb (Homozygous recessive)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="btn" onclick="generate()">Generate</button>
+    `;
+    setupMonoSelects();
+  } else {
+    panel.innerHTML = `
+      <h2>Trait 1 Configuration</h2>
+      <div class="trait-config">
+        <div><label>Trait Name</label><input id="t1Name" value="Shape" oninput="generate()"></div>
+        <div><label>Dominant (letter/phenotype)</label><input id="t1Dom" value="R / Round" oninput="generate()"></div>
+        <div><label>Recessive (letter/phenotype)</label><input id="t1Rec" value="r / Wrinkled" oninput="generate()"></div>
+      </div>
+      <h2>Trait 2 Configuration</h2>
+      <div class="trait-config">
+        <div><label>Trait Name</label><input id="t2Name" value="Colour" oninput="generate()"></div>
+        <div><label>Dominant (letter/phenotype)</label><input id="t2Dom" value="Y / Yellow" oninput="generate()"></div>
+        <div><label>Recessive (letter/phenotype)</label><input id="t2Rec" value="y / Green" oninput="generate()"></div>
+      </div>
+
+      <h2 style="margin-top:1rem;">Parent Genotypes</h2>
+      <div class="cross-setup">
+        <div class="parent-col">
+          <h3>Parent 1</h3>
+          <div class="trait-row">
+            <label>Genotype</label>
+            <select class="allele-select" id="dp1t1" onchange="generate()">
+              <option value="RR">RR</option>
+              <option value="Rr" selected>Rr</option>
+              <option value="rr">rr</option>
+            </select>
+            <select class="allele-select" id="dp1t2" onchange="generate()">
+              <option value="YY">YY</option>
+              <option value="Yy" selected>Yy</option>
+              <option value="yy">yy</option>
+            </select>
+          </div>
+        </div>
+        <div class="cross-symbol">×</div>
+        <div class="parent-col">
+          <h3>Parent 2</h3>
+          <div class="trait-row">
+            <label>Genotype</label>
+            <select class="allele-select" id="dp2t1" onchange="generate()">
+              <option value="RR">RR</option>
+              <option value="Rr" selected>Rr</option>
+              <option value="rr">rr</option>
+            </select>
+            <select class="allele-select" id="dp2t2" onchange="generate()">
+              <option value="YY">YY</option>
+              <option value="Yy" selected>Yy</option>
+              <option value="yy">yy</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="btn" onclick="generate()">Generate</button>
+    `;
+  }
+}
+
+function setupMonoSelects() {
+  updateMonoOptions();
+  const domInput = document.getElementById('domAllele');
+  const recInput = document.getElementById('recAllele');
+  domInput.addEventListener('input', updateMonoOptions);
+  recInput.addEventListener('input', updateMonoOptions);
+}
+
+function updateMonoOptions() {
+  const d = (document.getElementById('domAllele').value || 'B').charAt(0).toUpperCase();
+  const r = (document.getElementById('recAllele').value || 'b').charAt(0).toLowerCase();
+
+  ['p1Geno', 'p2Geno'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const val = sel.value;
+    sel.innerHTML = `
+      <option value="${d}${d}">${d}${d} (Homozygous dominant)</option>
+      <option value="${d}${r}">${d}${r} (Heterozygous)</option>
+      <option value="${r}${r}">${r}${r} (Homozygous recessive)</option>
+    `;
+    // Try to restore selection type
+    if (val.charAt(0) === val.charAt(1) && val.charAt(0) === val.charAt(0).toUpperCase()) sel.value = d + d;
+    else if (val.charAt(0) !== val.charAt(1)) sel.value = d + r;
+    else sel.value = r + r;
+  });
+}
+
+function parseDiTrait(input) {
+  const parts = input.split('/').map(s => s.trim());
+  return { letter: parts[0] || '?', phenotype: parts[1] || '' };
+}
+
+function getGametes(geno) {
+  // For a string like "Bb" return ["B", "b"]
+  return [geno[0], geno[1]];
+}
+
+function getDiGametes(g1, g2) {
+  // g1 = "Rr", g2 = "Yy" -> ["RY", "Ry", "rY", "ry"]
+  const a1 = getGametes(g1);
+  const a2 = getGametes(g2);
+  const gametes = [];
+  for (const x of a1) {
+    for (const y of a2) {
+      gametes.push(x + y);
+    }
+  }
+  return gametes;
+}
+
+function sortGenotype(g) {
+  // Sort so dominant (uppercase) comes first
+  return g.split('').sort((a, b) => {
+    if (a.toUpperCase() === b.toUpperCase()) {
+      return a === a.toUpperCase() ? -1 : 1;
+    }
+    return a.toUpperCase().localeCompare(b.toUpperCase());
+  }).join('');
+}
+
+function formatGenotype(g) {
+  return g.split('').map(c =>
+    c === c.toUpperCase() ? `<span class="allele-dom">${c}</span>` : `<span class="allele-rec">${c}</span>`
+  ).join('');
+}
+
+function getPhenotype(genotype, domLetter, domPhen, recPhen) {
+  if (genotype.includes(domLetter.toUpperCase())) return domPhen;
+  return recPhen;
+}
+
+function generate() {
+  if (mode === 'mono') generateMono();
+  else generateDi();
+}
+
+function generateMono() {
+  const domAllele = (document.getElementById('domAllele').value || 'B').charAt(0).toUpperCase();
+  const recAllele = (document.getElementById('recAllele').value || 'b').charAt(0).toLowerCase();
+  const domName = document.getElementById('domName').value || 'Dominant';
+  const recName = document.getElementById('recName').value || 'Recessive';
+
+  const p1 = document.getElementById('p1Geno');
+  const p2 = document.getElementById('p2Geno');
+  if (!p1 || !p2) return;
+
+  const g1 = getGametes(p1.value);
+  const g2 = getGametes(p2.value);
+
+  // Build 2x2 grid
+  const offspring = [];
+  for (const a of g2) {
+    const row = [];
+    for (const b of g1) {
+      row.push(sortGenotype(b + a));
+    }
+    offspring.push(row);
+  }
+
+  // Build table HTML
+  let html = `<table class="punnett">
+    <tr>
+      <th class="corner"></th>
+      <th class="parent-label">Parent 1</th>
+      <th>${formatGenotype(g1[0])}</th>
+      <th>${formatGenotype(g1[1])}</th>
+    </tr>
+    <tr>
+      <th class="parent-label">Parent 2</th>
+      <th class="corner"></th>
+      <th></th><th></th>
+    </tr>`;
+
+  for (let i = 0; i < 2; i++) {
+    html += `<tr><th>${formatGenotype(g2[i])}</th><th></th>`;
+    for (let j = 0; j < 2; j++) {
+      const geno = offspring[i][j];
+      const pheno = getPhenotype(geno, domAllele, domName, recName);
+      html += `<td>
+        <span class="genotype">${formatGenotype(geno)}</span>
+        <span class="phenotype-label">${pheno}</span>
+      </td>`;
+    }
+    html += `</tr>`;
+  }
+  html += `</table>`;
+
+  document.getElementById('squareArea').innerHTML = html;
+
+  // Calculate ratios
+  const allOffspring = offspring.flat();
+  const genoCounts = {};
+  const phenoCounts = {};
+  for (const g of allOffspring) {
+    genoCounts[g] = (genoCounts[g] || 0) + 1;
+    const ph = getPhenotype(g, domAllele, domName, recName);
+    phenoCounts[ph] = (phenoCounts[ph] || 0) + 1;
+  }
+
+  let ratiosHtml = `<div class="ratio-card"><h3>Genotypic Ratio</h3>`;
+  for (const [g, c] of Object.entries(genoCounts).sort((a, b) => b[1] - a[1])) {
+    const pct = (c / allOffspring.length * 100);
+    ratiosHtml += `<div class="ratio-item">
+      <span class="ratio-genotype">${formatGenotype(g)}</span>
+      <div class="ratio-bar-wrap"><div class="ratio-bar" style="width: ${pct}%"></div></div>
+      <span class="ratio-pct">${c}/${allOffspring.length} (${pct.toFixed(0)}%)</span>
+    </div>`;
+  }
+  ratiosHtml += `</div>`;
+
+  ratiosHtml += `<div class="ratio-card"><h3>Phenotypic Ratio</h3>`;
+  for (const [ph, c] of Object.entries(phenoCounts).sort((a, b) => b[1] - a[1])) {
+    const pct = (c / allOffspring.length * 100);
+    ratiosHtml += `<div class="ratio-item">
+      <span class="ratio-genotype" style="font-size:0.8rem;">${ph}</span>
+      <div class="ratio-bar-wrap"><div class="ratio-bar" style="width: ${pct}%"></div></div>
+      <span class="ratio-pct">${c}/${allOffspring.length} (${pct.toFixed(0)}%)</span>
+    </div>`;
+  }
+  ratiosHtml += `</div>`;
+
+  document.getElementById('ratiosArea').innerHTML = ratiosHtml;
+  document.getElementById('resultPanel').style.display = 'block';
+}
+
+function generateDi() {
+  const t1d = parseDiTrait(document.getElementById('t1Dom').value || 'R / Round');
+  const t1r = parseDiTrait(document.getElementById('t1Rec').value || 'r / Wrinkled');
+  const t2d = parseDiTrait(document.getElementById('t2Dom').value || 'Y / Yellow');
+  const t2r = parseDiTrait(document.getElementById('t2Rec').value || 'y / Green');
+
+  const p1t1 = document.getElementById('dp1t1');
+  const p1t2 = document.getElementById('dp1t2');
+  const p2t1 = document.getElementById('dp2t1');
+  const p2t2 = document.getElementById('dp2t2');
+  if (!p1t1 || !p1t2 || !p2t1 || !p2t2) return;
+
+  const g1 = getDiGametes(p1t1.value, p1t2.value);
+  const g2 = getDiGametes(p2t1.value, p2t2.value);
+
+  // Build 4x4 grid
+  const offspring = [];
+  for (const a of g2) {
+    const row = [];
+    for (const b of g1) {
+      // Combine: first letters of each gamete = trait 1, second letters = trait 2
+      const t1geno = sortGenotype(b[0] + a[0]);
+      const t2geno = sortGenotype(b[1] + a[1]);
+      row.push(t1geno + t2geno);
+    }
+    offspring.push(row);
+  }
+
+  let html = `<table class="punnett punnett-4x4">
+    <tr><th class="corner"></th>`;
+  for (const g of g1) {
+    html += `<th>${formatGenotype(g)}</th>`;
+  }
+  html += `</tr>`;
+
+  for (let i = 0; i < 4; i++) {
+    html += `<tr><th>${formatGenotype(g2[i])}</th>`;
+    for (let j = 0; j < 4; j++) {
+      const geno = offspring[i][j];
+      const t1g = geno.substring(0, 2);
+      const t2g = geno.substring(2, 4);
+      const ph1 = getPhenotype(t1g, t1d.letter, t1d.phenotype, t1r.phenotype);
+      const ph2 = getPhenotype(t2g, t2d.letter, t2d.phenotype, t2r.phenotype);
+      html += `<td>
+        <span class="genotype">${formatGenotype(geno)}</span>
+        <span class="phenotype-label">${ph1}, ${ph2}</span>
+      </td>`;
+    }
+    html += `</tr>`;
+  }
+  html += `</table>`;
+
+  document.getElementById('squareArea').innerHTML = html;
+
+  // Calculate ratios
+  const allOffspring = offspring.flat();
+  const genoCounts = {};
+  const phenoCounts = {};
+  for (const g of allOffspring) {
+    genoCounts[g] = (genoCounts[g] || 0) + 1;
+    const t1g = g.substring(0, 2);
+    const t2g = g.substring(2, 4);
+    const ph = getPhenotype(t1g, t1d.letter, t1d.phenotype, t1r.phenotype) + ', ' +
+               getPhenotype(t2g, t2d.letter, t2d.phenotype, t2r.phenotype);
+    phenoCounts[ph] = (phenoCounts[ph] || 0) + 1;
+  }
+
+  let ratiosHtml = `<div class="ratio-card"><h3>Genotypic Ratio</h3>`;
+  for (const [g, c] of Object.entries(genoCounts).sort((a, b) => b[1] - a[1])) {
+    const pct = (c / allOffspring.length * 100);
+    ratiosHtml += `<div class="ratio-item">
+      <span class="ratio-genotype">${formatGenotype(g)}</span>
+      <div class="ratio-bar-wrap"><div class="ratio-bar" style="width: ${pct}%"></div></div>
+      <span class="ratio-pct">${c}/${allOffspring.length} (${pct.toFixed(0)}%)</span>
+    </div>`;
+  }
+  ratiosHtml += `</div>`;
+
+  ratiosHtml += `<div class="ratio-card"><h3>Phenotypic Ratio</h3>`;
+  for (const [ph, c] of Object.entries(phenoCounts).sort((a, b) => b[1] - a[1])) {
+    const pct = (c / allOffspring.length * 100);
+    ratiosHtml += `<div class="ratio-item">
+      <span class="ratio-genotype" style="font-size:0.75rem;">${ph}</span>
+      <div class="ratio-bar-wrap"><div class="ratio-bar" style="width: ${pct}%"></div></div>
+      <span class="ratio-pct">${c}/${allOffspring.length} (${pct.toFixed(0)}%)</span>
+    </div>`;
+  }
+  ratiosHtml += `</div>`;
+
+  document.getElementById('ratiosArea').innerHTML = ratiosHtml;
+  document.getElementById('resultPanel').style.display = 'block';
+}
+
+function loadPreset(idx) {
+  const p = PRESETS[mode][idx];
+  if (mode === 'mono') {
+    document.getElementById('traitName').value = p.trait;
+    document.getElementById('domAllele').value = p.dom;
+    document.getElementById('domName').value = p.domName;
+    document.getElementById('recAllele').value = p.rec;
+    document.getElementById('recName').value = p.recName;
+    updateMonoOptions();
+    document.getElementById('p1Geno').value = p.p1;
+    document.getElementById('p2Geno').value = p.p2;
+    generate();
+  } else {
+    document.getElementById('t1Name').value = p.t1;
+    document.getElementById('t1Dom').value = p.d1 + ' / ' + p.dn1;
+    document.getElementById('t1Rec').value = p.r1 + ' / ' + p.rn1;
+    document.getElementById('t2Name').value = p.t2;
+    document.getElementById('t2Dom').value = p.d2 + ' / ' + p.dn2;
+    document.getElementById('t2Rec').value = p.r2 + ' / ' + p.rn2;
+
+    // Update selects for dihybrid
+    const updateDiSelects = () => {
+      const d1 = p.d1.toUpperCase();
+      const r1 = p.r1.toLowerCase();
+      const d2 = p.d2.toUpperCase();
+      const r2 = p.r2.toLowerCase();
+
+      ['dp1t1', 'dp2t1'].forEach(id => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = `
+          <option value="${d1}${d1}">${d1}${d1}</option>
+          <option value="${d1}${r1}">${d1}${r1}</option>
+          <option value="${r1}${r1}">${r1}${r1}</option>
+        `;
+      });
+      ['dp1t2', 'dp2t2'].forEach(id => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = `
+          <option value="${d2}${d2}">${d2}${d2}</option>
+          <option value="${d2}${r2}">${d2}${r2}</option>
+          <option value="${r2}${r2}">${r2}${r2}</option>
+        `;
+      });
+
+      // Set values from preset
+      const p1g = p.p1;
+      const p2g = p.p2;
+      document.getElementById('dp1t1').value = p1g.substring(0, 2);
+      document.getElementById('dp1t2').value = p1g.substring(2, 4);
+      document.getElementById('dp2t1').value = p2g.substring(0, 2);
+      document.getElementById('dp2t2').value = p2g.substring(2, 4);
+    };
+    updateDiSelects();
+    generate();
+  }
+}
+
+// Init
+renderPresets();
+renderTraitPanel();
+</script>
+</body>
+</html>

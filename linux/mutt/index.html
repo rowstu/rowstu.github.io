@@ -1,0 +1,375 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Mutt – Terminal Email Client // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Mutt – Terminal Email Client</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/linuxmutt/>Linuxmutt</a></div><div class="card markdown-content"><p>Mutt is a powerful text-based email client for Linux. It handles IMAP, POP3, and SMTP natively, and with the right configuration can connect to Gmail, Outlook/Exchange (via OAuth2 or app passwords), and any standard mail server. NeoMutt is a maintained fork with extra features — everything here works with both.</p><hr><h2 id=installation>Installation</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Debian/Ubuntu</span>
+</span></span><span style=display:flex><span>sudo apt install mutt
+</span></span><span style=display:flex><span><span style=color:#75715e># or NeoMutt (recommended)</span>
+</span></span><span style=display:flex><span>sudo apt install neomutt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Arch</span>
+</span></span><span style=display:flex><span>sudo pacman -S neomutt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Fedora</span>
+</span></span><span style=display:flex><span>sudo dnf install neomutt
+</span></span></code></pre></div><p>For Exchange/Office 365, you&rsquo;ll also want:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># DavMail - bridges Exchange to IMAP/SMTP</span>
+</span></span><span style=display:flex><span>sudo apt install davmail
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Or use hydroxide for ProtonMail</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Or mbsync + mu for offline IMAP</span>
+</span></span></code></pre></div><hr><h2 id=basic-imap-configuration>Basic IMAP Configuration</h2><p>Create <code>~/.muttrc</code> (or <code>~/.config/mutt/muttrc</code>):</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Identity ──────────────────────────────────────────
+set realname = &#34;Your Name&#34;
+set from = &#34;you@example.com&#34;
+
+# ── IMAP ──────────────────────────────────────────────
+set imap_user = &#34;you@example.com&#34;
+set imap_pass = &#34;your-password&#34;
+set folder = &#34;imaps://mail.example.com:993/&#34;
+set spoolfile = &#34;+INBOX&#34;
+set record = &#34;+Sent&#34;
+set postponed = &#34;+Drafts&#34;
+set trash = &#34;+Trash&#34;
+
+# ── SMTP ──────────────────────────────────────────────
+set smtp_url = &#34;smtps://you@example.com@mail.example.com:465/&#34;
+set smtp_pass = &#34;your-password&#34;
+
+# ── TLS ───────────────────────────────────────────────
+set ssl_force_tls = yes
+set ssl_starttls = yes
+</code></pre><p>That&rsquo;s the minimum to get connected. The rest of this guide covers making it actually pleasant to use.</p><hr><h2 id=gmail>Gmail</h2><p>Gmail requires an <strong>App Password</strong> (if 2FA is enabled) or OAuth2.</p><h3 id=with-app-password-simplest>With App Password (simplest)</h3><ol><li>Go to myaccount.google.com → Security → 2-Step Verification → App passwords</li><li>Generate a password for &ldquo;Mail&rdquo;</li></ol><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set imap_user = &#34;you@gmail.com&#34;
+set imap_pass = &#34;xxxx xxxx xxxx xxxx&#34;
+set folder = &#34;imaps://imap.gmail.com:993/&#34;
+set spoolfile = &#34;+INBOX&#34;
+set record = &#34;+[Gmail]/Sent Mail&#34;
+set postponed = &#34;+[Gmail]/Drafts&#34;
+set trash = &#34;+[Gmail]/Bin&#34;
+
+set smtp_url = &#34;smtps://you@gmail.com@smtp.gmail.com:465/&#34;
+set smtp_pass = &#34;xxxx xxxx xxxx xxxx&#34;
+
+set from = &#34;you@gmail.com&#34;
+set realname = &#34;Your Name&#34;
+</code></pre><h3 id=gmail-specific-tweaks>Gmail-Specific Tweaks</h3><pre tabindex=0><code class=language-muttrc data-lang=muttrc># Gmail uses labels, not folders — don&#39;t move deleted messages
+set delete = yes
+unset confirmappend
+set move = no
+
+# Gmail handles sent mail automatically (server-side copy)
+unset record
+</code></pre><hr><h2 id=microsoft-exchange--office-365>Microsoft Exchange / Office 365</h2><p>Exchange is the most complex to set up. There are three approaches, from simplest to most robust.</p><h3 id=option-1-direct-imap-office-365-with-app-password>Option 1: Direct IMAP (Office 365 with App Password)</h3><p>If your org allows IMAP access and app passwords:</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set imap_user = &#34;you@company.com&#34;
+set imap_pass = &#34;your-app-password&#34;
+set folder = &#34;imaps://outlook.office365.com:993/&#34;
+set spoolfile = &#34;+INBOX&#34;
+set record = &#34;+Sent Items&#34;
+set postponed = &#34;+Drafts&#34;
+set trash = &#34;+Deleted Items&#34;
+
+set smtp_url = &#34;smtps://you@company.com@smtp.office365.com:587/&#34;
+set smtp_pass = &#34;your-app-password&#34;
+set smtp_authenticators = &#34;login&#34;
+</code></pre><p>Note: Microsoft is deprecating basic auth. This may not work for all tenants.</p><h3 id=option-2-oauth2-modern-auth>Option 2: OAuth2 (Modern Auth)</h3><p>NeoMutt supports OAuth2 natively. This is the correct approach for Office 365 tenants that require modern authentication.</p><p>First, install the helper script:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Get the mutt_oauth2.py script (included with NeoMutt or from GitHub)</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Place it somewhere in your PATH</span>
+</span></span><span style=display:flex><span>chmod +x /usr/local/bin/mutt_oauth2.py
+</span></span></code></pre></div><p>Create a token file:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># First-time setup — opens a browser for authentication</span>
+</span></span><span style=display:flex><span>mutt_oauth2.py ~/.config/mutt/oauth2-token <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --provider microsoft <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --client-id <span style=color:#e6db74>&#34;your-azure-app-id&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --client-secret <span style=color:#e6db74>&#34;your-azure-secret&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  --authorize
+</span></span></code></pre></div><p>For the Azure App registration:</p><ol><li>Go to portal.azure.com → Azure Active Directory → App registrations</li><li>New registration, set redirect URI to <code>http://localhost</code></li><li>Under API permissions, add: <code>IMAP.AccessAsUser.All</code>, <code>SMTP.Send</code>, <code>offline_access</code></li><li>Under Certificates & secrets, create a client secret</li><li>Note the Application (client) ID and the secret value</li></ol><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set imap_user = &#34;you@company.com&#34;
+set folder = &#34;imaps://outlook.office365.com:993/&#34;
+set spoolfile = &#34;+INBOX&#34;
+set record = &#34;+Sent Items&#34;
+set postponed = &#34;+Drafts&#34;
+set trash = &#34;+Deleted Items&#34;
+
+set imap_authenticators = &#34;oauthbearer:xoauth2&#34;
+set imap_oauth_refresh_command = &#34;mutt_oauth2.py ~/.config/mutt/oauth2-token --quiet&#34;
+
+set smtp_url = &#34;smtp://you@company.com@smtp.office365.com:587/&#34;
+set smtp_authenticators = &#34;oauthbearer:xoauth2&#34;
+set smtp_oauth_refresh_command = &#34;mutt_oauth2.py ~/.config/mutt/oauth2-token --quiet&#34;
+
+set from = &#34;you@company.com&#34;
+set realname = &#34;Your Name&#34;
+</code></pre><h3 id=option-3-davmail-bridge>Option 3: DavMail Bridge</h3><p>DavMail runs locally and translates Exchange protocols (EWS/OWA) into standard IMAP/SMTP. Works with on-premises Exchange servers that don&rsquo;t expose IMAP at all.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install and start DavMail</span>
+</span></span><span style=display:flex><span>sudo apt install davmail
+</span></span><span style=display:flex><span>davmail &amp;
+</span></span></code></pre></div><p>Configure DavMail (GUI or <code>~/.davmail.properties</code>):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-properties data-lang=properties><span style=display:flex><span><span style=color:#a6e22e>davmail.mode</span><span style=color:#f92672>=</span><span style=color:#e6db74>O365Interactive</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>davmail.url</span><span style=color:#f92672>=</span><span style=color:#e6db74>https://outlook.office365.com/EWS/Exchange.asmx</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>davmail.imapPort</span><span style=color:#f92672>=</span><span style=color:#e6db74>1143</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>davmail.smtpPort</span><span style=color:#f92672>=</span><span style=color:#e6db74>1025</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>davmail.enableEws</span><span style=color:#f92672>=</span><span style=color:#e6db74>auto</span>
+</span></span></code></pre></div><p>Then point Mutt at localhost:</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set imap_user = &#34;you@company.com&#34;
+set imap_pass = &#34;your-password&#34;
+set folder = &#34;imap://localhost:1143/&#34;
+set spoolfile = &#34;+INBOX&#34;
+set record = &#34;+Sent Items&#34;
+set postponed = &#34;+Drafts&#34;
+
+set smtp_url = &#34;smtp://you@company.com@localhost:1025/&#34;
+set smtp_pass = &#34;your-password&#34;
+
+set from = &#34;you@company.com&#34;
+set realname = &#34;Your Name&#34;
+</code></pre><p>DavMail handles the Exchange authentication dance. Mutt only sees plain IMAP/SMTP.</p><hr><h2 id=fastmail--standard-imap>Fastmail / Standard IMAP</h2><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set imap_user = &#34;you@fastmail.com&#34;
+set imap_pass = &#34;your-app-password&#34;
+set folder = &#34;imaps://imap.fastmail.com:993/&#34;
+set spoolfile = &#34;+INBOX&#34;
+set record = &#34;+Sent&#34;
+set postponed = &#34;+Drafts&#34;
+set trash = &#34;+Trash&#34;
+
+set smtp_url = &#34;smtps://you@fastmail.com@smtp.fastmail.com:465/&#34;
+set smtp_pass = &#34;your-app-password&#34;
+</code></pre><hr><h2 id=protonmail-via-proton-bridge>ProtonMail (via Proton Bridge)</h2><p>ProtonMail requires their Bridge app to expose IMAP/SMTP locally:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install Proton Bridge (from proton.me)</span>
+</span></span><span style=display:flex><span>protonmail-bridge &amp;
+</span></span></code></pre></div><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set imap_user = &#34;you@proton.me&#34;
+set imap_pass = &#34;bridge-generated-password&#34;
+set folder = &#34;imap://127.0.0.1:1143/&#34;
+set spoolfile = &#34;+INBOX&#34;
+set record = &#34;+Sent&#34;
+set postponed = &#34;+Drafts&#34;
+
+set smtp_url = &#34;smtp://you@proton.me@127.0.0.1:1025/&#34;
+set smtp_pass = &#34;bridge-generated-password&#34;
+
+# Bridge uses self-signed cert
+set ssl_verify_host = no
+set ssl_verify_dates = no
+</code></pre><hr><h2 id=making-it-look-good>Making It Look Good</h2><p>The default Mutt appearance is spartan. These settings transform the experience.</p><h3 id=sidebar-neomutt>Sidebar (NeoMutt)</h3><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Sidebar ───────────────────────────────────────────
+set sidebar_visible = yes
+set sidebar_width = 28
+set sidebar_format = &#34;%D%* %?N?[%N]?&#34;
+set sidebar_short_path = yes
+set sidebar_delim_chars = &#34;/.&#34;
+set sidebar_folder_indent = yes
+set sidebar_indent_string = &#34;  &#34;
+set mail_check_stats = yes
+
+# Sidebar navigation
+bind index,pager \Cp sidebar-prev
+bind index,pager \Cn sidebar-next
+bind index,pager \Co sidebar-open
+
+# Sidebar colours
+color sidebar_new    color2   default
+color sidebar_flagged color1  default
+color sidebar_indicator color0 color4
+</code></pre><h3 id=index-format-message-list>Index Format (Message List)</h3><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Index format ──────────────────────────────────────
+# Show: flags, date, from, subject, size
+set index_format = &#34; %Z  %&lt;[y?%&lt;[d?%[%H:%M]&amp;%[%b %d]&gt;&amp;%[%b %Y]&gt;  %-20.20L  %s&#34;
+set sort = threads
+set sort_aux = reverse-last-date-received
+set collapse_all = yes
+
+# Date: show time for today, day+month for this year, month+year for older
+</code></pre><h3 id=pstrstrager-reading-messages>Pstrstrager (Reading Messages)</h3><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Pager ─────────────────────────────────────────────
+set pager_index_lines = 10    # Show 10 index lines above the pager
+set pager_context = 3         # Lines of context when scrolling
+set pager_stop = yes          # Don&#39;t skip to next message at end
+set tstrstrilde = yes              # Pad empty lines with ~
+set markers = no              # No + on wrapped lines
+
+# Wrap long lines
+set wrap = 120
+
+# Headers to show (hide the noise)
+ignore *
+unignore from: to: cc: date: subject: reply-to: x-mailer: user-agent:
+unhdr_order *
+hdr_order from: to: cc: date: subject:
+</code></pre><h3 id=colour-scheme>Colour Scheme</h3><p>A clean dark theme that works well in any terminal:</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Colours ───────────────────────────────────────────
+# Basic
+color normal        default       default
+color error         color1        default
+color message       color2        default
+color indicator     color0        color4
+color status        color7        color8
+color tree          color8        default
+
+# Index
+color index         color4        default  &#34;~N&#34;          # new
+color index         color2        default  &#34;~F&#34;          # flagged
+color index         color1        default  &#34;~D&#34;          # deleted
+color index         color8        default  &#34;~R !~N&#34;      # read, not new
+
+# Message body
+color body          color4        default  &#34;([a-z]+://[^ ]+)&#34;  # URLs
+color body          color2        default  &#34;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+&#34; # emails
+color body          color1        default  &#34;(^| )[*][^ ]+[*]&#34;  # *bold*
+
+# Headers
+color hdrdefault    color8        default
+color header        color4        default  &#34;^(From|To|Cc):&#34;
+color header        color2        default  &#34;^Subject:&#34;
+color header        color8        default  &#34;^Date:&#34;
+
+# Quoted text (nested reply levels)
+color quoted        color6        default
+color quoted1       color4        default
+color quoted2       color2        default
+color quoted3       color8        default
+
+# Attachment list
+color attach_headers color8       default
+color attachment    color3        default
+
+# Compose
+color compose header           color4  default
+color compose security_encrypt color2  default
+color compose security_sign    color2  default
+color compose security_both    color2  default
+color compose security_none    color1  default
+</code></pre><h3 id=status-bar>Status Bar</h3><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Status bar ────────────────────────────────────────
+set status_format = &#34; %f [%m messages%?n?, %n new?%?d?, %d deleted?%?t?, %t tagged?] %&gt; %P &#34;
+</code></pre><hr><h2 id=keybindings>Keybindings</h2><p>Make Mutt feel more natural:</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Keybindings ───────────────────────────────────────
+# Vim-like movement
+bind index gg first-entry
+bind index G  last-entry
+bind index j  next-entry
+bind index k  previous-entry
+bind pager j  next-line
+bind pager k  previous-line
+bind pager gg top
+bind pager G  bottom
+
+# Quick sync
+macro index S &#34;&lt;shell-escape&gt;mbsync -a&lt;enter&gt;&#34; &#34;Sync all mail&#34;
+
+# Quick reply / forward
+bind index r  reply
+bind index R  group-reply
+bind index f  forward-message
+
+# Tag operations
+bind index t  tag-entry
+bind index T  tag-pattern
+
+# Archive (move to All Mail for Gmail, Archive for others)
+# Adjust the folder path to match your provider
+macro index A &#34;&lt;save-message&gt;=Archive&lt;enter&gt;&#34; &#34;Archive message&#34;
+
+# Search
+bind index /  search
+bind index n  search-next
+bind index N  search-opposite
+
+# Collapse/expand threads
+bind index &lt;space&gt; collapse-thread
+bind index zA      collapse-all
+</code></pre><hr><h2 id=composing>Composing</h2><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Compose ───────────────────────────────────────────
+set editor = &#34;nvim +/^$ ++1&#34;      # Open editor with cursor after headers
+set edit_headers = yes             # Edit headers in the editor
+set autoedit = yes                 # Go straight to editor
+set fast_reply = yes               # Skip prompts when replying
+set include = yes                  # Include original in reply
+set forward_format = &#34;Fwd: %s&#34;
+set attribution = &#34;On %d, %n wrote:&#34;
+set text_flowed = yes              # Format=flowed for mobile-friendly text
+
+# Signature
+set signature = &#34;~/.config/mutt/signature&#34;
+</code></pre><p>Create <code>~/.config/mutt/signature</code>:</p><pre tabindex=0><code>--
+Your Name
+your@email.com
+</code></pre><hr><h2 id=html-email>HTML Email</h2><p>Most email today contains HTML. Mutt can render it:</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── HTML handling ─────────────────────────────────────
+set mailcap_path = &#34;~/.config/mutt/mailcap&#34;
+auto_view text/html
+alternative_order text/plain text/enriched text/html
+</code></pre><p>Create <code>~/.config/mutt/mailcap</code>:</p><pre tabindex=0><code>text/html; lynx -dump -assume_charset=%{charset} %s; nametemplate=%s.html; copiousoutput
+text/html; w3m -dump -T text/html %s; copiousoutput
+text/html; firefox %s &amp;; test=test -n &#34;$DISPLAY&#34;
+</code></pre><p>Install a text-mode browser: <code>sudo apt install lynx</code> or <code>w3m</code>. Mutt uses the first matching entry — <code>lynx</code> renders HTML inline, <code>firefox</code> opens it in a browser.</p><p>For better HTML rendering, try <code>pandoc</code>:</p><pre tabindex=0><code>text/html; pandoc -f html -t plain --wrap=auto %s; copiousoutput
+</code></pre><hr><h2 id=address-book--contacts>Address Book / Contacts</h2><h3 id=using-abook>Using abook</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt install abook
+</span></span></code></pre></div><pre tabindex=0><code class=language-muttrc data-lang=muttrc># Query abook for addresses when composing (Tab to autocomplete)
+set query_command = &#34;abook --mutt-query &#39;%s&#39;&#34;
+
+# Add sender to abook with a macro
+macro index,pager a &#34;&lt;pipe-message&gt;abook --add-email-quiet&lt;return&gt;&#34; &#34;Add sender to abook&#34;
+</code></pre><h3 id=using-khard-carddav>Using khard (CardDAV)</h3><p>For syncing contacts from a CardDAV server (Nextcloud, iCloud, etc.):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt install khard vdirsyncer
+</span></span></code></pre></div><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set query_command = &#34;khard email --parsable &#39;%s&#39;&#34;
+</code></pre><hr><h2 id=offline-with-mbsync--notmuch>Offline with mbsync + notmuch</h2><p>For working offline or with very large mailboxes, sync mail locally:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt install isync notmuch
+</span></span></code></pre></div><p><code>~/.mbsyncrc</code>:</p><pre tabindex=0><code>IMAPAccount work
+Host outlook.office365.com
+Port 993
+User you@company.com
+PassCmd &#34;pass email/work&#34;
+SSLType IMAPS
+
+IMAPStore work-remote
+Account work
+
+MaildirStore work-local
+Path ~/mail/work/
+Inbox ~/mail/work/INBOX
+SubFolders Verbatim
+
+Channel work
+Far :work-remote:
+Near :work-local:
+Patterns *
+Create Both
+SyncState *
+Expunge Both
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Sync all mail</span>
+</span></span><span style=display:flex><span>mbsync -a
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Index with notmuch</span>
+</span></span><span style=display:flex><span>notmuch new
+</span></span></code></pre></div><p>Then point Mutt at the local maildir:</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set folder = &#34;~/mail/work&#34;
+set mbox_type = Maildir
+set spoolfile = &#34;+INBOX&#34;
+set record = &#34;+Sent Items&#34;
+set postponed = &#34;+Drafts&#34;
+
+# Use notmuch for search (much faster than IMAP search)
+set nm_default_url = &#34;notstrstrsmstrstrtp:///home/you/mail/work&#34;
+macro index \\ &#34;&lt;vfolder-from-query&gt;&#34; &#34;Search with notmuch&#34;
+</code></pre><hr><h2 id=password-security>Password Security</h2><p>Don&rsquo;t put passwords in plain text in your muttrc.</p><h3 id=using-pass-password-store>Using pass (password-store)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Store the password</span>
+</span></span><span style=display:flex><span>pass insert email/work
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># In muttrc, use a command to retrieve it</span>
+</span></span><span style=display:flex><span>set imap_pass <span style=color:#f92672>=</span> <span style=color:#e6db74>`</span>pass email/work<span style=color:#e6db74>`</span>
+</span></span><span style=display:flex><span>set smtp_pass <span style=color:#f92672>=</span> <span style=color:#e6db74>`</span>pass email/work<span style=color:#e6db74>`</span>
+</span></span></code></pre></div><h3 id=using-gpg-encrypted-file>Using GPG-encrypted file</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>echo <span style=color:#e6db74>&#34;your-password&#34;</span> | gpg --encrypt -r you@email.com -o ~/.config/mutt/pass.gpg
+</span></span></code></pre></div><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set imap_pass = `gpg --quiet --batch --decrypt ~/.config/mutt/pass.gpg`
+</code></pre><h3 id=using-secret-tool-gnome-keyring>Using secret-tool (GNOME Keyring)</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>secret-tool store --label<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Email Work&#34;</span> service mutt account work
+</span></span></code></pre></div><pre tabindex=0><code class=language-muttrc data-lang=muttrc>set imap_pass = `secret-tool lookup service mutt account work`
+</code></pre><hr><h2 id=multiple-accounts>Multiple Accounts</h2><p>Use folder hooks to switch settings per-account:</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Account: Personal ────────────────────────────────
+source ~/.config/mutt/personal.muttrc
+
+# ── Account switching ────────────────────────────────
+folder-hook &#34;imaps://imap.gmail.com&#34; &#34;source ~/.config/mutt/personal.muttrc&#34;
+folder-hook &#34;imaps://outlook.office365.com&#34; &#34;source ~/.config/mutt/work.muttrc&#34;
+
+# Quick switch macros
+macro index &lt;f2&gt; &#34;&lt;sync-mailbox&gt;&lt;enter-command&gt;source ~/.config/mutt/personal.muttrc&lt;enter&gt;&lt;change-folder&gt;!&lt;enter&gt;&#34; &#34;Switch to personal&#34;
+macro index &lt;f3&gt; &#34;&lt;sync-mailbox&gt;&lt;enter-command&gt;source ~/.config/mutt/work.muttrc&lt;enter&gt;&lt;change-folder&gt;!&lt;enter&gt;&#34; &#34;Switch to work&#34;
+</code></pre><p>Each account file (<code>personal.muttrc</code>, <code>work.muttrc</code>) contains the full <code>set from</code>, <code>set folder</code>, <code>set smtp_url</code>, etc. for that account.</p><hr><h2 id=useful-settings>Useful Settings</h2><pre tabindex=0><code class=language-muttrc data-lang=muttrc># ── Misc ──────────────────────────────────────────────
+set sleep_time = 0             # No pause between folder changes
+set wait_key = no              # Don&#39;t press key after shell commands
+set timeout = 30               # Check for new mail every 30 seconds
+set mail_check = 60            # Check mailboxes every 60 seconds
+set beep_new = yes             # Beep on new mail
+set pipe_decode = yes          # Decode messages when piping
+set thorough_search = yes      # Decode headers for searching
+set help = no                  # Hide the help line at top (saves a row)
+set confirmappend = no         # Don&#39;t ask when appending to mailbox
+set quit = ask-yes             # Confirm quit
+set mark_old = no              # Don&#39;t mark unread as old
+set mime_forward = yes         # Forward attachments
+set forward_decode = yes       # Decode when forwarding
+set reply_to = yes             # Use Reply-To header
+set reverse_name = yes         # Reply as the address it was sent to
+set charset = &#34;utf-8&#34;
+set assumed_charset = &#34;utf-8&#34;
+set send_charset = &#34;utf-8:iso-8859-1:us-ascii&#34;
+</code></pre><hr><h2 id=quick-reference>Quick Reference</h2><table><thead><tr><th>Key</th><th>Action</th></tr></thead><tbody><tr><td><code>m</code></td><td>Compose new message</td></tr><tr><td><code>r</code></td><td>Reply</td></tr><tr><td><code>g</code></td><td>Group reply (reply-all)</td></tr><tr><td><code>f</code></td><td>Forward</td></tr><tr><td><code>d</code></td><td>Delete</td></tr><tr><td><code>u</code></td><td>Undelete</td></tr><tr><td><code>s</code></td><td>Save to folder</td></tr><tr><td><code>c</code></td><td>Change folder</td></tr><tr><td><code>t</code></td><td>Tag message</td></tr><tr><td><code>;</code></td><td>Apply command to tagged messages</td></tr><tr><td><code>/</code></td><td>Search</td></tr><tr><td><code>q</code></td><td>Quit / go back</td></tr><tr><td><code>$</code></td><td>Sync mailbox</td></tr><tr><td><code>?</code></td><td>Help (list all bindings)</td></tr><tr><td><code>Enter</code></td><td>Open message</td></tr><tr><td><code>Tab</code></td><td>Toggle new/read</td></tr><tr><td><code>v</code></td><td>View attachments</td></tr><tr><td><code>e</code></td><td>Edit message (as new)</td></tr><tr><td><code>b</code></td><td>Bounce (redirect) message</td></tr><tr><td><code>p</code></td><td>PGP menu</td></tr></tbody></table><hr><h2 id=recommended-file-structure>Recommended File Structure</h2><pre tabindex=0><code>~/.config/mutt/
+  muttrc              Main config (or ~/.muttrc)
+  personal.muttrc     Personal account settings
+  work.muttrc         Work account settings
+  signature           Email signature
+  mailcap             MIME type handlers
+  aliases             Address aliases
+  colours.muttrc      Colour scheme (source from muttrc)
+</code></pre><p>Keep each concern in its own file and <code>source</code> them from your main muttrc:</p><pre tabindex=0><code class=language-muttrc data-lang=muttrc>source ~/.config/mutt/colours.muttrc
+source ~/.config/mutt/personal.muttrc
+</code></pre></div></div><script src=/assets/shared-nav.js></script></body></html>

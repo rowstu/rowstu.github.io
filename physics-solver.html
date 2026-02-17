@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCSE Physics Equation Solver</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a10;
+            --surface: #111118;
+            --surface2: #1a1a25;
+            --border: #282838;
+            --accent: #818cf8;
+            --accent-dim: #3730a3;
+            --accent2: #34d399;
+            --text: #d0d0e0;
+            --text-dim: #606078;
+            --text-bright: #f0f0ff;
+            --result: #fbbf24;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Lexend', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image: radial-gradient(ellipse at 50% 0%, rgba(129,140,248,0.04) 0%, transparent 50%);
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        header h1 { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+        header h1 span { color: var(--text-dim); font-weight: 300; }
+        header p { color: var(--text-dim); font-size: 0.78rem; margin-top: 0.4rem; }
+
+        .topic-tabs {
+            display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem;
+        }
+        .topic-btn {
+            background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
+            font-family: inherit; font-size: 0.7rem; font-weight: 500; padding: 0.4rem 0.8rem;
+            border-radius: 5px; cursor: pointer; transition: all 0.15s;
+        }
+        .topic-btn:hover { color: var(--text); border-color: var(--accent-dim); }
+        .topic-btn.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+
+        .eq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8rem; }
+        .eq-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+            overflow: hidden; transition: border-color 0.15s;
+        }
+        .eq-card.active { border-color: var(--accent); }
+        .eq-header {
+            padding: 0.6rem 0.8rem; background: var(--surface2); border-bottom: 1px solid var(--border);
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+        }
+        .eq-header:hover { background: rgba(129,140,248,0.05); }
+        .eq-name { font-size: 0.75rem; font-weight: 600; color: var(--accent); }
+        .eq-formula { font-size: 0.7rem; color: var(--text-dim); font-style: italic; }
+
+        .eq-body { padding: 0.8rem; display: none; }
+        .eq-body.open { display: block; }
+
+        .eq-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.6rem; }
+        .eq-field { display: flex; flex-direction: column; gap: 0.2rem; }
+        .eq-field label { font-size: 0.6rem; color: var(--text-dim); font-weight: 500; }
+        .eq-field input {
+            background: var(--bg); border: 1px solid var(--border); color: var(--text-bright);
+            font-family: inherit; font-size: 0.85rem; padding: 0.35rem 0.5rem; border-radius: 4px; outline: none; width: 100%;
+        }
+        .eq-field input:focus { border-color: var(--accent); }
+        .eq-field input.result-field { border-color: var(--result); color: var(--result); font-weight: 600; }
+        .eq-field .unit { font-size: 0.6rem; color: var(--text-dim); }
+
+        .eq-btn {
+            background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent);
+            font-family: inherit; font-size: 0.7rem; font-weight: 600; padding: 0.4rem 0.8rem;
+            border-radius: 4px; cursor: pointer; transition: all 0.15s; width: 100%;
+        }
+        .eq-btn:hover { background: var(--accent); color: var(--bg); }
+
+        .eq-result {
+            margin-top: 0.5rem; padding: 0.5rem; background: rgba(251,191,36,0.06);
+            border: 1px solid rgba(251,191,36,0.15); border-radius: 4px;
+            font-size: 0.75rem; line-height: 1.6; display: none;
+        }
+        .eq-result.show { display: block; }
+        .eq-result .answer { color: var(--result); font-weight: 600; font-size: 0.9rem; }
+        .eq-result .step { color: var(--text-dim); }
+        .eq-result .step strong { color: var(--text); }
+
+        .eq-desc {
+            font-size: 0.65rem; color: var(--text-dim); line-height: 1.5;
+            margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            header h1 { font-size: 1.2rem; }
+            .eq-grid { grid-template-columns: 1fr; }
+            .eq-inputs { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <script src="/assets/shared-nav.js"></script>
+    <div class="container">
+        <header>
+            <h1>Physics <span>Equation Solver</span></h1>
+            <p>GCSE Physics equations &mdash; fill in what you know, solve for what you don't</p>
+        </header>
+
+        <div class="topic-tabs" id="topic-tabs"></div>
+        <div class="eq-grid" id="eq-grid"></div>
+    </div>
+
+    <script>
+    const equations = [
+        // Forces & Motion
+        { topic: 'Forces & Motion', name: 'Speed', formula: 'v = d / t', desc: 'Distance = speed x time',
+          vars: [
+            { id: 'v', label: 'Speed (v)', unit: 'm/s' },
+            { id: 'd', label: 'Distance (d)', unit: 'm' },
+            { id: 't', label: 'Time (t)', unit: 's' }
+          ],
+          solve: (v) => {
+            if (v.d !== '' && v.t !== '') return { id: 'v', val: v.d / v.t, steps: [`v = d ÷ t`, `v = ${v.d} ÷ ${v.t}`, `v = ${(v.d/v.t).toFixed(4)}`] };
+            if (v.v !== '' && v.t !== '') return { id: 'd', val: v.v * v.t, steps: [`d = v × t`, `d = ${v.v} × ${v.t}`, `d = ${(v.v*v.t).toFixed(4)}`] };
+            if (v.v !== '' && v.d !== '') return { id: 't', val: v.d / v.v, steps: [`t = d ÷ v`, `t = ${v.d} ÷ ${v.v}`, `t = ${(v.d/v.v).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Forces & Motion', name: 'Acceleration', formula: 'a = (v-u) / t', desc: 'Change in velocity over time',
+          vars: [
+            { id: 'a', label: 'Acceleration (a)', unit: 'm/s²' },
+            { id: 'v', label: 'Final velocity (v)', unit: 'm/s' },
+            { id: 'u', label: 'Initial velocity (u)', unit: 'm/s' },
+            { id: 't', label: 'Time (t)', unit: 's' }
+          ],
+          solve: (vals) => {
+            const {a,v,u,t} = vals;
+            if (v !== '' && u !== '' && t !== '') return { id: 'a', val: (v-u)/t, steps: [`a = (v - u) ÷ t`, `a = (${v} - ${u}) ÷ ${t}`, `a = ${((v-u)/t).toFixed(4)}`] };
+            if (a !== '' && u !== '' && t !== '') return { id: 'v', val: u + a*t, steps: [`v = u + at`, `v = ${u} + ${a} × ${t}`, `v = ${(u+a*t).toFixed(4)}`] };
+            if (a !== '' && v !== '' && t !== '') return { id: 'u', val: v - a*t, steps: [`u = v - at`, `u = ${v} - ${a} × ${t}`, `u = ${(v-a*t).toFixed(4)}`] };
+            if (a !== '' && v !== '' && u !== '') return { id: 't', val: (v-u)/a, steps: [`t = (v - u) ÷ a`, `t = (${v} - ${u}) ÷ ${a}`, `t = ${((v-u)/a).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Forces & Motion', name: 'Force', formula: 'F = m × a', desc: 'Newton\'s second law',
+          vars: [
+            { id: 'F', label: 'Force (F)', unit: 'N' },
+            { id: 'm', label: 'Mass (m)', unit: 'kg' },
+            { id: 'a', label: 'Acceleration (a)', unit: 'm/s²' }
+          ],
+          solve: (v) => {
+            if (v.m !== '' && v.a !== '') return { id: 'F', val: v.m*v.a, steps: [`F = m × a`, `F = ${v.m} × ${v.a}`, `F = ${(v.m*v.a).toFixed(4)}`] };
+            if (v.F !== '' && v.a !== '') return { id: 'm', val: v.F/v.a, steps: [`m = F ÷ a`, `m = ${v.F} ÷ ${v.a}`, `m = ${(v.F/v.a).toFixed(4)}`] };
+            if (v.F !== '' && v.m !== '') return { id: 'a', val: v.F/v.m, steps: [`a = F ÷ m`, `a = ${v.F} ÷ ${v.m}`, `a = ${(v.F/v.m).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Forces & Motion', name: 'Weight', formula: 'W = m × g', desc: 'Weight from mass and gravitational field strength',
+          vars: [
+            { id: 'W', label: 'Weight (W)', unit: 'N' },
+            { id: 'm', label: 'Mass (m)', unit: 'kg' },
+            { id: 'g', label: 'Gravity (g)', unit: 'N/kg', default: 9.8 }
+          ],
+          solve: (v) => {
+            if (v.m !== '' && v.g !== '') return { id: 'W', val: v.m*v.g, steps: [`W = m × g`, `W = ${v.m} × ${v.g}`, `W = ${(v.m*v.g).toFixed(4)}`] };
+            if (v.W !== '' && v.g !== '') return { id: 'm', val: v.W/v.g, steps: [`m = W ÷ g`, `m = ${v.W} ÷ ${v.g}`, `m = ${(v.W/v.g).toFixed(4)}`] };
+            if (v.W !== '' && v.m !== '') return { id: 'g', val: v.W/v.m, steps: [`g = W ÷ m`, `g = ${v.W} ÷ ${v.m}`, `g = ${(v.W/v.m).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Forces & Motion', name: 'Momentum', formula: 'p = m × v', desc: 'Momentum = mass times velocity',
+          vars: [
+            { id: 'p', label: 'Momentum (p)', unit: 'kg m/s' },
+            { id: 'm', label: 'Mass (m)', unit: 'kg' },
+            { id: 'v', label: 'Velocity (v)', unit: 'm/s' }
+          ],
+          solve: (v) => {
+            if (v.m !== '' && v.v !== '') return { id: 'p', val: v.m*v.v, steps: [`p = m × v`, `p = ${v.m} × ${v.v}`, `p = ${(v.m*v.v).toFixed(4)}`] };
+            if (v.p !== '' && v.v !== '') return { id: 'm', val: v.p/v.v, steps: [`m = p ÷ v`, `m = ${v.p} ÷ ${v.v}`, `m = ${(v.p/v.v).toFixed(4)}`] };
+            if (v.p !== '' && v.m !== '') return { id: 'v', val: v.p/v.m, steps: [`v = p ÷ m`, `v = ${v.p} ÷ ${v.m}`, `v = ${(v.p/v.m).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Forces & Motion', name: 'Work Done', formula: 'W = F × d', desc: 'Work done = force times distance',
+          vars: [
+            { id: 'W', label: 'Work done (W)', unit: 'J' },
+            { id: 'F', label: 'Force (F)', unit: 'N' },
+            { id: 'd', label: 'Distance (d)', unit: 'm' }
+          ],
+          solve: (v) => {
+            if (v.F !== '' && v.d !== '') return { id: 'W', val: v.F*v.d, steps: [`W = F × d`, `W = ${v.F} × ${v.d}`, `W = ${(v.F*v.d).toFixed(4)}`] };
+            if (v.W !== '' && v.d !== '') return { id: 'F', val: v.W/v.d, steps: [`F = W ÷ d`, `F = ${v.W} ÷ ${v.d}`, `F = ${(v.W/v.d).toFixed(4)}`] };
+            if (v.W !== '' && v.F !== '') return { id: 'd', val: v.W/v.F, steps: [`d = W ÷ F`, `d = ${v.W} ÷ ${v.F}`, `d = ${(v.W/v.F).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Forces & Motion', name: 'Kinetic Energy', formula: 'KE = ½mv²', desc: 'Kinetic energy of a moving object',
+          vars: [
+            { id: 'KE', label: 'Kinetic energy (KE)', unit: 'J' },
+            { id: 'm', label: 'Mass (m)', unit: 'kg' },
+            { id: 'v', label: 'Velocity (v)', unit: 'm/s' }
+          ],
+          solve: (vals) => {
+            if (vals.m !== '' && vals.v !== '') return { id: 'KE', val: 0.5*vals.m*vals.v*vals.v, steps: [`KE = ½ × m × v²`, `KE = 0.5 × ${vals.m} × ${vals.v}²`, `KE = ${(0.5*vals.m*vals.v*vals.v).toFixed(4)}`] };
+            if (vals.KE !== '' && vals.v !== '') return { id: 'm', val: 2*vals.KE/(vals.v*vals.v), steps: [`m = 2KE ÷ v²`, `m = 2 × ${vals.KE} ÷ ${vals.v}²`, `m = ${(2*vals.KE/(vals.v*vals.v)).toFixed(4)}`] };
+            if (vals.KE !== '' && vals.m !== '') return { id: 'v', val: Math.sqrt(2*vals.KE/vals.m), steps: [`v = √(2KE ÷ m)`, `v = √(2 × ${vals.KE} ÷ ${vals.m})`, `v = ${Math.sqrt(2*vals.KE/vals.m).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Forces & Motion', name: 'GPE', formula: 'GPE = m × g × h', desc: 'Gravitational potential energy',
+          vars: [
+            { id: 'GPE', label: 'GPE', unit: 'J' },
+            { id: 'm', label: 'Mass (m)', unit: 'kg' },
+            { id: 'g', label: 'Gravity (g)', unit: 'N/kg', default: 9.8 },
+            { id: 'h', label: 'Height (h)', unit: 'm' }
+          ],
+          solve: (v) => {
+            if (v.m !== '' && v.g !== '' && v.h !== '') return { id: 'GPE', val: v.m*v.g*v.h, steps: [`GPE = m × g × h`, `GPE = ${v.m} × ${v.g} × ${v.h}`, `GPE = ${(v.m*v.g*v.h).toFixed(4)}`] };
+            if (v.GPE !== '' && v.g !== '' && v.h !== '') return { id: 'm', val: v.GPE/(v.g*v.h), steps: [`m = GPE ÷ (g × h)`, `m = ${v.GPE} ÷ (${v.g} × ${v.h})`, `m = ${(v.GPE/(v.g*v.h)).toFixed(4)}`] };
+            if (v.GPE !== '' && v.m !== '' && v.g !== '') return { id: 'h', val: v.GPE/(v.m*v.g), steps: [`h = GPE ÷ (m × g)`, `h = ${v.GPE} ÷ (${v.m} × ${v.g})`, `h = ${(v.GPE/(v.m*v.g)).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Forces & Motion', name: 'Pressure', formula: 'P = F / A', desc: 'Pressure = force per unit area',
+          vars: [
+            { id: 'P', label: 'Pressure (P)', unit: 'Pa' },
+            { id: 'F', label: 'Force (F)', unit: 'N' },
+            { id: 'A', label: 'Area (A)', unit: 'm²' }
+          ],
+          solve: (v) => {
+            if (v.F !== '' && v.A !== '') return { id: 'P', val: v.F/v.A, steps: [`P = F ÷ A`, `P = ${v.F} ÷ ${v.A}`, `P = ${(v.F/v.A).toFixed(4)}`] };
+            if (v.P !== '' && v.A !== '') return { id: 'F', val: v.P*v.A, steps: [`F = P × A`, `F = ${v.P} × ${v.A}`, `F = ${(v.P*v.A).toFixed(4)}`] };
+            if (v.P !== '' && v.F !== '') return { id: 'A', val: v.F/v.P, steps: [`A = F ÷ P`, `A = ${v.F} ÷ ${v.P}`, `A = ${(v.F/v.P).toFixed(4)}`] };
+            return null;
+          }
+        },
+        // Electricity
+        { topic: 'Electricity', name: "Ohm's Law", formula: 'V = I × R', desc: 'Voltage = current times resistance',
+          vars: [
+            { id: 'V', label: 'Voltage (V)', unit: 'V' },
+            { id: 'I', label: 'Current (I)', unit: 'A' },
+            { id: 'R', label: 'Resistance (R)', unit: 'Ω' }
+          ],
+          solve: (v) => {
+            if (v.I !== '' && v.R !== '') return { id: 'V', val: v.I*v.R, steps: [`V = I × R`, `V = ${v.I} × ${v.R}`, `V = ${(v.I*v.R).toFixed(4)}`] };
+            if (v.V !== '' && v.R !== '') return { id: 'I', val: v.V/v.R, steps: [`I = V ÷ R`, `I = ${v.V} ÷ ${v.R}`, `I = ${(v.V/v.R).toFixed(4)}`] };
+            if (v.V !== '' && v.I !== '') return { id: 'R', val: v.V/v.I, steps: [`R = V ÷ I`, `R = ${v.V} ÷ ${v.I}`, `R = ${(v.V/v.I).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Electricity', name: 'Power (IV)', formula: 'P = I × V', desc: 'Electrical power',
+          vars: [
+            { id: 'P', label: 'Power (P)', unit: 'W' },
+            { id: 'I', label: 'Current (I)', unit: 'A' },
+            { id: 'V', label: 'Voltage (V)', unit: 'V' }
+          ],
+          solve: (v) => {
+            if (v.I !== '' && v.V !== '') return { id: 'P', val: v.I*v.V, steps: [`P = I × V`, `P = ${v.I} × ${v.V}`, `P = ${(v.I*v.V).toFixed(4)}`] };
+            if (v.P !== '' && v.V !== '') return { id: 'I', val: v.P/v.V, steps: [`I = P ÷ V`, `I = ${v.P} ÷ ${v.V}`, `I = ${(v.P/v.V).toFixed(4)}`] };
+            if (v.P !== '' && v.I !== '') return { id: 'V', val: v.P/v.I, steps: [`V = P ÷ I`, `V = ${v.P} ÷ ${v.I}`, `V = ${(v.P/v.I).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Electricity', name: 'Power (I²R)', formula: 'P = I² × R', desc: 'Power from current and resistance',
+          vars: [
+            { id: 'P', label: 'Power (P)', unit: 'W' },
+            { id: 'I', label: 'Current (I)', unit: 'A' },
+            { id: 'R', label: 'Resistance (R)', unit: 'Ω' }
+          ],
+          solve: (v) => {
+            if (v.I !== '' && v.R !== '') return { id: 'P', val: v.I*v.I*v.R, steps: [`P = I² × R`, `P = ${v.I}² × ${v.R}`, `P = ${(v.I*v.I*v.R).toFixed(4)}`] };
+            if (v.P !== '' && v.R !== '') return { id: 'I', val: Math.sqrt(v.P/v.R), steps: [`I = √(P ÷ R)`, `I = √(${v.P} ÷ ${v.R})`, `I = ${Math.sqrt(v.P/v.R).toFixed(4)}`] };
+            if (v.P !== '' && v.I !== '') return { id: 'R', val: v.P/(v.I*v.I), steps: [`R = P ÷ I²`, `R = ${v.P} ÷ ${v.I}²`, `R = ${(v.P/(v.I*v.I)).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Electricity', name: 'Charge', formula: 'Q = I × t', desc: 'Charge = current times time',
+          vars: [
+            { id: 'Q', label: 'Charge (Q)', unit: 'C' },
+            { id: 'I', label: 'Current (I)', unit: 'A' },
+            { id: 't', label: 'Time (t)', unit: 's' }
+          ],
+          solve: (v) => {
+            if (v.I !== '' && v.t !== '') return { id: 'Q', val: v.I*v.t, steps: [`Q = I × t`, `Q = ${v.I} × ${v.t}`, `Q = ${(v.I*v.t).toFixed(4)}`] };
+            if (v.Q !== '' && v.t !== '') return { id: 'I', val: v.Q/v.t, steps: [`I = Q ÷ t`, `I = ${v.Q} ÷ ${v.t}`, `I = ${(v.Q/v.t).toFixed(4)}`] };
+            if (v.Q !== '' && v.I !== '') return { id: 't', val: v.Q/v.I, steps: [`t = Q ÷ I`, `t = ${v.Q} ÷ ${v.I}`, `t = ${(v.Q/v.I).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Electricity', name: 'Energy Transferred', formula: 'E = Q × V', desc: 'Energy = charge times voltage',
+          vars: [
+            { id: 'E', label: 'Energy (E)', unit: 'J' },
+            { id: 'Q', label: 'Charge (Q)', unit: 'C' },
+            { id: 'V', label: 'Voltage (V)', unit: 'V' }
+          ],
+          solve: (v) => {
+            if (v.Q !== '' && v.V !== '') return { id: 'E', val: v.Q*v.V, steps: [`E = Q × V`, `E = ${v.Q} × ${v.V}`, `E = ${(v.Q*v.V).toFixed(4)}`] };
+            if (v.E !== '' && v.V !== '') return { id: 'Q', val: v.E/v.V, steps: [`Q = E ÷ V`, `Q = ${v.E} ÷ ${v.V}`, `Q = ${(v.E/v.V).toFixed(4)}`] };
+            if (v.E !== '' && v.Q !== '') return { id: 'V', val: v.E/v.Q, steps: [`V = E ÷ Q`, `V = ${v.E} ÷ ${v.Q}`, `V = ${(v.E/v.Q).toFixed(4)}`] };
+            return null;
+          }
+        },
+        // Waves
+        { topic: 'Waves', name: 'Wave Speed', formula: 'v = f × λ', desc: 'Wave speed = frequency times wavelength',
+          vars: [
+            { id: 'v', label: 'Wave speed (v)', unit: 'm/s' },
+            { id: 'f', label: 'Frequency (f)', unit: 'Hz' },
+            { id: 'lam', label: 'Wavelength (λ)', unit: 'm' }
+          ],
+          solve: (v) => {
+            if (v.f !== '' && v.lam !== '') return { id: 'v', val: v.f*v.lam, steps: [`v = f × λ`, `v = ${v.f} × ${v.lam}`, `v = ${(v.f*v.lam).toFixed(4)}`] };
+            if (v.v !== '' && v.lam !== '') return { id: 'f', val: v.v/v.lam, steps: [`f = v ÷ λ`, `f = ${v.v} ÷ ${v.lam}`, `f = ${(v.v/v.lam).toFixed(4)}`] };
+            if (v.v !== '' && v.f !== '') return { id: 'lam', val: v.v/v.f, steps: [`λ = v ÷ f`, `λ = ${v.v} ÷ ${v.f}`, `λ = ${(v.v/v.f).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Waves', name: 'Period', formula: 'T = 1 / f', desc: 'Period = 1 over frequency',
+          vars: [
+            { id: 'T', label: 'Period (T)', unit: 's' },
+            { id: 'f', label: 'Frequency (f)', unit: 'Hz' }
+          ],
+          solve: (v) => {
+            if (v.f !== '') return { id: 'T', val: 1/v.f, steps: [`T = 1 ÷ f`, `T = 1 ÷ ${v.f}`, `T = ${(1/v.f).toFixed(6)}`] };
+            if (v.T !== '') return { id: 'f', val: 1/v.T, steps: [`f = 1 ÷ T`, `f = 1 ÷ ${v.T}`, `f = ${(1/v.T).toFixed(4)}`] };
+            return null;
+          }
+        },
+        // Thermal
+        { topic: 'Thermal', name: 'Specific Heat', formula: 'E = m × c × ΔT', desc: 'Energy for temperature change',
+          vars: [
+            { id: 'E', label: 'Energy (E)', unit: 'J' },
+            { id: 'm', label: 'Mass (m)', unit: 'kg' },
+            { id: 'c', label: 'Specific heat (c)', unit: 'J/kg°C' },
+            { id: 'dT', label: 'Temp change (ΔT)', unit: '°C' }
+          ],
+          solve: (v) => {
+            if (v.m !== '' && v.c !== '' && v.dT !== '') return { id: 'E', val: v.m*v.c*v.dT, steps: [`E = m × c × ΔT`, `E = ${v.m} × ${v.c} × ${v.dT}`, `E = ${(v.m*v.c*v.dT).toFixed(4)}`] };
+            if (v.E !== '' && v.c !== '' && v.dT !== '') return { id: 'm', val: v.E/(v.c*v.dT), steps: [`m = E ÷ (c × ΔT)`, `m = ${v.E} ÷ (${v.c} × ${v.dT})`, `m = ${(v.E/(v.c*v.dT)).toFixed(4)}`] };
+            if (v.E !== '' && v.m !== '' && v.dT !== '') return { id: 'c', val: v.E/(v.m*v.dT), steps: [`c = E ÷ (m × ΔT)`, `c = ${v.E} ÷ (${v.m} × ${v.dT})`, `c = ${(v.E/(v.m*v.dT)).toFixed(4)}`] };
+            if (v.E !== '' && v.m !== '' && v.c !== '') return { id: 'dT', val: v.E/(v.m*v.c), steps: [`ΔT = E ÷ (m × c)`, `ΔT = ${v.E} ÷ (${v.m} × ${v.c})`, `ΔT = ${(v.E/(v.m*v.c)).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Thermal', name: 'Efficiency', formula: 'η = useful / total', desc: 'Efficiency as a ratio or percentage',
+          vars: [
+            { id: 'eff', label: 'Efficiency', unit: '(0-1)' },
+            { id: 'useful', label: 'Useful output', unit: 'J or W' },
+            { id: 'total', label: 'Total input', unit: 'J or W' }
+          ],
+          solve: (v) => {
+            if (v.useful !== '' && v.total !== '') return { id: 'eff', val: v.useful/v.total, steps: [`η = useful ÷ total`, `η = ${v.useful} ÷ ${v.total}`, `η = ${(v.useful/v.total).toFixed(4)} (${(v.useful/v.total*100).toFixed(1)}%)`] };
+            if (v.eff !== '' && v.total !== '') return { id: 'useful', val: v.eff*v.total, steps: [`useful = η × total`, `useful = ${v.eff} × ${v.total}`, `useful = ${(v.eff*v.total).toFixed(4)}`] };
+            if (v.eff !== '' && v.useful !== '') return { id: 'total', val: v.useful/v.eff, steps: [`total = useful ÷ η`, `total = ${v.useful} ÷ ${v.eff}`, `total = ${(v.useful/v.eff).toFixed(4)}`] };
+            return null;
+          }
+        },
+        // Density
+        { topic: 'Materials', name: 'Density', formula: 'ρ = m / V', desc: 'Density = mass over volume',
+          vars: [
+            { id: 'rho', label: 'Density (ρ)', unit: 'kg/m³' },
+            { id: 'm', label: 'Mass (m)', unit: 'kg' },
+            { id: 'V', label: 'Volume (V)', unit: 'm³' }
+          ],
+          solve: (v) => {
+            if (v.m !== '' && v.V !== '') return { id: 'rho', val: v.m/v.V, steps: [`ρ = m ÷ V`, `ρ = ${v.m} ÷ ${v.V}`, `ρ = ${(v.m/v.V).toFixed(4)}`] };
+            if (v.rho !== '' && v.V !== '') return { id: 'm', val: v.rho*v.V, steps: [`m = ρ × V`, `m = ${v.rho} × ${v.V}`, `m = ${(v.rho*v.V).toFixed(4)}`] };
+            if (v.rho !== '' && v.m !== '') return { id: 'V', val: v.m/v.rho, steps: [`V = m ÷ ρ`, `V = ${v.m} ÷ ${v.rho}`, `V = ${(v.m/v.rho).toFixed(4)}`] };
+            return null;
+          }
+        },
+        { topic: 'Materials', name: 'Hooke\'s Law', formula: 'F = k × e', desc: 'Force = spring constant times extension',
+          vars: [
+            { id: 'F', label: 'Force (F)', unit: 'N' },
+            { id: 'k', label: 'Spring constant (k)', unit: 'N/m' },
+            { id: 'e', label: 'Extension (e)', unit: 'm' }
+          ],
+          solve: (v) => {
+            if (v.k !== '' && v.e !== '') return { id: 'F', val: v.k*v.e, steps: [`F = k × e`, `F = ${v.k} × ${v.e}`, `F = ${(v.k*v.e).toFixed(4)}`] };
+            if (v.F !== '' && v.e !== '') return { id: 'k', val: v.F/v.e, steps: [`k = F ÷ e`, `k = ${v.F} ÷ ${v.e}`, `k = ${(v.F/v.e).toFixed(4)}`] };
+            if (v.F !== '' && v.k !== '') return { id: 'e', val: v.F/v.k, steps: [`e = F ÷ k`, `e = ${v.F} ÷ ${v.k}`, `e = ${(v.F/v.k).toFixed(4)}`] };
+            return null;
+          }
+        },
+    ];
+
+    // Build topic tabs
+    const topics = [...new Set(equations.map(e => e.topic))];
+    let activeTopic = 'all';
+
+    const tabsEl = document.getElementById('topic-tabs');
+    let tabHtml = '<button class="topic-btn active" onclick="filterTopic(\'all\')">All</button>';
+    topics.forEach(t => { tabHtml += `<button class="topic-btn" onclick="filterTopic('${t}')">${t}</button>`; });
+    tabsEl.innerHTML = tabHtml;
+
+    function filterTopic(topic) {
+        activeTopic = topic;
+        tabsEl.querySelectorAll('.topic-btn').forEach(b => b.classList.toggle('active', (topic === 'all' && b.textContent === 'All') || b.textContent === topic));
+        renderEquations();
+    }
+
+    // Render
+    function renderEquations() {
+        const grid = document.getElementById('eq-grid');
+        const filtered = activeTopic === 'all' ? equations : equations.filter(e => e.topic === activeTopic);
+        grid.innerHTML = filtered.map((eq, i) => {
+            const idx = equations.indexOf(eq);
+            return `<div class="eq-card" id="eq-${idx}">
+                <div class="eq-header" onclick="toggleEq(${idx})">
+                    <span class="eq-name">${eq.name}</span>
+                    <span class="eq-formula">${eq.formula}</span>
+                </div>
+                <div class="eq-body" id="eq-body-${idx}">
+                    <div class="eq-desc">${eq.desc}</div>
+                    <div class="eq-inputs">
+                        ${eq.vars.map(v => `
+                            <div class="eq-field">
+                                <label>${v.label} <span class="unit">${v.unit}</span></label>
+                                <input type="text" id="eq-${idx}-${v.id}" placeholder="${v.default !== undefined ? v.default : '?'}" value="${v.default !== undefined ? v.default : ''}" oninput="solveEq(${idx})">
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="eq-btn" onclick="solveEq(${idx})">Calculate</button>
+                    <div class="eq-result" id="eq-result-${idx}"></div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function toggleEq(idx) {
+        const body = document.getElementById(`eq-body-${idx}`);
+        const card = document.getElementById(`eq-${idx}`);
+        body.classList.toggle('open');
+        card.classList.toggle('active');
+    }
+
+    function solveEq(idx) {
+        const eq = equations[idx];
+        const vals = {};
+        let filled = 0;
+        eq.vars.forEach(v => {
+            const el = document.getElementById(`eq-${idx}-${v.id}`);
+            const raw = el.value.trim();
+            if (raw !== '') { vals[v.id] = parseFloat(raw); filled++; } else { vals[v.id] = ''; }
+            el.classList.remove('result-field');
+        });
+
+        const resultEl = document.getElementById(`eq-result-${idx}`);
+        if (filled < eq.vars.length - 1) {
+            resultEl.classList.remove('show');
+            return;
+        }
+
+        const result = eq.solve(vals);
+        if (!result) { resultEl.classList.remove('show'); return; }
+
+        // Fill in the result field
+        const resInput = document.getElementById(`eq-${idx}-${result.id}`);
+        resInput.value = parseFloat(result.val.toFixed(6));
+        resInput.classList.add('result-field');
+
+        // Show working
+        const unit = eq.vars.find(v => v.id === result.id)?.unit || '';
+        resultEl.innerHTML = result.steps.map((s, i) =>
+            i === result.steps.length - 1
+                ? `<div class="answer">${s} ${unit}</div>`
+                : `<div class="step">${s}</div>`
+        ).join('');
+        resultEl.classList.add('show');
+    }
+
+    renderEquations();
+    </script>
+</body>
+</html>

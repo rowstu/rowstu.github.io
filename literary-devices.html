@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Literary Devices Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=Overpass+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0b0e;
+    --surface: #171318;
+    --surface2: #201b22;
+    --border: #362d3a;
+    --accent: #f0abfc;
+    --accent2: #c4b5fd;
+    --accent-dim: #4c1d60;
+    --gold: #fbbf24;
+    --green: #4ade80;
+    --red: #f87171;
+    --text: #f0e6f6;
+    --text-dim: #8a7a92;
+    --serif: 'Crimson Pro', serif;
+    --mono: 'Overpass Mono', monospace;
+  }
+
+  body {
+    font-family: var(--serif);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-top: 60px;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.5px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .panel h2 {
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+    font-weight: 400;
+  }
+
+  /* Mode selector */
+  .mode-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .mode-btn {
+    background: var(--surface2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.55rem 1rem;
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mode-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+  /* Score bar */
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .score-val {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  /* Question card */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .q-number {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+  }
+
+  .q-prompt {
+    font-size: 1.1rem;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .q-example {
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--accent2);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-left: 3px solid var(--accent-dim);
+    text-align: left;
+    line-height: 1.7;
+  }
+
+  .q-source {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: normal;
+    display: block;
+    margin-top: 0.4rem;
+  }
+
+  /* Answer options */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .option-btn {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .option-btn:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: rgba(240, 171, 252, 0.06);
+  }
+
+  .option-btn.correct {
+    border-color: var(--green);
+    background: rgba(74, 222, 128, 0.1);
+    color: var(--green);
+  }
+
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: rgba(248, 113, 113, 0.1);
+    color: var(--red);
+  }
+
+  .option-btn.disabled { cursor: default; opacity: 0.6; }
+  .option-btn.disabled.correct { opacity: 1; }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    display: none;
+    text-align: left;
+  }
+
+  .feedback.visible { display: block; }
+
+  .feedback.correct-fb {
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.25);
+  }
+
+  .feedback.wrong-fb {
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+  }
+
+  .fb-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .fb-title.correct-t { color: var(--green); }
+  .fb-title.wrong-t { color: var(--red); }
+
+  .fb-text {
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .fb-text strong { color: var(--accent); }
+
+  .next-btn {
+    display: none;
+    margin: 1.5rem auto 0;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.7rem 2rem;
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .next-btn.visible { display: block; }
+  .next-btn:hover { background: var(--accent); color: var(--bg); }
+
+  /* End screen */
+  .end-screen {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .end-score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .end-msg {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+  }
+
+  .restart-btn {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.7rem 2rem;
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .restart-btn:hover { background: var(--accent); color: var(--bg); }
+
+  /* Reference table */
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .ref-table th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 400;
+  }
+
+  .ref-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(54, 45, 58, 0.4);
+    vertical-align: top;
+  }
+
+  .ref-table .device-name {
+    color: var(--accent);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .ref-table .device-example {
+    font-style: italic;
+    color: var(--accent2);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 1rem; }
+    h1 { font-size: 1.5rem; }
+    .options { grid-template-columns: 1fr; }
+    .q-example { font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+<script src="/assets/shared-nav.js"></script>
+
+<div class="container">
+  <h1>Literary Devices Quiz</h1>
+  <p class="subtitle">Identify literary techniques from examples in poetry and prose</p>
+
+  <div class="panel">
+    <h2>Quiz Mode</h2>
+    <div class="mode-row">
+      <button class="mode-btn active" id="modeIdentify" onclick="setMode('identify')">Identify the Device</button>
+      <button class="mode-btn" id="modeExample" onclick="setMode('example')">Match the Example</button>
+      <button class="mode-btn" id="modeDefn" onclick="setMode('definition')">Definition Quiz</button>
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <span>Question <span class="score-val" id="qNum">1</span> / <span id="qTotal">10</span></span>
+    <span>Score: <span class="score-val" id="scoreVal">0</span></span>
+    <span>Streak: <span class="score-val" id="streakVal">0</span></span>
+  </div>
+
+  <div id="quizArea"></div>
+
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+
+  <div class="panel" style="margin-top: 1rem;">
+    <h2>Reference Guide</h2>
+    <table class="ref-table" id="refTable"></table>
+  </div>
+</div>
+
+<script>
+const DEVICES = [
+  {
+    name: 'Simile',
+    definition: 'A comparison between two things using "like" or "as"',
+    examples: [
+      { text: 'Her smile was <em>like sunshine</em> breaking through clouds.', source: '' },
+      { text: 'He fought <em>like a lion</em> on the battlefield.', source: '' },
+      { text: 'The water was <em>as clear as crystal</em>.', source: '' },
+      { text: 'Life is <em>like a box of chocolates</em>.', source: 'Forrest Gump' },
+    ]
+  },
+  {
+    name: 'Metaphor',
+    definition: 'A direct comparison stating one thing IS another (without like/as)',
+    examples: [
+      { text: 'The world <em>is a stage</em>, and we are merely players.', source: 'Shakespeare' },
+      { text: 'Time <em>is money</em>.', source: '' },
+      { text: 'Her voice <em>was velvet</em>, smooth and rich.', source: '' },
+      { text: 'The classroom <em>was a zoo</em> after the teacher left.', source: '' },
+    ]
+  },
+  {
+    name: 'Personification',
+    definition: 'Giving human qualities to non-human things or abstract ideas',
+    examples: [
+      { text: 'The wind <em>whispered</em> through the trees.', source: '' },
+      { text: 'The sun <em>smiled down</em> on the children playing.', source: '' },
+      { text: 'Opportunity <em>knocked</em> on his door.', source: '' },
+      { text: 'The flowers <em>danced</em> in the gentle breeze.', source: '' },
+    ]
+  },
+  {
+    name: 'Alliteration',
+    definition: 'Repetition of the same consonant sound at the beginning of nearby words',
+    examples: [
+      { text: '<em>Peter Piper picked</em> a peck of pickled peppers.', source: '' },
+      { text: 'The <em>wild wind whipped</em> across the wasteland.', source: '' },
+      { text: '<em>Sally sells seashells</em> by the seashore.', source: '' },
+      { text: 'The <em>big, bad bear</em> bounded through the bushes.', source: '' },
+    ]
+  },
+  {
+    name: 'Onomatopoeia',
+    definition: 'Words that imitate the sound they describe',
+    examples: [
+      { text: 'The bees <em>buzzed</em> around the garden.', source: '' },
+      { text: 'The fire <em>crackled</em> and <em>popped</em> in the hearth.', source: '' },
+      { text: 'Thunder <em>rumbled</em> in the distance.', source: '' },
+      { text: 'The snake <em>hissed</em> at the approaching threat.', source: '' },
+    ]
+  },
+  {
+    name: 'Hyperbole',
+    definition: 'Extreme exaggeration for emphasis or effect',
+    examples: [
+      { text: 'I\'ve told you <em>a million times</em> not to do that!', source: '' },
+      { text: 'This bag weighs <em>a ton</em>.', source: '' },
+      { text: 'I\'m <em>so hungry I could eat a horse</em>.', source: '' },
+      { text: 'She <em>cried a river</em> of tears.', source: '' },
+    ]
+  },
+  {
+    name: 'Oxymoron',
+    definition: 'Two contradictory words placed together for effect',
+    examples: [
+      { text: 'It was an <em>open secret</em> that they were leaving.', source: '' },
+      { text: 'The <em>living dead</em> roamed the streets.', source: '' },
+      { text: 'A <em>deafening silence</em> filled the room.', source: '' },
+      { text: 'The assignment was <em>clearly confusing</em>.', source: '' },
+    ]
+  },
+  {
+    name: 'Pathetic Fallacy',
+    definition: 'Using weather or nature to reflect a character\'s mood or the atmosphere',
+    examples: [
+      { text: 'As she wept, <em>rain began to fall heavily</em> from dark clouds.', source: '' },
+      { text: 'On the morning of the wedding, <em>the sun beamed brilliantly</em>.', source: '' },
+      { text: '<em>Storm clouds gathered</em> as the villain approached the castle.', source: '' },
+      { text: '<em>Fog crept</em> through the streets as the detective investigated.', source: '' },
+    ]
+  },
+  {
+    name: 'Sibilance',
+    definition: 'Repetition of "s" and "sh" sounds, creating a hissing effect',
+    examples: [
+      { text: 'The <em>snake slithered silently</em> through the grass.', source: '' },
+      { text: '<em>Soft shadows shifted</em> across the shore.', source: '' },
+      { text: 'She <em>sang sweetly, swaying slowly</em>.', source: '' },
+      { text: '<em>Sinister whispers</em> spread through the <em>shadows</em>.', source: '' },
+    ]
+  },
+  {
+    name: 'Juxtaposition',
+    definition: 'Placing two contrasting ideas or images side by side for effect',
+    examples: [
+      { text: 'It was the <em>best of times, it was the worst of times</em>.', source: 'Dickens' },
+      { text: 'The <em>rich man walked past the beggar</em> without a glance.', source: '' },
+      { text: '<em>Youth and age</em> sat together on the park bench.', source: '' },
+      { text: 'In the <em>beautiful garden grew poisonous weeds</em>.', source: '' },
+    ]
+  },
+  {
+    name: 'Irony',
+    definition: 'When the opposite of what is expected happens or is said',
+    examples: [
+      { text: 'A <em>fire station burns down</em>.', source: '' },
+      { text: 'The <em>traffic cop gets a parking ticket</em>.', source: '' },
+      { text: '"What <em>lovely weather</em>," she said, soaked by the storm.', source: '' },
+      { text: 'The <em>swimming teacher drowned</em> in the bathtub.', source: '' },
+    ]
+  },
+  {
+    name: 'Foreshadowing',
+    definition: 'Hints or clues about what will happen later in the story',
+    examples: [
+      { text: '"I have a <em>bad feeling</em> about this journey," she murmured as they set off.', source: '' },
+      { text: 'The <em>dark clouds on the horizon</em> suggested the picnic would not end well.', source: '' },
+      { text: 'He <em>polished the gun carefully</em>, placing it back in the drawer.', source: '' },
+      { text: '"<em>Nothing could go wrong</em> on a day like today," he grinned.', source: '' },
+    ]
+  },
+  {
+    name: 'Enjambment',
+    definition: 'A line of poetry that runs on to the next line without punctuation',
+    examples: [
+      { text: 'I think that I shall never see<br>A poem lovely as a tree.', source: 'Kilmer' },
+      { text: 'April is the cruellest month, breeding<br>Lilacs out of the dead land.', source: 'T.S. Eliot' },
+      { text: 'I wandered lonely as a cloud<br>That floats on high o\'er vales and hills.', source: 'Wordsworth' },
+    ]
+  },
+  {
+    name: 'Caesura',
+    definition: 'A pause in the middle of a line of poetry, often shown by punctuation',
+    examples: [
+      { text: 'To be, <em>||</em> or not to be, <em>||</em> that is the question.', source: 'Shakespeare' },
+      { text: 'I came. <em>||</em> I saw. <em>||</em> I conquered.', source: 'Caesar' },
+      { text: 'The dog barked; <em>||</em> nobody came to the door.', source: '' },
+    ]
+  },
+  {
+    name: 'Anaphora',
+    definition: 'Repetition of a word or phrase at the start of successive lines or clauses',
+    examples: [
+      { text: '<em>I have a dream</em> that one day...<br><em>I have a dream</em> that one day...', source: 'MLK' },
+      { text: '<em>Every day</em> she waited. <em>Every day</em> she hoped. <em>Every day</em> she prayed.', source: '' },
+      { text: '<em>We shall</em> fight on the beaches, <em>we shall</em> fight on the landing grounds.', source: 'Churchill' },
+    ]
+  },
+  {
+    name: 'Emotive Language',
+    definition: 'Words deliberately chosen to provoke an emotional response from the reader',
+    examples: [
+      { text: 'The <em>helpless, innocent</em> puppy <em>trembled</em> in the cold.', source: '' },
+      { text: '<em>Devastating floods destroyed</em> the homes of <em>terrified</em> families.', source: '' },
+      { text: 'The <em>cruel, heartless</em> decision left workers <em>abandoned</em>.', source: '' },
+    ]
+  },
+  {
+    name: 'Rhetorical Question',
+    definition: 'A question asked for effect, not expecting an answer',
+    examples: [
+      { text: '<em>Is this what we\'ve come to?</em>', source: '' },
+      { text: '<em>Do we really want to live in a world like this?</em>', source: '' },
+      { text: '<em>Who wouldn\'t want a better future for their children?</em>', source: '' },
+    ]
+  },
+  {
+    name: 'Symbolism',
+    definition: 'Using an object, colour, or image to represent a deeper meaning',
+    examples: [
+      { text: 'He gave her a <em>red rose</em>, their love blossoming anew.', source: '' },
+      { text: 'The <em>broken mirror</em> reflected his shattered identity.', source: '' },
+      { text: 'A <em>white dove</em> was released at the ceremony.', source: '' },
+      { text: 'The <em>chains</em> around his wrists represented his lack of freedom.', source: '' },
+    ]
+  },
+];
+
+let currentMode = 'identify';
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let streak = 0;
+let answered = false;
+const TOTAL_QUESTIONS = 10;
+
+function setMode(m) {
+  currentMode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  if (m === 'identify') document.getElementById('modeIdentify').classList.add('active');
+  else if (m === 'example') document.getElementById('modeExample').classList.add('active');
+  else document.getElementById('modeDefn').classList.add('active');
+  startQuiz();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickRandom(arr, n) {
+  return shuffle(arr).slice(0, n);
+}
+
+function generateQuestions() {
+  questions = [];
+  const devices = shuffle(DEVICES);
+
+  for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+    const device = devices[i % devices.length];
+    const example = device.examples[Math.floor(Math.random() * device.examples.length)];
+
+    // Get 3 wrong answers
+    const others = DEVICES.filter(d => d.name !== device.name);
+    const wrongs = pickRandom(others, 3);
+
+    if (currentMode === 'identify') {
+      questions.push({
+        prompt: 'Which literary device is used in this example?',
+        example: example.text,
+        source: example.source,
+        correct: device.name,
+        options: shuffle([device.name, ...wrongs.map(w => w.name)]),
+        explanation: `<strong>${device.name}</strong>: ${device.definition}`,
+      });
+    } else if (currentMode === 'example') {
+      // Show device name, pick the right example from 4
+      const wrongExamples = wrongs.map(w => ({
+        text: w.examples[Math.floor(Math.random() * w.examples.length)].text,
+        device: w.name,
+      }));
+      const correctOpt = { text: example.text, device: device.name };
+      const allOpts = shuffle([correctOpt, ...wrongExamples]);
+
+      questions.push({
+        prompt: `Which example demonstrates <strong>${device.name}</strong>?`,
+        example: `<strong>${device.name}</strong>: ${device.definition}`,
+        source: '',
+        correct: example.text,
+        options: allOpts.map(o => o.text),
+        optionsHtml: true,
+        explanation: `The correct example of <strong>${device.name}</strong> is the one shown.`,
+      });
+    } else {
+      // Definition quiz
+      const wrongDefs = wrongs.map(w => w.definition);
+      questions.push({
+        prompt: `What is the definition of <strong>${device.name}</strong>?`,
+        example: '',
+        source: '',
+        correct: device.definition,
+        options: shuffle([device.definition, ...wrongDefs]),
+        explanation: `<strong>${device.name}</strong>: ${device.definition}`,
+      });
+    }
+  }
+}
+
+function startQuiz() {
+  currentQ = 0;
+  score = 0;
+  streak = 0;
+  answered = false;
+  generateQuestions();
+  updateScore();
+  renderQuestion();
+}
+
+function updateScore() {
+  document.getElementById('qNum').textContent = currentQ + 1;
+  document.getElementById('qTotal').textContent = TOTAL_QUESTIONS;
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = streak;
+}
+
+function renderQuestion() {
+  if (currentQ >= TOTAL_QUESTIONS) {
+    showEnd();
+    return;
+  }
+
+  const q = questions[currentQ];
+  answered = false;
+  document.getElementById('nextBtn').classList.remove('visible');
+
+  let html = `<div class="question-card">
+    <div class="q-number">Question ${currentQ + 1} of ${TOTAL_QUESTIONS}</div>
+    <div class="q-prompt">${q.prompt}</div>`;
+
+  if (q.example) {
+    html += `<div class="q-example">${q.example}`;
+    if (q.source) html += `<span class="q-source">— ${q.source}</span>`;
+    html += `</div>`;
+  }
+
+  html += `<div class="options">`;
+  q.options.forEach((opt, i) => {
+    const display = q.optionsHtml ? opt : opt;
+    html += `<button class="option-btn" onclick="answer(${i})" id="opt${i}">${display}</button>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="feedback" id="feedback"></div>`;
+  html += `</div>`;
+
+  document.getElementById('quizArea').innerHTML = html;
+  updateScore();
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQ];
+  const isCorrect = q.options[idx] === q.correct;
+
+  // Mark all buttons
+  q.options.forEach((opt, i) => {
+    const btn = document.getElementById('opt' + i);
+    btn.classList.add('disabled');
+    if (opt === q.correct) btn.classList.add('correct');
+    if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  if (isCorrect) {
+    score++;
+    streak++;
+  } else {
+    streak = 0;
+  }
+
+  updateScore();
+
+  const fb = document.getElementById('feedback');
+  fb.className = `feedback visible ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  fb.innerHTML = `
+    <div class="fb-title ${isCorrect ? 'correct-t' : 'wrong-t'}">${isCorrect ? 'Correct!' : 'Not quite!'}</div>
+    <div class="fb-text">${q.explanation}</div>
+  `;
+
+  document.getElementById('nextBtn').classList.add('visible');
+}
+
+function nextQuestion() {
+  currentQ++;
+  renderQuestion();
+}
+
+function showEnd() {
+  const pct = Math.round(score / TOTAL_QUESTIONS * 100);
+  let msg = '';
+  if (pct === 100) msg = 'Perfect score! Outstanding knowledge of literary devices!';
+  else if (pct >= 80) msg = 'Excellent! You know your literary devices well.';
+  else if (pct >= 60) msg = 'Good effort! Keep practising to improve.';
+  else if (pct >= 40) msg = 'Not bad — review the reference guide below for more practice.';
+  else msg = 'Keep studying! The reference guide below will help.';
+
+  document.getElementById('quizArea').innerHTML = `
+    <div class="question-card end-screen">
+      <div class="end-score">${score} / ${TOTAL_QUESTIONS}</div>
+      <div class="end-msg">${msg}</div>
+      <button class="restart-btn" onclick="startQuiz()">Play Again</button>
+    </div>
+  `;
+  document.getElementById('nextBtn').classList.remove('visible');
+}
+
+// Reference table
+function renderRef() {
+  let html = `<tr><th>Device</th><th>Definition</th><th>Example</th></tr>`;
+  for (const d of DEVICES) {
+    html += `<tr>
+      <td class="device-name">${d.name}</td>
+      <td>${d.definition}</td>
+      <td class="device-example">${d.examples[0].text}</td>
+    </tr>`;
+  }
+  document.getElementById('refTable').innerHTML = html;
+}
+
+renderRef();
+startQuiz();
+</script>
+</body>
+</html>
