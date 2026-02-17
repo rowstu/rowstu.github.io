@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Fail2ban Jail Generator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #110e0a;
+			--surface: #1c1710;
+			--surface-hover: #261f16;
+			--border: #3a2f20;
+			--border-bright: #504028;
+			--text: #e8ddc8;
+			--text-muted: #8a7a60;
+			--accent: #e8a020;
+			--accent-hover: #cc8810;
+			--accent-dim: rgba(232,160,32,0.1);
+			--danger: #e05050;
+			--section: #e8a020;
+			--key: #7ab8e0;
+			--value: #a8d870;
+			--comment: #5a5040;
+			--enabled: #50c050;
+			--disabled: #c05050;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Ubuntu Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image: radial-gradient(ellipse at 20% 0%, rgba(232,160,32,0.04) 0%, transparent 50%);
+		}
+
+		.container { max-width: 960px; margin: 0 auto; }
+		header { margin-bottom: 1.5rem; }
+		h1 { font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-bottom: 0.4rem; }
+		.subtitle { color: var(--text-muted); font-size: 0.9rem; }
+
+		.config-display { background: #0a0806; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.25rem; overflow: hidden; }
+		.config-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+		.config-bar-left { display: flex; align-items: center; gap: 0.6rem; }
+		.config-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+		.config-bar-title { font-size: 0.8rem; color: var(--text-muted); }
+		.config-bar-actions { display: flex; gap: 0.4rem; }
+		.config-body { padding: 1.25rem; overflow-x: auto; max-height: 500px; overflow-y: auto; }
+		.config-body pre { font-family: inherit; font-size: 0.85rem; line-height: 1.6; white-space: pre; margin: 0; }
+
+		.f2b-section { color: var(--section); font-weight: 700; }
+		.f2b-key { color: var(--key); }
+		.f2b-val { color: var(--value); }
+		.f2b-cmt { color: var(--comment); }
+
+		button { padding: 0.45rem 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: inherit; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; }
+		button:hover { background: var(--surface-hover); border-color: var(--accent); }
+		button.primary { background: var(--accent); border-color: var(--accent); color: #110e0a; font-weight: 700; }
+		button.small { padding: 0.28rem 0.6rem; font-size: 0.75rem; }
+		button.danger { color: var(--danger); border-color: var(--danger); }
+		button.danger:hover { background: rgba(224,80,80,0.1); }
+
+		.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+		.panel-header { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+		.panel-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+		.panel-body { padding: 1rem; }
+
+		.presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+		.preset-btn { padding: 0.4rem 0.8rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); font-family: inherit; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; }
+		.preset-btn:hover { border-color: var(--accent); color: var(--text); }
+
+		.field-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; flex-wrap: wrap; }
+		.field-label { font-size: 0.82rem; color: var(--key); min-width: 145px; }
+		.opt-group { margin-bottom: 0.75rem; }
+		.opt-group-title { font-size: 0.8rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 700; }
+		.opt-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+		.opt-row label { font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+		.opt-hint { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+
+		input[type="text"], input[type="number"], select {
+			background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.4rem 0.6rem;
+			color: var(--text); font-family: inherit; font-size: 0.82rem; outline: none;
+		}
+		input:focus, select:focus { border-color: var(--accent); }
+		input::placeholder { color: var(--text-muted); }
+		input.wide { flex: 1; min-width: 160px; }
+		input.medium { width: 200px; }
+		input.narrow { width: 80px; }
+
+		input[type="checkbox"] {
+			appearance: none; -webkit-appearance: none; width: 15px; height: 15px;
+			border: 1px solid var(--border-bright); border-radius: 3px; background: var(--bg);
+			cursor: pointer; position: relative; flex-shrink: 0;
+		}
+		input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+		input[type="checkbox"]:checked::after { content: '\2713'; position: absolute; top: -1px; left: 2px; color: #110e0a; font-size: 11px; font-weight: 700; }
+
+		hr.divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+
+		.jail-entry { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.7rem; background: var(--surface); overflow: hidden; }
+		.jail-header { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.85rem; background: rgba(232,160,32,0.03); border-bottom: 1px solid var(--border); cursor: pointer; }
+		.jail-name { font-size: 0.85rem; font-weight: 700; color: var(--section); }
+		.jail-status { font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 3px; }
+		.jail-status.on { background: rgba(80,192,80,0.15); color: var(--enabled); }
+		.jail-status.off { background: rgba(192,80,80,0.15); color: var(--disabled); }
+		.jail-body { padding: 0.85rem; }
+		.jail-body.hidden { display: none; }
+
+		.add-btn { width: 100%; padding: 0.65rem; background: var(--surface); border: 1px dashed var(--border-bright); border-radius: 6px; color: var(--accent); font-family: inherit; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; margin-bottom: 0.75rem; }
+		.add-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+		.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); padding: 0.45rem 1.1rem; border-radius: 4px; font-size: 0.82rem; font-family: inherit; opacity: 0; transition: all 0.3s; z-index: 100; }
+		.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+			.field-label { min-width: 115px; font-size: 0.78rem; }
+			input.medium { width: 160px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Fail2ban Jail Generator</h1>
+			<p class="subtitle">Build jail.local configurations for fail2ban</p>
+		</header>
+
+		<div class="config-display">
+			<div class="config-bar">
+				<div class="config-bar-left"><span class="config-dot"></span><span class="config-bar-title">/etc/fail2ban/jail.local</span></div>
+				<div class="config-bar-actions">
+					<button class="small" onclick="downloadConfig()">Download</button>
+					<button class="small primary" onclick="copyConfig()">Copy</button>
+				</div>
+			</div>
+			<div class="config-body"><pre id="configOutput"></pre></div>
+		</div>
+
+		<div class="presets">
+			<button class="preset-btn" onclick="applyPreset('webserver')">Web Server</button>
+			<button class="preset-btn" onclick="applyPreset('mailserver')">Mail Server</button>
+			<button class="preset-btn" onclick="applyPreset('ssh-hardened')">SSH Hardened</button>
+			<button class="preset-btn" onclick="applyPreset('full')">Full Stack</button>
+		</div>
+
+		<!-- Global defaults -->
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">[DEFAULT]</span></div>
+			<div class="panel-body">
+				<div class="field-row"><span class="field-label">bantime</span><input type="text" class="medium" id="defBantime" value="1h" oninput="build()"></div>
+				<p class="opt-hint">Duration of ban. Use s/m/h/d suffixes or seconds</p>
+				<div class="field-row"><span class="field-label">findtime</span><input type="text" class="medium" id="defFindtime" value="10m" oninput="build()"></div>
+				<p class="opt-hint">Window to count failures in</p>
+				<div class="field-row"><span class="field-label">maxretry</span><input type="number" class="narrow" id="defMaxretry" value="5" min="1" oninput="build()"></div>
+
+				<hr class="divider">
+
+				<div class="field-row"><span class="field-label">banaction</span>
+					<select id="defBanaction" onchange="build()">
+						<option value="iptables-multiport" selected>iptables-multiport</option>
+						<option value="nftables-multiport">nftables-multiport</option>
+						<option value="firewallcmd-rich-rules">firewallcmd-rich-rules</option>
+						<option value="ufw">ufw</option>
+					</select>
+				</div>
+				<div class="field-row"><span class="field-label">backend</span>
+					<select id="defBackend" onchange="build()">
+						<option value="auto" selected>auto</option>
+						<option value="systemd">systemd</option>
+						<option value="pyinotify">pyinotify</option>
+						<option value="polling">polling</option>
+					</select>
+				</div>
+				<div class="field-row"><span class="field-label">ignoreip</span><input type="text" class="wide" id="defIgnoreip" value="127.0.0.1/8 ::1" oninput="build()"></div>
+				<p class="opt-hint">Space-separated IPs/CIDRs to never ban</p>
+
+				<hr class="divider">
+
+				<div class="opt-group-title">Notifications</div>
+				<div class="field-row"><span class="field-label">destemail</span><input type="text" class="medium" id="defDestemail" placeholder="admin@example.com" oninput="build()"></div>
+				<div class="field-row"><span class="field-label">sender</span><input type="text" class="medium" id="defSender" placeholder="fail2ban@example.com" oninput="build()"></div>
+				<div class="field-row"><span class="field-label">action</span>
+					<select id="defAction" onchange="build()">
+						<option value="%(action_)s" selected>Ban only</option>
+						<option value="%(action_mw)s">Ban + email with whois</option>
+						<option value="%(action_mwl)s">Ban + email with whois + logs</option>
+					</select>
+				</div>
+
+				<hr class="divider">
+
+				<div class="opt-group-title">Incremental Banning</div>
+				<div class="opt-row"><label><input type="checkbox" id="defBantimeIncr" onchange="build()"> Enable bantime.increment</label></div>
+				<div class="field-row"><span class="field-label">bantime.factor</span><input type="text" class="narrow" id="defBantimeFactor" value="2" oninput="build()"></div>
+				<div class="field-row"><span class="field-label">bantime.maxtime</span><input type="text" class="medium" id="defBantimeMax" value="4w" oninput="build()"></div>
+			</div>
+		</div>
+
+		<!-- Jails -->
+		<div id="jailEntries"></div>
+		<button class="add-btn" onclick="addJail()">+ Add Jail</button>
+
+		<!-- Reference -->
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Quick Reference</span></div>
+			<div class="panel-body">
+				<pre style="font-family:inherit;font-size:0.8rem;line-height:1.7;color:var(--text-muted);">
+<span style="color:var(--comment)"># Test your config</span>
+<span style="color:var(--value)">sudo fail2ban-client -t</span>
+
+<span style="color:var(--comment)"># Restart fail2ban</span>
+<span style="color:var(--value)">sudo systemctl restart fail2ban</span>
+
+<span style="color:var(--comment)"># Check jail status</span>
+<span style="color:var(--value)">sudo fail2ban-client status sshd</span>
+
+<span style="color:var(--comment)"># Unban an IP</span>
+<span style="color:var(--value)">sudo fail2ban-client set sshd unbanip 1.2.3.4</span>
+
+<span style="color:var(--comment)"># List banned IPs</span>
+<span style="color:var(--value)">sudo fail2ban-client status sshd | grep "Banned IP"</span></pre>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		let jails = [];
+		let jailId = 0;
+
+		const knownFilters = {
+			'sshd': { port: 'ssh', logpath: '%(sshd_log)s' },
+			'nginx-http-auth': { port: 'http,https', logpath: '%(nginx_error_log)s' },
+			'nginx-limit-req': { port: 'http,https', logpath: '%(nginx_error_log)s' },
+			'nginx-botsearch': { port: 'http,https', logpath: '%(nginx_access_log)s' },
+			'apache-auth': { port: 'http,https', logpath: '%(apache_error_log)s' },
+			'apache-badbots': { port: 'http,https', logpath: '%(apache_access_log)s' },
+			'apache-overflows': { port: 'http,https', logpath: '%(apache_error_log)s' },
+			'postfix': { port: 'smtp,465,submission', logpath: '%(postfix_log)s' },
+			'dovecot': { port: 'pop3,pop3s,imap,imaps,submission,465,sieve', logpath: '%(dovecot_log)s' },
+			'postfix-sasl': { port: 'smtp,465,submission,imap,imaps,pop3,pop3s', logpath: '%(postfix_log)s' },
+			'recidive': { port: 'all', logpath: '/var/log/fail2ban.log' },
+			'mysqld-auth': { port: '3306', logpath: '%(mysql_log)s' },
+			'phpmyadmin-syslog': { port: 'http,https', logpath: '%(syslog_authpriv)s' },
+		};
+
+		function createJail(o = {}) {
+			return {
+				id: jailId++, collapsed: false,
+				name: o.name || 'sshd',
+				enabled: o.enabled !== undefined ? o.enabled : true,
+				port: o.port || '',
+				logpath: o.logpath || '',
+				filter: o.filter || '',
+				maxretry: o.maxretry || '',
+				bantime: o.bantime || '',
+				findtime: o.findtime || '',
+			};
+		}
+
+		function addJail(data) {
+			const j = data || createJail();
+			if (!data) jails.push(j);
+			renderJails(); build();
+		}
+
+		function removeJail(id) { jails = jails.filter(j => j.id !== id); renderJails(); build(); }
+		function toggleJail(id) { const j = jails.find(x=>x.id===id); if(j) { j.collapsed=!j.collapsed; renderJails(); } }
+
+		function syncJail(id) {
+			const j = jails.find(x=>x.id===id);
+			if (!j) return;
+			const el = n => document.getElementById(`j${id}_${n}`);
+			j.name = el('name')?.value || '';
+			j.enabled = el('enabled')?.checked || false;
+			j.port = el('port')?.value || '';
+			j.logpath = el('logpath')?.value || '';
+			j.filter = el('filter')?.value || '';
+			j.maxretry = el('maxretry')?.value || '';
+			j.bantime = el('bantime')?.value || '';
+			j.findtime = el('findtime')?.value || '';
+			build();
+		}
+
+		function onJailNameChange(id) {
+			const j = jails.find(x=>x.id===id);
+			if (!j) return;
+			const nameEl = document.getElementById(`j${id}_name`);
+			j.name = nameEl.value;
+			// Auto-fill known filter defaults
+			const known = knownFilters[j.name];
+			if (known) {
+				const portEl = document.getElementById(`j${id}_port`);
+				const logEl = document.getElementById(`j${id}_logpath`);
+				if (!portEl.value) portEl.value = known.port;
+				if (!logEl.value) logEl.value = known.logpath;
+				j.port = portEl.value;
+				j.logpath = logEl.value;
+			}
+			build();
+		}
+
+		function renderJails() {
+			document.getElementById('jailEntries').innerHTML = jails.map(j => {
+				const name = j.name || 'unnamed';
+				const statusClass = j.enabled ? 'on' : 'off';
+				const statusText = j.enabled ? 'enabled' : 'disabled';
+				return `<div class="jail-entry">
+					<div class="jail-header" onclick="toggleJail(${j.id})">
+						<div style="display:flex;align-items:center;gap:0.6rem;">
+							<span class="jail-name">[${esc(name)}]</span>
+							<span class="jail-status ${statusClass}">${statusText}</span>
+						</div>
+						<div style="display:flex;gap:0.3rem;align-items:center;">
+							<button class="small danger" onclick="event.stopPropagation();removeJail(${j.id})">&times;</button>
+							<span style="color:var(--text-muted);font-size:0.8rem;">${j.collapsed?'&#9654;':'&#9660;'}</span>
+						</div>
+					</div>
+					<div class="jail-body ${j.collapsed?'hidden':''}">
+						<div class="field-row"><span class="field-label">Jail name</span>
+							<select id="j${j.id}_name" onchange="onJailNameChange(${j.id})">
+								<option value="sshd" ${j.name==='sshd'?'selected':''}>sshd</option>
+								<option value="nginx-http-auth" ${j.name==='nginx-http-auth'?'selected':''}>nginx-http-auth</option>
+								<option value="nginx-limit-req" ${j.name==='nginx-limit-req'?'selected':''}>nginx-limit-req</option>
+								<option value="nginx-botsearch" ${j.name==='nginx-botsearch'?'selected':''}>nginx-botsearch</option>
+								<option value="apache-auth" ${j.name==='apache-auth'?'selected':''}>apache-auth</option>
+								<option value="apache-badbots" ${j.name==='apache-badbots'?'selected':''}>apache-badbots</option>
+								<option value="apache-overflows" ${j.name==='apache-overflows'?'selected':''}>apache-overflows</option>
+								<option value="postfix" ${j.name==='postfix'?'selected':''}>postfix</option>
+								<option value="dovecot" ${j.name==='dovecot'?'selected':''}>dovecot</option>
+								<option value="postfix-sasl" ${j.name==='postfix-sasl'?'selected':''}>postfix-sasl</option>
+								<option value="recidive" ${j.name==='recidive'?'selected':''}>recidive</option>
+								<option value="mysqld-auth" ${j.name==='mysqld-auth'?'selected':''}>mysqld-auth</option>
+								<option value="phpmyadmin-syslog" ${j.name==='phpmyadmin-syslog'?'selected':''}>phpmyadmin-syslog</option>
+							</select>
+						</div>
+						<div class="opt-row"><label><input type="checkbox" id="j${j.id}_enabled" ${j.enabled?'checked':''} onchange="syncJail(${j.id}); renderJails()"> enabled</label></div>
+
+						<hr class="divider">
+
+						<div class="field-row"><span class="field-label">port</span><input type="text" class="medium" id="j${j.id}_port" value="${esc(j.port)}" placeholder="ssh" oninput="syncJail(${j.id})"></div>
+						<div class="field-row"><span class="field-label">logpath</span><input type="text" class="wide" id="j${j.id}_logpath" value="${esc(j.logpath)}" placeholder="%(sshd_log)s" oninput="syncJail(${j.id})"></div>
+						<div class="field-row"><span class="field-label">filter</span><input type="text" class="medium" id="j${j.id}_filter" value="${esc(j.filter)}" placeholder="(auto from jail name)" oninput="syncJail(${j.id})"></div>
+
+						<hr class="divider">
+						<p class="opt-hint">Override defaults (leave blank to use [DEFAULT] values)</p>
+
+						<div class="field-row"><span class="field-label">maxretry</span><input type="number" class="narrow" id="j${j.id}_maxretry" value="${esc(j.maxretry)}" placeholder="" min="1" oninput="syncJail(${j.id})"></div>
+						<div class="field-row"><span class="field-label">bantime</span><input type="text" class="medium" id="j${j.id}_bantime" value="${esc(j.bantime)}" placeholder="" oninput="syncJail(${j.id})"></div>
+						<div class="field-row"><span class="field-label">findtime</span><input type="text" class="medium" id="j${j.id}_findtime" value="${esc(j.findtime)}" placeholder="" oninput="syncJail(${j.id})"></div>
+					</div>
+				</div>`;
+			}).join('');
+		}
+
+		function build() {
+			const lines = [];
+			const v = id => document.getElementById(id)?.value?.trim() || '';
+			const c = id => document.getElementById(id)?.checked || false;
+
+			// [DEFAULT]
+			lines.push('[DEFAULT]');
+			lines.push('');
+			if (v('defBantime')) lines.push(`bantime  = ${v('defBantime')}`);
+			if (v('defFindtime')) lines.push(`findtime = ${v('defFindtime')}`);
+			if (v('defMaxretry')) lines.push(`maxretry = ${v('defMaxretry')}`);
+			lines.push('');
+			if (v('defBanaction')) lines.push(`banaction = ${v('defBanaction')}`);
+			if (v('defBackend')) lines.push(`backend  = ${v('defBackend')}`);
+			if (v('defIgnoreip')) lines.push(`ignoreip = ${v('defIgnoreip')}`);
+
+			if (v('defDestemail') || v('defSender')) {
+				lines.push('');
+				if (v('defDestemail')) lines.push(`destemail = ${v('defDestemail')}`);
+				if (v('defSender')) lines.push(`sender    = ${v('defSender')}`);
+				if (v('defAction')) lines.push(`action    = ${v('defAction')}`);
+			}
+
+			if (c('defBantimeIncr')) {
+				lines.push('');
+				lines.push('bantime.increment = true');
+				if (v('defBantimeFactor')) lines.push(`bantime.factor    = ${v('defBantimeFactor')}`);
+				if (v('defBantimeMax')) lines.push(`bantime.maxtime   = ${v('defBantimeMax')}`);
+			}
+
+			// Jails
+			jails.forEach(j => {
+				if (!j.name) return;
+				lines.push('');
+				lines.push('');
+				lines.push(`[${j.name}]`);
+				lines.push('');
+				lines.push(`enabled  = ${j.enabled ? 'true' : 'false'}`);
+				if (j.port) lines.push(`port     = ${j.port}`);
+				if (j.logpath) lines.push(`logpath  = ${j.logpath}`);
+				if (j.filter) lines.push(`filter   = ${j.filter}`);
+				if (j.maxretry) lines.push(`maxretry = ${j.maxretry}`);
+				if (j.bantime) lines.push(`bantime  = ${j.bantime}`);
+				if (j.findtime) lines.push(`findtime = ${j.findtime}`);
+			});
+
+			const output = document.getElementById('configOutput');
+			output.innerHTML = lines.map(line => {
+				if (!line.trim()) return '';
+				if (line.match(/^\[.+\]$/)) return `<span class="f2b-section">${esc(line)}</span>`;
+				if (line.startsWith('#')) return `<span class="f2b-cmt">${esc(line)}</span>`;
+				const m = line.match(/^(\S+)\s*(=)\s*(.*)$/);
+				if (m) return `<span class="f2b-key">${esc(m[1])}</span> <span class="f2b-cmt">=</span> <span class="f2b-val">${esc(m[3])}</span>`;
+				return esc(line);
+			}).join('\n');
+		}
+
+		function getPlainConfig() { const t=document.createElement('div'); t.innerHTML=document.getElementById('configOutput').innerHTML; return t.textContent; }
+		function copyConfig() { navigator.clipboard.writeText(getPlainConfig()).then(()=>showToast('Copied!')); }
+		function downloadConfig() { const t=getPlainConfig(); const b=new Blob([t+'\n'],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='jail.local'; a.click(); URL.revokeObjectURL(a.href); showToast('Downloaded!'); }
+		function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+		function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+
+		function applyPreset(name) {
+			jails = []; jailId = 0;
+			document.getElementById('defBantime').value = '1h';
+			document.getElementById('defFindtime').value = '10m';
+			document.getElementById('defMaxretry').value = '5';
+			document.getElementById('defBanaction').value = 'iptables-multiport';
+			document.getElementById('defBackend').value = 'auto';
+			document.getElementById('defIgnoreip').value = '127.0.0.1/8 ::1';
+			document.getElementById('defDestemail').value = '';
+			document.getElementById('defSender').value = '';
+			document.getElementById('defAction').value = '%(action_)s';
+			document.getElementById('defBantimeIncr').checked = false;
+
+			switch(name) {
+				case 'webserver':
+					jails.push(createJail({ name:'sshd', port:'ssh', logpath:'%(sshd_log)s' }));
+					jails.push(createJail({ name:'nginx-http-auth', port:'http,https', logpath:'%(nginx_error_log)s' }));
+					jails.push(createJail({ name:'nginx-limit-req', port:'http,https', logpath:'%(nginx_error_log)s', maxretry:'10', findtime:'1m' }));
+					jails.push(createJail({ name:'nginx-botsearch', port:'http,https', logpath:'%(nginx_access_log)s', maxretry:'3', bantime:'1d' }));
+					break;
+				case 'mailserver':
+					jails.push(createJail({ name:'sshd', port:'ssh', logpath:'%(sshd_log)s' }));
+					jails.push(createJail({ name:'postfix', port:'smtp,465,submission', logpath:'%(postfix_log)s' }));
+					jails.push(createJail({ name:'dovecot', port:'pop3,pop3s,imap,imaps,submission,465,sieve', logpath:'%(dovecot_log)s' }));
+					jails.push(createJail({ name:'postfix-sasl', port:'smtp,465,submission,imap,imaps,pop3,pop3s', logpath:'%(postfix_log)s' }));
+					break;
+				case 'ssh-hardened':
+					document.getElementById('defBantime').value = '24h';
+					document.getElementById('defMaxretry').value = '3';
+					document.getElementById('defBantimeIncr').checked = true;
+					document.getElementById('defBantimeFactor').value = '2';
+					document.getElementById('defBantimeMax').value = '4w';
+					jails.push(createJail({ name:'sshd', port:'ssh', logpath:'%(sshd_log)s', maxretry:'3', bantime:'24h' }));
+					jails.push(createJail({ name:'recidive', port:'all', logpath:'/var/log/fail2ban.log', maxretry:'3', bantime:'1w', findtime:'1d' }));
+					break;
+				case 'full':
+					document.getElementById('defBantimeIncr').checked = true;
+					jails.push(createJail({ name:'sshd', port:'ssh', logpath:'%(sshd_log)s' }));
+					jails.push(createJail({ name:'nginx-http-auth', port:'http,https', logpath:'%(nginx_error_log)s' }));
+					jails.push(createJail({ name:'nginx-limit-req', port:'http,https', logpath:'%(nginx_error_log)s' }));
+					jails.push(createJail({ name:'nginx-botsearch', port:'http,https', logpath:'%(nginx_access_log)s' }));
+					jails.push(createJail({ name:'postfix', port:'smtp,465,submission', logpath:'%(postfix_log)s' }));
+					jails.push(createJail({ name:'recidive', port:'all', logpath:'/var/log/fail2ban.log', maxretry:'3', bantime:'1w', findtime:'1d' }));
+					break;
+			}
+			renderJails(); build();
+		}
+
+		// Initial
+		applyPreset('webserver');
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

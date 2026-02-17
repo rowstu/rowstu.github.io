@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ASCII Art Generator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0a0a0a;
+			--surface: #141414;
+			--surface-hover: #1e1e1e;
+			--border: #2a2a2a;
+			--text: #33ff33;
+			--text-dim: #1a8a1a;
+			--text-muted: #1e661e;
+			--accent: #33ff33;
+			--accent-dim: rgba(51,255,51,0.08);
+			--input-text: #e0e0e0;
+			--danger: #ff4444;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'VT323', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			position: relative;
+		}
+
+		/* CRT scanline effect */
+		body::after {
+			content: '';
+			position: fixed;
+			top: 0; left: 0; right: 0; bottom: 0;
+			background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+			pointer-events: none;
+			z-index: 999;
+		}
+
+		.container { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+		header { margin-bottom: 1.5rem; }
+		h1 { font-size: 2rem; color: var(--accent); margin-bottom: 0.3rem; text-shadow: 0 0 10px rgba(51,255,51,0.3); }
+		.subtitle { color: var(--text-muted); font-size: 1.1rem; }
+
+		.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 1rem; overflow: hidden; }
+		.panel-header { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+		.panel-title { font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+		.panel-body { padding: 1rem; }
+
+		.input-row { display: flex; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap; align-items: center; }
+		.input-label { font-size: 1rem; color: var(--text-dim); min-width: 80px; }
+
+		input[type="text"], select {
+			background: #0d0d0d; border: 1px solid var(--border); border-radius: 4px; padding: 0.5rem 0.75rem;
+			color: var(--input-text); font-family: inherit; font-size: 1.1rem; outline: none;
+		}
+		input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 6px rgba(51,255,51,0.15); }
+		input.wide { flex: 1; min-width: 200px; }
+
+		.font-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
+		.font-btn {
+			padding: 0.4rem 0.8rem; background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+			color: var(--text-dim); font-family: inherit; font-size: 0.95rem; cursor: pointer; transition: all 0.15s;
+		}
+		.font-btn:hover { border-color: var(--accent); color: var(--text); }
+		.font-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+		.art-display {
+			background: #050505;
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.art-bar {
+			display: flex; justify-content: space-between; align-items: center;
+			padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
+		}
+		.art-bar-title { font-size: 0.9rem; color: var(--text-muted); }
+
+		.art-body {
+			padding: 1.25rem;
+			overflow-x: auto;
+		}
+
+		.art-body pre {
+			font-family: 'VT323', monospace;
+			font-size: 1rem;
+			line-height: 1;
+			color: var(--accent);
+			white-space: pre;
+			margin: 0;
+			text-shadow: 0 0 4px rgba(51,255,51,0.2);
+		}
+
+		button { padding: 0.5rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: inherit; font-size: 1rem; cursor: pointer; transition: all 0.15s; }
+		button:hover { background: var(--surface-hover); border-color: var(--accent); }
+		button.primary { background: var(--accent); border-color: var(--accent); color: #000; }
+		button.small { padding: 0.3rem 0.65rem; font-size: 0.9rem; }
+
+		.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); padding: 0.5rem 1.25rem; border-radius: 4px; font-size: 1rem; font-family: inherit; opacity: 0; transition: all 0.3s; z-index: 1000; }
+		.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+			h1 { font-size: 1.6rem; }
+			.art-body pre { font-size: 0.7rem; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>ASCII Art Generator</h1>
+			<p class="subtitle">Convert text into ASCII art banners</p>
+		</header>
+
+		<div class="panel">
+			<div class="panel-body">
+				<div class="input-row">
+					<span class="input-label">Text:</span>
+					<input type="text" class="wide" id="textInput" value="Hello" oninput="generate()" maxlength="30" placeholder="Type something...">
+				</div>
+				<div class="input-row">
+					<span class="input-label">Font:</span>
+				</div>
+				<div class="font-grid" id="fontGrid"></div>
+			</div>
+		</div>
+
+		<div class="art-display">
+			<div class="art-bar">
+				<span class="art-bar-title">output</span>
+				<button class="small primary" onclick="copyArt()">Copy</button>
+			</div>
+			<div class="art-body">
+				<pre id="artOutput"></pre>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		// Bitmap font definitions (each char is an array of strings, one per row)
+		const fonts = {
+			banner: {
+				height: 6,
+				chars: {
+					'A': ['  ##  ','  ##  ',' #  # ',' #### ','#    #','#    #'],
+					'B': ['#### ','#   #','#### ','#   #','#   #','#### '],
+					'C': [' ####','#    ','#    ','#    ','#    ',' ####'],
+					'D': ['#### ','#   #','#   #','#   #','#   #','#### '],
+					'E': ['#####','#    ','#### ','#    ','#    ','#####'],
+					'F': ['#####','#    ','#### ','#    ','#    ','#    '],
+					'G': [' ####','#    ','#  ##','#   #','#   #',' ####'],
+					'H': ['#   #','#   #','#####','#   #','#   #','#   #'],
+					'I': ['###',' # ',' # ',' # ',' # ','###'],
+					'J': ['  ###','   # ','   # ','   # ','#  # ',' ##  '],
+					'K': ['#   #','#  # ','###  ','#  # ','#   #','#   #'],
+					'L': ['#    ','#    ','#    ','#    ','#    ','#####'],
+					'M': ['#   #','## ##','# # #','#   #','#   #','#   #'],
+					'N': ['#   #','##  #','# # #','#  ##','#   #','#   #'],
+					'O': [' ### ','#   #','#   #','#   #','#   #',' ### '],
+					'P': ['#### ','#   #','#### ','#    ','#    ','#    '],
+					'Q': [' ### ','#   #','#   #','# # #','#  # ',' ## #'],
+					'R': ['#### ','#   #','#### ','#  # ','#   #','#   #'],
+					'S': [' ####','#    ',' ### ','    #','    #','#### '],
+					'T': ['#####','  #  ','  #  ','  #  ','  #  ','  #  '],
+					'U': ['#   #','#   #','#   #','#   #','#   #',' ### '],
+					'V': ['#   #','#   #','#   #',' # # ',' # # ','  #  '],
+					'W': ['#   #','#   #','# # #','# # #','## ##','#   #'],
+					'X': ['#   #',' # # ','  #  ',' # # ','#   #','#   #'],
+					'Y': ['#   #',' # # ','  #  ','  #  ','  #  ','  #  '],
+					'Z': ['#####','   # ','  #  ',' #   ','#    ','#####'],
+					'0': [' ### ','#   #','#  ##','# # #','##  #',' ### '],
+					'1': ['  #  ',' ##  ','  #  ','  #  ','  #  ',' ### '],
+					'2': [' ### ','#   #','   # ','  #  ',' #   ','#####'],
+					'3': [' ### ','#   #','  ## ','    #','#   #',' ### '],
+					'4': ['   # ','  ## ',' # # ','#####','   # ','   # '],
+					'5': ['#####','#    ','#### ','    #','    #','#### '],
+					'6': [' ### ','#    ','#### ','#   #','#   #',' ### '],
+					'7': ['#####','   # ','  #  ',' #   ',' #   ',' #   '],
+					'8': [' ### ','#   #',' ### ','#   #','#   #',' ### '],
+					'9': [' ### ','#   #','#   #',' ####','    #',' ### '],
+					' ': ['   ','   ','   ','   ','   ','   '],
+					'.': ['  ','  ','  ','  ',' #',' #'],
+					'!': [' # ',' # ',' # ',' # ','   ',' # '],
+					'?': [' ### ','#   #','  ## ','  #  ','    ','  #  '],
+					'-': ['     ','     ','#####','     ','     ','     '],
+					'_': ['     ','     ','     ','     ','     ','#####'],
+					'/': ['    #','   # ','  #  ',' #   ','#    ','     '],
+					':': ['  ','  ',' #','  ',' #','  '],
+					'@': [' ### ','#   #','# ###','# # #','# ## ',' ## #'],
+				}
+			},
+			block: {
+				height: 5,
+				chars: {
+					'A': [' ███ ','█   █','█████','█   █','█   █'],
+					'B': ['████ ','█   █','████ ','█   █','████ '],
+					'C': [' ████','█    ','█    ','█    ',' ████'],
+					'D': ['████ ','█   █','█   █','█   █','████ '],
+					'E': ['█████','█    ','███  ','█    ','█████'],
+					'F': ['█████','█    ','███  ','█    ','█    '],
+					'G': [' ████','█    ','█  ██','█   █',' ████'],
+					'H': ['█   █','█   █','█████','█   █','█   █'],
+					'I': ['███',' █ ',' █ ',' █ ','███'],
+					'J': ['  ███','   █ ','   █ ','█  █ ',' ██  '],
+					'K': ['█  █ ','█ █  ','██   ','█ █  ','█  █ '],
+					'L': ['█    ','█    ','█    ','█    ','█████'],
+					'M': ['█   █','██ ██','█ █ █','█   █','█   █'],
+					'N': ['█   █','██  █','█ █ █','█  ██','█   █'],
+					'O': [' ███ ','█   █','█   █','█   █',' ███ '],
+					'P': ['████ ','█   █','████ ','█    ','█    '],
+					'Q': [' ███ ','█   █','█ █ █','█  █ ',' ██ █'],
+					'R': ['████ ','█   █','████ ','█  █ ','█   █'],
+					'S': [' ████','█    ',' ███ ','    █','████ '],
+					'T': ['█████','  █  ','  █  ','  █  ','  █  '],
+					'U': ['█   █','█   █','█   █','█   █',' ███ '],
+					'V': ['█   █','█   █',' █ █ ',' █ █ ','  █  '],
+					'W': ['█   █','█   █','█ █ █','██ ██','█   █'],
+					'X': ['█   █',' █ █ ','  █  ',' █ █ ','█   █'],
+					'Y': ['█   █',' █ █ ','  █  ','  █  ','  █  '],
+					'Z': ['█████','   █ ','  █  ',' █   ','█████'],
+					' ': ['   ','   ','   ','   ','   '],
+					'.': ['  ','  ','  ','  ','██'],
+					'!': ['██','██','██','  ','██'],
+					'-': ['     ','     ','█████','     ','     '],
+					'_': ['     ','     ','     ','     ','█████'],
+				}
+			},
+			slim: {
+				height: 5,
+				chars: {
+					'A': [' _ ','/_\\','|_|','| |','   '],
+					'B': ['_  ','|_)','|_)','|_)','   '],
+					'C': [' _ ','/ ','|  ','\\_','   '],
+					'D': ['_  ','| \\','|  |','|_/','   '],
+					'E': [' _ ','|_ ','|_ ','|_ ','   '],
+					'F': [' _ ','|_ ','|  ','|  ','   '],
+					'G': [' _ ','/ _','| |','\\_|','   '],
+					'H': ['   ','|_|','| |','| |','   '],
+					'I': ['_','|','|','|','   '],
+					'J': ['  _','  |','  |','|_|','   '],
+					'K': ['   ','|/ ','|\\ ','| \\','   '],
+					'L': ['   ','|  ','|  ','|_ ','   '],
+					'M': ['    ','|\\/|','|  |','|  |','    '],
+					'N': ['   ','|\\ ','| \\','|  ','   '],
+					'O': [' _ ','/ \\','| |','\\_/','   '],
+					'P': ['_  ','|_)','|  ','|  ','   '],
+					'Q': [' _ ','/ \\','|\\|',' \\|','   '],
+					'R': ['_  ','|_)','| \\','|  ','   '],
+					'S': [' _ ','(_  ',' _)','_) ','   '],
+					'T': ['___',' | ',' | ',' | ','   '],
+					'U': ['   ','| |','| |','|_|','   '],
+					'V': ['   ','\\ /','\\/ ',' V ','   '],
+					'W': ['     ','|   |','\\ / /',' V V ','     '],
+					'X': ['   ','\\/ ','/\\ ','  \\','   '],
+					'Y': ['   ','\\ /',' | ',' | ','   '],
+					'Z': ['__ ',' / ','/ ','/__','   '],
+					' ': ['  ','  ','  ','  ','  '],
+					'.': [' ',' ',' ','.','  '],
+					'!': ['!','!','!','.','  '],
+					'-': ['   ','   ','---','   ','   '],
+				}
+			},
+			shadow: {
+				height: 6,
+				chars: {
+					'A': ['   _   ','  /_\\  ',' / _ \\ ','/ ___ \\','/_/  \\_\\','       '],
+					'B': [' ____ ','| __ )','|  _ \\','| |_) |','|____/','      '],
+					'C': ['  ____ ',' / ___|','| |    ','| |___ ',' \\____|','       '],
+					'D': [' ____  ','|  _ \\ ','| | | |','| |_| |','|____/ ','       '],
+					'E': [' _____ ','| ____|','|  _|  ','| |___ ','|_____|','       '],
+					'F': [' _____ ','|  ___|','| |_   ','|  _|  ','|_|    ','       '],
+					'G': ['  ____ ',' / ___|','| |  _ ','| |_| |',' \\____|','       '],
+					'H': [' _   _ ','| | | |','| |_| |','|  _  |','|_| |_|','       '],
+					'I': [' ___ ','|_ _|',' | | ',' | | ','|___|','     '],
+					'J': ['   _ ','  | |','  | |','  | |',' _/ |','|__/ '],
+					'K': [' _  __','| |/ /','| \' / ','| . \\ ','|_|\\_\\','      '],
+					'L': [' _    ','| |   ','| |   ','| |__ ','|____|','      '],
+					'M': [' __  __ ','|  \\/  |','| |\\/| |','| |  | |','|_|  |_|','        '],
+					'N': [' _   _ ','| \\ | |','|  \\| |','| |\\  |','|_| \\_|','       '],
+					'O': ['  ___  ',' / _ \\ ','| | | |','| |_| |',' \\___/ ','       '],
+					'P': [' ____  ','|  _ \\ ','| |_) |','|  __/ ','|_|    ','       '],
+					'Q': ['  ___  ',' / _ \\ ','| | | |','| |_| |',' \\__\\_\\','       '],
+					'R': [' ____  ','|  _ \\ ','| |_) |','|  _ < ','|_| \\_\\','       '],
+					'S': [' ____  ','/ ___| ','\\___ \\ ',' ___) |','|____/ ','       '],
+					'T': [' _____ ','|_   _|','  | |  ','  | |  ','  |_|  ','       '],
+					'U': [' _   _ ','| | | |','| | | |','| |_| |',' \\___/ ','       '],
+					'V': ['__     __','\\ \\   / /','  \\ / /  ','   v /   ','   \\/    ','         '],
+					'W': ['__        __','\\ \\      / /','  \\ \\/\\/ /  ','   \\    /   ','    \\/\\/    ','            '],
+					'X': ['__  __','\\ \\/ /','  >  <',' / /\\ \\','/_/  \\_\\','       '],
+					'Y': ['__   __','\\ \\ / /','  | |  ','  | |  ','  |_|  ','       '],
+					'Z': [' _____','|__  / ','  / /  ',' / /__ ','/_____| ','       '],
+					' ': ['   ','   ','   ','   ','   ','   '],
+					'.': ['  ','  ','  ','  ',' _','   '],
+					'!': [' _ ','| |','| |','|_|',' _ ','|_|'],
+					'-': ['      ','      ','______','      ','      ','      '],
+				}
+			}
+		};
+
+		let currentFont = 'banner';
+
+		function renderFontGrid() {
+			const grid = document.getElementById('fontGrid');
+			grid.innerHTML = Object.keys(fonts).map(name =>
+				`<button class="font-btn ${name===currentFont?'active':''}" onclick="setFont('${name}')">${name}</button>`
+			).join('');
+		}
+
+		function setFont(name) {
+			currentFont = name;
+			renderFontGrid();
+			generate();
+		}
+
+		function generate() {
+			const text = document.getElementById('textInput').value.toUpperCase();
+			const font = fonts[currentFont];
+			if (!text || !font) { document.getElementById('artOutput').textContent = ''; return; }
+
+			const lines = [];
+			for (let row = 0; row < font.height; row++) {
+				let line = '';
+				for (const ch of text) {
+					const charData = font.chars[ch] || font.chars['?'] || font.chars[' '];
+					if (charData && charData[row] !== undefined) {
+						line += charData[row] + ' ';
+					} else {
+						line += ' ';
+					}
+				}
+				lines.push(line.replace(/\s+$/, ''));
+			}
+
+			document.getElementById('artOutput').textContent = lines.join('\n');
+		}
+
+		function copyArt() {
+			const text = document.getElementById('artOutput').textContent;
+			if (!text) return;
+			navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+		}
+
+		function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+
+		renderFontGrid();
+		generate();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>iptables / nftables Builder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0d0d0d;
+			--surface: #181818;
+			--surface-hover: #222222;
+			--border: #333;
+			--border-bright: #444;
+			--text: #e0d8cc;
+			--text-muted: #887755;
+			--accent: #ff8c00;
+			--accent-hover: #e07000;
+			--accent-dim: rgba(255,140,0,0.1);
+			--danger: #ff4040;
+			--accept: #50d050;
+			--drop: #ff4040;
+			--reject: #ff8040;
+			--log: #60a0ff;
+			--flag: #c0a0ff;
+			--comment: #555;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Share Tech Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image: radial-gradient(ellipse at 50% 0%, rgba(255,140,0,0.03) 0%, transparent 50%);
+		}
+
+		.container { max-width: 960px; margin: 0 auto; }
+		header { margin-bottom: 1.5rem; }
+		h1 { font-size: 1.5rem; font-weight: 400; color: var(--accent); margin-bottom: 0.4rem; letter-spacing: 0.02em; }
+		.subtitle { color: var(--text-muted); font-size: 0.85rem; }
+
+		.config-display { background: #080808; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.25rem; overflow: hidden; }
+		.config-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+		.config-bar-left { display: flex; align-items: center; gap: 0.6rem; }
+		.config-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+		.config-bar-title { font-size: 0.75rem; color: var(--text-muted); }
+		.config-bar-actions { display: flex; gap: 0.4rem; }
+		.config-body { padding: 1.25rem; overflow-x: auto; max-height: 400px; overflow-y: auto; }
+		.config-body pre { font-family: inherit; font-size: 0.82rem; line-height: 1.65; white-space: pre; margin: 0; }
+
+		.fw-cmd { color: var(--accept); }
+		.fw-flag { color: var(--flag); }
+		.fw-val { color: var(--text); }
+		.fw-accept { color: var(--accept); font-weight: bold; }
+		.fw-drop { color: var(--drop); font-weight: bold; }
+		.fw-reject { color: var(--reject); font-weight: bold; }
+		.fw-log { color: var(--log); font-weight: bold; }
+		.fw-cmt { color: var(--comment); }
+
+		button { padding: 0.45rem 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: inherit; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; }
+		button:hover { background: var(--surface-hover); border-color: var(--accent); }
+		button.primary { background: var(--accent); border-color: var(--accent); color: #000; font-weight: bold; }
+		button.small { padding: 0.28rem 0.6rem; font-size: 0.72rem; }
+		button.danger { color: var(--danger); border-color: var(--danger); }
+		button.danger:hover { background: rgba(255,64,64,0.1); }
+
+		.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+		.panel-header { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+		.panel-title { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+		.panel-body { padding: 1rem; }
+
+		.presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+		.preset-btn { padding: 0.4rem 0.8rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); font-family: inherit; font-size: 0.75rem; cursor: pointer; transition: all 0.15s; }
+		.preset-btn:hover { border-color: var(--accent); color: var(--text); }
+
+		.mode-toggle { display: flex; gap: 0.25rem; background: var(--bg); padding: 0.25rem; border-radius: 4px; }
+		.mode-toggle button { padding: 0.3rem 0.8rem; background: transparent; border: none; color: var(--text-muted); font-family: inherit; font-size: 0.75rem; cursor: pointer; border-radius: 3px; }
+		.mode-toggle button.active { background: var(--surface); color: var(--accent); }
+
+		.field-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; flex-wrap: wrap; }
+		.field-label { font-size: 0.78rem; color: var(--flag); min-width: 110px; }
+
+		input[type="text"], input[type="number"], select {
+			background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.4rem 0.6rem;
+			color: var(--text); font-family: inherit; font-size: 0.78rem; outline: none;
+		}
+		input:focus, select:focus { border-color: var(--accent); }
+		input::placeholder { color: var(--text-muted); }
+		input.wide { flex: 1; min-width: 150px; }
+		input.medium { width: 180px; }
+		input.narrow { width: 70px; }
+
+		.rule-entry { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.6rem; background: var(--surface); overflow: hidden; }
+		.rule-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.8rem; background: rgba(255,140,0,0.03); border-bottom: 1px solid var(--border); cursor: pointer; }
+		.rule-summary { font-size: 0.78rem; color: var(--text-muted); }
+		.rule-body { padding: 0.8rem; }
+		.rule-body.hidden { display: none; }
+
+		.add-btn { width: 100%; padding: 0.6rem; background: var(--surface); border: 1px dashed var(--border-bright); border-radius: 6px; color: var(--accent); font-family: inherit; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; margin-bottom: 0.5rem; }
+		.add-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+		hr.divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+
+		.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); padding: 0.45rem 1.1rem; border-radius: 4px; font-size: 0.78rem; font-family: inherit; opacity: 0; transition: all 0.3s; z-index: 100; }
+		.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+			.field-label { min-width: 90px; }
+			input.medium { width: 140px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Firewall Rule Builder</h1>
+			<p class="subtitle">Build iptables and nftables rules</p>
+		</header>
+
+		<div class="config-display">
+			<div class="config-bar">
+				<div class="config-bar-left">
+					<span class="config-dot"></span>
+					<span class="config-bar-title" id="syntaxLabel">iptables rules</span>
+				</div>
+				<div class="config-bar-actions">
+					<div class="mode-toggle">
+						<button class="active" onclick="setMode('iptables',this)">iptables</button>
+						<button onclick="setMode('nftables',this)">nftables</button>
+					</div>
+					<button class="small primary" onclick="copyConfig()">Copy</button>
+				</div>
+			</div>
+			<div class="config-body"><pre id="configOutput"></pre></div>
+		</div>
+
+		<div class="presets">
+			<button class="preset-btn" onclick="applyPreset('webserver')">Web Server</button>
+			<button class="preset-btn" onclick="applyPreset('ssh-only')">SSH Only</button>
+			<button class="preset-btn" onclick="applyPreset('docker')">Docker Host</button>
+			<button class="preset-btn" onclick="applyPreset('lockdown')">Lockdown</button>
+		</div>
+
+		<!-- Default policies -->
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Default Policies</span></div>
+			<div class="panel-body">
+				<div class="field-row">
+					<span class="field-label">INPUT</span>
+					<select id="policyInput" onchange="build()"><option value="DROP" selected>DROP</option><option value="ACCEPT">ACCEPT</option></select>
+				</div>
+				<div class="field-row">
+					<span class="field-label">FORWARD</span>
+					<select id="policyForward" onchange="build()"><option value="DROP" selected>DROP</option><option value="ACCEPT">ACCEPT</option></select>
+				</div>
+				<div class="field-row">
+					<span class="field-label">OUTPUT</span>
+					<select id="policyOutput" onchange="build()"><option value="ACCEPT" selected>ACCEPT</option><option value="DROP">DROP</option></select>
+				</div>
+			</div>
+		</div>
+
+		<!-- Rules -->
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Rules</span></div>
+			<div class="panel-body">
+				<div id="ruleEntries"></div>
+				<button class="add-btn" onclick="addRule()">+ Add Rule</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		let rules = [];
+		let ruleId = 0;
+		let mode = 'iptables';
+
+		function createRule(o = {}) {
+			return {
+				id: ruleId++, collapsed: false,
+				chain: o.chain || 'INPUT',
+				protocol: o.protocol || 'tcp',
+				srcIP: o.srcIP || '',
+				dstIP: o.dstIP || '',
+				dport: o.dport || '',
+				sport: o.sport || '',
+				state: o.state || '',
+				iface: o.iface || '',
+				action: o.action || 'ACCEPT',
+				comment: o.comment || '',
+			};
+		}
+
+		function addRule(data) {
+			const r = data || createRule();
+			if (!data) rules.push(r);
+			renderRules(); build();
+		}
+
+		function removeRule(id) { rules = rules.filter(r => r.id !== id); renderRules(); build(); }
+		function toggleRule(id) { const r = rules.find(x=>x.id===id); if(r) { r.collapsed=!r.collapsed; renderRules(); } }
+
+		function moveRule(id, dir) {
+			const idx = rules.findIndex(r => r.id === id);
+			const ni = idx + dir;
+			if (ni < 0 || ni >= rules.length) return;
+			[rules[idx], rules[ni]] = [rules[ni], rules[idx]];
+			renderRules(); build();
+		}
+
+		function syncRule(id) {
+			const r = rules.find(x=>x.id===id);
+			if (!r) return;
+			const el = n => document.getElementById(`r${id}_${n}`);
+			r.chain = el('chain')?.value || 'INPUT';
+			r.protocol = el('protocol')?.value || 'tcp';
+			r.srcIP = el('srcIP')?.value || '';
+			r.dstIP = el('dstIP')?.value || '';
+			r.dport = el('dport')?.value || '';
+			r.sport = el('sport')?.value || '';
+			r.state = el('state')?.value || '';
+			r.iface = el('iface')?.value || '';
+			r.action = el('action')?.value || 'ACCEPT';
+			r.comment = el('comment')?.value || '';
+			build();
+		}
+
+		function getRuleSummary(r) {
+			let parts = [r.chain];
+			if (r.protocol !== 'all') parts.push(r.protocol);
+			if (r.dport) parts.push(`dport:${r.dport}`);
+			if (r.srcIP) parts.push(`src:${r.srcIP}`);
+			parts.push(`-> ${r.action}`);
+			if (r.comment) parts.push(`(${r.comment})`);
+			return parts.join(' ');
+		}
+
+		function renderRules() {
+			document.getElementById('ruleEntries').innerHTML = rules.map(r => `
+				<div class="rule-entry">
+					<div class="rule-header" onclick="toggleRule(${r.id})">
+						<span class="rule-summary">${esc(getRuleSummary(r))}</span>
+						<div style="display:flex;gap:0.3rem;align-items:center;">
+							<button class="small" onclick="event.stopPropagation();moveRule(${r.id},-1)">&uarr;</button>
+							<button class="small" onclick="event.stopPropagation();moveRule(${r.id},1)">&darr;</button>
+							<button class="small danger" onclick="event.stopPropagation();removeRule(${r.id})">&times;</button>
+						</div>
+					</div>
+					<div class="rule-body ${r.collapsed?'hidden':''}">
+						<div class="field-row"><span class="field-label">Chain</span>
+							<select id="r${r.id}_chain" onchange="syncRule(${r.id})">
+								<option value="INPUT" ${r.chain==='INPUT'?'selected':''}>INPUT</option>
+								<option value="OUTPUT" ${r.chain==='OUTPUT'?'selected':''}>OUTPUT</option>
+								<option value="FORWARD" ${r.chain==='FORWARD'?'selected':''}>FORWARD</option>
+							</select>
+						</div>
+						<div class="field-row"><span class="field-label">Protocol</span>
+							<select id="r${r.id}_protocol" onchange="syncRule(${r.id})">
+								<option value="tcp" ${r.protocol==='tcp'?'selected':''}>TCP</option>
+								<option value="udp" ${r.protocol==='udp'?'selected':''}>UDP</option>
+								<option value="icmp" ${r.protocol==='icmp'?'selected':''}>ICMP</option>
+								<option value="all" ${r.protocol==='all'?'selected':''}>All</option>
+							</select>
+						</div>
+						<div class="field-row"><span class="field-label">Source IP</span><input type="text" class="medium" id="r${r.id}_srcIP" value="${esc(r.srcIP)}" placeholder="0.0.0.0/0" oninput="syncRule(${r.id})"></div>
+						<div class="field-row"><span class="field-label">Dest IP</span><input type="text" class="medium" id="r${r.id}_dstIP" value="${esc(r.dstIP)}" placeholder="0.0.0.0/0" oninput="syncRule(${r.id})"></div>
+						<div class="field-row"><span class="field-label">Dest Port</span><input type="text" class="medium" id="r${r.id}_dport" value="${esc(r.dport)}" placeholder="80 or 80,443 or 8000:9000" oninput="syncRule(${r.id})"></div>
+						<div class="field-row"><span class="field-label">Source Port</span><input type="text" class="medium" id="r${r.id}_sport" value="${esc(r.sport)}" placeholder="" oninput="syncRule(${r.id})"></div>
+						<div class="field-row"><span class="field-label">State</span>
+							<select id="r${r.id}_state" onchange="syncRule(${r.id})">
+								<option value="" ${r.state===''?'selected':''}>--</option>
+								<option value="NEW" ${r.state==='NEW'?'selected':''}>NEW</option>
+								<option value="ESTABLISHED,RELATED" ${r.state==='ESTABLISHED,RELATED'?'selected':''}>ESTABLISHED,RELATED</option>
+								<option value="NEW,ESTABLISHED" ${r.state==='NEW,ESTABLISHED'?'selected':''}>NEW,ESTABLISHED</option>
+							</select>
+						</div>
+						<div class="field-row"><span class="field-label">Interface</span><input type="text" class="medium" id="r${r.id}_iface" value="${esc(r.iface)}" placeholder="eth0" oninput="syncRule(${r.id})"></div>
+						<div class="field-row"><span class="field-label">Action</span>
+							<select id="r${r.id}_action" onchange="syncRule(${r.id})">
+								<option value="ACCEPT" ${r.action==='ACCEPT'?'selected':''}>ACCEPT</option>
+								<option value="DROP" ${r.action==='DROP'?'selected':''}>DROP</option>
+								<option value="REJECT" ${r.action==='REJECT'?'selected':''}>REJECT</option>
+								<option value="LOG" ${r.action==='LOG'?'selected':''}>LOG</option>
+							</select>
+						</div>
+						<div class="field-row"><span class="field-label">Comment</span><input type="text" class="wide" id="r${r.id}_comment" value="${esc(r.comment)}" placeholder="Allow SSH" oninput="syncRule(${r.id})"></div>
+					</div>
+				</div>
+			`).join('');
+		}
+
+		function setMode(m, btn) {
+			mode = m;
+			document.querySelectorAll('.mode-toggle button').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			document.getElementById('syntaxLabel').textContent = m === 'iptables' ? 'iptables rules' : 'nftables ruleset';
+			build();
+		}
+
+		function build() {
+			const lines = [];
+			const polIn = document.getElementById('policyInput').value;
+			const polFwd = document.getElementById('policyForward').value;
+			const polOut = document.getElementById('policyOutput').value;
+
+			if (mode === 'iptables') {
+				lines.push('# Flush existing rules');
+				lines.push('iptables -F');
+				lines.push('iptables -X');
+				lines.push('');
+				lines.push('# Default policies');
+				lines.push(`iptables -P INPUT ${polIn}`);
+				lines.push(`iptables -P FORWARD ${polFwd}`);
+				lines.push(`iptables -P OUTPUT ${polOut}`);
+				lines.push('');
+				lines.push('# Allow loopback');
+				lines.push('iptables -A INPUT -i lo -j ACCEPT');
+				lines.push('iptables -A OUTPUT -o lo -j ACCEPT');
+				lines.push('');
+				lines.push('# Allow established connections');
+				lines.push('iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT');
+
+				if (rules.length) lines.push('');
+				rules.forEach(r => {
+					if (r.comment) lines.push(`# ${r.comment}`);
+					let cmd = `iptables -A ${r.chain}`;
+					if (r.protocol !== 'all') cmd += ` -p ${r.protocol}`;
+					if (r.srcIP) cmd += ` -s ${r.srcIP}`;
+					if (r.dstIP) cmd += ` -d ${r.dstIP}`;
+					if (r.iface) cmd += ` -i ${r.iface}`;
+					if (r.dport) {
+						if (r.dport.includes(',')) cmd += ` -m multiport --dports ${r.dport}`;
+						else cmd += ` --dport ${r.dport}`;
+					}
+					if (r.sport) cmd += ` --sport ${r.sport}`;
+					if (r.state) cmd += ` -m state --state ${r.state}`;
+					cmd += ` -j ${r.action}`;
+					lines.push(cmd);
+				});
+			} else {
+				// nftables
+				const nftAction = a => ({ ACCEPT:'accept', DROP:'drop', REJECT:'reject', LOG:'log' }[a] || 'accept');
+				const nftPol = p => p.toLowerCase();
+
+				lines.push('#!/usr/sbin/nft -f');
+				lines.push('');
+				lines.push('flush ruleset');
+				lines.push('');
+				lines.push('table inet filter {');
+				lines.push('    chain input {');
+				lines.push(`        type filter hook input priority 0; policy ${nftPol(polIn)};`);
+				lines.push('');
+				lines.push('        # Allow loopback');
+				lines.push('        iif lo accept');
+				lines.push('');
+				lines.push('        # Allow established');
+				lines.push('        ct state established,related accept');
+
+				rules.filter(r => r.chain === 'INPUT').forEach(r => {
+					lines.push('');
+					if (r.comment) lines.push(`        # ${r.comment}`);
+					let parts = [];
+					if (r.protocol !== 'all') parts.push(r.protocol);
+					if (r.iface) parts.push(`iif ${r.iface}`);
+					if (r.srcIP) parts.push(`ip saddr ${r.srcIP}`);
+					if (r.dstIP) parts.push(`ip daddr ${r.dstIP}`);
+					if (r.dport) {
+						if (r.dport.includes(',')) parts.push(`dport { ${r.dport} }`);
+						else if (r.dport.includes(':')) parts.push(`dport ${r.dport}`);
+						else parts.push(`dport ${r.dport}`);
+					}
+					if (r.state) parts.push(`ct state ${r.state.toLowerCase().replace(',', ',')}`);
+					parts.push(nftAction(r.action));
+					lines.push(`        ${parts.join(' ')}`);
+				});
+
+				lines.push('    }');
+				lines.push('');
+				lines.push('    chain forward {');
+				lines.push(`        type filter hook forward priority 0; policy ${nftPol(polFwd)};`);
+
+				rules.filter(r => r.chain === 'FORWARD').forEach(r => {
+					if (r.comment) lines.push(`        # ${r.comment}`);
+					let parts = [];
+					if (r.protocol !== 'all') parts.push(r.protocol);
+					if (r.srcIP) parts.push(`ip saddr ${r.srcIP}`);
+					if (r.dstIP) parts.push(`ip daddr ${r.dstIP}`);
+					if (r.dport) parts.push(`dport ${r.dport}`);
+					parts.push(nftAction(r.action));
+					lines.push(`        ${parts.join(' ')}`);
+				});
+
+				lines.push('    }');
+				lines.push('');
+				lines.push('    chain output {');
+				lines.push(`        type filter hook output priority 0; policy ${nftPol(polOut)};`);
+
+				rules.filter(r => r.chain === 'OUTPUT').forEach(r => {
+					if (r.comment) lines.push(`        # ${r.comment}`);
+					let parts = [];
+					if (r.protocol !== 'all') parts.push(r.protocol);
+					if (r.dstIP) parts.push(`ip daddr ${r.dstIP}`);
+					if (r.dport) parts.push(`dport ${r.dport}`);
+					parts.push(nftAction(r.action));
+					lines.push(`        ${parts.join(' ')}`);
+				});
+
+				lines.push('    }');
+				lines.push('}');
+			}
+
+			const output = document.getElementById('configOutput');
+			output.innerHTML = lines.map(line => {
+				if (!line.trim()) return '';
+				if (line.trim().startsWith('#')) return `<span class="fw-cmt">${esc(line)}</span>`;
+				// Highlight actions
+				let h = esc(line);
+				h = h.replace(/\b(ACCEPT|accept)\b/g, '<span class="fw-accept">$1</span>');
+				h = h.replace(/\b(DROP|drop)\b/g, '<span class="fw-drop">$1</span>');
+				h = h.replace(/\b(REJECT|reject)\b/g, '<span class="fw-reject">$1</span>');
+				h = h.replace(/\b(LOG|log)\b/g, '<span class="fw-log">$1</span>');
+				// Highlight flags
+				h = h.replace(/(-[A-Z]|-[a-z]+|--\w+)/g, '<span class="fw-flag">$1</span>');
+				return h;
+			}).join('\n');
+		}
+
+		function getPlainConfig() { const t=document.createElement('div'); t.innerHTML=document.getElementById('configOutput').innerHTML; return t.textContent; }
+		function copyConfig() { navigator.clipboard.writeText(getPlainConfig()).then(()=>showToast('Copied!')); }
+		function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+		function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+
+		function applyPreset(name) {
+			rules = []; ruleId = 0;
+			document.getElementById('policyInput').value = 'DROP';
+			document.getElementById('policyForward').value = 'DROP';
+			document.getElementById('policyOutput').value = 'ACCEPT';
+
+			switch(name) {
+				case 'webserver':
+					rules.push(createRule({ chain:'INPUT', protocol:'tcp', dport:'22', action:'ACCEPT', comment:'Allow SSH' }));
+					rules.push(createRule({ chain:'INPUT', protocol:'tcp', dport:'80,443', action:'ACCEPT', comment:'Allow HTTP/HTTPS' }));
+					break;
+				case 'ssh-only':
+					rules.push(createRule({ chain:'INPUT', protocol:'tcp', dport:'22', action:'ACCEPT', comment:'Allow SSH' }));
+					rules.push(createRule({ chain:'INPUT', protocol:'icmp', action:'ACCEPT', comment:'Allow ping' }));
+					break;
+				case 'docker':
+					document.getElementById('policyForward').value = 'ACCEPT';
+					rules.push(createRule({ chain:'INPUT', protocol:'tcp', dport:'22', action:'ACCEPT', comment:'Allow SSH' }));
+					rules.push(createRule({ chain:'INPUT', protocol:'tcp', dport:'80,443', action:'ACCEPT', comment:'Allow HTTP/HTTPS' }));
+					rules.push(createRule({ chain:'INPUT', protocol:'tcp', dport:'2376', srcIP:'10.0.0.0/8', action:'ACCEPT', comment:'Docker API (internal only)' }));
+					break;
+				case 'lockdown':
+					rules.push(createRule({ chain:'INPUT', protocol:'tcp', dport:'22', srcIP:'192.168.1.0/24', action:'ACCEPT', comment:'SSH from LAN only' }));
+					rules.push(createRule({ chain:'INPUT', protocol:'icmp', srcIP:'192.168.1.0/24', action:'ACCEPT', comment:'Ping from LAN' }));
+					break;
+			}
+
+			renderRules(); build();
+		}
+
+		// Initial
+		applyPreset('webserver');
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

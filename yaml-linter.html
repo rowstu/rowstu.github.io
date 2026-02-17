@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAML Linter</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0e0e14;
+            --surface: #16161f;
+            --surface2: #1d1d2a;
+            --border: #2a2a3d;
+            --accent: #c084fc;
+            --accent-dim: #7c3aed;
+            --accent-glow: rgba(192,132,252,0.08);
+            --text: #d4d4e8;
+            --text-dim: #7a7a9a;
+            --text-bright: #f0f0ff;
+            --ok: #4ade80;
+            --ok-dim: #14532d;
+            --err: #f87171;
+            --err-dim: #3b1111;
+            --warn: #fbbf24;
+            --warn-dim: #3b2f08;
+            --key: #93c5fd;
+            --str: #86efac;
+            --num: #fde68a;
+            --bool: #c084fc;
+            --null-c: #f87171;
+            --comment-c: #555570;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(192,132,252,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 0% 100%, rgba(124,58,237,0.03) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+
+        header h1 span {
+            color: var(--text-dim);
+        }
+
+        header p {
+            color: var(--text-dim);
+            font-size: 0.78rem;
+            margin-top: 0.4rem;
+        }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.6rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-dim);
+        }
+
+        .status-dot.ok { background: var(--ok); box-shadow: 0 0 6px rgba(74,222,128,0.4); }
+        .status-dot.err { background: var(--err); box-shadow: 0 0 6px rgba(248,113,113,0.4); }
+        .status-dot.warn { background: var(--warn); box-shadow: 0 0 6px rgba(251,191,36,0.4); }
+
+        .status-text { color: var(--text-dim); }
+        .status-text.ok { color: var(--ok); }
+        .status-text.err { color: var(--err); }
+        .status-text.warn { color: var(--warn); }
+
+        .status-meta {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Editor area */
+        .editor-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pane {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pane-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.8rem;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .pane-header span {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .btn-row { display: flex; gap: 0.4rem; }
+
+        .btn {
+            background: var(--surface);
+            color: var(--accent);
+            border: 1px solid var(--border);
+            padding: 0.3rem 0.7rem;
+            font-family: inherit;
+            font-size: 0.65rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--text-bright);
+        }
+
+        /* Input editor */
+        .editor-container {
+            position: relative;
+            flex: 1;
+            min-height: 400px;
+        }
+
+        #input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            padding: 0.8rem;
+            padding-left: 3.5rem;
+            resize: none;
+            outline: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            tab-size: 2;
+            -moz-tab-size: 2;
+            white-space: pre;
+            overflow: auto;
+        }
+
+        .line-numbers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3rem;
+            padding: 0.8rem 0.4rem;
+            text-align: right;
+            font-size: 0.7rem;
+            line-height: 1.7;
+            color: var(--text-dim);
+            user-select: none;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+            border-right: 1px solid var(--border);
+        }
+
+        .line-numbers .err-line { color: var(--err); font-weight: 500; }
+
+        /* Output / issues */
+        .issues-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.8rem;
+            min-height: 400px;
+        }
+
+        .issue {
+            display: flex;
+            gap: 0.6rem;
+            padding: 0.5rem 0.6rem;
+            border-radius: 4px;
+            margin-bottom: 0.4rem;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .issue:hover { background: var(--surface2); }
+
+        .issue-error { border-left: 3px solid var(--err); }
+        .issue-warning { border-left: 3px solid var(--warn); }
+        .issue-info { border-left: 3px solid var(--accent); }
+
+        .issue-badge {
+            font-size: 0.65rem;
+            font-weight: 500;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
+
+        .issue-badge.error { color: var(--err); background: var(--err-dim); }
+        .issue-badge.warning { color: var(--warn); background: var(--warn-dim); }
+        .issue-badge.info { color: var(--accent); background: rgba(192,132,252,0.1); }
+
+        .issue-line {
+            color: var(--text-dim);
+            font-size: 0.65rem;
+            flex-shrink: 0;
+            min-width: 3rem;
+        }
+
+        .issue-msg { color: var(--text); }
+
+        .ok-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--ok);
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .ok-message .big { font-size: 2rem; }
+        .ok-message .label { font-size: 0.8rem; font-weight: 500; }
+        .ok-message .sub { font-size: 0.7rem; color: var(--text-dim); }
+
+        /* Parsed output */
+        .parsed-output {
+            padding: 0.8rem;
+            font-size: 0.78rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow: auto;
+            flex: 1;
+            min-height: 200px;
+        }
+
+        .parsed-output .y-key { color: var(--key); }
+        .parsed-output .y-str { color: var(--str); }
+        .parsed-output .y-num { color: var(--num); }
+        .parsed-output .y-bool { color: var(--bool); }
+        .parsed-output .y-null { color: var(--null-c); }
+        .parsed-output .y-comment { color: var(--comment-c); }
+        .parsed-output .y-punct { color: var(--text-dim); }
+
+        /* Samples row */
+        .samples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .sample-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 0.7rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .sample-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent-dim);
+            background: var(--surface2);
+        }
+
+        /* Tabs */
+        .tab-row {
+            display: flex;
+            gap: 0;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 0.68rem;
+            padding: 0.35rem 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-btn:hover { color: var(--text); }
+
+        .tab-content { display: none; flex: 1; overflow: hidden; }
+        .tab-content.active { display: flex; flex-direction: column; }
+
+        @media (max-width: 700px) {
+            .editor-wrap { grid-template-columns: 1fr; }
+            .editor-container { min-height: 250px; }
+            .issues-list { min-height: 200px; }
+            .status-meta { margin-left: 0; width: 100%; }
+            .container { padding: 1rem; }
+            header h1 { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <script src="/assets/shared-nav.js"></script>
+    <div class="container">
+        <header>
+            <h1>YAML <span>linter</span></h1>
+            <p>Validate, lint, and prettify YAML with instant feedback</p>
+        </header>
+
+        <!-- Status bar -->
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="status-dot"></div>
+                <span class="status-text" id="status-text">Paste YAML to validate</span>
+            </div>
+            <div class="status-meta">
+                <span id="meta-lines">0 lines</span>
+                <span id="meta-docs">0 docs</span>
+                <span id="meta-errors">0 errors</span>
+            </div>
+        </div>
+
+        <!-- Samples -->
+        <div class="samples">
+            <button class="sample-btn" onclick="loadSample('valid')">Valid Sample</button>
+            <button class="sample-btn" onclick="loadSample('k8s')">Kubernetes Pod</button>
+            <button class="sample-btn" onclick="loadSample('compose')">Docker Compose</button>
+            <button class="sample-btn" onclick="loadSample('ansible')">Ansible Playbook</button>
+            <button class="sample-btn" onclick="loadSample('bad-indent')">Bad Indentation</button>
+            <button class="sample-btn" onclick="loadSample('bad-dup')">Duplicate Keys</button>
+            <button class="sample-btn" onclick="loadSample('bad-tabs')">Tab Characters</button>
+        </div>
+
+        <!-- Editor -->
+        <div class="editor-wrap">
+            <div class="pane">
+                <div class="pane-header">
+                    <span>Input</span>
+                    <div class="btn-row">
+                        <button class="btn" onclick="clearInput()">Clear</button>
+                        <button class="btn" onclick="prettify()">Prettify</button>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <textarea id="input" spellcheck="false" placeholder="Paste your YAML here..."></textarea>
+                </div>
+            </div>
+
+            <div class="pane">
+                <div class="pane-header">
+                    <div class="tab-row">
+                        <button class="tab-btn active" data-tab="issues" onclick="switchTab('issues')">Issues</button>
+                        <button class="tab-btn" data-tab="parsed" onclick="switchTab('parsed')">JSON</button>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn" onclick="copyJSON()">Copy JSON</button>
+                    </div>
+                </div>
+                <div class="tab-content active" data-tab="issues">
+                    <div class="issues-list" id="issues-list"></div>
+                </div>
+                <div class="tab-content" data-tab="parsed">
+                    <div class="parsed-output" id="parsed-output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Minimal YAML parser for validation and linting
+    // Handles common YAML constructs; not a full spec implementation.
+
+    const input = document.getElementById('input');
+    const lineNums = document.getElementById('line-numbers');
+    const issuesList = document.getElementById('issues-list');
+    const parsedOutput = document.getElementById('parsed-output');
+
+    let debounceTimer;
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(lint, 150);
+        updateLineNumbers();
+    });
+    input.addEventListener('scroll', syncScroll);
+    input.addEventListener('keydown', handleTab);
+
+    function handleTab(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            input.value = input.value.substring(0, start) + '  ' + input.value.substring(end);
+            input.selectionStart = input.selectionEnd = start + 2;
+            lint();
+            updateLineNumbers();
+        }
+    }
+
+    function syncScroll() {
+        lineNums.style.transform = `translateY(-${input.scrollTop}px)`;
+    }
+
+    function updateLineNumbers() {
+        const lines = input.value.split('\n');
+        const errorLines = new Set();
+        // Will be updated after lint
+        lineNums.innerHTML = lines.map((_, i) =>
+            `<div${errorLines.has(i+1) ? ' class="err-line"' : ''}>${i+1}</div>`
+        ).join('');
+    }
+
+    function updateLineNumbersWithErrors(errorLineSet) {
+        const lines = input.value.split('\n');
+        lineNums.innerHTML = lines.map((_, i) =>
+            `<div${errorLineSet.has(i+1) ? ' class="err-line"' : ''}>${i+1}</div>`
+        ).join('');
+    }
+
+    const samples = {
+        valid: `# Application config
+app:
+  name: my-service
+  version: "2.1.0"
+  debug: false
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  workers: 4
+
+database:
+  host: localhost
+  port: 5432
+  name: mydb
+  pool:
+    min: 2
+    max: 10
+
+logging:
+  level: info
+  format: json
+  outputs:
+    - stdout
+    - file:///var/log/app.log`,
+
+        k8s: `apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+    tier: frontend
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.25
+      ports:
+        - containerPort: 80
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+      volumeMounts:
+        - name: config
+          mountPath: /etc/nginx/conf.d
+  volumes:
+    - name: config
+      configMap:
+        name: nginx-config`,
+
+        compose: `version: "3.8"
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:`,
+
+        ansible: `---
+- name: Configure web servers
+  hosts: webservers
+  become: true
+  vars:
+    http_port: 80
+    max_clients: 200
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: true
+
+    - name: Copy config
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: restart nginx
+
+    - name: Ensure running
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted`,
+
+        'bad-indent': `server:
+  host: localhost
+  port: 8080
+    name: bad-indent
+  database:
+      host: db
+     port: 5432
+    user: admin`,
+
+        'bad-dup': `database:
+  host: localhost
+  port: 5432
+  host: remotehost
+  name: mydb
+  port: 3306
+server:
+  listen: 80
+  listen: 443`,
+
+        'bad-tabs': `server:
+\thost: localhost
+\tport: 8080
+database:
+\thost: db
+\tport: 5432`
+    };
+
+    function loadSample(name) {
+        input.value = samples[name] || '';
+        updateLineNumbers();
+        lint();
+    }
+
+    function clearInput() {
+        input.value = '';
+        updateLineNumbers();
+        lint();
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.dataset.tab === tab));
+    }
+
+    function lint() {
+        const text = input.value;
+        const issues = [];
+        const lines = text.split('\n');
+
+        if (!text.trim()) {
+            setStatus('idle', 'Paste YAML to validate');
+            document.getElementById('meta-lines').textContent = '0 lines';
+            document.getElementById('meta-docs').textContent = '0 docs';
+            document.getElementById('meta-errors').textContent = '0 errors';
+            issuesList.innerHTML = '';
+            parsedOutput.textContent = '';
+            updateLineNumbers();
+            return;
+        }
+
+        let docCount = 1;
+        let parsedData = null;
+
+        // Line-by-line checks
+        const indentStack = [];
+        const keysByLevel = {};
+        let inMultiline = false;
+        let multilineIndent = 0;
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const lineNum = i + 1;
+            const raw = line;
+
+            // Document separator
+            if (line.trim() === '---') {
+                if (i > 0) docCount++;
+                inMultiline = false;
+                continue;
+            }
+            if (line.trim() === '...') {
+                inMultiline = false;
+                continue;
+            }
+
+            // Empty line or comment-only
+            if (line.trim() === '' || line.trim().startsWith('#')) {
+                continue;
+            }
+
+            // Tab check
+            if (line.includes('\t')) {
+                issues.push({ type: 'error', line: lineNum, msg: 'Tab character found — YAML requires spaces for indentation' });
+            }
+
+            // Trailing whitespace
+            if (line !== line.trimEnd() && line.trim() !== '') {
+                issues.push({ type: 'warning', line: lineNum, msg: 'Trailing whitespace' });
+            }
+
+            // Check indentation consistency
+            const indent = line.match(/^( *)/)[1].length;
+
+            // Skip multiline scalar content
+            if (inMultiline && indent > multilineIndent) continue;
+            inMultiline = false;
+
+            // Check for odd indentation
+            if (indent % 2 !== 0 && !line.trim().startsWith('-') && !line.trim().startsWith('#')) {
+                issues.push({ type: 'warning', line: lineNum, msg: `Odd indentation (${indent} spaces) — consider using multiples of 2` });
+            }
+
+            // Detect multiline scalar indicators
+            const trimmed = line.trim();
+            if (trimmed.match(/:\s*[|>][+-]?\s*$/)) {
+                inMultiline = true;
+                multilineIndent = indent;
+                continue;
+            }
+
+            // Check for duplicate keys at same level
+            const keyMatch = trimmed.match(/^-?\s*([^:#{\[]+?)\s*:/);
+            if (keyMatch) {
+                const key = keyMatch[1].trim();
+                const levelKey = `${indent}:${key}`;
+                if (!keysByLevel[indent]) keysByLevel[indent] = {};
+                if (keysByLevel[indent][key]) {
+                    issues.push({
+                        type: 'warning',
+                        line: lineNum,
+                        msg: `Duplicate key "${key}" (first seen at line ${keysByLevel[indent][key]})`
+                    });
+                } else {
+                    keysByLevel[indent][key] = lineNum;
+                }
+                // Clear deeper levels when we see a key at this level
+                for (const lvl of Object.keys(keysByLevel)) {
+                    if (parseInt(lvl) > indent) delete keysByLevel[lvl];
+                }
+            }
+
+            // Check for common errors
+            // Unquoted special values that may be unintentional
+            const valMatch = trimmed.match(/:\s+(.+)/);
+            if (valMatch) {
+                const val = valMatch[1].trim();
+                if (val === 'Yes' || val === 'No' || val === 'On' || val === 'Off') {
+                    issues.push({
+                        type: 'info',
+                        line: lineNum,
+                        msg: `"${val}" is parsed as a boolean in YAML 1.1 — quote it if you mean the string`
+                    });
+                }
+            }
+
+            // Missing space after colon
+            if (trimmed.match(/\w:[^ \s\n#"'{}\[\],]/)) {
+                const isFalsePositive = trimmed.match(/https?:\/\//) || trimmed.match(/^\s*#/);
+                if (!isFalsePositive) {
+                    issues.push({
+                        type: 'warning',
+                        line: lineNum,
+                        msg: 'Missing space after colon — values should be separated by ": "'
+                    });
+                }
+            }
+        }
+
+        // Try parsing with a simple approach — convert to JSON
+        try {
+            parsedData = parseYAML(text);
+        } catch (e) {
+            const lineMatch = e.message.match(/line (\d+)/i);
+            const errLine = lineMatch ? parseInt(lineMatch[1]) : null;
+            issues.unshift({
+                type: 'error',
+                line: errLine,
+                msg: `Parse error: ${e.message}`
+            });
+        }
+
+        // Update status
+        const errors = issues.filter(i => i.type === 'error').length;
+        const warnings = issues.filter(i => i.type === 'warning').length;
+        const infos = issues.filter(i => i.type === 'info').length;
+
+        if (errors > 0) {
+            setStatus('err', `${errors} error${errors>1?'s':''}, ${warnings} warning${warnings>1?'s':''}`);
+        } else if (warnings > 0) {
+            setStatus('warn', `Valid with ${warnings} warning${warnings>1?'s':''}`);
+        } else {
+            setStatus('ok', 'Valid YAML');
+        }
+
+        document.getElementById('meta-lines').textContent = `${lines.length} lines`;
+        document.getElementById('meta-docs').textContent = `${docCount} doc${docCount>1?'s':''}`;
+        document.getElementById('meta-errors').textContent = `${errors} error${errors!==1?'s':''}`;
+
+        // Update error lines
+        const errorLineSet = new Set(issues.filter(i => i.type === 'error').map(i => i.line).filter(Boolean));
+        updateLineNumbersWithErrors(errorLineSet);
+
+        // Render issues
+        if (issues.length === 0) {
+            issuesList.innerHTML = `
+                <div class="ok-message">
+                    <div class="big">\u2713</div>
+                    <div class="label">No issues found</div>
+                    <div class="sub">${lines.length} lines, ${docCount} document${docCount>1?'s':''}</div>
+                </div>`;
+        } else {
+            issuesList.innerHTML = issues.map(issue => `
+                <div class="issue issue-${issue.type}" onclick="goToLine(${issue.line || 1})">
+                    <span class="issue-badge ${issue.type}">${issue.type.toUpperCase()}</span>
+                    <span class="issue-line">${issue.line ? 'L' + issue.line : ''}</span>
+                    <span class="issue-msg">${escHtml(issue.msg)}</span>
+                </div>
+            `).join('');
+        }
+
+        // Render parsed JSON
+        if (parsedData !== null && parsedData !== undefined) {
+            const json = JSON.stringify(parsedData, null, 2);
+            parsedOutput.innerHTML = syntaxHighlightJSON(json);
+        } else {
+            parsedOutput.innerHTML = `<span style="color:var(--err)">Could not parse YAML</span>`;
+        }
+    }
+
+    function setStatus(state, text) {
+        const dot = document.getElementById('status-dot');
+        const txt = document.getElementById('status-text');
+        dot.className = 'status-dot ' + (state === 'idle' ? '' : state);
+        txt.className = 'status-text ' + (state === 'idle' ? '' : state);
+        txt.textContent = text;
+    }
+
+    function goToLine(lineNum) {
+        const lines = input.value.split('\n');
+        let pos = 0;
+        for (let i = 0; i < lineNum - 1 && i < lines.length; i++) {
+            pos += lines[i].length + 1;
+        }
+        input.focus();
+        input.setSelectionRange(pos, pos + (lines[lineNum-1]?.length || 0));
+    }
+
+    // Simple YAML parser
+    function parseYAML(text) {
+        // Strip BOM
+        if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
+        const lines = text.split('\n');
+        let idx = 0;
+
+        // Handle multiple documents
+        const docs = [];
+        let currentLines = [];
+
+        for (const line of lines) {
+            if (line.trim() === '---' && currentLines.length > 0) {
+                docs.push(currentLines);
+                currentLines = [];
+            } else if (line.trim() === '...') {
+                if (currentLines.length > 0) docs.push(currentLines);
+                currentLines = [];
+            } else {
+                currentLines.push(line);
+            }
+        }
+        if (currentLines.length > 0) docs.push(currentLines);
+
+        if (docs.length === 0) return null;
+        if (docs.length === 1) return parseDocument(docs[0]);
+        return docs.map(d => parseDocument(d));
+    }
+
+    function parseDocument(lines) {
+        // Remove leading empty / comment lines
+        while (lines.length && (lines[0].trim() === '' || lines[0].trim().startsWith('#'))) {
+            lines.shift();
+        }
+        if (lines.length === 0) return null;
+
+        const ctx = { lines, idx: 0 };
+        return parseValue(ctx, -1);
+    }
+
+    function parseValue(ctx, parentIndent) {
+        skipEmpty(ctx);
+        if (ctx.idx >= ctx.lines.length) return null;
+
+        const line = ctx.lines[ctx.idx];
+        const indent = getIndent(line);
+        const trimmed = line.trim();
+
+        // List?
+        if (trimmed.startsWith('- ') || trimmed === '-') {
+            return parseList(ctx, indent);
+        }
+
+        // Mapping?
+        if (trimmed.match(/^[^#{\[].+?:\s/) || trimmed.match(/^[^#{\[].+?:$/)) {
+            return parseMap(ctx, indent);
+        }
+
+        // Inline flow
+        if (trimmed.startsWith('{')) return parseFlowMap(trimmed);
+        if (trimmed.startsWith('[')) return parseFlowList(trimmed);
+
+        // Scalar
+        ctx.idx++;
+        return parseScalar(trimmed);
+    }
+
+    function parseMap(ctx, baseIndent) {
+        const result = {};
+        while (ctx.idx < ctx.lines.length) {
+            skipEmpty(ctx);
+            if (ctx.idx >= ctx.lines.length) break;
+
+            const line = ctx.lines[ctx.idx];
+            const indent = getIndent(line);
+            const trimmed = line.trim();
+
+            if (indent < baseIndent) break;
+            if (indent > baseIndent && Object.keys(result).length > 0) break;
+            if (indent < baseIndent) break;
+
+            if (trimmed.startsWith('#') || trimmed === '') {
+                ctx.idx++;
+                continue;
+            }
+
+            // Check if this is a mapping entry
+            const m = trimmed.match(/^([^:#{\[]+?)\s*:\s*(.*)/);
+            const m2 = trimmed.match(/^([^:#{\[]+?)\s*:$/);
+            if (!m && !m2) break;
+
+            const key = (m ? m[1] : m2[1]).trim();
+            const valueStr = m ? m[2].trim() : '';
+
+            ctx.idx++;
+
+            if (valueStr === '' || valueStr.startsWith('#')) {
+                // Value is on next lines
+                skipEmpty(ctx);
+                if (ctx.idx < ctx.lines.length) {
+                    const nextIndent = getIndent(ctx.lines[ctx.idx]);
+                    const nextTrimmed = ctx.lines[ctx.idx].trim();
+                    if (nextIndent > baseIndent && nextTrimmed !== '') {
+                        result[key] = parseValue(ctx, baseIndent);
+                    } else {
+                        result[key] = null;
+                    }
+                } else {
+                    result[key] = null;
+                }
+            } else if (valueStr.startsWith('|') || valueStr.startsWith('>')) {
+                // Multiline scalar
+                result[key] = parseMultilineScalar(ctx, baseIndent, valueStr);
+            } else if (valueStr.startsWith('{')) {
+                result[key] = parseFlowMap(valueStr);
+            } else if (valueStr.startsWith('[')) {
+                result[key] = parseFlowList(valueStr);
+            } else {
+                result[key] = parseScalar(valueStr);
+            }
+        }
+        return result;
+    }
+
+    function parseList(ctx, baseIndent) {
+        const result = [];
+        while (ctx.idx < ctx.lines.length) {
+            skipEmpty(ctx);
+            if (ctx.idx >= ctx.lines.length) break;
+
+            const line = ctx.lines[ctx.idx];
+            const indent = getIndent(line);
+            const trimmed = line.trim();
+
+            if (indent < baseIndent) break;
+            if (indent !== baseIndent) break;
+
+            if (!trimmed.startsWith('-')) break;
+
+            const afterDash = trimmed.slice(1).trim();
+            ctx.idx++;
+
+            if (afterDash === '' || afterDash.startsWith('#')) {
+                // Nested value
+                skipEmpty(ctx);
+                if (ctx.idx < ctx.lines.length) {
+                    const nextIndent = getIndent(ctx.lines[ctx.idx]);
+                    if (nextIndent > baseIndent) {
+                        result.push(parseValue(ctx, baseIndent));
+                    } else {
+                        result.push(null);
+                    }
+                } else {
+                    result.push(null);
+                }
+            } else if (afterDash.match(/^([^:#{\[]+?)\s*:\s/) || afterDash.match(/^([^:#{\[]+?)\s*:$/)) {
+                // Inline mapping in list
+                ctx.idx--;
+                // Reparse: need to handle "- key: val" form
+                const mapResult = {};
+                const mk = afterDash.match(/^([^:#{\[]+?)\s*:\s*(.*)/);
+                const mk2 = afterDash.match(/^([^:#{\[]+?)\s*:$/);
+                const key = (mk ? mk[1] : mk2[1]).trim();
+                const val = mk ? mk[2].trim() : '';
+                ctx.idx++;
+
+                if (val === '' || val.startsWith('#')) {
+                    skipEmpty(ctx);
+                    if (ctx.idx < ctx.lines.length && getIndent(ctx.lines[ctx.idx]) > baseIndent) {
+                        mapResult[key] = parseValue(ctx, baseIndent + 1);
+                    } else {
+                        mapResult[key] = null;
+                    }
+                } else if (val.startsWith('{')) {
+                    mapResult[key] = parseFlowMap(val);
+                } else if (val.startsWith('[')) {
+                    mapResult[key] = parseFlowList(val);
+                } else {
+                    mapResult[key] = parseScalar(val);
+                }
+
+                // Continue reading more keys at deeper indent
+                while (ctx.idx < ctx.lines.length) {
+                    skipEmpty(ctx);
+                    if (ctx.idx >= ctx.lines.length) break;
+                    const nl = ctx.lines[ctx.idx];
+                    const ni = getIndent(nl);
+                    const nt = nl.trim();
+                    if (ni <= baseIndent) break;
+                    if (nt.startsWith('#') || nt === '') { ctx.idx++; continue; }
+                    const nmk = nt.match(/^([^:#{\[]+?)\s*:\s*(.*)/);
+                    const nmk2 = nt.match(/^([^:#{\[]+?)\s*:$/);
+                    if (!nmk && !nmk2) break;
+                    const nkey = (nmk ? nmk[1] : nmk2[1]).trim();
+                    const nval = nmk ? nmk[2].trim() : '';
+                    ctx.idx++;
+                    if (nval === '' || nval.startsWith('#')) {
+                        skipEmpty(ctx);
+                        if (ctx.idx < ctx.lines.length && getIndent(ctx.lines[ctx.idx]) > ni) {
+                            mapResult[nkey] = parseValue(ctx, ni);
+                        } else {
+                            mapResult[nkey] = null;
+                        }
+                    } else if (nval.startsWith('{')) {
+                        mapResult[nkey] = parseFlowMap(nval);
+                    } else if (nval.startsWith('[')) {
+                        mapResult[nkey] = parseFlowList(nval);
+                    } else {
+                        mapResult[nkey] = parseScalar(nval);
+                    }
+                }
+
+                result.push(mapResult);
+            } else if (afterDash.startsWith('{')) {
+                result.push(parseFlowMap(afterDash));
+            } else if (afterDash.startsWith('[')) {
+                result.push(parseFlowList(afterDash));
+            } else {
+                result.push(parseScalar(afterDash));
+            }
+        }
+        return result;
+    }
+
+    function parseMultilineScalar(ctx, parentIndent, indicator) {
+        const chomping = indicator.includes('-') ? 'strip' : indicator.includes('+') ? 'keep' : 'clip';
+        const fold = indicator.startsWith('>');
+        const parts = [];
+        let scalarIndent = -1;
+
+        while (ctx.idx < ctx.lines.length) {
+            const line = ctx.lines[ctx.idx];
+            if (line.trim() === '' && scalarIndent === -1) {
+                parts.push('');
+                ctx.idx++;
+                continue;
+            }
+            const indent = getIndent(line);
+            if (scalarIndent === -1) {
+                if (line.trim() === '') { ctx.idx++; continue; }
+                scalarIndent = indent;
+            }
+            if (indent < scalarIndent && line.trim() !== '') break;
+            parts.push(line.slice(scalarIndent));
+            ctx.idx++;
+        }
+
+        let result = fold ? parts.join('\n').replace(/([^\n])\n([^\n])/g, '$1 $2') : parts.join('\n');
+        if (chomping === 'strip') result = result.replace(/\n+$/, '');
+        else if (chomping === 'clip') result = result.replace(/\n+$/, '\n');
+        return result;
+    }
+
+    function parseFlowMap(s) {
+        // Simple flow mapping parser: {key: val, key2: val2}
+        s = s.trim();
+        if (s.startsWith('{')) s = s.slice(1);
+        if (s.endsWith('}')) s = s.slice(0, -1);
+        const result = {};
+        if (!s.trim()) return result;
+        const pairs = splitFlowItems(s);
+        for (const pair of pairs) {
+            const colonIdx = pair.indexOf(':');
+            if (colonIdx === -1) continue;
+            const key = pair.slice(0, colonIdx).trim();
+            const val = pair.slice(colonIdx + 1).trim();
+            result[key] = parseScalar(val);
+        }
+        return result;
+    }
+
+    function parseFlowList(s) {
+        s = s.trim();
+        if (s.startsWith('[')) s = s.slice(1);
+        if (s.endsWith(']')) s = s.slice(0, -1);
+        if (!s.trim()) return [];
+        return splitFlowItems(s).map(item => parseScalar(item.trim()));
+    }
+
+    function splitFlowItems(s) {
+        const items = [];
+        let depth = 0;
+        let current = '';
+        let inQuote = false;
+        let quoteChar = '';
+        for (let i = 0; i < s.length; i++) {
+            const c = s[i];
+            if (inQuote) {
+                current += c;
+                if (c === quoteChar) inQuote = false;
+                continue;
+            }
+            if (c === '"' || c === "'") {
+                inQuote = true;
+                quoteChar = c;
+                current += c;
+                continue;
+            }
+            if (c === '{' || c === '[') depth++;
+            if (c === '}' || c === ']') depth--;
+            if (c === ',' && depth === 0) {
+                items.push(current);
+                current = '';
+                continue;
+            }
+            current += c;
+        }
+        if (current.trim()) items.push(current);
+        return items;
+    }
+
+    function parseScalar(s) {
+        s = s.trim();
+        // Remove inline comment
+        const commentMatch = s.match(/^(.*?)\s+#.*$/);
+        if (commentMatch && !s.startsWith('"') && !s.startsWith("'")) {
+            s = commentMatch[1].trim();
+        }
+        if (s === '' || s === '~' || s === 'null' || s === 'Null' || s === 'NULL') return null;
+        if (s === 'true' || s === 'True' || s === 'TRUE' || s === 'yes' || s === 'Yes' || s === 'YES' || s === 'on' || s === 'On' || s === 'ON') return true;
+        if (s === 'false' || s === 'False' || s === 'FALSE' || s === 'no' || s === 'No' || s === 'NO' || s === 'off' || s === 'Off' || s === 'OFF') return false;
+        // Quoted string
+        if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+            return s.slice(1, -1);
+        }
+        // Number
+        if (/^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/.test(s)) return Number(s);
+        if (/^0x[0-9a-fA-F]+$/.test(s)) return parseInt(s, 16);
+        if (/^0o[0-7]+$/.test(s)) return parseInt(s.slice(2), 8);
+        // Infinity / NaN
+        if (s === '.inf' || s === '.Inf' || s === '.INF') return Infinity;
+        if (s === '-.inf' || s === '-.Inf' || s === '-.INF') return -Infinity;
+        if (s === '.nan' || s === '.NaN' || s === '.NAN') return NaN;
+        return s;
+    }
+
+    function getIndent(line) {
+        const m = line.match(/^( *)/);
+        return m ? m[1].length : 0;
+    }
+
+    function skipEmpty(ctx) {
+        while (ctx.idx < ctx.lines.length) {
+            const t = ctx.lines[ctx.idx].trim();
+            if (t === '' || t.startsWith('#')) {
+                ctx.idx++;
+            } else {
+                break;
+            }
+        }
+    }
+
+    function prettify() {
+        const text = input.value;
+        if (!text.trim()) return;
+        try {
+            const parsed = parseYAML(text);
+            if (parsed !== null && parsed !== undefined) {
+                input.value = toYAML(parsed);
+                updateLineNumbers();
+                lint();
+            }
+        } catch (e) {
+            // Can't prettify invalid YAML
+        }
+    }
+
+    function toYAML(data, indent = 0) {
+        const pad = '  '.repeat(indent);
+        if (data === null || data === undefined) return 'null';
+        if (typeof data === 'boolean') return data ? 'true' : 'false';
+        if (typeof data === 'number') return String(data);
+        if (typeof data === 'string') {
+            if (data.includes('\n')) return '|\n' + data.split('\n').map(l => pad + '  ' + l).join('\n');
+            if (data.match(/^[\w./:-]+$/) && data !== 'true' && data !== 'false' && data !== 'null' && data !== 'yes' && data !== 'no') return data;
+            return `"${data.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+        }
+        if (Array.isArray(data)) {
+            if (data.length === 0) return '[]';
+            return data.map(item => {
+                const val = toYAML(item, indent + 1);
+                if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+                    const inner = val.split('\n');
+                    return pad + '- ' + inner[0].trim() + (inner.length > 1 ? '\n' + inner.slice(1).map(l => pad + '  ' + l.trim()).join('\n') : '');
+                }
+                return pad + '- ' + val;
+            }).join('\n');
+        }
+        if (typeof data === 'object') {
+            const keys = Object.keys(data);
+            if (keys.length === 0) return '{}';
+            return keys.map(key => {
+                const val = data[key];
+                if (val !== null && typeof val === 'object') {
+                    return pad + key + ':\n' + toYAML(val, indent + 1);
+                }
+                return pad + key + ': ' + toYAML(val, indent + 1);
+            }).join('\n');
+        }
+        return String(data);
+    }
+
+    function syntaxHighlightJSON(json) {
+        return json.replace(/("(?:[^"\\]|\\.)*")(\s*:)?|(\b(?:true|false|null)\b)|(-?\d+\.?\d*(?:[eE][+-]?\d+)?)/g,
+            (match, str, colon, bool, num) => {
+                if (str && colon) return `<span class="y-key">${escHtml(str)}</span>:`;
+                if (str) return `<span class="y-str">${escHtml(str)}</span>`;
+                if (bool) return bool === 'null' ? `<span class="y-null">${bool}</span>` : `<span class="y-bool">${bool}</span>`;
+                if (num) return `<span class="y-num">${num}</span>`;
+                return match;
+            });
+    }
+
+    function copyJSON() {
+        const text = input.value;
+        if (!text.trim()) return;
+        try {
+            const parsed = parseYAML(text);
+            const json = JSON.stringify(parsed, null, 2);
+            navigator.clipboard.writeText(json);
+            const btn = document.querySelector('[onclick="copyJSON()"]');
+            const old = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = old, 1500);
+        } catch (e) {}
+    }
+
+    function escHtml(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Init
+    updateLineNumbers();
+    lint();
+    </script>
+</body>
+</html>

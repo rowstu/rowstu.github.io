@@ -1221,7 +1221,18 @@ fi
 &lt;/table&gt;
 &lt;hr&gt;
 &lt;h2 id="submit-file-basics"&gt;Submit File Basics&lt;/h2&gt;
-&lt;p&gt;A submit file (&lt;code&gt;.sub&lt;/code&gt;) describes jobs to HTCondor.&lt;/p&gt;</description></item><item><title>Linux from scratch</title><link>https://rowstu.net/linux/scratch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/scratch/</guid><description>&lt;p&gt;Experimenting with building bare bones Linux OS without having to build the Linux from scratch sources.&lt;/p&gt;
+&lt;p&gt;A submit file (&lt;code&gt;.sub&lt;/code&gt;) describes jobs to HTCondor.&lt;/p&gt;</description></item><item><title>IRC – Internet Relay Chat Guide</title><link>https://rowstu.net/linux/irc/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/irc/</guid><description>&lt;p&gt;IRC (Internet Relay Chat) is a real-time text messaging protocol from 1988 that is still widely used by open source projects, Linux communities, and tech groups. It&amp;rsquo;s lightweight, no-frills, and runs in a terminal.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="quick-start"&gt;Quick Start&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Install a client&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install irssi &lt;span style="color:#75715e"&gt;# Debian/Ubuntu&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo pacman -S irssi &lt;span style="color:#75715e"&gt;# Arch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo dnf install irssi &lt;span style="color:#75715e"&gt;# Fedora&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Or use weechat (more modern)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo apt install weechat
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sudo pacman -S weechat
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Connect to a network:&lt;/p&gt;</description></item><item><title>Linux from scratch</title><link>https://rowstu.net/linux/scratch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/scratch/</guid><description>&lt;p&gt;Experimenting with building bare bones Linux OS without having to build the Linux from scratch sources.&lt;/p&gt;
 &lt;h3 id="1-prepare-the-environment"&gt;&lt;strong&gt;1. Prepare the Environment&lt;/strong&gt;&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;Boot into a live Linux environment using an ArchLinux, Debian, or RHEL-based ISO.&lt;/li&gt;

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logrotate Config Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c100c;
+            --surface: #151e15;
+            --surface2: #1c2a1c;
+            --border: #2a3d2a;
+            --accent: #7ec87e;
+            --accent-dim: #4a7a4a;
+            --text: #d4e8d4;
+            --text-dim: #7a9a7a;
+            --text-bright: #f0fff0;
+            --danger: #d44;
+            --danger-dim: #3a1515;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Code Pro', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 20% 0%, rgba(126,200,126,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(74,122,74,0.03) 0%, transparent 60%);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+
+        header h1 span {
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        header p {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+        }
+
+        /* Output panel */
+        .output-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .output-header span {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            background: var(--surface);
+            color: var(--accent);
+            border: 1px solid var(--border);
+            padding: 0.35rem 0.8rem;
+            font-family: inherit;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--text-bright);
+        }
+
+        .btn-accent {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+        }
+
+        #output {
+            padding: 1rem;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            white-space: pre;
+            overflow-x: auto;
+            min-height: 80px;
+            color: var(--text);
+        }
+
+        #output .comment { color: var(--text-dim); }
+        #output .path { color: #8dd; }
+        #output .directive { color: var(--accent); }
+        #output .value { color: #dda; }
+        #output .brace { color: #aaa; font-weight: 700; }
+
+        /* Presets */
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .preset-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 0.72rem;
+            padding: 0.4rem 0.85rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent-dim);
+            background: var(--surface2);
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .panel-header:hover { background: rgba(126,200,126,0.05); }
+
+        .panel-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .panel-toggle {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            transition: transform 0.2s;
+        }
+
+        .panel-toggle.collapsed { transform: rotate(-90deg); }
+
+        .panel-body {
+            padding: 1rem;
+        }
+
+        .panel-body.hidden { display: none; }
+
+        /* Form grid */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .form-group.full { grid-column: 1 / -1; }
+
+        label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.78rem;
+            padding: 0.45rem 0.6rem;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        /* Checkboxes */
+        .check-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text);
+        }
+
+        .check-item input[type="checkbox"] {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .check-item input[type="checkbox"]:checked {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+        }
+
+        .check-item input[type="checkbox"]:checked::after {
+            content: '\2713';
+            position: absolute;
+            top: -1px;
+            left: 2px;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        /* Entry blocks */
+        .entry {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            overflow: hidden;
+        }
+
+        .entry-header {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            gap: 0.5rem;
+        }
+
+        .entry-header .entry-title {
+            flex: 1;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .entry-header .entry-title:hover { color: var(--accent); }
+
+        .entry-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .entry-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .entry-btn.remove:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: var(--danger-dim);
+        }
+
+        .entry-body {
+            padding: 1rem;
+        }
+
+        .entry-body.hidden { display: none; }
+
+        /* Add button */
+        .add-btn {
+            display: block;
+            width: 100%;
+            padding: 0.7rem;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 0.78rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 1.5rem;
+        }
+
+        .add-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--surface2);
+        }
+
+        /* Reference */
+        .ref-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .ref-panel h3 {
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+
+        .ref-panel code {
+            display: block;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            padding: 0.2rem 0;
+            line-height: 1.5;
+        }
+
+        .ref-panel code span { color: var(--accent); }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            header h1 { font-size: 1.2rem; }
+            .form-row, .form-row.three { grid-template-columns: 1fr; }
+            .check-grid { grid-template-columns: 1fr; }
+            .presets { gap: 0.35rem; }
+        }
+    </style>
+</head>
+<body>
+    <script src="/assets/shared-nav.js"></script>
+    <div class="container">
+        <header>
+            <h1>logrotate <span>config builder</span></h1>
+            <p>Generate logrotate configuration files with live preview</p>
+        </header>
+
+        <!-- Output -->
+        <div class="output-panel">
+            <div class="output-header">
+                <span>Config Output</span>
+                <div class="btn-row">
+                    <button class="btn" onclick="copyOutput()">Copy</button>
+                    <button class="btn" onclick="downloadOutput()">Download</button>
+                </div>
+            </div>
+            <div id="output"></div>
+        </div>
+
+        <!-- Presets -->
+        <div class="presets">
+            <button class="preset-btn" onclick="loadPreset('nginx')">Nginx Logs</button>
+            <button class="preset-btn" onclick="loadPreset('apache')">Apache Logs</button>
+            <button class="preset-btn" onclick="loadPreset('syslog')">Syslog</button>
+            <button class="preset-btn" onclick="loadPreset('app')">Application Log</button>
+            <button class="preset-btn" onclick="loadPreset('docker')">Docker Logs</button>
+            <button class="preset-btn" onclick="loadPreset('mail')">Mail Logs</button>
+        </div>
+
+        <!-- Global defaults -->
+        <div class="panel" id="globals-panel">
+            <div class="panel-header" onclick="togglePanel('globals')">
+                <span class="panel-title">Global Defaults</span>
+                <span class="panel-toggle" id="globals-toggle">&#9660;</span>
+            </div>
+            <div class="panel-body" id="globals-body">
+                <div class="form-row three">
+                    <div class="form-group">
+                        <label>Rotation Frequency</label>
+                        <select id="g-frequency">
+                            <option value="">-- not set --</option>
+                            <option value="daily">daily</option>
+                            <option value="weekly" selected>weekly</option>
+                            <option value="monthly">monthly</option>
+                            <option value="yearly">yearly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Rotate (keep N)</label>
+                        <input type="number" id="g-rotate" value="4" min="0" max="999">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Size</label>
+                        <input type="text" id="g-maxsize" placeholder="e.g. 100M">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Min Size</label>
+                        <input type="text" id="g-minsize" placeholder="e.g. 10M">
+                    </div>
+                    <div class="form-group">
+                        <label>Date Extension Format</label>
+                        <input type="text" id="g-dateformat" placeholder="e.g. -%Y%m%d">
+                    </div>
+                </div>
+                <label style="margin-bottom: 0.4rem; display: block;">Options</label>
+                <div class="check-grid">
+                    <label class="check-item"><input type="checkbox" id="g-compress" checked> compress</label>
+                    <label class="check-item"><input type="checkbox" id="g-delaycompress"> delaycompress</label>
+                    <label class="check-item"><input type="checkbox" id="g-missingok" checked> missingok</label>
+                    <label class="check-item"><input type="checkbox" id="g-notifempty" checked> notifempty</label>
+                    <label class="check-item"><input type="checkbox" id="g-copytruncate"> copytruncate</label>
+                    <label class="check-item"><input type="checkbox" id="g-create" checked> create</label>
+                    <label class="check-item"><input type="checkbox" id="g-dateext"> dateext</label>
+                    <label class="check-item"><input type="checkbox" id="g-sharedscripts"> sharedscripts</label>
+                    <label class="check-item"><input type="checkbox" id="g-su"> su (root root)</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entries -->
+        <div id="entries"></div>
+        <button class="add-btn" onclick="addEntry()">+ Add Log Entry</button>
+
+        <!-- Reference -->
+        <div class="ref-panel">
+            <h3>Quick Reference</h3>
+            <code><span>sudo logrotate -f /etc/logrotate.d/myapp</span>  # force rotation</code>
+            <code><span>sudo logrotate -d /etc/logrotate.d/myapp</span>  # dry run / debug</code>
+            <code><span>cat /var/lib/logrotate/status</span>             # check rotation state</code>
+            <code><span>sudo logrotate /etc/logrotate.conf</span>        # run all configs</code>
+        </div>
+    </div>
+
+    <script>
+    let entries = [];
+    let entryId = 0;
+
+    const presets = {
+        nginx: {
+            path: '/var/log/nginx/*.log',
+            frequency: 'daily',
+            rotate: 14,
+            options: { compress: true, delaycompress: true, missingok: true, notifempty: true, sharedscripts: true, create: true },
+            createMode: '0640 www-data adm',
+            postrotate: '    [ ! -f /var/run/nginx.pid ] || kill -USR1 `cat /var/run/nginx.pid`'
+        },
+        apache: {
+            path: '/var/log/apache2/*.log',
+            frequency: 'daily',
+            rotate: 14,
+            options: { compress: true, delaycompress: true, missingok: true, notifempty: true, sharedscripts: true, create: true },
+            createMode: '0640 root adm',
+            postrotate: '    /etc/init.d/apache2 reload > /dev/null 2>&1 || true'
+        },
+        syslog: {
+            path: '/var/log/syslog',
+            frequency: 'daily',
+            rotate: 7,
+            options: { compress: true, delaycompress: true, missingok: true, notifempty: true },
+            postrotate: '    /usr/lib/rsyslog/rsyslog-rotate'
+        },
+        app: {
+            path: '/var/log/myapp/*.log',
+            frequency: 'daily',
+            rotate: 30,
+            maxsize: '100M',
+            options: { compress: true, missingok: true, notifempty: true, copytruncate: true, dateext: true },
+            dateformat: '-%Y%m%d'
+        },
+        docker: {
+            path: '/var/lib/docker/containers/*/*.log',
+            frequency: 'daily',
+            rotate: 7,
+            maxsize: '50M',
+            options: { compress: true, missingok: true, notifempty: true, copytruncate: true },
+        },
+        mail: {
+            path: '/var/log/mail.log\n/var/log/mail.err\n/var/log/mail.warn',
+            frequency: 'daily',
+            rotate: 10,
+            options: { compress: true, delaycompress: true, missingok: true, notifempty: true, sharedscripts: true },
+            postrotate: '    /etc/init.d/rsyslog rotate > /dev/null 2>&1 || true'
+        }
+    };
+
+    function addEntry(preset) {
+        const id = entryId++;
+        const e = {
+            id,
+            path: preset?.path || '/var/log/myapp/*.log',
+            frequency: preset?.frequency || '',
+            rotate: preset?.rotate ?? '',
+            maxsize: preset?.maxsize || '',
+            minsize: preset?.minsize || '',
+            options: {
+                compress: false, delaycompress: false, missingok: false,
+                notifempty: false, copytruncate: false, create: false,
+                dateext: false, sharedscripts: false, su: false
+            },
+            createMode: preset?.createMode || '',
+            dateformat: preset?.dateformat || '',
+            prerotate: preset?.prerotate || '',
+            postrotate: preset?.postrotate || '',
+            firstaction: preset?.firstaction || '',
+            lastaction: preset?.lastaction || '',
+            collapsed: false
+        };
+        if (preset?.options) {
+            for (const k in preset.options) e.options[k] = preset.options[k];
+        }
+        entries.push(e);
+        renderEntries();
+        render();
+    }
+
+    function removeEntry(id) {
+        entries = entries.filter(e => e.id !== id);
+        renderEntries();
+        render();
+    }
+
+    function moveEntry(id, dir) {
+        const idx = entries.findIndex(e => e.id === id);
+        const newIdx = idx + dir;
+        if (newIdx < 0 || newIdx >= entries.length) return;
+        [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
+        renderEntries();
+        render();
+    }
+
+    function toggleEntry(id) {
+        const e = entries.find(x => x.id === id);
+        if (e) {
+            e.collapsed = !e.collapsed;
+            const body = document.getElementById(`entry-body-${id}`);
+            const toggle = document.getElementById(`entry-toggle-${id}`);
+            if (body) body.classList.toggle('hidden', e.collapsed);
+            if (toggle) toggle.textContent = e.collapsed ? '\u25B6' : '\u25BC';
+        }
+    }
+
+    function renderEntries() {
+        const container = document.getElementById('entries');
+        container.innerHTML = entries.map(e => `
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title" onclick="toggleEntry(${e.id})">
+                        <span id="entry-toggle-${e.id}">${e.collapsed ? '\u25B6' : '\u25BC'}</span>
+                        ${escHtml(e.path.split('\n')[0] || 'New Entry')}
+                    </span>
+                    <button class="entry-btn" onclick="moveEntry(${e.id},-1)" title="Move up">\u2191</button>
+                    <button class="entry-btn" onclick="moveEntry(${e.id},1)" title="Move down">\u2193</button>
+                    <button class="entry-btn remove" onclick="removeEntry(${e.id})" title="Remove">\u2715</button>
+                </div>
+                <div class="entry-body ${e.collapsed ? 'hidden' : ''}" id="entry-body-${e.id}">
+                    <div class="form-group full" style="margin-bottom:0.8rem">
+                        <label>Log Path(s) — one per line, globs supported</label>
+                        <textarea data-id="${e.id}" data-field="path" oninput="updateEntry(this)">${escHtml(e.path)}</textarea>
+                    </div>
+                    <div class="form-row three">
+                        <div class="form-group">
+                            <label>Frequency</label>
+                            <select data-id="${e.id}" data-field="frequency" onchange="updateEntry(this)">
+                                <option value="">-- inherit --</option>
+                                <option value="daily" ${e.frequency==='daily'?'selected':''}>daily</option>
+                                <option value="weekly" ${e.frequency==='weekly'?'selected':''}>weekly</option>
+                                <option value="monthly" ${e.frequency==='monthly'?'selected':''}>monthly</option>
+                                <option value="yearly" ${e.frequency==='yearly'?'selected':''}>yearly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Rotate (keep N)</label>
+                            <input type="number" data-id="${e.id}" data-field="rotate" value="${e.rotate}" min="0" max="999" oninput="updateEntry(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Size</label>
+                            <input type="text" data-id="${e.id}" data-field="maxsize" value="${escHtml(e.maxsize)}" placeholder="e.g. 100M" oninput="updateEntry(this)">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Min Size</label>
+                            <input type="text" data-id="${e.id}" data-field="minsize" value="${escHtml(e.minsize)}" placeholder="e.g. 10M" oninput="updateEntry(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>Create Mode (e.g. 0640 user group)</label>
+                            <input type="text" data-id="${e.id}" data-field="createMode" value="${escHtml(e.createMode)}" placeholder="0640 www-data adm" oninput="updateEntry(this)">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0.8rem">
+                        <label>Date Extension Format</label>
+                        <input type="text" data-id="${e.id}" data-field="dateformat" value="${escHtml(e.dateformat)}" placeholder="e.g. -%Y%m%d" oninput="updateEntry(this)">
+                    </div>
+                    <label style="margin-bottom:0.4rem;display:block">Options</label>
+                    <div class="check-grid" style="margin-bottom:0.8rem">
+                        ${['compress','delaycompress','missingok','notifempty','copytruncate','create','dateext','sharedscripts','su'].map(o =>
+                            `<label class="check-item"><input type="checkbox" data-id="${e.id}" data-opt="${o}" ${e.options[o]?'checked':''} onchange="updateEntryOpt(this)"> ${o}</label>`
+                        ).join('')}
+                    </div>
+                    <div class="form-group" style="margin-bottom:0.8rem">
+                        <label>postrotate script</label>
+                        <textarea data-id="${e.id}" data-field="postrotate" oninput="updateEntry(this)" placeholder="    systemctl reload myapp">${escHtml(e.postrotate)}</textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0.8rem">
+                        <label>prerotate script</label>
+                        <textarea data-id="${e.id}" data-field="prerotate" oninput="updateEntry(this)" placeholder="    echo 'rotating logs...'">${escHtml(e.prerotate)}</textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>firstaction script</label>
+                            <textarea data-id="${e.id}" data-field="firstaction" oninput="updateEntry(this)">${escHtml(e.firstaction)}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>lastaction script</label>
+                            <textarea data-id="${e.id}" data-field="lastaction" oninput="updateEntry(this)">${escHtml(e.lastaction)}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateEntry(el) {
+        const id = parseInt(el.dataset.id);
+        const field = el.dataset.field;
+        const e = entries.find(x => x.id === id);
+        if (!e) return;
+        e[field] = el.value;
+        // Update title
+        const titleEl = el.closest('.entry')?.querySelector('.entry-title');
+        if (titleEl && field === 'path') {
+            const toggle = document.getElementById(`entry-toggle-${id}`);
+            titleEl.innerHTML = `<span id="entry-toggle-${id}">${toggle?.textContent || '\u25BC'}</span> ${escHtml(el.value.split('\n')[0] || 'New Entry')}`;
+        }
+        render();
+    }
+
+    function updateEntryOpt(el) {
+        const id = parseInt(el.dataset.id);
+        const opt = el.dataset.opt;
+        const e = entries.find(x => x.id === id);
+        if (!e) return;
+        e.options[opt] = el.checked;
+        render();
+    }
+
+    function togglePanel(name) {
+        const body = document.getElementById(`${name}-body`);
+        const toggle = document.getElementById(`${name}-toggle`);
+        body.classList.toggle('hidden');
+        toggle.classList.toggle('collapsed');
+    }
+
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function render() {
+        const lines = [];
+
+        // Global defaults
+        const gFreq = document.getElementById('g-frequency').value;
+        const gRotate = document.getElementById('g-rotate').value;
+        const gMaxsize = document.getElementById('g-maxsize').value.trim();
+        const gMinsize = document.getElementById('g-minsize').value.trim();
+        const gDateformat = document.getElementById('g-dateformat').value.trim();
+        const gOpts = {};
+        ['compress','delaycompress','missingok','notifempty','copytruncate','create','dateext','sharedscripts','su'].forEach(o => {
+            gOpts[o] = document.getElementById(`g-${o}`).checked;
+        });
+
+        const hasGlobals = gFreq || gRotate || gMaxsize || gMinsize || gDateformat ||
+            Object.values(gOpts).some(v => v);
+
+        if (hasGlobals) {
+            lines.push(span('# Global defaults', 'comment'));
+            if (gFreq) lines.push(span(gFreq, 'directive'));
+            if (gRotate) lines.push(span('rotate', 'directive') + ' ' + span(gRotate, 'value'));
+            if (gMaxsize) lines.push(span('maxsize', 'directive') + ' ' + span(gMaxsize, 'value'));
+            if (gMinsize) lines.push(span('minsize', 'directive') + ' ' + span(gMinsize, 'value'));
+            for (const o of ['compress','delaycompress','missingok','notifempty','copytruncate','create','dateext','sharedscripts']) {
+                if (gOpts[o]) lines.push(span(o, 'directive'));
+            }
+            if (gOpts.su) lines.push(span('su', 'directive') + ' ' + span('root root', 'value'));
+            if (gDateformat) lines.push(span('dateformat', 'directive') + ' ' + span(gDateformat, 'value'));
+            lines.push('');
+        }
+
+        // Entry blocks
+        entries.forEach((e, i) => {
+            const paths = e.path.split('\n').map(p => p.trim()).filter(Boolean);
+            if (!paths.length) return;
+
+            if (i > 0 || hasGlobals) lines.push('');
+
+            // Path line(s)
+            if (paths.length === 1) {
+                lines.push(span(paths[0], 'path') + ' ' + span('{', 'brace'));
+            } else {
+                paths.forEach(p => lines.push(span(p, 'path')));
+                lines.push(span('{', 'brace'));
+            }
+
+            const indent = '    ';
+            if (e.frequency) lines.push(indent + span(e.frequency, 'directive'));
+            if (e.rotate !== '') lines.push(indent + span('rotate', 'directive') + ' ' + span(e.rotate, 'value'));
+            if (e.maxsize) lines.push(indent + span('maxsize', 'directive') + ' ' + span(e.maxsize, 'value'));
+            if (e.minsize) lines.push(indent + span('minsize', 'directive') + ' ' + span(e.minsize, 'value'));
+
+            for (const o of ['compress','delaycompress','missingok','notifempty','copytruncate','dateext','sharedscripts']) {
+                if (e.options[o]) lines.push(indent + span(o, 'directive'));
+            }
+            if (e.options.create) {
+                if (e.createMode) {
+                    lines.push(indent + span('create', 'directive') + ' ' + span(e.createMode, 'value'));
+                } else {
+                    lines.push(indent + span('create', 'directive'));
+                }
+            }
+            if (e.options.su) lines.push(indent + span('su', 'directive') + ' ' + span('root root', 'value'));
+            if (e.dateformat) lines.push(indent + span('dateformat', 'directive') + ' ' + span(e.dateformat, 'value'));
+
+            // Scripts
+            for (const [name, val] of [['prerotate', e.prerotate], ['postrotate', e.postrotate], ['firstaction', e.firstaction], ['lastaction', e.lastaction]]) {
+                if (val.trim()) {
+                    lines.push(indent + span(name, 'directive'));
+                    val.split('\n').forEach(l => lines.push(l));
+                    lines.push(indent + span('endscript', 'directive'));
+                }
+            }
+
+            lines.push(span('}', 'brace'));
+        });
+
+        if (lines.length === 0) {
+            document.getElementById('output').innerHTML = '<span class="comment"># Add a log entry to get started</span>';
+        } else {
+            document.getElementById('output').innerHTML = lines.join('\n');
+        }
+    }
+
+    function span(text, cls) {
+        return `<span class="${cls}">${escHtml(text)}</span>`;
+    }
+
+    function getPlainOutput() {
+        const el = document.getElementById('output');
+        return el.textContent || el.innerText;
+    }
+
+    function copyOutput() {
+        navigator.clipboard.writeText(getPlainOutput());
+        const btn = document.querySelector('.output-header .btn');
+        const old = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = old, 1500);
+    }
+
+    function downloadOutput() {
+        const blob = new Blob([getPlainOutput()], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'logrotate.conf';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function loadPreset(name) {
+        const p = presets[name];
+        if (!p) return;
+        addEntry(p);
+    }
+
+    // Attach global listeners
+    document.querySelectorAll('#globals-body input, #globals-body select').forEach(el => {
+        el.addEventListener('change', render);
+        el.addEventListener('input', render);
+    });
+
+    // Initial entry
+    addEntry(presets.app);
+    </script>
+</body>
+</html>

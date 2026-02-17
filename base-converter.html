@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base Converter with Working</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #111118;
+            --surface2: #1a1a24;
+            --border: #2a2a3a;
+            --accent: #f59e0b;
+            --accent-dim: #78500d;
+            --accent2: #3b82f6;
+            --accent3: #10b981;
+            --text: #d4d4dc;
+            --text-dim: #6b6b80;
+            --text-bright: #f0f0f8;
+            --bit-on: #f59e0b;
+            --bit-off: #2a2a3a;
+            --carry: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 0% 80%, rgba(59,130,246,0.03) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        header h1 span { color: var(--text-dim); font-weight: 400; }
+        header p { color: var(--text-dim); font-size: 0.78rem; margin-top: 0.4rem; }
+
+        /* Input panel */
+        .input-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .input-group label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .input-group input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .input-group input:focus { border-color: var(--accent); }
+
+        .input-group input.error { border-color: var(--carry); }
+
+        .base-select {
+            display: flex;
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .base-opt {
+            background: var(--bg);
+            border: none;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.6rem 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-right: 1px solid var(--border);
+        }
+
+        .base-opt:last-child { border-right: none; }
+        .base-opt:hover { color: var(--text); background: var(--surface2); }
+        .base-opt.active { background: var(--accent-dim); color: var(--accent); }
+
+        .error-msg {
+            font-size: 0.7rem;
+            color: var(--carry);
+            margin-top: 0.3rem;
+            min-height: 1em;
+        }
+
+        /* Results */
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: border-color 0.15s;
+        }
+
+        .result-card.active { border-color: var(--accent); }
+
+        .result-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .result-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            word-break: break-all;
+        }
+
+        .result-value.bin { color: var(--accent); }
+        .result-value.dec { color: var(--accent2); }
+        .result-value.hex { color: var(--accent3); }
+
+        .result-prefix {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        /* Bit visualizer */
+        .bit-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.8rem;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .panel-header span {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .panel-body { padding: 1rem; }
+        .panel-body.hidden { display: none; }
+
+        .bit-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .bit-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .bit-pos {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            color: var(--text-dim);
+        }
+
+        .bit-cell {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.1s;
+            border: 1px solid var(--border);
+        }
+
+        .bit-cell.on {
+            background: rgba(245,158,11,0.15);
+            color: var(--bit-on);
+            border-color: var(--accent-dim);
+        }
+
+        .bit-cell.off {
+            background: var(--bg);
+            color: var(--text-dim);
+        }
+
+        .bit-cell:hover { border-color: var(--accent); transform: scale(1.05); }
+
+        .bit-power {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.5rem;
+            color: var(--text-dim);
+        }
+
+        .bit-separator {
+            width: 8px;
+            align-self: center;
+        }
+
+        .bit-info {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+
+        .bit-info strong { color: var(--accent); }
+
+        /* Working panel */
+        .working-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .working-body {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            line-height: 1.8;
+        }
+
+        .step {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .step:last-child { border-bottom: none; }
+
+        .step-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.68rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+
+        .step-content {
+            color: var(--text);
+        }
+
+        .step-content .num { color: var(--accent2); font-weight: 600; }
+        .step-content .op { color: var(--text-dim); }
+        .step-content .result { color: var(--accent3); font-weight: 600; }
+        .step-content .remainder { color: var(--accent); font-weight: 600; }
+        .step-content .highlight { color: var(--accent); font-weight: 600; }
+        .step-content .dim { color: var(--text-dim); }
+
+        .division-table {
+            display: inline-block;
+            margin: 0.4rem 0;
+        }
+
+        .division-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.15rem 0;
+        }
+
+        .division-row .quotient { color: var(--accent2); min-width: 4ch; text-align: right; }
+        .division-row .divider { color: var(--text-dim); }
+        .division-row .divisor { color: var(--text-dim); }
+        .division-row .equals { color: var(--text-dim); }
+        .division-row .quot-result { color: var(--accent3); min-width: 4ch; }
+        .division-row .rem-label { color: var(--text-dim); font-size: 0.65rem; }
+        .division-row .rem-val { color: var(--accent); font-weight: 700; }
+
+        .arrow { color: var(--accent); }
+
+        .power-breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            align-items: center;
+        }
+
+        .power-term {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.15rem 0.4rem;
+            background: rgba(245,158,11,0.08);
+            border-radius: 3px;
+        }
+
+        .power-term .coeff { color: var(--accent); font-weight: 600; }
+        .power-term .times { color: var(--text-dim); }
+        .power-term .base-val { color: var(--accent2); }
+        .power-term sup { font-size: 0.55rem; color: var(--accent2); }
+        .power-term .eq { color: var(--text-dim); }
+        .power-term .val { color: var(--accent3); }
+        .plus-sign { color: var(--text-dim); }
+
+        .final-sum {
+            margin-top: 0.4rem;
+            padding: 0.4rem 0.6rem;
+            background: rgba(16,185,129,0.08);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .final-sum .eq { color: var(--text-dim); }
+        .final-sum .val { color: var(--accent3); font-weight: 700; font-size: 0.9rem; }
+
+        /* Tab selectors for working */
+        .working-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+        }
+
+        .work-tab {
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 0.68rem;
+            padding: 0.35rem 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .work-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .work-tab:hover { color: var(--text); }
+
+        .work-content { display: none; }
+        .work-content.active { display: block; }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            header h1 { font-size: 1.2rem; }
+            .results { grid-template-columns: 1fr; }
+            .input-row { flex-direction: column; }
+            .input-group { min-width: unset; }
+            .bit-cell { width: 26px; height: 26px; font-size: 0.75rem; }
+            .result-value { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <script src="/assets/shared-nav.js"></script>
+    <div class="container">
+        <header>
+            <h1>Base Converter <span>with Working</span></h1>
+            <p>Binary, Decimal, Hexadecimal &mdash; see every division and multiplication step</p>
+        </header>
+
+        <!-- Input -->
+        <div class="input-panel">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Value</label>
+                    <input type="text" id="input-value" placeholder="Enter a number..." autocomplete="off" spellcheck="false">
+                    <div class="error-msg" id="error-msg"></div>
+                </div>
+                <div class="input-group" style="flex:0;min-width:auto">
+                    <label>Input Base</label>
+                    <div class="base-select">
+                        <button class="base-opt" data-base="2" onclick="setBase(2)">BIN</button>
+                        <button class="base-opt active" data-base="10" onclick="setBase(10)">DEC</button>
+                        <button class="base-opt" data-base="16" onclick="setBase(16)">HEX</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results">
+            <div class="result-card" id="card-bin">
+                <div class="result-label">Binary (Base 2)</div>
+                <div class="result-value bin" id="result-bin"><span class="result-prefix">0b</span>0</div>
+            </div>
+            <div class="result-card" id="card-dec">
+                <div class="result-label">Decimal (Base 10)</div>
+                <div class="result-value dec" id="result-dec">0</div>
+            </div>
+            <div class="result-card" id="card-hex">
+                <div class="result-label">Hexadecimal (Base 16)</div>
+                <div class="result-value hex" id="result-hex"><span class="result-prefix">0x</span>0</div>
+            </div>
+        </div>
+
+        <!-- Bit visualizer -->
+        <div class="bit-panel">
+            <div class="panel-header" onclick="togglePanel('bits')">
+                <span>8-Bit Visualiser</span>
+                <span id="bits-toggle">&#9660;</span>
+            </div>
+            <div class="panel-body" id="bits-body">
+                <div class="bit-grid" id="bit-grid"></div>
+                <div class="bit-info" id="bit-info">Click bits to toggle. Value: <strong>0</strong></div>
+            </div>
+        </div>
+
+        <!-- Working -->
+        <div class="working-panel">
+            <div class="panel-header">
+                <div class="working-tabs">
+                    <button class="work-tab active" data-tab="to-bin" onclick="switchWorkTab('to-bin')">To Binary</button>
+                    <button class="work-tab" data-tab="to-dec" onclick="switchWorkTab('to-dec')">To Decimal</button>
+                    <button class="work-tab" data-tab="to-hex" onclick="switchWorkTab('to-hex')">To Hex</button>
+                </div>
+                <span style="font-size:0.7rem;color:var(--text-dim);font-weight:600;letter-spacing:0.8px">WORKING</span>
+            </div>
+            <div class="panel-body">
+                <div class="work-content active" id="work-to-bin"></div>
+                <div class="work-content" id="work-to-dec"></div>
+                <div class="work-content" id="work-to-hex"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let currentBase = 10;
+    let currentDecimal = 0;
+    let bitWidth = 8;
+
+    const inputEl = document.getElementById('input-value');
+    const errorEl = document.getElementById('error-msg');
+
+    inputEl.addEventListener('input', convert);
+
+    function setBase(base) {
+        currentBase = base;
+        document.querySelectorAll('.base-opt').forEach(b => b.classList.toggle('active', parseInt(b.dataset.base) === base));
+        // Update placeholder
+        if (base === 2) inputEl.placeholder = 'e.g. 10110011';
+        else if (base === 10) inputEl.placeholder = 'e.g. 179';
+        else inputEl.placeholder = 'e.g. B3';
+        convert();
+    }
+
+    function convert() {
+        const raw = inputEl.value.trim();
+        errorEl.textContent = '';
+        inputEl.classList.remove('error');
+
+        if (!raw) {
+            currentDecimal = 0;
+            updateResults();
+            return;
+        }
+
+        // Clean input
+        let cleaned = raw.toUpperCase()
+            .replace(/^0B/, '').replace(/^0X/, '').replace(/^#/, '')
+            .replace(/[\s_]/g, '');
+
+        // Validate
+        if (currentBase === 2 && !/^[01]+$/.test(cleaned)) {
+            errorEl.textContent = 'Binary: only 0 and 1 allowed';
+            inputEl.classList.add('error');
+            return;
+        }
+        if (currentBase === 10 && !/^\d+$/.test(cleaned)) {
+            errorEl.textContent = 'Decimal: only digits 0-9 allowed';
+            inputEl.classList.add('error');
+            return;
+        }
+        if (currentBase === 16 && !/^[0-9A-F]+$/.test(cleaned)) {
+            errorEl.textContent = 'Hex: only 0-9 and A-F allowed';
+            inputEl.classList.add('error');
+            return;
+        }
+
+        currentDecimal = parseInt(cleaned, currentBase);
+
+        if (isNaN(currentDecimal) || currentDecimal < 0) {
+            errorEl.textContent = 'Invalid number';
+            inputEl.classList.add('error');
+            return;
+        }
+
+        if (currentDecimal > 4294967295) {
+            errorEl.textContent = 'Max value: 4,294,967,295 (32-bit unsigned)';
+            inputEl.classList.add('error');
+            return;
+        }
+
+        updateResults();
+        generateWorking(cleaned);
+    }
+
+    function updateResults() {
+        const bin = currentDecimal.toString(2);
+        const dec = currentDecimal.toString(10);
+        const hex = currentDecimal.toString(16).toUpperCase();
+
+        document.getElementById('result-bin').innerHTML = `<span class="result-prefix">0b</span>${formatBin(bin)}`;
+        document.getElementById('result-dec').textContent = formatDec(dec);
+        document.getElementById('result-hex').innerHTML = `<span class="result-prefix">0x</span>${hex}`;
+
+        // Highlight active card
+        document.getElementById('card-bin').classList.toggle('active', currentBase === 2);
+        document.getElementById('card-dec').classList.toggle('active', currentBase === 10);
+        document.getElementById('card-hex').classList.toggle('active', currentBase === 16);
+
+        updateBitVisualiser();
+    }
+
+    function formatBin(bin) {
+        // Group in 4s
+        const padded = bin.padStart(Math.ceil(bin.length / 4) * 4, '0');
+        return padded.match(/.{4}/g).join(' ');
+    }
+
+    function formatDec(dec) {
+        return parseInt(dec).toLocaleString();
+    }
+
+    // Bit visualiser
+    function updateBitVisualiser() {
+        // Auto-size: 8, 16, or 32 bits
+        if (currentDecimal > 65535) bitWidth = 32;
+        else if (currentDecimal > 255) bitWidth = 16;
+        else bitWidth = 8;
+
+        const grid = document.getElementById('bit-grid');
+        const bin = currentDecimal.toString(2).padStart(bitWidth, '0');
+        let html = '';
+
+        for (let i = 0; i < bitWidth; i++) {
+            if (i > 0 && i % 4 === 0) {
+                html += '<div class="bit-separator"></div>';
+            }
+            const bit = bin[i];
+            const pos = bitWidth - 1 - i;
+            const power = Math.pow(2, pos);
+            html += `<div class="bit-group">
+                <div class="bit-pos">${pos}</div>
+                <div class="bit-cell ${bit === '1' ? 'on' : 'off'}" data-pos="${pos}" onclick="toggleBit(${pos})">${bit}</div>
+                <div class="bit-power">${pos < 16 ? Math.pow(2, pos) : '2<sup>' + pos + '</sup>'}</div>
+            </div>`;
+        }
+
+        grid.innerHTML = html;
+        document.getElementById('bit-info').innerHTML = `Click bits to toggle. Value: <strong>${currentDecimal}</strong> (${bitWidth}-bit)`;
+    }
+
+    function toggleBit(pos) {
+        currentDecimal ^= (1 << pos);
+        inputEl.value = currentDecimal.toString(currentBase === 2 ? 2 : currentBase === 16 ? 16 : 10).toUpperCase();
+        convert();
+    }
+
+    function togglePanel(name) {
+        const body = document.getElementById(`${name}-body`);
+        const toggle = document.getElementById(`${name}-toggle`);
+        body.classList.toggle('hidden');
+        toggle.textContent = body.classList.contains('hidden') ? '\u25B6' : '\u25BC';
+    }
+
+    function switchWorkTab(tab) {
+        document.querySelectorAll('.work-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.querySelectorAll('.work-content').forEach(c => c.classList.toggle('active', c.id === `work-${tab}`));
+    }
+
+    // Generate working
+    function generateWorking(inputStr) {
+        generateToBin();
+        generateToDec();
+        generateToHex();
+    }
+
+    function generateToBin() {
+        const el = document.getElementById('work-to-bin');
+        if (currentDecimal === 0) {
+            el.innerHTML = '<div class="step"><div class="step-content"><span class="dim">0 in binary is</span> <span class="result">0</span></div></div>';
+            return;
+        }
+
+        let html = '';
+
+        if (currentBase === 2) {
+            html += '<div class="step"><div class="step-content"><span class="dim">Already in binary:</span> <span class="highlight">' + currentDecimal.toString(2) + '</span></div></div>';
+        } else if (currentBase === 16) {
+            // Hex to binary: each hex digit = 4 bits
+            const hex = currentDecimal.toString(16).toUpperCase();
+            html += '<div class="step"><div class="step-label">Method: Each hex digit &rarr; 4 binary digits</div><div class="step-content">';
+            const hexDigits = hex.split('');
+            for (const d of hexDigits) {
+                const val = parseInt(d, 16);
+                const bits = val.toString(2).padStart(4, '0');
+                html += `<div style="margin:0.2rem 0"><span class="num">${d}</span> <span class="op">&rarr;</span> <span class="result">${bits}</span> <span class="dim">(${d} = ${val} in decimal)</span></div>`;
+            }
+            html += '</div></div>';
+            html += `<div class="step"><div class="step-label">Result</div><div class="step-content"><span class="highlight">${formatBin(currentDecimal.toString(2))}</span></div></div>`;
+        } else {
+            // Decimal to binary: repeated division by 2
+            html += '<div class="step"><div class="step-label">Method: Repeated division by 2</div>';
+            html += '<div class="step-content">Divide by 2, record the remainder. Read remainders bottom-to-top.</div></div>';
+            html += '<div class="step"><div class="step-content"><div class="division-table">';
+
+            let n = currentDecimal;
+            const remainders = [];
+            while (n > 0) {
+                const q = Math.floor(n / 2);
+                const r = n % 2;
+                remainders.push(r);
+                html += `<div class="division-row">
+                    <span class="quotient">${n}</span>
+                    <span class="divider">&divide;</span>
+                    <span class="divisor">2</span>
+                    <span class="equals">=</span>
+                    <span class="quot-result">${q}</span>
+                    <span class="rem-label">remainder</span>
+                    <span class="rem-val">${r}</span>
+                </div>`;
+                n = q;
+            }
+
+            html += '</div></div></div>';
+            html += `<div class="step"><div class="step-label">Read remainders bottom &uarr; top</div>`;
+            html += `<div class="step-content"><span class="arrow">&uarr;</span> `;
+            html += remainders.map((r, i) => `<span class="${i === 0 ? 'dim' : ''}" style="color:var(--accent)">${r}</span>`).join(' ');
+            html += ` <span class="op">&rarr;</span> <span class="highlight">${remainders.reverse().join('')}</span>`;
+            html += `</div></div>`;
+            html += `<div class="step"><div class="step-label">Result</div><div class="step-content"><span class="highlight">${formatBin(currentDecimal.toString(2))}</span></div></div>`;
+        }
+
+        el.innerHTML = html;
+    }
+
+    function generateToDec() {
+        const el = document.getElementById('work-to-dec');
+        if (currentDecimal === 0) {
+            el.innerHTML = '<div class="step"><div class="step-content"><span class="dim">0 in decimal is</span> <span class="result">0</span></div></div>';
+            return;
+        }
+
+        let html = '';
+
+        if (currentBase === 10) {
+            html += '<div class="step"><div class="step-content"><span class="dim">Already in decimal:</span> <span class="highlight">' + formatDec(currentDecimal.toString()) + '</span></div></div>';
+        } else {
+            const baseLabel = currentBase === 2 ? 'binary' : 'hex';
+            const digits = currentBase === 2
+                ? currentDecimal.toString(2).split('')
+                : currentDecimal.toString(16).toUpperCase().split('');
+
+            html += `<div class="step"><div class="step-label">Method: Multiply each digit by its place value</div>`;
+            html += `<div class="step-content">Each digit &times; ${currentBase}<sup>position</sup>, then sum all terms.</div></div>`;
+
+            // Show powers
+            html += '<div class="step"><div class="step-label">Positional expansion</div><div class="step-content">';
+            html += '<div class="power-breakdown">';
+
+            const terms = [];
+            for (let i = 0; i < digits.length; i++) {
+                const pos = digits.length - 1 - i;
+                const digitVal = parseInt(digits[i], currentBase);
+                const powerVal = Math.pow(currentBase, pos);
+                const termVal = digitVal * powerVal;
+                terms.push(termVal);
+
+                if (i > 0) html += '<span class="plus-sign">+</span>';
+                html += `<span class="power-term">
+                    <span class="coeff">${digits[i]}</span>
+                    <span class="times">&times;</span>
+                    <span class="base-val">${currentBase}<sup>${pos}</sup></span>
+                </span>`;
+            }
+            html += '</div></div></div>';
+
+            // Show evaluation
+            html += '<div class="step"><div class="step-label">Evaluate each term</div><div class="step-content">';
+            html += '<div class="power-breakdown">';
+            for (let i = 0; i < digits.length; i++) {
+                const pos = digits.length - 1 - i;
+                const digitVal = parseInt(digits[i], currentBase);
+                const powerVal = Math.pow(currentBase, pos);
+                const termVal = digitVal * powerVal;
+
+                if (i > 0) html += '<span class="plus-sign">+</span>';
+                html += `<span class="power-term">
+                    <span class="coeff">${digits[i]}</span>
+                    <span class="times">&times;</span>
+                    <span class="base-val">${powerVal}</span>
+                    <span class="eq">=</span>
+                    <span class="val">${termVal}</span>
+                </span>`;
+            }
+            html += '</div></div></div>';
+
+            // Sum
+            html += '<div class="step"><div class="step-label">Sum all terms</div><div class="step-content">';
+            html += `<span class="dim">${terms.join(' + ')}</span>`;
+            html += `<div class="final-sum"><span class="eq">=</span> <span class="val">${formatDec(currentDecimal.toString())}</span></div>`;
+            html += '</div></div>';
+        }
+
+        el.innerHTML = html;
+    }
+
+    function generateToHex() {
+        const el = document.getElementById('work-to-hex');
+        if (currentDecimal === 0) {
+            el.innerHTML = '<div class="step"><div class="step-content"><span class="dim">0 in hexadecimal is</span> <span class="result">0</span></div></div>';
+            return;
+        }
+
+        let html = '';
+
+        if (currentBase === 16) {
+            html += '<div class="step"><div class="step-content"><span class="dim">Already in hexadecimal:</span> <span class="highlight">' + currentDecimal.toString(16).toUpperCase() + '</span></div></div>';
+        } else if (currentBase === 2) {
+            // Binary to hex: group 4 bits
+            const bin = currentDecimal.toString(2);
+            const padded = bin.padStart(Math.ceil(bin.length / 4) * 4, '0');
+            const groups = padded.match(/.{4}/g);
+
+            html += '<div class="step"><div class="step-label">Method: Group into 4-bit nibbles</div>';
+            html += '<div class="step-content">';
+            for (const g of groups) {
+                const val = parseInt(g, 2);
+                const hexD = val.toString(16).toUpperCase();
+                html += `<div style="margin:0.2rem 0"><span class="num">${g}</span> <span class="op">&rarr;</span> <span class="result">${hexD}</span> <span class="dim">(${g} = ${val} in decimal)</span></div>`;
+            }
+            html += '</div></div>';
+            html += `<div class="step"><div class="step-label">Result</div><div class="step-content"><span class="highlight">${currentDecimal.toString(16).toUpperCase()}</span></div></div>`;
+        } else {
+            // Decimal to hex: repeated division by 16
+            html += '<div class="step"><div class="step-label">Method: Repeated division by 16</div>';
+            html += '<div class="step-content">Divide by 16, record the remainder as a hex digit. Read remainders bottom-to-top.</div></div>';
+            html += '<div class="step"><div class="step-content"><div class="division-table">';
+
+            let n = currentDecimal;
+            const remainders = [];
+            while (n > 0) {
+                const q = Math.floor(n / 16);
+                const r = n % 16;
+                const hexR = r.toString(16).toUpperCase();
+                remainders.push(hexR);
+                html += `<div class="division-row">
+                    <span class="quotient">${n}</span>
+                    <span class="divider">&divide;</span>
+                    <span class="divisor">16</span>
+                    <span class="equals">=</span>
+                    <span class="quot-result">${q}</span>
+                    <span class="rem-label">remainder</span>
+                    <span class="rem-val">${r}${r >= 10 ? ' (' + hexR + ')' : ''}</span>
+                </div>`;
+                n = q;
+            }
+
+            html += '</div></div></div>';
+            html += `<div class="step"><div class="step-label">Read remainders bottom &uarr; top</div>`;
+            html += `<div class="step-content"><span class="arrow">&uarr;</span> `;
+            html += remainders.map(r => `<span style="color:var(--accent)">${r}</span>`).join(' ');
+            html += ` <span class="op">&rarr;</span> <span class="highlight">${remainders.reverse().join('')}</span>`;
+            html += `</div></div>`;
+            html += `<div class="step"><div class="step-label">Result</div><div class="step-content"><span class="highlight">${currentDecimal.toString(16).toUpperCase()}</span></div></div>`;
+        }
+
+        el.innerHTML = html;
+    }
+
+    // Init
+    updateBitVisualiser();
+    generateWorking('');
+    document.getElementById('work-to-bin').innerHTML = '<div class="step"><div class="step-content"><span class="dim">Enter a number to see the conversion steps</span></div></div>';
+    document.getElementById('work-to-dec').innerHTML = '<div class="step"><div class="step-content"><span class="dim">Enter a number to see the conversion steps</span></div></div>';
+    document.getElementById('work-to-hex').innerHTML = '<div class="step"><div class="step-content"><span class="dim">Enter a number to see the conversion steps</span></div></div>';
+    </script>
+</body>
+</html>

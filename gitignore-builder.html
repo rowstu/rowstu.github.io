@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>.gitignore Builder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #1a1008;
+			--surface: #241a0e;
+			--surface-hover: #2e2114;
+			--border: #3d2e1a;
+			--border-bright: #55412a;
+			--text: #e8dcc8;
+			--text-muted: #9a8468;
+			--accent: #f0883e;
+			--accent-hover: #d67530;
+			--accent-dim: rgba(240,136,62,0.1);
+			--danger: #ef5555;
+			--pattern: #7ee787;
+			--comment: #6a5a44;
+			--negation: #ff7b72;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Red Hat Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image: radial-gradient(ellipse at 30% 0%, rgba(240,136,62,0.04) 0%, transparent 50%);
+		}
+
+		.container { max-width: 960px; margin: 0 auto; }
+		header { margin-bottom: 1.5rem; }
+		h1 { font-size: 1.4rem; font-weight: 700; color: var(--accent); margin-bottom: 0.4rem; }
+		.subtitle { color: var(--text-muted); font-size: 0.78rem; font-weight: 300; }
+
+		.config-display { background: #120c04; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.25rem; overflow: hidden; }
+		.config-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+		.config-bar-left { display: flex; align-items: center; gap: 0.6rem; }
+		.config-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+		.config-bar-title { font-size: 0.7rem; color: var(--text-muted); }
+		.config-bar-actions { display: flex; gap: 0.4rem; }
+		.config-body { padding: 1.25rem; overflow-x: auto; max-height: 400px; overflow-y: auto; }
+		.config-body pre { font-family: inherit; font-size: 0.78rem; line-height: 1.6; white-space: pre; margin: 0; }
+
+		.gi-comment { color: var(--comment); }
+		.gi-pattern { color: var(--pattern); }
+		.gi-negation { color: var(--negation); }
+
+		button { padding: 0.45rem 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: inherit; font-size: 0.72rem; cursor: pointer; transition: all 0.15s; }
+		button:hover { background: var(--surface-hover); border-color: var(--accent); }
+		button.primary { background: var(--accent); border-color: var(--accent); color: #1a1008; font-weight: 600; }
+		button.small { padding: 0.28rem 0.6rem; font-size: 0.65rem; }
+
+		.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+		.panel-header { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+		.panel-title { font-size: 0.72rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+		.panel-body { padding: 1rem; }
+
+		.template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.4rem; }
+		.template-btn {
+			padding: 0.45rem 0.6rem; background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+			color: var(--text-muted); font-family: inherit; font-size: 0.7rem; cursor: pointer; transition: all 0.15s; text-align: left;
+		}
+		.template-btn:hover { border-color: var(--accent); color: var(--text); }
+		.template-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+		.custom-area { width: 100%; min-height: 80px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.75rem; color: var(--text); font-family: inherit; font-size: 0.75rem; resize: vertical; outline: none; }
+		.custom-area:focus { border-color: var(--accent); }
+
+		.section-label { font-size: 0.7rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 500; margin-top: 0.75rem; }
+		.section-label:first-child { margin-top: 0; }
+
+		.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); padding: 0.45rem 1.1rem; border-radius: 4px; font-size: 0.72rem; font-family: inherit; opacity: 0; transition: all 0.3s; z-index: 100; }
+		.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+			.template-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>.gitignore Builder</h1>
+			<p class="subtitle">Pick templates and build a .gitignore file</p>
+		</header>
+
+		<div class="config-display">
+			<div class="config-bar">
+				<div class="config-bar-left"><span class="config-dot"></span><span class="config-bar-title">.gitignore</span></div>
+				<div class="config-bar-actions">
+					<button class="small" onclick="downloadConfig()">Download</button>
+					<button class="small primary" onclick="copyConfig()">Copy</button>
+				</div>
+			</div>
+			<div class="config-body"><pre id="configOutput"></pre></div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Languages & Frameworks</span></div>
+			<div class="panel-body">
+				<div class="template-grid" id="langGrid"></div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Operating Systems</span></div>
+			<div class="panel-body">
+				<div class="template-grid" id="osGrid"></div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Editors & IDEs</span></div>
+			<div class="panel-body">
+				<div class="template-grid" id="ideGrid"></div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Custom Patterns</span></div>
+			<div class="panel-body">
+				<textarea class="custom-area" id="customPatterns" placeholder="Add custom patterns, one per line..." oninput="build()"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		const templates = {
+			// Languages
+			node: { cat:'lang', label:'Node.js', patterns: ['node_modules/', 'npm-debug.log*', 'yarn-debug.log*', 'yarn-error.log*', '.npm', '.yarn/cache', '.yarn/unplugged', '.pnp.*', 'dist/', 'build/', '.env', '.env.local', '.env.*.local', 'coverage/', '.nyc_output/'] },
+			python: { cat:'lang', label:'Python', patterns: ['__pycache__/', '*.py[cod]', '*$py.class', '*.so', '.Python', 'build/', 'develop-eggs/', 'dist/', 'eggs/', '.eggs/', '*.egg-info/', '*.egg', '.venv/', 'venv/', 'ENV/', '.env', 'pip-log.txt', '.mypy_cache/', '.pytest_cache/', '.coverage', 'htmlcov/'] },
+			go: { cat:'lang', label:'Go', patterns: ['*.exe', '*.exe~', '*.dll', '*.so', '*.dylib', '*.test', '*.out', 'vendor/', 'go.work'] },
+			rust: { cat:'lang', label:'Rust', patterns: ['/target/', 'Cargo.lock', '**/*.rs.bk'] },
+			java: { cat:'lang', label:'Java', patterns: ['*.class', '*.log', '*.jar', '*.war', '*.nar', '*.ear', '*.zip', '*.tar.gz', '*.rar', 'hs_err_pid*', '.gradle/', 'build/', '.idea/', '*.iml', 'out/'] },
+			csharp: { cat:'lang', label:'C# / .NET', patterns: ['[Bb]in/', '[Oo]bj/', '[Dd]ebug/', '[Rr]elease/', '*.user', '*.suo', '*.userosscache', '*.cache', '.vs/', 'packages/', '*.nupkg'] },
+			ruby: { cat:'lang', label:'Ruby', patterns: ['*.gem', '*.rbc', '.bundle/', 'vendor/bundle/', '.byebug_history', 'coverage/', 'tmp/', '.env'] },
+			php: { cat:'lang', label:'PHP', patterns: ['vendor/', 'composer.phar', '.env', '*.log', 'storage/framework/cache/', 'storage/framework/sessions/', 'storage/framework/views/', 'bootstrap/cache/'] },
+			swift: { cat:'lang', label:'Swift', patterns: ['.build/', 'Packages/', '*.xcodeproj/', 'xcuserdata/', '*.playground/', 'DerivedData/', '.swiftpm/'] },
+			cpp: { cat:'lang', label:'C / C++', patterns: ['*.o', '*.obj', '*.so', '*.dylib', '*.dll', '*.exe', '*.out', '*.app', '*.dSYM/', 'build/', 'cmake-build-*/'] },
+			terraform: { cat:'lang', label:'Terraform', patterns: ['.terraform/', '*.tfstate', '*.tfstate.*', 'crash.log', 'crash.*.log', '*.tfvars', '*.tfvars.json', 'override.tf', 'override.tf.json', '.terraformrc', 'terraform.rc'] },
+			react: { cat:'lang', label:'React', patterns: ['node_modules/', 'build/', '.env', '.env.local', '.env.*.local', 'npm-debug.log*', 'coverage/', '.DS_Store'] },
+			vue: { cat:'lang', label:'Vue', patterns: ['node_modules/', 'dist/', '.env.local', '.env.*.local', 'npm-debug.log*', 'yarn-debug.log*', 'yarn-error.log*', '*.local', '.vscode/'] },
+			nextjs: { cat:'lang', label:'Next.js', patterns: ['node_modules/', '.next/', 'out/', '.env', '.env.local', '.env.*.local', 'npm-debug.log*', 'coverage/'] },
+			hugo: { cat:'lang', label:'Hugo', patterns: ['public/', 'resources/_gen/', '.hugo_build.lock'] },
+			latex: { cat:'lang', label:'LaTeX', patterns: ['*.aux', '*.bbl', '*.blg', '*.fdb_latexmk', '*.fls', '*.log', '*.out', '*.synctex.gz', '*.toc', '*.pdf'] },
+			ansible: { cat:'lang', label:'Ansible', patterns: ['*.retry', '.vault_pass', '*.pyc', 'inventory/host_vars/*vault*'] },
+
+			// OS
+			macos: { cat:'os', label:'macOS', patterns: ['.DS_Store', '.AppleDouble', '.LSOverride', '._*', '.Spotlight-V100', '.Trashes', 'Icon\r\r', '.fseventsd', '.VolumeIcon.icns', '.com.apple.timemachine.donotpresent'] },
+			linux: { cat:'os', label:'Linux', patterns: ['*~', '.fuse_hidden*', '.directory', '.Trash-*', '.nfs*'] },
+			windows: { cat:'os', label:'Windows', patterns: ['Thumbs.db', 'Thumbs.db:encryptable', 'ehthumbs.db', 'ehthumbs_vista.db', '*.lnk', 'Desktop.ini', '$RECYCLE.BIN/', '*.cab', '*.msi', '*.msix', '*.msm', '*.msp'] },
+
+			// IDEs
+			vscode: { cat:'ide', label:'VS Code', patterns: ['.vscode/*', '!.vscode/settings.json', '!.vscode/tasks.json', '!.vscode/launch.json', '!.vscode/extensions.json', '*.code-workspace', '.history/'] },
+			jetbrains: { cat:'ide', label:'JetBrains', patterns: ['.idea/', '*.iml', '*.iws', '*.ipr', 'out/', '.idea_modules/'] },
+			vim: { cat:'ide', label:'Vim', patterns: ['[._]*.s[a-v][a-z]', '!*.svg', '[._]*.sw[a-p]', '[._]s[a-rt-v][a-z]', '[._]ss[a-gi-z]', '[._]sw[a-p]', 'Session.vim', 'Sessionx.vim', '.netrwhist', 'tags', '[._]*.un~'] },
+			emacs: { cat:'ide', label:'Emacs', patterns: ['*~', '\\#*\\#', '/.emacs.desktop', '/.emacs.desktop.lock', '*.elc', 'auto-save-list', 'tramp', '.\\#*', '.org-id-locations', '*_flymake.*', '/eshell/history', '/eshell/lastdir', '/elpa/', '*.rel', '/auto/', '.cask/'] },
+			sublimetext: { cat:'ide', label:'Sublime Text', patterns: ['*.tmlanguage.cache', '*.tmPreferences.cache', '*.stTheme.cache', '*.sublime-workspace', '*.sublime-project', 'sftp-config.json', 'sftp-config-alt*.json', 'Package Control.last-run', 'Package Control.ca-list', 'Package Control.ca-bundle', 'Package Control.system-ca-bundle', 'Package Control.cache/', 'Package Control.ca-certs/'] },
+		};
+
+		const selected = new Set();
+
+		function renderGrids() {
+			['lang','os','ide'].forEach(cat => {
+				const gridId = { lang:'langGrid', os:'osGrid', ide:'ideGrid' }[cat];
+				const grid = document.getElementById(gridId);
+				grid.innerHTML = Object.entries(templates)
+					.filter(([,t]) => t.cat === cat)
+					.map(([key, t]) => `<button class="template-btn ${selected.has(key)?'active':''}" onclick="toggle('${key}')">${t.label}</button>`)
+					.join('');
+			});
+		}
+
+		function toggle(key) {
+			if (selected.has(key)) selected.delete(key); else selected.add(key);
+			renderGrids();
+			build();
+		}
+
+		function build() {
+			const lines = [];
+			const custom = document.getElementById('customPatterns').value.trim();
+
+			// Group by category
+			const cats = { lang: [], os: [], ide: [] };
+			selected.forEach(key => {
+				const t = templates[key];
+				if (t) cats[t.cat].push(key);
+			});
+
+			const catLabels = { lang: 'Languages & Frameworks', os: 'Operating Systems', ide: 'Editors & IDEs' };
+
+			Object.entries(cats).forEach(([cat, keys]) => {
+				if (!keys.length) return;
+				if (lines.length) lines.push('');
+				lines.push(`# ${catLabels[cat]}`);
+				keys.forEach(key => {
+					const t = templates[key];
+					lines.push(`# --- ${t.label} ---`);
+					t.patterns.forEach(p => lines.push(p));
+				});
+			});
+
+			if (custom) {
+				if (lines.length) lines.push('');
+				lines.push('# Custom');
+				custom.split('\n').forEach(l => lines.push(l));
+			}
+
+			const output = document.getElementById('configOutput');
+			if (!lines.length) {
+				output.innerHTML = '<span style="color:var(--text-muted);font-style:italic;">Select templates to build your .gitignore</span>';
+				return;
+			}
+
+			output.innerHTML = lines.map(line => {
+				if (line.startsWith('#')) return `<span class="gi-comment">${esc(line)}</span>`;
+				if (line.startsWith('!')) return `<span class="gi-negation">${esc(line)}</span>`;
+				return `<span class="gi-pattern">${esc(line)}</span>`;
+			}).join('\n');
+		}
+
+		function getPlainConfig() { const t=document.createElement('div'); t.innerHTML=document.getElementById('configOutput').innerHTML; return t.textContent; }
+		function copyConfig() { const t=getPlainConfig(); if(!t.trim()) return; navigator.clipboard.writeText(t).then(()=>showToast('Copied!')); }
+		function downloadConfig() { const t=getPlainConfig(); if(!t.trim()) return; const b=new Blob([t+'\n'],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='.gitignore'; a.click(); URL.revokeObjectURL(a.href); showToast('Downloaded!'); }
+		function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+		function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+
+		renderGrids();
+		build();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

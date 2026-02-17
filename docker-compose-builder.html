@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Docker Compose Builder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0b1121;
+			--surface: #121d33;
+			--surface-hover: #182640;
+			--border: #1e3050;
+			--border-bright: #2a4268;
+			--text: #cdd9e5;
+			--text-muted: #6488a8;
+			--accent: #2496ED;
+			--accent-hover: #1a7fd4;
+			--accent-dim: rgba(36,150,237,0.1);
+			--danger: #ef5555;
+			--yaml-key: #79c0ff;
+			--yaml-val: #a5d6ff;
+			--yaml-str: #7ee787;
+			--yaml-num: #f2cc60;
+			--yaml-comment: #4a6a88;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Fira Code', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image: radial-gradient(ellipse at 80% 10%, rgba(36,150,237,0.05) 0%, transparent 50%);
+		}
+
+		.container { max-width: 960px; margin: 0 auto; }
+		header { margin-bottom: 1.5rem; }
+		h1 { font-size: 1.4rem; font-weight: 700; color: var(--accent); margin-bottom: 0.4rem; }
+		.subtitle { color: var(--text-muted); font-size: 0.78rem; font-weight: 300; }
+
+		.config-display { background: #060d1a; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.25rem; overflow: hidden; }
+		.config-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+		.config-bar-left { display: flex; align-items: center; gap: 0.6rem; }
+		.config-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+		.config-bar-title { font-size: 0.7rem; color: var(--text-muted); }
+		.config-bar-actions { display: flex; gap: 0.4rem; }
+		.config-body { padding: 1.25rem; overflow-x: auto; max-height: 500px; overflow-y: auto; }
+		.config-body pre { font-family: inherit; font-size: 0.78rem; line-height: 1.6; white-space: pre; margin: 0; }
+
+		.y-key { color: var(--yaml-key); }
+		.y-str { color: var(--yaml-str); }
+		.y-num { color: var(--yaml-num); }
+		.y-cmt { color: var(--yaml-comment); }
+		.y-val { color: var(--yaml-val); }
+
+		button { padding: 0.45rem 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: inherit; font-size: 0.72rem; cursor: pointer; transition: all 0.15s; }
+		button:hover { background: var(--surface-hover); border-color: var(--accent); }
+		button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+		button.small { padding: 0.28rem 0.6rem; font-size: 0.65rem; }
+		button.danger { color: var(--danger); border-color: var(--danger); }
+		button.danger:hover { background: rgba(239,85,85,0.1); }
+
+		.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+		.panel-header { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+		.panel-title { font-size: 0.72rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+		.panel-body { padding: 1rem; }
+
+		.presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+		.preset-btn { padding: 0.4rem 0.8rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); font-family: inherit; font-size: 0.68rem; cursor: pointer; transition: all 0.15s; }
+		.preset-btn:hover { border-color: var(--accent); color: var(--text); }
+
+		.field-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+		.field-label { font-size: 0.72rem; color: var(--yaml-key); min-width: 120px; font-weight: 500; }
+		.opt-group { margin-bottom: 0.75rem; }
+		.opt-group-title { font-size: 0.7rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 500; }
+		.opt-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+		.opt-row label { font-size: 0.75rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+		.opt-hint { font-size: 0.64rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+
+		input[type="text"], input[type="number"], select, textarea {
+			background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.4rem 0.6rem;
+			color: var(--text); font-family: inherit; font-size: 0.75rem; outline: none;
+		}
+		input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+		input::placeholder, textarea::placeholder { color: var(--text-muted); }
+		input.wide { flex: 1; min-width: 160px; }
+		input.medium { width: 200px; }
+		input.narrow { width: 70px; }
+
+		input[type="checkbox"] {
+			appearance: none; -webkit-appearance: none; width: 15px; height: 15px;
+			border: 1px solid var(--border-bright); border-radius: 3px; background: var(--bg);
+			cursor: pointer; position: relative; flex-shrink: 0;
+		}
+		input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+		input[type="checkbox"]:checked::after { content: '\2713'; position: absolute; top: -1px; left: 2px; color: #fff; font-size: 11px; font-weight: 700; }
+
+		hr.divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+
+		.svc-entry { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.75rem; background: var(--surface); overflow: hidden; }
+		.svc-header { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.85rem; background: rgba(36,150,237,0.03); border-bottom: 1px solid var(--border); cursor: pointer; }
+		.svc-name { font-size: 0.78rem; font-weight: 600; color: var(--yaml-key); }
+		.svc-body { padding: 0.85rem; }
+		.svc-body.hidden { display: none; }
+
+		.add-btn { width: 100%; padding: 0.6rem; background: var(--surface); border: 1px dashed var(--border-bright); border-radius: 6px; color: var(--accent); font-family: inherit; font-size: 0.72rem; cursor: pointer; transition: all 0.15s; margin-bottom: 0.5rem; }
+		.add-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+		.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); padding: 0.45rem 1.1rem; border-radius: 4px; font-size: 0.72rem; font-family: inherit; opacity: 0; transition: all 0.3s; z-index: 100; }
+		.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+			.field-label { min-width: 100px; }
+			input.medium { width: 150px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Docker Compose Builder</h1>
+			<p class="subtitle">Visually build docker-compose.yml files</p>
+		</header>
+
+		<div class="config-display">
+			<div class="config-bar">
+				<div class="config-bar-left"><span class="config-dot"></span><span class="config-bar-title">docker-compose.yml</span></div>
+				<div class="config-bar-actions">
+					<button class="small" onclick="downloadConfig()">Download</button>
+					<button class="small primary" onclick="copyConfig()">Copy</button>
+				</div>
+			</div>
+			<div class="config-body"><pre id="configOutput"></pre></div>
+		</div>
+
+		<div class="presets">
+			<button class="preset-btn" onclick="applyPreset('webapp')">Web App + Postgres</button>
+			<button class="preset-btn" onclick="applyPreset('node-redis')">Node + Redis</button>
+			<button class="preset-btn" onclick="applyPreset('wordpress')">WordPress + MySQL</button>
+			<button class="preset-btn" onclick="applyPreset('lamp')">LAMP Stack</button>
+			<button class="preset-btn" onclick="applyPreset('monitoring')">Prometheus + Grafana</button>
+		</div>
+
+		<div id="serviceEntries"></div>
+		<button class="add-btn" onclick="addService()">+ Add Service</button>
+
+		<!-- Networks -->
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Networks</span>
+				<button class="small" onclick="addNetwork()">+ Add</button>
+			</div>
+			<div class="panel-body" id="networkEntries">
+				<p class="opt-hint">No custom networks defined. Services will use the default network.</p>
+			</div>
+		</div>
+
+		<!-- Volumes -->
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Named Volumes</span>
+				<button class="small" onclick="addVolume()">+ Add</button>
+			</div>
+			<div class="panel-body" id="volumeEntries">
+				<p class="opt-hint">No named volumes defined.</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		let services = [];
+		let networks = [];
+		let volumes = [];
+		let svcId = 0;
+
+		function createService(o = {}) {
+			return {
+				id: svcId++, collapsed: false,
+				name: o.name || '', image: o.image || '', build: o.build || '',
+				ports: o.ports || '', volumes: o.volumes || '', environment: o.environment || '',
+				dependsOn: o.dependsOn || '', restart: o.restart || 'unless-stopped',
+				command: o.command || '', networks: o.networks || '',
+				containerName: o.containerName || '',
+			};
+		}
+
+		function addService(data) {
+			const s = data || createService();
+			if (!data) services.push(s);
+			renderServices();
+			build();
+		}
+
+		function removeService(id) {
+			services = services.filter(s => s.id !== id);
+			renderServices(); build();
+		}
+
+		function toggleService(id) {
+			const s = services.find(x => x.id === id);
+			if (s) { s.collapsed = !s.collapsed; renderServices(); }
+		}
+
+		function syncService(id) {
+			const s = services.find(x => x.id === id);
+			if (!s) return;
+			const el = n => document.getElementById(`svc${id}_${n}`);
+			s.name = el('name')?.value || '';
+			s.image = el('image')?.value || '';
+			s.build = el('build')?.value || '';
+			s.ports = el('ports')?.value || '';
+			s.volumes = el('volumes')?.value || '';
+			s.environment = el('environment')?.value || '';
+			s.dependsOn = el('dependsOn')?.value || '';
+			s.restart = el('restart')?.value || '';
+			s.command = el('command')?.value || '';
+			s.networks = el('networks')?.value || '';
+			s.containerName = el('containerName')?.value || '';
+			build();
+		}
+
+		function renderServices() {
+			document.getElementById('serviceEntries').innerHTML = services.map(s => {
+				const name = s.name || 'unnamed';
+				return `<div class="svc-entry">
+					<div class="svc-header" onclick="toggleService(${s.id})">
+						<span class="svc-name">${esc(name)}</span>
+						<div style="display:flex;gap:0.3rem;align-items:center;">
+							<button class="small danger" onclick="event.stopPropagation();removeService(${s.id})">&times;</button>
+							<span style="color:var(--text-muted);font-size:0.7rem;">${s.collapsed?'&#9654;':'&#9660;'}</span>
+						</div>
+					</div>
+					<div class="svc-body ${s.collapsed?'hidden':''}">
+						<div class="opt-group">
+							<div class="opt-group-title">Basic</div>
+							<div class="field-row"><span class="field-label">Service name</span><input type="text" class="medium" id="svc${s.id}_name" value="${esc(s.name)}" placeholder="web" oninput="syncService(${s.id})"></div>
+							<div class="field-row"><span class="field-label">image</span><input type="text" class="medium" id="svc${s.id}_image" value="${esc(s.image)}" placeholder="nginx:alpine" oninput="syncService(${s.id})"></div>
+							<div class="field-row"><span class="field-label">build</span><input type="text" class="medium" id="svc${s.id}_build" value="${esc(s.build)}" placeholder="./app" oninput="syncService(${s.id})"></div>
+							<div class="field-row"><span class="field-label">container_name</span><input type="text" class="medium" id="svc${s.id}_containerName" value="${esc(s.containerName)}" placeholder="" oninput="syncService(${s.id})"></div>
+							<div class="field-row"><span class="field-label">command</span><input type="text" class="wide" id="svc${s.id}_command" value="${esc(s.command)}" placeholder="" oninput="syncService(${s.id})"></div>
+						</div>
+						<hr class="divider">
+						<div class="opt-group">
+							<div class="opt-group-title">Networking & Storage</div>
+							<div class="field-row"><span class="field-label">ports</span><input type="text" class="medium" id="svc${s.id}_ports" value="${esc(s.ports)}" placeholder="8080:80, 443:443" oninput="syncService(${s.id})"></div>
+							<p class="opt-hint">Comma-separated: host:container</p>
+							<div class="field-row"><span class="field-label">volumes</span><input type="text" class="wide" id="svc${s.id}_volumes" value="${esc(s.volumes)}" placeholder="./data:/var/lib/data, pgdata:/var/lib/postgresql" oninput="syncService(${s.id})"></div>
+							<p class="opt-hint">Comma-separated: host:container or named:container</p>
+							<div class="field-row"><span class="field-label">networks</span><input type="text" class="medium" id="svc${s.id}_networks" value="${esc(s.networks)}" placeholder="frontend, backend" oninput="syncService(${s.id})"></div>
+						</div>
+						<hr class="divider">
+						<div class="opt-group">
+							<div class="opt-group-title">Configuration</div>
+							<div class="field-row"><span class="field-label">environment</span><input type="text" class="wide" id="svc${s.id}_environment" value="${esc(s.environment)}" placeholder="DB_HOST=db, DB_PORT=5432" oninput="syncService(${s.id})"></div>
+							<p class="opt-hint">Comma-separated: KEY=value</p>
+							<div class="field-row"><span class="field-label">depends_on</span><input type="text" class="medium" id="svc${s.id}_dependsOn" value="${esc(s.dependsOn)}" placeholder="db, redis" oninput="syncService(${s.id})"></div>
+							<div class="field-row"><span class="field-label">restart</span>
+								<select id="svc${s.id}_restart" onchange="syncService(${s.id})">
+									<option value="" ${s.restart===''?'selected':''}>--</option>
+									<option value="no" ${s.restart==='no'?'selected':''}>no</option>
+									<option value="always" ${s.restart==='always'?'selected':''}>always</option>
+									<option value="on-failure" ${s.restart==='on-failure'?'selected':''}>on-failure</option>
+									<option value="unless-stopped" ${s.restart==='unless-stopped'?'selected':''}>unless-stopped</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>`;
+			}).join('');
+		}
+
+		function addNetwork() {
+			const name = prompt('Network name:');
+			if (!name) return;
+			networks.push(name.trim());
+			renderNetworks(); build();
+		}
+
+		function removeNetwork(idx) { networks.splice(idx,1); renderNetworks(); build(); }
+
+		function renderNetworks() {
+			const c = document.getElementById('networkEntries');
+			if (!networks.length) { c.innerHTML = '<p class="opt-hint">No custom networks defined.</p>'; return; }
+			c.innerHTML = networks.map((n,i) => `<div class="field-row"><span style="color:var(--yaml-key);font-size:0.75rem;">${esc(n)}</span><button class="small danger" onclick="removeNetwork(${i})">&times;</button></div>`).join('');
+		}
+
+		function addVolume() {
+			const name = prompt('Volume name:');
+			if (!name) return;
+			volumes.push(name.trim());
+			renderVolumes(); build();
+		}
+
+		function removeVolume(idx) { volumes.splice(idx,1); renderVolumes(); build(); }
+
+		function renderVolumes() {
+			const c = document.getElementById('volumeEntries');
+			if (!volumes.length) { c.innerHTML = '<p class="opt-hint">No named volumes defined.</p>'; return; }
+			c.innerHTML = volumes.map((v,i) => `<div class="field-row"><span style="color:var(--yaml-key);font-size:0.75rem;">${esc(v)}</span><button class="small danger" onclick="removeVolume(${i})">&times;</button></div>`).join('');
+		}
+
+		function parseList(s) { return s ? s.split(',').map(x=>x.trim()).filter(Boolean) : []; }
+
+		function build() {
+			const lines = [];
+
+			lines.push('services:');
+
+			services.forEach(s => {
+				if (!s.name) return;
+				lines.push(`  ${s.name}:`);
+				if (s.image) lines.push(`    image: ${s.image}`);
+				if (s.build) lines.push(`    build: ${s.build}`);
+				if (s.containerName) lines.push(`    container_name: ${s.containerName}`);
+				if (s.command) lines.push(`    command: ${s.command}`);
+				if (s.restart) lines.push(`    restart: ${s.restart}`);
+
+				const ports = parseList(s.ports);
+				if (ports.length) { lines.push('    ports:'); ports.forEach(p => lines.push(`      - "${p}"`)); }
+
+				const vols = parseList(s.volumes);
+				if (vols.length) { lines.push('    volumes:'); vols.forEach(v => lines.push(`      - ${v}`)); }
+
+				const envs = parseList(s.environment);
+				if (envs.length) { lines.push('    environment:'); envs.forEach(e => { const [k,...rest]=e.split('='); lines.push(`      ${k}: ${rest.join('=')}`); }); }
+
+				const deps = parseList(s.dependsOn);
+				if (deps.length) { lines.push('    depends_on:'); deps.forEach(d => lines.push(`      - ${d}`)); }
+
+				const nets = parseList(s.networks);
+				if (nets.length) { lines.push('    networks:'); nets.forEach(n => lines.push(`      - ${n}`)); }
+
+				lines.push('');
+			});
+
+			if (networks.length) {
+				lines.push('networks:');
+				networks.forEach(n => { lines.push(`  ${n}:`); lines.push('    driver: bridge'); });
+				lines.push('');
+			}
+
+			if (volumes.length) {
+				lines.push('volumes:');
+				volumes.forEach(v => lines.push(`  ${v}:`));
+			}
+
+			const output = document.getElementById('configOutput');
+			output.innerHTML = lines.map(line => {
+				if (!line.trim()) return '';
+				// Top-level keys
+				if (line.match(/^(services|networks|volumes):/)) return `<span class="y-key">${esc(line)}</span>`;
+				// Service name
+				if (line.match(/^  \S+:$/)) return `  <span class="y-key">${esc(line.trim())}</span>`;
+				// key: value
+				const m = line.match(/^(\s+)(\S+):\s*(.*)$/);
+				if (m) {
+					const [, indent, key, val] = m;
+					if (!val) return `${indent}<span class="y-key">${esc(key)}:</span>`;
+					// Detect type
+					if (val.match(/^\d+$/)) return `${indent}<span class="y-key">${esc(key)}:</span> <span class="y-num">${esc(val)}</span>`;
+					return `${indent}<span class="y-key">${esc(key)}:</span> <span class="y-str">${esc(val)}</span>`;
+				}
+				// List items
+				const lm = line.match(/^(\s+)- (.*)$/);
+				if (lm) {
+					const [, indent, val] = lm;
+					return `${indent}<span class="y-val">-</span> <span class="y-str">${esc(val)}</span>`;
+				}
+				return esc(line);
+			}).join('\n');
+		}
+
+		function getPlainConfig() { const t=document.createElement('div'); t.innerHTML=document.getElementById('configOutput').innerHTML; return t.textContent; }
+		function copyConfig() { const t=getPlainConfig(); navigator.clipboard.writeText(t).then(()=>showToast('Copied!')); }
+		function downloadConfig() { const t=getPlainConfig(); const b=new Blob([t+'\n'],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='docker-compose.yml'; a.click(); URL.revokeObjectURL(a.href); showToast('Downloaded!'); }
+		function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+		function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+
+		function applyPreset(name) {
+			services = []; networks = []; volumes = []; svcId = 0;
+
+			switch(name) {
+				case 'webapp':
+					services.push(createService({ name:'web', image:'node:20-alpine', build:'.', ports:'3000:3000', environment:'DATABASE_URL=postgresql://user:pass@db:5432/app', dependsOn:'db', restart:'unless-stopped' }));
+					services.push(createService({ name:'db', image:'postgres:16-alpine', environment:'POSTGRES_USER=user, POSTGRES_PASSWORD=pass, POSTGRES_DB=app', volumes:'pgdata:/var/lib/postgresql/data', ports:'5432:5432', restart:'unless-stopped' }));
+					volumes = ['pgdata'];
+					break;
+				case 'node-redis':
+					services.push(createService({ name:'app', image:'node:20-alpine', build:'.', ports:'3000:3000', environment:'REDIS_URL=redis://cache:6379', dependsOn:'cache', restart:'unless-stopped' }));
+					services.push(createService({ name:'cache', image:'redis:7-alpine', ports:'6379:6379', volumes:'redis-data:/data', restart:'unless-stopped' }));
+					volumes = ['redis-data'];
+					break;
+				case 'wordpress':
+					services.push(createService({ name:'wordpress', image:'wordpress:latest', ports:'8080:80', environment:'WORDPRESS_DB_HOST=db, WORDPRESS_DB_USER=wp, WORDPRESS_DB_PASSWORD=secret, WORDPRESS_DB_NAME=wordpress', volumes:'wp-content:/var/www/html/wp-content', dependsOn:'db', restart:'unless-stopped' }));
+					services.push(createService({ name:'db', image:'mysql:8', environment:'MYSQL_ROOT_PASSWORD=rootpass, MYSQL_DATABASE=wordpress, MYSQL_USER=wp, MYSQL_PASSWORD=secret', volumes:'db-data:/var/lib/mysql', restart:'unless-stopped' }));
+					volumes = ['wp-content', 'db-data'];
+					break;
+				case 'lamp':
+					services.push(createService({ name:'apache', image:'php:8.2-apache', ports:'80:80', volumes:'./src:/var/www/html', dependsOn:'db', restart:'unless-stopped' }));
+					services.push(createService({ name:'db', image:'mariadb:11', environment:'MARIADB_ROOT_PASSWORD=rootpass, MARIADB_DATABASE=app, MARIADB_USER=app, MARIADB_PASSWORD=secret', volumes:'db-data:/var/lib/mysql', restart:'unless-stopped' }));
+					services.push(createService({ name:'phpmyadmin', image:'phpmyadmin:latest', ports:'8080:80', environment:'PMA_HOST=db', dependsOn:'db', restart:'unless-stopped' }));
+					volumes = ['db-data'];
+					break;
+				case 'monitoring':
+					services.push(createService({ name:'prometheus', image:'prom/prometheus:latest', ports:'9090:9090', volumes:'./prometheus.yml:/etc/prometheus/prometheus.yml, prom-data:/prometheus', restart:'unless-stopped' }));
+					services.push(createService({ name:'grafana', image:'grafana/grafana:latest', ports:'3000:3000', environment:'GF_SECURITY_ADMIN_PASSWORD=admin', volumes:'grafana-data:/var/lib/grafana', dependsOn:'prometheus', restart:'unless-stopped' }));
+					volumes = ['prom-data', 'grafana-data'];
+					break;
+			}
+
+			renderServices(); renderNetworks(); renderVolumes(); build();
+		}
+
+		// Initial empty state
+		build();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

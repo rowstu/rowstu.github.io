@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Nginx Config Builder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Overpass+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0a1210;
+			--surface: #111f1a;
+			--surface-hover: #172922;
+			--border: #1e3a2f;
+			--border-bright: #2a5244;
+			--text: #d0e8df;
+			--text-muted: #6a9a86;
+			--accent: #34d399;
+			--accent-hover: #2bb880;
+			--accent-dim: rgba(52, 211, 153, 0.1);
+			--danger: #ef5555;
+			--keyword: #5eead4;
+			--directive: #a78bfa;
+			--value: #fbbf24;
+			--string: #86efac;
+			--comment: #4a7a66;
+			--brace: #94a3b8;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Overpass Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image: radial-gradient(ellipse at 50% 0%, rgba(52,211,153,0.04) 0%, transparent 60%);
+		}
+
+		.container { max-width: 960px; margin: 0 auto; }
+		header { margin-bottom: 1.5rem; }
+		h1 { font-size: 1.4rem; font-weight: 700; color: var(--accent); margin-bottom: 0.4rem; }
+		.subtitle { color: var(--text-muted); font-size: 0.78rem; font-weight: 300; }
+
+		.config-display {
+			background: #060e0a;
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			margin-bottom: 1.25rem;
+			overflow: hidden;
+		}
+
+		.config-bar {
+			display: flex; justify-content: space-between; align-items: center;
+			padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
+		}
+
+		.config-bar-left { display: flex; align-items: center; gap: 0.6rem; }
+		.config-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px rgba(52,211,153,0.3); }
+		.config-bar-title { font-size: 0.7rem; color: var(--text-muted); }
+		.config-bar-actions { display: flex; gap: 0.4rem; }
+
+		.config-body { padding: 1.25rem; overflow-x: auto; max-height: 500px; overflow-y: auto; }
+		.config-body pre { font-family: inherit; font-size: 0.78rem; line-height: 1.6; white-space: pre; margin: 0; }
+
+		.n-dir { color: var(--directive); font-weight: 600; }
+		.n-key { color: var(--keyword); }
+		.n-val { color: var(--value); }
+		.n-str { color: var(--string); }
+		.n-cmt { color: var(--comment); }
+		.n-br { color: var(--brace); }
+
+		button { padding: 0.45rem 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: inherit; font-size: 0.72rem; cursor: pointer; transition: all 0.15s; }
+		button:hover { background: var(--surface-hover); border-color: var(--accent); }
+		button.primary { background: var(--accent); border-color: var(--accent); color: #060e0a; font-weight: 600; }
+		button.primary:hover { opacity: 0.9; }
+		button.small { padding: 0.28rem 0.6rem; font-size: 0.65rem; }
+		button.danger { color: var(--danger); border-color: var(--danger); }
+		button.danger:hover { background: rgba(239,85,85,0.1); }
+
+		.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+		.panel-header { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+		.panel-title { font-size: 0.72rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+		.panel-body { padding: 1rem; }
+
+		.presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+		.preset-btn { padding: 0.4rem 0.8rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); font-family: inherit; font-size: 0.68rem; cursor: pointer; transition: all 0.15s; }
+		.preset-btn:hover { border-color: var(--accent); color: var(--text); }
+
+		.field-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+		.field-label { font-size: 0.72rem; color: var(--keyword); min-width: 150px; font-weight: 500; }
+
+		input[type="text"], input[type="number"], select, textarea {
+			background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.4rem 0.6rem;
+			color: var(--text); font-family: inherit; font-size: 0.75rem; outline: none; transition: border-color 0.15s;
+		}
+		input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+		input::placeholder, textarea::placeholder { color: var(--text-muted); }
+		input.wide { flex: 1; min-width: 160px; }
+		input.medium { width: 200px; }
+		input.narrow { width: 70px; }
+
+		input[type="checkbox"] {
+			appearance: none; -webkit-appearance: none; width: 15px; height: 15px;
+			border: 1px solid var(--border-bright); border-radius: 3px; background: var(--bg);
+			cursor: pointer; position: relative; flex-shrink: 0;
+		}
+		input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+		input[type="checkbox"]:checked::after { content: '\2713'; position: absolute; top: -1px; left: 2px; color: #060e0a; font-size: 11px; font-weight: 700; }
+
+		.opt-group { margin-bottom: 0.75rem; }
+		.opt-group-title { font-size: 0.7rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 500; }
+		.opt-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+		.opt-row label { font-size: 0.75rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+
+		hr.divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+
+		.location-entry { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.6rem; background: var(--surface); overflow: hidden; }
+		.location-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.8rem; background: rgba(52,211,153,0.03); border-bottom: 1px solid var(--border); cursor: pointer; }
+		.location-name { font-size: 0.75rem; font-weight: 600; color: var(--directive); }
+		.location-body { padding: 0.8rem; }
+		.location-body.hidden { display: none; }
+
+		.add-btn { width: 100%; padding: 0.6rem; background: var(--surface); border: 1px dashed var(--border-bright); border-radius: 6px; color: var(--accent); font-family: inherit; font-size: 0.72rem; cursor: pointer; transition: all 0.15s; margin-bottom: 0.5rem; }
+		.add-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+		.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); padding: 0.45rem 1.1rem; border-radius: 4px; font-size: 0.72rem; font-family: inherit; opacity: 0; transition: all 0.3s; z-index: 100; }
+		.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+		@media (max-width: 600px) {
+			body { padding: 1rem; }
+			.field-label { min-width: 120px; font-size: 0.68rem; }
+			input.medium { width: 150px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Nginx Config Builder</h1>
+			<p class="subtitle">Build nginx server block configurations</p>
+		</header>
+
+		<div class="config-display">
+			<div class="config-bar">
+				<div class="config-bar-left">
+					<span class="config-dot"></span>
+					<span class="config-bar-title">/etc/nginx/sites-available/site.conf</span>
+				</div>
+				<div class="config-bar-actions">
+					<button class="small" onclick="downloadConfig()">Download</button>
+					<button class="small primary" onclick="copyConfig()">Copy</button>
+				</div>
+			</div>
+			<div class="config-body"><pre id="configOutput"></pre></div>
+		</div>
+
+		<div class="presets">
+			<button class="preset-btn" onclick="applyPreset('static')">Static Site</button>
+			<button class="preset-btn" onclick="applyPreset('proxy')">Reverse Proxy</button>
+			<button class="preset-btn" onclick="applyPreset('php')">PHP-FPM</button>
+			<button class="preset-btn" onclick="applyPreset('spa')">SPA (React/Vue)</button>
+			<button class="preset-btn" onclick="applyPreset('redirect')">HTTPS Redirect</button>
+			<button class="preset-btn" onclick="applyPreset('websocket')">WebSocket Proxy</button>
+		</div>
+
+		<!-- Server block settings -->
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Server Block</span></div>
+			<div class="panel-body">
+				<div class="opt-group">
+					<div class="opt-group-title">Listen</div>
+					<div class="field-row">
+						<span class="field-label">Port</span>
+						<input type="number" class="narrow" id="listenPort" value="80" min="1" max="65535" oninput="build()">
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="enableSSL" onchange="build()"> Enable SSL (443)</label>
+					</div>
+					<div class="opt-row">
+						<label><input type="checkbox" id="http2" onchange="build()"> HTTP/2</label>
+					</div>
+					<div class="field-row">
+						<span class="field-label">server_name</span>
+						<input type="text" class="wide" id="serverName" value="example.com www.example.com" oninput="build()">
+					</div>
+				</div>
+
+				<hr class="divider">
+
+				<div class="opt-group">
+					<div class="opt-group-title">Document Root</div>
+					<div class="field-row">
+						<span class="field-label">root</span>
+						<input type="text" class="medium" id="docRoot" value="/var/www/html" oninput="build()">
+					</div>
+					<div class="field-row">
+						<span class="field-label">index</span>
+						<input type="text" class="medium" id="indexFiles" value="index.html index.htm" oninput="build()">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- SSL -->
+		<div class="panel" id="sslPanel" style="display:none;">
+			<div class="panel-header"><span class="panel-title">SSL / TLS</span></div>
+			<div class="panel-body">
+				<div class="field-row">
+					<span class="field-label">ssl_certificate</span>
+					<input type="text" class="wide" id="sslCert" value="/etc/letsencrypt/live/example.com/fullchain.pem" oninput="build()">
+				</div>
+				<div class="field-row">
+					<span class="field-label">ssl_certificate_key</span>
+					<input type="text" class="wide" id="sslKey" value="/etc/letsencrypt/live/example.com/privkey.pem" oninput="build()">
+				</div>
+				<div class="field-row">
+					<span class="field-label">ssl_protocols</span>
+					<input type="text" class="medium" id="sslProtocols" value="TLSv1.2 TLSv1.3" oninput="build()">
+				</div>
+				<div class="opt-row">
+					<label><input type="checkbox" id="sslStapling" checked onchange="build()"> OCSP Stapling</label>
+				</div>
+				<div class="opt-row">
+					<label><input type="checkbox" id="sslRedirect" checked onchange="build()"> Redirect HTTP to HTTPS</label>
+				</div>
+			</div>
+		</div>
+
+		<!-- Headers & Security -->
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Headers & Security</span></div>
+			<div class="panel-body">
+				<div class="opt-row"><label><input type="checkbox" id="hdrHSTS" onchange="build()"> HSTS (Strict-Transport-Security)</label></div>
+				<div class="opt-row"><label><input type="checkbox" id="hdrXFrame" onchange="build()"> X-Frame-Options: SAMEORIGIN</label></div>
+				<div class="opt-row"><label><input type="checkbox" id="hdrXContent" onchange="build()"> X-Content-Type-Options: nosniff</label></div>
+				<div class="opt-row"><label><input type="checkbox" id="hdrXXSS" onchange="build()"> X-XSS-Protection</label></div>
+				<div class="opt-row"><label><input type="checkbox" id="hdrReferrer" onchange="build()"> Referrer-Policy: no-referrer-when-downgrade</label></div>
+				<div class="opt-row"><label><input type="checkbox" id="hdrServerTokens" onchange="build()"> Hide server version (server_tokens off)</label></div>
+			</div>
+		</div>
+
+		<!-- Gzip -->
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Compression & Performance</span></div>
+			<div class="panel-body">
+				<div class="opt-row"><label><input type="checkbox" id="enableGzip" onchange="build()"> Enable gzip compression</label></div>
+				<div class="opt-row"><label><input type="checkbox" id="enableCacheStatic" onchange="build()"> Cache static assets (30 days)</label></div>
+				<div class="field-row">
+					<span class="field-label">client_max_body_size</span>
+					<input type="text" class="narrow" id="clientMaxBody" placeholder="10m" oninput="build()">
+				</div>
+			</div>
+		</div>
+
+		<!-- Logging -->
+		<div class="panel">
+			<div class="panel-header"><span class="panel-title">Logging</span></div>
+			<div class="panel-body">
+				<div class="field-row">
+					<span class="field-label">access_log</span>
+					<input type="text" class="wide" id="accessLog" placeholder="/var/log/nginx/access.log" oninput="build()">
+				</div>
+				<div class="field-row">
+					<span class="field-label">error_log</span>
+					<input type="text" class="wide" id="errorLog" placeholder="/var/log/nginx/error.log" oninput="build()">
+				</div>
+			</div>
+		</div>
+
+		<!-- Location blocks -->
+		<div class="panel">
+			<div class="panel-header">
+				<span class="panel-title">Location Blocks</span>
+			</div>
+			<div class="panel-body">
+				<div id="locationEntries"></div>
+				<button class="add-btn" onclick="addLocation()">+ Add Location Block</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		let locations = [];
+		let locIdCounter = 0;
+
+		document.getElementById('enableSSL').addEventListener('change', function() {
+			document.getElementById('sslPanel').style.display = this.checked ? 'block' : 'none';
+		});
+
+		function createLocation(overrides = {}) {
+			return {
+				id: locIdCounter++,
+				collapsed: false,
+				path: overrides.path || '/',
+				type: overrides.type || 'try_files',
+				tryFiles: overrides.tryFiles || '$uri $uri/ =404',
+				proxyPass: overrides.proxyPass || 'http://localhost:3000',
+				proxyHeaders: overrides.proxyHeaders !== undefined ? overrides.proxyHeaders : true,
+				proxyWS: overrides.proxyWS || false,
+				fastcgiPass: overrides.fastcgiPass || 'unix:/run/php/php-fpm.sock',
+				returnCode: overrides.returnCode || '301',
+				returnUrl: overrides.returnUrl || 'https://$server_name$request_uri',
+				alias: overrides.alias || '',
+			};
+		}
+
+		function addLocation(data) {
+			const loc = data || createLocation();
+			if (!data) locations.push(loc);
+			renderLocations();
+			build();
+		}
+
+		function removeLocation(id) {
+			locations = locations.filter(l => l.id !== id);
+			renderLocations();
+			build();
+		}
+
+		function syncLocation(id) {
+			const l = locations.find(x => x.id === id);
+			if (!l) return;
+			const el = n => document.getElementById(`loc${id}_${n}`);
+			l.path = el('path')?.value || '/';
+			l.type = el('type')?.value || 'try_files';
+			l.tryFiles = el('tryFiles')?.value || '';
+			l.proxyPass = el('proxyPass')?.value || '';
+			l.proxyHeaders = el('proxyHeaders')?.checked || false;
+			l.proxyWS = el('proxyWS')?.checked || false;
+			l.fastcgiPass = el('fastcgiPass')?.value || '';
+			l.returnCode = el('returnCode')?.value || '301';
+			l.returnUrl = el('returnUrl')?.value || '';
+			l.alias = el('alias')?.value || '';
+			build();
+		}
+
+		function renderLocations() {
+			const container = document.getElementById('locationEntries');
+			container.innerHTML = locations.map(l => {
+				const showTryFiles = l.type === 'try_files';
+				const showProxy = l.type === 'proxy';
+				const showFastcgi = l.type === 'fastcgi';
+				const showReturn = l.type === 'return';
+				const showAlias = l.type === 'alias';
+
+				return `<div class="location-entry">
+					<div class="location-header" onclick="toggleLoc(${l.id})">
+						<span class="location-name">location ${esc(l.path)}</span>
+						<div style="display:flex;gap:0.3rem;">
+							<button class="small danger" onclick="event.stopPropagation();removeLocation(${l.id})">&times;</button>
+						</div>
+					</div>
+					<div class="location-body ${l.collapsed ? 'hidden' : ''}">
+						<div class="field-row">
+							<span class="field-label">Path</span>
+							<input type="text" class="medium" id="loc${l.id}_path" value="${esc(l.path)}" oninput="syncLocation(${l.id}); updateLocName(${l.id})">
+						</div>
+						<div class="field-row">
+							<span class="field-label">Type</span>
+							<select id="loc${l.id}_type" onchange="syncLocation(${l.id}); renderLocations()">
+								<option value="try_files" ${l.type==='try_files'?'selected':''}>try_files</option>
+								<option value="proxy" ${l.type==='proxy'?'selected':''}>Reverse Proxy</option>
+								<option value="fastcgi" ${l.type==='fastcgi'?'selected':''}>FastCGI (PHP)</option>
+								<option value="return" ${l.type==='return'?'selected':''}>Return / Redirect</option>
+								<option value="alias" ${l.type==='alias'?'selected':''}>Alias</option>
+							</select>
+						</div>
+						${showTryFiles ? `<div class="field-row">
+							<span class="field-label">try_files</span>
+							<input type="text" class="wide" id="loc${l.id}_tryFiles" value="${esc(l.tryFiles)}" oninput="syncLocation(${l.id})">
+						</div>` : ''}
+						${showProxy ? `<div class="field-row">
+							<span class="field-label">proxy_pass</span>
+							<input type="text" class="wide" id="loc${l.id}_proxyPass" value="${esc(l.proxyPass)}" oninput="syncLocation(${l.id})">
+						</div>
+						<div class="opt-row">
+							<label><input type="checkbox" id="loc${l.id}_proxyHeaders" ${l.proxyHeaders?'checked':''} onchange="syncLocation(${l.id})"> Proxy headers (Host, X-Real-IP, etc.)</label>
+						</div>
+						<div class="opt-row">
+							<label><input type="checkbox" id="loc${l.id}_proxyWS" ${l.proxyWS?'checked':''} onchange="syncLocation(${l.id})"> WebSocket upgrade</label>
+						</div>` : ''}
+						${showFastcgi ? `<div class="field-row">
+							<span class="field-label">fastcgi_pass</span>
+							<input type="text" class="wide" id="loc${l.id}_fastcgiPass" value="${esc(l.fastcgiPass)}" oninput="syncLocation(${l.id})">
+						</div>` : ''}
+						${showReturn ? `<div class="field-row">
+							<span class="field-label">Return code</span>
+							<select id="loc${l.id}_returnCode" onchange="syncLocation(${l.id})">
+								<option value="301" ${l.returnCode==='301'?'selected':''}>301 (Permanent)</option>
+								<option value="302" ${l.returnCode==='302'?'selected':''}>302 (Temporary)</option>
+								<option value="404" ${l.returnCode==='404'?'selected':''}>404 (Not Found)</option>
+								<option value="403" ${l.returnCode==='403'?'selected':''}>403 (Forbidden)</option>
+							</select>
+						</div>
+						<div class="field-row">
+							<span class="field-label">URL / body</span>
+							<input type="text" class="wide" id="loc${l.id}_returnUrl" value="${esc(l.returnUrl)}" oninput="syncLocation(${l.id})">
+						</div>` : ''}
+						${showAlias ? `<div class="field-row">
+							<span class="field-label">alias</span>
+							<input type="text" class="wide" id="loc${l.id}_alias" value="${esc(l.alias)}" placeholder="/var/www/other" oninput="syncLocation(${l.id})">
+						</div>` : ''}
+					</div>
+				</div>`;
+			}).join('');
+		}
+
+		function toggleLoc(id) {
+			const l = locations.find(x => x.id === id);
+			if (l) { l.collapsed = !l.collapsed; renderLocations(); }
+		}
+
+		function updateLocName(id) {
+			const l = locations.find(x => x.id === id);
+			if (!l) return;
+			const el = document.querySelector(`.location-entry:nth-child(${locations.indexOf(l)+1}) .location-name`);
+			if (el) el.textContent = `location ${l.path}`;
+		}
+
+		function build() {
+			const lines = [];
+			const ssl = document.getElementById('enableSSL').checked;
+			const h2 = document.getElementById('http2').checked;
+			const port = document.getElementById('listenPort').value || '80';
+			const serverName = document.getElementById('serverName').value.trim();
+			const root = document.getElementById('docRoot').value.trim();
+			const index = document.getElementById('indexFiles').value.trim();
+
+			// HTTP->HTTPS redirect block
+			if (ssl && document.getElementById('sslRedirect').checked) {
+				lines.push('server {');
+				lines.push(`    listen 80;`);
+				lines.push(`    listen [::]:80;`);
+				if (serverName) lines.push(`    server_name ${serverName};`);
+				lines.push(`    return 301 https://$server_name$request_uri;`);
+				lines.push('}');
+				lines.push('');
+			}
+
+			lines.push('server {');
+
+			// Listen
+			if (ssl) {
+				const h2str = h2 ? ' http2' : '';
+				lines.push(`    listen 443 ssl${h2str};`);
+				lines.push(`    listen [::]:443 ssl${h2str};`);
+			} else {
+				lines.push(`    listen ${port};`);
+				lines.push(`    listen [::]:${port};`);
+			}
+
+			if (serverName) lines.push(`    server_name ${serverName};`);
+			if (root) lines.push(`    root ${root};`);
+			if (index) lines.push(`    index ${index};`);
+
+			// SSL
+			if (ssl) {
+				lines.push('');
+				const cert = document.getElementById('sslCert').value.trim();
+				const key = document.getElementById('sslKey').value.trim();
+				const protocols = document.getElementById('sslProtocols').value.trim();
+				if (cert) lines.push(`    ssl_certificate ${cert};`);
+				if (key) lines.push(`    ssl_certificate_key ${key};`);
+				if (protocols) lines.push(`    ssl_protocols ${protocols};`);
+				lines.push('    ssl_prefer_server_ciphers on;');
+				if (document.getElementById('sslStapling').checked) {
+					lines.push('    ssl_stapling on;');
+					lines.push('    ssl_stapling_verify on;');
+				}
+			}
+
+			// Headers
+			const headers = [];
+			if (document.getElementById('hdrHSTS').checked) headers.push('    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;');
+			if (document.getElementById('hdrXFrame').checked) headers.push('    add_header X-Frame-Options "SAMEORIGIN" always;');
+			if (document.getElementById('hdrXContent').checked) headers.push('    add_header X-Content-Type-Options "nosniff" always;');
+			if (document.getElementById('hdrXXSS').checked) headers.push('    add_header X-XSS-Protection "1; mode=block" always;');
+			if (document.getElementById('hdrReferrer').checked) headers.push('    add_header Referrer-Policy "no-referrer-when-downgrade" always;');
+			if (document.getElementById('hdrServerTokens').checked) headers.push('    server_tokens off;');
+
+			if (headers.length) { lines.push(''); headers.forEach(h => lines.push(h)); }
+
+			// Logging
+			const accessLog = document.getElementById('accessLog').value.trim();
+			const errorLog = document.getElementById('errorLog').value.trim();
+			if (accessLog || errorLog) {
+				lines.push('');
+				if (accessLog) lines.push(`    access_log ${accessLog};`);
+				if (errorLog) lines.push(`    error_log ${errorLog};`);
+			}
+
+			// Client max body
+			const maxBody = document.getElementById('clientMaxBody').value.trim();
+			if (maxBody) lines.push(`    client_max_body_size ${maxBody};`);
+
+			// Gzip
+			if (document.getElementById('enableGzip').checked) {
+				lines.push('');
+				lines.push('    gzip on;');
+				lines.push('    gzip_vary on;');
+				lines.push('    gzip_min_length 1024;');
+				lines.push('    gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript image/svg+xml;');
+			}
+
+			// Cache static
+			if (document.getElementById('enableCacheStatic').checked) {
+				lines.push('');
+				lines.push('    location ~* \\.(jpg|jpeg|png|gif|ico|css|js|svg|woff2?)$ {');
+				lines.push('        expires 30d;');
+				lines.push('        add_header Cache-Control "public, immutable";');
+				lines.push('    }');
+			}
+
+			// Location blocks
+			locations.forEach(l => {
+				lines.push('');
+				lines.push(`    location ${l.path} {`);
+
+				if (l.type === 'try_files' && l.tryFiles) {
+					lines.push(`        try_files ${l.tryFiles};`);
+				} else if (l.type === 'proxy') {
+					lines.push(`        proxy_pass ${l.proxyPass};`);
+					if (l.proxyHeaders) {
+						lines.push('        proxy_set_header Host $host;');
+						lines.push('        proxy_set_header X-Real-IP $remote_addr;');
+						lines.push('        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;');
+						lines.push('        proxy_set_header X-Forwarded-Proto $scheme;');
+					}
+					if (l.proxyWS) {
+						lines.push('        proxy_http_version 1.1;');
+						lines.push('        proxy_set_header Upgrade $http_upgrade;');
+						lines.push('        proxy_set_header Connection "upgrade";');
+					}
+				} else if (l.type === 'fastcgi') {
+					lines.push(`        fastcgi_pass ${l.fastcgiPass};`);
+					lines.push('        fastcgi_index index.php;');
+					lines.push('        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;');
+					lines.push('        include fastcgi_params;');
+				} else if (l.type === 'return') {
+					const url = l.returnUrl ? ` ${l.returnUrl}` : '';
+					lines.push(`        return ${l.returnCode}${url};`);
+				} else if (l.type === 'alias' && l.alias) {
+					lines.push(`        alias ${l.alias};`);
+				}
+
+				lines.push('    }');
+			});
+
+			lines.push('}');
+
+			// Render with syntax highlighting
+			const output = document.getElementById('configOutput');
+			output.innerHTML = lines.map(line => {
+				if (!line.trim()) return '';
+				if (line.trim().startsWith('#')) return `<span class="n-cmt">${esc(line)}</span>`;
+				if (line.trim() === '{' || line.trim() === '}') return `<span class="n-br">${esc(line)}</span>`;
+
+				// server { or location ... {
+				if (line.match(/^\s*(server|location|upstream)\s/)) {
+					return line.replace(/(server|location|upstream)(\s+)(.*?)(\s*\{)/, (m, kw, s1, rest, brace) =>
+						`<span class="n-dir">${kw}</span>${s1}<span class="n-val">${esc(rest)}</span><span class="n-br">${brace}</span>`
+					);
+				}
+
+				// Closing brace
+				if (line.trim() === '}') return `<span class="n-br">${esc(line)}</span>`;
+
+				// directive value;
+				const m = line.match(/^(\s*)(\S+)(\s+)(.*?)(;)$/);
+				if (m) {
+					const [, indent, key, sp, val, semi] = m;
+					// Check for quoted strings
+					const highlighted = val.replace(/"([^"]*)"/g, '<span class="n-str">"$1"</span>');
+					return `${indent}<span class="n-key">${esc(key)}</span>${sp}<span class="n-val">${highlighted}</span>${semi}`;
+				}
+
+				return esc(line);
+			}).join('\n');
+		}
+
+		function getPlainConfig() {
+			const el = document.getElementById('configOutput');
+			const tmp = document.createElement('div');
+			tmp.innerHTML = el.innerHTML;
+			return tmp.textContent;
+		}
+
+		function copyConfig() {
+			const t = getPlainConfig();
+			if (!t.trim()) return;
+			navigator.clipboard.writeText(t).then(() => showToast('Copied!'));
+		}
+
+		function downloadConfig() {
+			const t = getPlainConfig();
+			if (!t.trim()) return;
+			const blob = new Blob([t + '\n'], { type: 'text/plain' });
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = 'site.conf';
+			a.click();
+			URL.revokeObjectURL(a.href);
+			showToast('Downloaded!');
+		}
+
+		function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+		function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+
+		function applyPreset(name) {
+			// Reset
+			locations = [];
+			locIdCounter = 0;
+			document.getElementById('enableSSL').checked = false;
+			document.getElementById('sslPanel').style.display = 'none';
+			document.getElementById('http2').checked = false;
+			document.getElementById('listenPort').value = '80';
+			document.getElementById('serverName').value = 'example.com www.example.com';
+			document.getElementById('docRoot').value = '/var/www/html';
+			document.getElementById('indexFiles').value = 'index.html index.htm';
+			document.getElementById('enableGzip').checked = false;
+			document.getElementById('enableCacheStatic').checked = false;
+			document.getElementById('clientMaxBody').value = '';
+			document.getElementById('accessLog').value = '';
+			document.getElementById('errorLog').value = '';
+			['hdrHSTS','hdrXFrame','hdrXContent','hdrXXSS','hdrReferrer','hdrServerTokens'].forEach(id => document.getElementById(id).checked = false);
+
+			switch (name) {
+				case 'static':
+					document.getElementById('enableGzip').checked = true;
+					document.getElementById('enableCacheStatic').checked = true;
+					locations.push(createLocation({ path: '/', type: 'try_files', tryFiles: '$uri $uri/ =404' }));
+					break;
+
+				case 'proxy':
+					document.getElementById('enableSSL').checked = true;
+					document.getElementById('sslPanel').style.display = 'block';
+					document.getElementById('http2').checked = true;
+					document.getElementById('hdrHSTS').checked = true;
+					document.getElementById('hdrXFrame').checked = true;
+					document.getElementById('hdrXContent').checked = true;
+					document.getElementById('hdrServerTokens').checked = true;
+					locations.push(createLocation({ path: '/', type: 'proxy', proxyPass: 'http://localhost:3000', proxyHeaders: true }));
+					break;
+
+				case 'php':
+					document.getElementById('indexFiles').value = 'index.php index.html index.htm';
+					document.getElementById('enableGzip').checked = true;
+					document.getElementById('clientMaxBody').value = '64m';
+					locations.push(createLocation({ path: '/', type: 'try_files', tryFiles: '$uri $uri/ /index.php?$query_string' }));
+					locations.push(createLocation({ path: '~ \\.php$', type: 'fastcgi', fastcgiPass: 'unix:/run/php/php-fpm.sock' }));
+					break;
+
+				case 'spa':
+					document.getElementById('enableGzip').checked = true;
+					document.getElementById('enableCacheStatic').checked = true;
+					locations.push(createLocation({ path: '/', type: 'try_files', tryFiles: '$uri $uri/ /index.html' }));
+					break;
+
+				case 'redirect':
+					document.getElementById('docRoot').value = '';
+					document.getElementById('indexFiles').value = '';
+					locations.push(createLocation({ path: '/', type: 'return', returnCode: '301', returnUrl: 'https://new-domain.com$request_uri' }));
+					break;
+
+				case 'websocket':
+					document.getElementById('enableSSL').checked = true;
+					document.getElementById('sslPanel').style.display = 'block';
+					document.getElementById('http2').checked = true;
+					locations.push(createLocation({ path: '/', type: 'proxy', proxyPass: 'http://localhost:3000', proxyHeaders: true }));
+					locations.push(createLocation({ path: '/ws', type: 'proxy', proxyPass: 'http://localhost:3000', proxyHeaders: true, proxyWS: true }));
+					break;
+			}
+
+			renderLocations();
+			build();
+		}
+
+		// Initial
+		locations.push(createLocation());
+		renderLocations();
+		build();
+	</script>
+	<script src="/assets/shared-nav.js"></script>
+</body>
+</html>

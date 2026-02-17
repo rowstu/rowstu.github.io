@@ -1,0 +1,107 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>IRC – Internet Relay Chat Guide // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>IRC – Internet Relay Chat Guide</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/linuxirc/>Linuxirc</a></div><div class="card markdown-content"><p>IRC (Internet Relay Chat) is a real-time text messaging protocol from 1988 that is still widely used by open source projects, Linux communities, and tech groups. It&rsquo;s lightweight, no-frills, and runs in a terminal.</p><hr><h2 id=quick-start>Quick Start</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install a client</span>
+</span></span><span style=display:flex><span>sudo apt install irssi          <span style=color:#75715e># Debian/Ubuntu</span>
+</span></span><span style=display:flex><span>sudo pacman -S irssi            <span style=color:#75715e># Arch</span>
+</span></span><span style=display:flex><span>sudo dnf install irssi          <span style=color:#75715e># Fedora</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Or use weechat (more modern)</span>
+</span></span><span style=display:flex><span>sudo apt install weechat
+</span></span><span style=display:flex><span>sudo pacman -S weechat
+</span></span></code></pre></div><p>Connect to a network:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>irssi -c irc.libera.chat -n YourNick
+</span></span></code></pre></div><p>Or in WeeChat:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>weechat
+</span></span><span style=display:flex><span>/server add libera irc.libera.chat/6697 -ssl
+</span></span><span style=display:flex><span>/connect libera
+</span></span></code></pre></div><hr><h2 id=core-concepts>Core Concepts</h2><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>Network</strong></td><td>An IRC network (e.g. Libera Chat, OFTC, EFnet). Each is independent</td></tr><tr><td><strong>Server</strong></td><td>A host on the network you connect to (e.g. <code>irc.libera.chat</code>)</td></tr><tr><td><strong>Channel</strong></td><td>A chat room, always prefixed with <code>#</code> (e.g. <code>#linux</code>)</td></tr><tr><td><strong>Nick</strong></td><td>Your display name on the network</td></tr><tr><td><strong>NickServ</strong></td><td>A service that lets you register and protect your nick</td></tr><tr><td><strong>ChanServ</strong></td><td>A service that manages channel registration and permissions</td></tr><tr><td><strong>Op (@)</strong></td><td>Channel operator — can kick, ban, set topic</td></tr><tr><td><strong>Voice (+)</strong></td><td>A user given voice in a moderated channel</td></tr><tr><td><strong>CTCP</strong></td><td>Client-to-client protocol (VERSION, PING, etc.)</td></tr></tbody></table><hr><h2 id=everyday-commands>Everyday Commands</h2><p>These work in virtually every IRC client.</p><h3 id=connecting--identity>Connecting & Identity</h3><pre tabindex=0><code>/connect irc.libera.chat        Connect to a server
+/disconnect                     Disconnect from current server
+/nick MyNewNick                 Change your nickname
+/quit Goodbye!                  Quit IRC with an optional message
+</code></pre><h3 id=channels>Channels</h3><pre tabindex=0><code>/join #channel                  Join a channel
+/part #channel                  Leave a channel
+/part #channel See you later    Leave with a message
+/list                           List all channels (can be huge — use /list *linux* to filter)
+/topic #channel New topic       Set channel topic (if you have permission)
+/names #channel                 List users in a channel
+</code></pre><h3 id=messaging>Messaging</h3><pre tabindex=0><code>/msg NickName Hello!            Send a private message
+/notice NickName Hello!         Send a notice (less intrusive than msg)
+/me does something              Action message — shows as &#34;* YourNick does something&#34;
+/away Gone for lunch            Mark yourself as away
+/away                           Remove away status
+</code></pre><h3 id=user-information>User Information</h3><pre tabindex=0><code>/whois NickName                 Look up info about a user
+/who #channel                   List users in a channel with details
+/userhost NickName              Quick host lookup
+</code></pre><h3 id=channel-management-ops>Channel Management (Ops)</h3><pre tabindex=0><code>/kick #channel NickName reason  Kick a user
+/ban #channel *!*@hostname      Ban a host pattern
+/mode #channel +o NickName      Give someone operator status
+/mode #channel +v NickName      Give someone voice
+/mode #channel +m               Set channel to moderated (only voiced/ops can talk)
+/mode #channel +i               Set channel to invite-only
+/mode #channel +t               Only ops can change topic
+</code></pre><hr><h2 id=nickserv--registering-your-nick>NickServ – Registering Your Nick</h2><p>Most networks let you register a nick so nobody else can use it.</p><pre tabindex=0><code>/msg NickServ REGISTER password email@example.com     Register your nick
+/msg NickServ IDENTIFY password                        Log in to your nick
+/msg NickServ SET ENFORCE ON                           Auto-kick imposters after 30s
+/msg NickServ INFO NickName                            Check if a nick is registered
+/msg NickServ GHOST NickName password                  Kill a ghost session using your nick
+</code></pre><hr><h2 id=popular-networks>Popular Networks</h2><table><thead><tr><th>Network</th><th>Server</th><th>Used by</th></tr></thead><tbody><tr><td><strong>Libera Chat</strong></td><td><code>irc.libera.chat</code></td><td>Most open source projects (moved from Freenode in 2021)</td></tr><tr><td><strong>OFTC</strong></td><td><code>irc.oftc.net</code></td><td>Debian, Tor, many Linux distros</td></tr><tr><td><strong>EFnet</strong></td><td><code>irc.efnet.org</code></td><td>One of the oldest, general chat</td></tr><tr><td><strong>IRCnet</strong></td><td><code>open.ircnet.net</code></td><td>European communities</td></tr><tr><td><strong>Rizon</strong></td><td><code>irc.rizon.net</code></td><td>Anime, general</td></tr><tr><td><strong>hackint</strong></td><td><code>irc.hackint.org</code></td><td>Hackerspace and CCC communities</td></tr></tbody></table><h3 id=useful-libera-chat-channels>Useful Libera Chat Channels</h3><pre tabindex=0><code>#linux          General Linux help
+#archlinux      Arch Linux
+#debian         Debian
+#ubuntu         Ubuntu
+#fedora         Fedora
+#python         Python programming
+#bash           Shell scripting
+#git            Git version control
+#vim            Vim/Neovim
+#networking     Networking discussion
+##security      Security (note the double ##)
+</code></pre><hr><h2 id=client-comparison>Client Comparison</h2><table><thead><tr><th>Client</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><strong>irssi</strong></td><td>Terminal</td><td>Classic, highly scriptable with Perl, lightweight</td></tr><tr><td><strong>WeeChat</strong></td><td>Terminal</td><td>Modern, extensible with Python/Lua/Ruby, split windows</td></tr><tr><td><strong>HexChat</strong></td><td>GUI</td><td>GTK-based, easy to use, good for beginners</td></tr><tr><td><strong>Konversation</strong></td><td>GUI</td><td>KDE-based IRC client</td></tr><tr><td><strong>Senpai</strong></td><td>Terminal</td><td>Minimal, written in Go</td></tr><tr><td><strong>Halloy</strong></td><td>GUI</td><td>Modern Rust-based client</td></tr><tr><td><strong>Tiny</strong></td><td>Terminal</td><td>Lightweight, written in Rust</td></tr></tbody></table><hr><h2 id=irssi-quick-reference>Irssi Quick Reference</h2><p>Irssi is the most common terminal IRC client on Linux.</p><h3 id=window-management>Window Management</h3><pre tabindex=0><code>Alt+1 to Alt+9          Switch to window 1-9
+Alt+0                   Switch to window 10
+/window N               Switch to window N (for higher numbers)
+/window close           Close current window
+/window list            List all windows
+Ctrl+N / Ctrl+P         Next / previous window
+Page Up / Page Down     Scroll history
+/scrollback clear       Clear scrollback buffer
+</code></pre><h3 id=configuration>Configuration</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Config file location</span>
+</span></span><span style=display:flex><span>~/.irssi/config
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Useful settings</span>
+</span></span><span style=display:flex><span>/set nick YourNick
+</span></span><span style=display:flex><span>/set real_name Your Name
+</span></span><span style=display:flex><span>/set user_name username
+</span></span><span style=display:flex><span>/set theme default
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Auto-connect on startup</span>
+</span></span><span style=display:flex><span>/network add libera
+</span></span><span style=display:flex><span>/server add -auto -network libera irc.libera.chat <span style=color:#ae81ff>6697</span> -ssl
+</span></span><span style=display:flex><span>/channel add -auto <span style=color:#75715e>#linux libera</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Save your config</span>
+</span></span><span style=display:flex><span>/save
+</span></span></code></pre></div><h3 id=logging>Logging</h3><pre tabindex=0><code>/set autolog ON                 Enable auto-logging
+/set autolog_path ~/irclogs/%Y/$tag/$0.%m-%d.log
+</code></pre><hr><h2 id=weechat-quick-reference>WeeChat Quick Reference</h2><h3 id=key-bindings>Key Bindings</h3><pre tabindex=0><code>Alt+1 to Alt+9          Switch buffers
+F5 / F6                 Switch buffer list
+F7 / F8                 Switch windows (split view)
+F11 / F12               Scroll nick list
+Alt+&lt; / Alt+&gt;           Switch to buffer with activity
+/buffer N               Go to buffer N
+</code></pre><h3 id=useful-commands>Useful Commands</h3><pre tabindex=0><code>/set *option*           Search settings
+/fset                   Interactive settings editor
+/script install script  Install a script from the repository
+/trigger                Manage triggers (auto-responses, filters)
+/filter add name * tag  Filter messages by tag
+</code></pre><h3 id=split-windows>Split Windows</h3><pre tabindex=0><code>/window splitv          Split vertically
+/window splith          Split horizontally
+/window merge           Merge windows
+/window zoom            Zoom/unzoom current window
+</code></pre><hr><h2 id=using-irc-over-tlsssl>Using IRC Over TLS/SSL</h2><p>Always use TLS when connecting. Most networks support it on port 6697.</p><pre tabindex=0><code># irssi
+/connect -tls irc.libera.chat 6697
+
+# weechat — SSL is set per-server
+/server add libera irc.libera.chat/6697 -ssl
+/set irc.server.libera.ssl on
+/set irc.server.libera.ssl_verify on
+</code></pre><hr><h2 id=irc-bouncers-stay-connected-247>IRC Bouncers (Stay Connected 24/7)</h2><p>A bouncer keeps you connected when your client disconnects, buffering messages.</p><table><thead><tr><th>Bouncer</th><th>Notes</th></tr></thead><tbody><tr><td><strong>ZNC</strong></td><td>Most popular, web admin panel, multi-network</td></tr><tr><td><strong>soju</strong></td><td>Modern, lightweight, IRCv3-native</td></tr><tr><td><strong>Pounce</strong></td><td>Minimal, TLS-only</td></tr></tbody></table><h3 id=basic-znc-setup>Basic ZNC Setup</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt install znc
+</span></span><span style=display:flex><span>znc --makeconf        <span style=color:#75715e># Interactive setup wizard</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Default web panel: https://your-server:8080</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Connect your client to the bouncer instead of directly to the IRC network</span>
+</span></span></code></pre></div><hr><h2 id=irc-etiquette>IRC Etiquette</h2><ul><li><strong>Don&rsquo;t ask to ask</strong> — just ask your question directly</li><li><strong>Be patient</strong> — people are in different timezones, wait at least 15-20 minutes</li><li><strong>Use a pastebin</strong> for anything longer than 3 lines (e.g. <code>0x0.st</code>, <code>ix.io</code>)</li><li><strong>Read the channel topic</strong> — it often has rules and useful links</li><li><strong>Don&rsquo;t PM people without asking</strong> in the channel first</li><li><strong>Use your nick consistently</strong> so people recognise you</li></ul></div></div><script src=/assets/shared-nav.js></script></body></html>
