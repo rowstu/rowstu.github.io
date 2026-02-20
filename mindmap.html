@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Mindmap // rowstu.net</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06080f;
+            --surface: #0c1019;
+            --surface2: #141924;
+            --border: #1e263a;
+            --depth-0: #e0f2fe;
+            --depth-1: #38bdf8;
+            --depth-2: #a78bfa;
+            --depth-3: #fb7185;
+            --depth-4: #fbbf24;
+            --depth-0-dim: rgba(224,242,254,0.08);
+            --depth-1-dim: rgba(56,189,248,0.07);
+            --depth-2-dim: rgba(167,139,250,0.06);
+            --depth-3-dim: rgba(251,113,133,0.05);
+            --depth-4-dim: rgba(251,191,36,0.04);
+            --learned: #4ade80;
+            --learned-dim: rgba(74,222,128,0.15);
+            --conn: #1e2d4a;
+            --conn-hover: #38bdf8;
+            --text: #d1d9e6;
+            --text-dim: #5a6580;
+            --text-bright: #f0f4ff;
+            --beginner: #4ade80;
+            --intermediate: #fbbf24;
+            --advanced: #f87171;
+            --font-display: 'Bricolage Grotesque', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-display);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 15% 10%, rgba(56,189,248,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 90%, rgba(167,139,250,0.03) 0%, transparent 50%);
+        }
+        header {
+            text-align: center;
+            padding: 1.5rem 1rem 0.75rem;
+        }
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--depth-0), var(--depth-1), var(--depth-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        header p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            font-family: var(--font-mono);
+        }
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        .topic-search {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+        .topic-search input {
+            width: 100%;
+            padding: 0.55rem 0.85rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .topic-search input:focus { border-color: var(--depth-1); }
+        .topic-search input::placeholder { color: var(--text-dim); }
+        .autocomplete-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 320px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .ac-item {
+            padding: 0.5rem 0.85rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .ac-item:last-child { border-bottom: none; }
+        .ac-item:hover { background: rgba(56,189,248,0.08); }
+        .ac-item strong { color: var(--text-bright); font-size: 0.85rem; }
+        .ac-item span { color: var(--text-dim); font-size: 0.72rem; font-family: var(--font-mono); }
+        .ac-item.ac-custom { color: var(--text-dim); font-size: 0.8rem; font-style: italic; flex-direction: row; }
+        .toolbar-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.45rem 0.75rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            white-space: nowrap;
+        }
+        .btn:hover { border-color: var(--depth-1); background: rgba(56,189,248,0.06); }
+        .btn-accent {
+            background: rgba(56,189,248,0.12);
+            border-color: var(--depth-1);
+            color: var(--depth-1);
+        }
+        .btn-accent:hover { background: rgba(56,189,248,0.2); }
+        .mindmap-container {
+            position: relative;
+            width: calc(100% - 2rem);
+            max-width: 1200px;
+            height: calc(100vh - 220px);
+            min-height: 400px;
+            margin: 0 auto;
+            overflow: auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background-image: radial-gradient(circle, rgba(30,38,58,0.5) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .mindmap-container svg {
+            display: block;
+        }
+        .bottom-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        .legend {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .progress-wrap {
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--surface2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--learned);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .progress-text {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            white-space: nowrap;
+        }
+        .context-menu {
+            position: fixed;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.3rem 0;
+            z-index: 200;
+            min-width: 160px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        .context-menu button {
+            display: block;
+            width: 100%;
+            padding: 0.45rem 0.85rem;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+        .context-menu button:hover { background: rgba(56,189,248,0.1); }
+        .context-menu .cm-danger:hover { background: rgba(248,113,113,0.12); color: var(--advanced); }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+        .modal {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 380px;
+        }
+        .modal h3 {
+            font-size: 1rem;
+            color: var(--depth-1);
+            margin-bottom: 1rem;
+        }
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 0.5rem 0.7rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            margin-bottom: 0.6rem;
+            outline: none;
+        }
+        .modal input:focus, .modal textarea:focus { border-color: var(--depth-1); }
+        .modal textarea { resize: vertical; min-height: 60px; }
+        .modal-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+        .empty-state {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+        .empty-state .hint { font-size: 0.72rem; opacity: 0.6; }
+
+        .topic-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            padding: 0 1rem 0.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .topic-chip {
+            padding: 0.3rem 0.65rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+            white-space: nowrap;
+        }
+        .topic-chip:hover { border-color: var(--depth-1); color: var(--depth-1); background: rgba(56,189,248,0.06); }
+        .topic-chip.active { border-color: var(--depth-1); color: var(--depth-1); background: rgba(56,189,248,0.1); }
+
+        .node-actions {
+            position: fixed;
+            display: none;
+            gap: 0.25rem;
+            z-index: 150;
+            pointer-events: auto;
+        }
+        .node-actions.visible { display: flex; }
+        .node-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.15s, background 0.15s;
+            line-height: 1;
+            padding: 0;
+            font-family: var(--font-mono);
+        }
+        .node-action-btn:hover { border-color: var(--depth-1); background: rgba(56,189,248,0.12); }
+        .node-action-btn.danger:hover { border-color: var(--advanced); background: rgba(248,113,113,0.12); color: var(--advanced); }
+        .node-action-btn[title]::after { content: none; }
+
+        .node-rect { cursor: pointer; transition: filter 0.2s; }
+        .node-group:hover .node-rect { filter: brightness(1.3); }
+        .node-label { cursor: pointer; user-select: none; }
+        .difficulty-badge { font-size: 9px; }
+        .expand-badge { cursor: pointer; }
+
+        @keyframes nodeAppear {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes connDraw {
+            from { stroke-dashoffset: 500; }
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes learnedPulse {
+            0% { filter: drop-shadow(0 0 0 var(--learned)); }
+            50% { filter: drop-shadow(0 0 10px var(--learned)); }
+            100% { filter: drop-shadow(0 0 3px var(--learned)); }
+        }
+
+        @media (max-width: 900px) {
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-actions { justify-content: center; }
+            .mindmap-container { height: calc(100vh - 320px); }
+            .topic-chips { gap: 0.25rem; }
+        }
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.25rem; }
+            header p { font-size: 0.75rem; }
+            .toolbar { padding: 0.5rem; gap: 0.4rem; }
+            .btn { font-size: 0.68rem; padding: 0.35rem 0.55rem; }
+            .topic-chips { padding: 0 0.5rem 0.4rem; }
+            .topic-chip { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
+            .mindmap-container {
+                width: calc(100% - 1rem);
+                height: calc(100vh - 300px);
+                min-height: 300px;
+            }
+            .bottom-bar { flex-direction: column; align-items: stretch; padding: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Learning Mindmap</h1>
+        <p>explore curated learning paths or build your own</p>
+    </header>
+
+    <div class="toolbar">
+        <div class="topic-search">
+            <input type="text" id="topic-input" placeholder="Search topics or type a custom one..." autocomplete="off">
+            <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
+        </div>
+        <div class="toolbar-actions">
+            <button class="btn" id="btn-expand">Expand All</button>
+            <button class="btn" id="btn-collapse">Collapse</button>
+            <button class="btn" id="btn-zoom-in">+</button>
+            <button class="btn" id="btn-zoom-out">&minus;</button>
+            <button class="btn" id="btn-export-svg">SVG</button>
+            <button class="btn" id="btn-export-png">PNG</button>
+            <button class="btn" id="btn-reset">Reset</button>
+        </div>
+    </div>
+
+    <div class="topic-chips" id="topic-chips"></div>
+
+    <div id="node-actions" class="node-actions">
+        <button class="node-action-btn" id="na-add" title="Add child node">+</button>
+        <button class="node-action-btn" id="na-collapse" title="Collapse">&minus;</button>
+        <button class="node-action-btn" id="na-learned" title="Toggle learned">&#x2713;</button>
+        <button class="node-action-btn danger" id="na-delete" title="Delete node">&times;</button>
+    </div>
+
+    <div class="mindmap-container" id="mindmap-container">
+        <div class="empty-state" id="empty-state">
+            <div>Pick a topic below or search above</div>
+            <div class="hint">click nodes to expand &middot; click again for actions</div>
+        </div>
+        <svg id="mindmap-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="legend" id="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--depth-0)"></div>Root</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--depth-1)"></div>Core</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--depth-2)"></div>Topics</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--depth-3)"></div>Skills</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--depth-4)"></div>Detail</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--learned)"></div>Learned</div>
+        </div>
+        <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+            <span class="progress-text" id="progress-text">0 / 0</span>
+        </div>
+    </div>
+
+    <div id="context-menu" class="context-menu" style="display:none">
+        <button data-action="toggle">Expand / Collapse</button>
+        <button data-action="add-child">Add Child Node</button>
+        <button data-action="edit">Edit Node</button>
+        <button data-action="toggle-learned">Toggle Learned</button>
+        <button class="cm-danger" data-action="delete">Delete Node</button>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay" style="display:none">
+        <div class="modal">
+            <h3 id="modal-title">Edit Node</h3>
+            <input type="text" id="modal-label" placeholder="Label">
+            <textarea id="modal-desc" placeholder="Description (optional)"></textarea>
+            <div class="modal-buttons">
+                <button class="btn" id="modal-cancel">Cancel</button>
+                <button class="btn btn-accent" id="modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/shared-nav.js"></script>
+    <script>
+    // ===== TOPIC DATA =====
+    const TOPICS = {
+        docker: {
+            label: 'Docker', desc: 'Container platform for building, shipping, and running applications',
+            children: [
+                { label: 'Core Concepts', diff: 'beginner', children: [
+                    { label: 'Images', diff: 'beginner', children: [
+                        { label: 'Dockerfile syntax', diff: 'beginner' },
+                        { label: 'Layer caching', diff: 'intermediate' },
+                        { label: 'Multi-stage builds', diff: 'intermediate' },
+                        { label: 'Base image selection', diff: 'beginner' },
+                    ]},
+                    { label: 'Containers', diff: 'beginner', children: [
+                        { label: 'Lifecycle (run/stop/rm)', diff: 'beginner' },
+                        { label: 'Exec & attach', diff: 'beginner' },
+                        { label: 'Resource limits', diff: 'intermediate' },
+                        { label: 'Logging drivers', diff: 'intermediate' },
+                    ]},
+                    { label: 'Volumes', diff: 'beginner', children: [
+                        { label: 'Named volumes', diff: 'beginner' },
+                        { label: 'Bind mounts', diff: 'beginner' },
+                        { label: 'tmpfs mounts', diff: 'intermediate' },
+                    ]},
+                    { label: 'Networking', diff: 'beginner', children: [
+                        { label: 'Bridge networks', diff: 'beginner' },
+                        { label: 'Host networking', diff: 'intermediate' },
+                        { label: 'Overlay networks', diff: 'advanced' },
+                    ]},
+                ]},
+                { label: 'Docker Compose', diff: 'intermediate', children: [
+                    { label: 'Service definitions', diff: 'intermediate' },
+                    { label: 'Environment variables', diff: 'intermediate' },
+                    { label: 'Depends_on & healthchecks', diff: 'intermediate' },
+                    { label: 'Profiles & overrides', diff: 'advanced' },
+                ]},
+                { label: 'Security', diff: 'intermediate', children: [
+                    { label: 'Rootless containers', diff: 'intermediate' },
+                    { label: 'Image scanning', diff: 'intermediate' },
+                    { label: 'Secrets management', diff: 'advanced' },
+                    { label: 'AppArmor / Seccomp', diff: 'advanced' },
+                ]},
+                { label: 'Orchestration', diff: 'advanced', children: [
+                    { label: 'Docker Swarm', diff: 'advanced' },
+                    { label: 'Container registries', diff: 'intermediate' },
+                    { label: 'CI/CD integration', diff: 'advanced' },
+                ]},
+            ]
+        },
+        git: {
+            label: 'Git', desc: 'Distributed version control system',
+            children: [
+                { label: 'Basics', diff: 'beginner', children: [
+                    { label: 'init / clone', diff: 'beginner' },
+                    { label: 'add / commit', diff: 'beginner' },
+                    { label: 'status / log / diff', diff: 'beginner' },
+                    { label: '.gitignore', diff: 'beginner' },
+                ]},
+                { label: 'Branching', diff: 'beginner', children: [
+                    { label: 'Creating branches', diff: 'beginner' },
+                    { label: 'Switching branches', diff: 'beginner' },
+                    { label: 'Remote tracking', diff: 'intermediate' },
+                    { label: 'Branch strategies', diff: 'intermediate' },
+                ]},
+                { label: 'Merging & Rebasing', diff: 'intermediate', children: [
+                    { label: 'Fast-forward merge', diff: 'beginner' },
+                    { label: 'Three-way merge', diff: 'intermediate' },
+                    { label: 'Conflict resolution', diff: 'intermediate' },
+                    { label: 'Interactive rebase', diff: 'advanced' },
+                    { label: 'Cherry-pick', diff: 'intermediate' },
+                ]},
+                { label: 'Collaboration', diff: 'intermediate', children: [
+                    { label: 'Pull requests', diff: 'beginner' },
+                    { label: 'Code review', diff: 'intermediate' },
+                    { label: 'Forking workflow', diff: 'intermediate' },
+                ]},
+                { label: 'Advanced', diff: 'advanced', children: [
+                    { label: 'Reflog', diff: 'advanced' },
+                    { label: 'Bisect', diff: 'advanced' },
+                    { label: 'Hooks', diff: 'advanced' },
+                    { label: 'Submodules', diff: 'advanced' },
+                    { label: 'Worktrees', diff: 'advanced' },
+                ]},
+            ]
+        },
+        linux: {
+            label: 'Linux', desc: 'Operating system kernel and userland fundamentals',
+            children: [
+                { label: 'Shell Basics', diff: 'beginner', children: [
+                    { label: 'Navigation (cd/ls/pwd)', diff: 'beginner' },
+                    { label: 'File ops (cp/mv/rm/mkdir)', diff: 'beginner' },
+                    { label: 'Pipes & redirection', diff: 'beginner' },
+                    { label: 'Globbing & wildcards', diff: 'beginner' },
+                ]},
+                { label: 'File System', diff: 'beginner', children: [
+                    { label: 'FHS layout', diff: 'beginner' },
+                    { label: 'Inodes & links', diff: 'intermediate' },
+                    { label: 'Mount points', diff: 'intermediate' },
+                    { label: 'ext4 / btrfs / xfs', diff: 'advanced' },
+                ]},
+                { label: 'Users & Permissions', diff: 'beginner', children: [
+                    { label: 'chmod / chown', diff: 'beginner' },
+                    { label: 'User management', diff: 'intermediate' },
+                    { label: 'sudo & sudoers', diff: 'intermediate' },
+                    { label: 'ACLs', diff: 'advanced' },
+                ]},
+                { label: 'Process Management', diff: 'intermediate', children: [
+                    { label: 'ps / top / htop', diff: 'beginner' },
+                    { label: 'Signals (kill/SIGTERM)', diff: 'intermediate' },
+                    { label: 'Job control (bg/fg)', diff: 'intermediate' },
+                    { label: 'cgroups & namespaces', diff: 'advanced' },
+                ]},
+                { label: 'systemd', diff: 'intermediate', children: [
+                    { label: 'Unit files', diff: 'intermediate' },
+                    { label: 'systemctl', diff: 'intermediate' },
+                    { label: 'journalctl', diff: 'intermediate' },
+                    { label: 'Timers', diff: 'advanced' },
+                ]},
+                { label: 'Networking', diff: 'intermediate', children: [
+                    { label: 'ip / ss / netstat', diff: 'intermediate' },
+                    { label: 'iptables / nftables', diff: 'advanced' },
+                    { label: 'DNS resolution', diff: 'intermediate' },
+                    { label: 'NetworkManager', diff: 'intermediate' },
+                ]},
+                { label: 'Package Management', diff: 'beginner', children: [
+                    { label: 'apt / dnf / pacman', diff: 'beginner' },
+                    { label: 'Building from source', diff: 'advanced' },
+                    { label: 'Flatpak / Snap', diff: 'intermediate' },
+                ]},
+            ]
+        },
+        python: {
+            label: 'Python', desc: 'General-purpose programming language',
+            children: [
+                { label: 'Fundamentals', diff: 'beginner', children: [
+                    { label: 'Variables & types', diff: 'beginner' },
+                    { label: 'Control flow', diff: 'beginner' },
+                    { label: 'Functions', diff: 'beginner' },
+                    { label: 'String formatting', diff: 'beginner' },
+                ]},
+                { label: 'Data Structures', diff: 'beginner', children: [
+                    { label: 'Lists & tuples', diff: 'beginner' },
+                    { label: 'Dictionaries & sets', diff: 'beginner' },
+                    { label: 'Comprehensions', diff: 'intermediate' },
+                    { label: 'Collections module', diff: 'intermediate' },
+                ]},
+                { label: 'OOP', diff: 'intermediate', children: [
+                    { label: 'Classes & objects', diff: 'intermediate' },
+                    { label: 'Inheritance & MRO', diff: 'intermediate' },
+                    { label: 'Dunder methods', diff: 'intermediate' },
+                    { label: 'Dataclasses', diff: 'intermediate' },
+                ]},
+                { label: 'Advanced Features', diff: 'intermediate', children: [
+                    { label: 'Decorators', diff: 'intermediate' },
+                    { label: 'Generators & itertools', diff: 'intermediate' },
+                    { label: 'Context managers', diff: 'intermediate' },
+                    { label: 'Type hints', diff: 'intermediate' },
+                    { label: 'Metaclasses', diff: 'advanced' },
+                ]},
+                { label: 'Async', diff: 'advanced', children: [
+                    { label: 'asyncio event loop', diff: 'advanced' },
+                    { label: 'async/await syntax', diff: 'intermediate' },
+                    { label: 'Coroutines & tasks', diff: 'advanced' },
+                ]},
+                { label: 'Testing & Tooling', diff: 'intermediate', children: [
+                    { label: 'pytest', diff: 'intermediate' },
+                    { label: 'Virtual environments', diff: 'beginner' },
+                    { label: 'Linting (ruff/flake8)', diff: 'intermediate' },
+                    { label: 'Packaging (pyproject.toml)', diff: 'advanced' },
+                ]},
+            ]
+        },
+        javascript: {
+            label: 'JavaScript', desc: 'Language of the web — browser and server-side',
+            children: [
+                { label: 'Core Language', diff: 'beginner', children: [
+                    { label: 'Variables (let/const)', diff: 'beginner' },
+                    { label: 'Functions & arrow fns', diff: 'beginner' },
+                    { label: 'Objects & arrays', diff: 'beginner' },
+                    { label: 'Template literals', diff: 'beginner' },
+                    { label: 'Destructuring', diff: 'beginner' },
+                ]},
+                { label: 'Async Patterns', diff: 'intermediate', children: [
+                    { label: 'Callbacks', diff: 'beginner' },
+                    { label: 'Promises', diff: 'intermediate' },
+                    { label: 'async/await', diff: 'intermediate' },
+                    { label: 'Event loop', diff: 'advanced' },
+                ]},
+                { label: 'DOM & Browser', diff: 'intermediate', children: [
+                    { label: 'Selectors & traversal', diff: 'beginner' },
+                    { label: 'Event handling', diff: 'intermediate' },
+                    { label: 'Fetch API', diff: 'intermediate' },
+                    { label: 'Web Storage', diff: 'intermediate' },
+                ]},
+                { label: 'Advanced Concepts', diff: 'advanced', children: [
+                    { label: 'Closures & scope', diff: 'intermediate' },
+                    { label: 'Prototypes & this', diff: 'advanced' },
+                    { label: 'Proxies & Reflect', diff: 'advanced' },
+                    { label: 'WeakMap & WeakRef', diff: 'advanced' },
+                ]},
+                { label: 'Modules & Tooling', diff: 'intermediate', children: [
+                    { label: 'ES Modules', diff: 'intermediate' },
+                    { label: 'npm ecosystem', diff: 'beginner' },
+                    { label: 'Bundlers (Vite/esbuild)', diff: 'intermediate' },
+                ]},
+                { label: 'Node.js', diff: 'intermediate', children: [
+                    { label: 'File system (fs)', diff: 'intermediate' },
+                    { label: 'HTTP server', diff: 'intermediate' },
+                    { label: 'Streams', diff: 'advanced' },
+                    { label: 'Worker threads', diff: 'advanced' },
+                ]},
+            ]
+        },
+        react: {
+            label: 'React', desc: 'Component-based UI library',
+            children: [
+                { label: 'Fundamentals', diff: 'beginner', children: [
+                    { label: 'JSX syntax', diff: 'beginner' },
+                    { label: 'Components & props', diff: 'beginner' },
+                    { label: 'Conditional rendering', diff: 'beginner' },
+                    { label: 'Lists & keys', diff: 'beginner' },
+                ]},
+                { label: 'Hooks', diff: 'intermediate', children: [
+                    { label: 'useState', diff: 'beginner' },
+                    { label: 'useEffect', diff: 'intermediate' },
+                    { label: 'useRef', diff: 'intermediate' },
+                    { label: 'useMemo / useCallback', diff: 'intermediate' },
+                    { label: 'useReducer', diff: 'intermediate' },
+                    { label: 'Custom hooks', diff: 'advanced' },
+                ]},
+                { label: 'State Management', diff: 'intermediate', children: [
+                    { label: 'Lifting state up', diff: 'beginner' },
+                    { label: 'Context API', diff: 'intermediate' },
+                    { label: 'Zustand / Jotai', diff: 'intermediate' },
+                    { label: 'Redux Toolkit', diff: 'advanced' },
+                ]},
+                { label: 'Routing', diff: 'intermediate', children: [
+                    { label: 'React Router basics', diff: 'intermediate' },
+                    { label: 'Nested routes', diff: 'intermediate' },
+                    { label: 'Data loaders', diff: 'advanced' },
+                ]},
+                { label: 'Performance', diff: 'advanced', children: [
+                    { label: 'React.memo', diff: 'intermediate' },
+                    { label: 'Code splitting', diff: 'advanced' },
+                    { label: 'Suspense & lazy', diff: 'advanced' },
+                    { label: 'React Compiler', diff: 'advanced' },
+                ]},
+                { label: 'Testing', diff: 'intermediate', children: [
+                    { label: 'React Testing Library', diff: 'intermediate' },
+                    { label: 'Component testing', diff: 'intermediate' },
+                    { label: 'E2E with Playwright', diff: 'advanced' },
+                ]},
+            ]
+        },
+        kubernetes: {
+            label: 'Kubernetes', desc: 'Container orchestration platform',
+            children: [
+                { label: 'Core Objects', diff: 'beginner', children: [
+                    { label: 'Pods', diff: 'beginner' },
+                    { label: 'ReplicaSets', diff: 'beginner' },
+                    { label: 'Deployments', diff: 'beginner' },
+                    { label: 'Namespaces', diff: 'beginner' },
+                ]},
+                { label: 'Services & Networking', diff: 'intermediate', children: [
+                    { label: 'ClusterIP / NodePort', diff: 'intermediate' },
+                    { label: 'LoadBalancer', diff: 'intermediate' },
+                    { label: 'Ingress controllers', diff: 'intermediate' },
+                    { label: 'Network policies', diff: 'advanced' },
+                ]},
+                { label: 'Configuration', diff: 'intermediate', children: [
+                    { label: 'ConfigMaps', diff: 'intermediate' },
+                    { label: 'Secrets', diff: 'intermediate' },
+                    { label: 'Resource limits', diff: 'intermediate' },
+                    { label: 'PVs & PVCs', diff: 'intermediate' },
+                ]},
+                { label: 'Workloads', diff: 'intermediate', children: [
+                    { label: 'DaemonSets', diff: 'intermediate' },
+                    { label: 'StatefulSets', diff: 'advanced' },
+                    { label: 'Jobs & CronJobs', diff: 'intermediate' },
+                ]},
+                { label: 'Operations', diff: 'advanced', children: [
+                    { label: 'Helm charts', diff: 'intermediate' },
+                    { label: 'Kustomize', diff: 'intermediate' },
+                    { label: 'Operators & CRDs', diff: 'advanced' },
+                    { label: 'RBAC', diff: 'advanced' },
+                ]},
+                { label: 'Observability', diff: 'advanced', children: [
+                    { label: 'Prometheus / Grafana', diff: 'advanced' },
+                    { label: 'Logging (EFK stack)', diff: 'advanced' },
+                    { label: 'Tracing (Jaeger)', diff: 'advanced' },
+                ]},
+            ]
+        },
+        sql: {
+            label: 'SQL', desc: 'Structured query language for relational databases',
+            children: [
+                { label: 'Basics', diff: 'beginner', children: [
+                    { label: 'SELECT / FROM / WHERE', diff: 'beginner' },
+                    { label: 'INSERT / UPDATE / DELETE', diff: 'beginner' },
+                    { label: 'ORDER BY / LIMIT', diff: 'beginner' },
+                    { label: 'Data types', diff: 'beginner' },
+                ]},
+                { label: 'Joins', diff: 'intermediate', children: [
+                    { label: 'INNER JOIN', diff: 'beginner' },
+                    { label: 'LEFT / RIGHT JOIN', diff: 'intermediate' },
+                    { label: 'CROSS / SELF JOIN', diff: 'intermediate' },
+                    { label: 'Subqueries', diff: 'intermediate' },
+                ]},
+                { label: 'Aggregation', diff: 'intermediate', children: [
+                    { label: 'GROUP BY / HAVING', diff: 'intermediate' },
+                    { label: 'COUNT / SUM / AVG', diff: 'beginner' },
+                    { label: 'Window functions', diff: 'advanced' },
+                    { label: 'CTEs (WITH clause)', diff: 'intermediate' },
+                ]},
+                { label: 'Schema Design', diff: 'intermediate', children: [
+                    { label: 'Normalization (1NF-3NF)', diff: 'intermediate' },
+                    { label: 'Primary / foreign keys', diff: 'beginner' },
+                    { label: 'Indexes', diff: 'intermediate' },
+                    { label: 'Constraints', diff: 'intermediate' },
+                ]},
+                { label: 'Performance', diff: 'advanced', children: [
+                    { label: 'EXPLAIN / query plans', diff: 'advanced' },
+                    { label: 'Index strategies', diff: 'advanced' },
+                    { label: 'Query optimization', diff: 'advanced' },
+                    { label: 'Partitioning', diff: 'advanced' },
+                ]},
+                { label: 'Transactions', diff: 'intermediate', children: [
+                    { label: 'ACID properties', diff: 'intermediate' },
+                    { label: 'Isolation levels', diff: 'advanced' },
+                    { label: 'Locking & deadlocks', diff: 'advanced' },
+                ]},
+            ]
+        },
+        networking: {
+            label: 'Networking', desc: 'Computer network fundamentals and protocols',
+            children: [
+                { label: 'OSI Model', diff: 'beginner', children: [
+                    { label: 'Physical & Data Link', diff: 'beginner' },
+                    { label: 'Network layer', diff: 'beginner' },
+                    { label: 'Transport layer', diff: 'beginner' },
+                    { label: 'Application layer', diff: 'beginner' },
+                ]},
+                { label: 'TCP/IP', diff: 'intermediate', children: [
+                    { label: 'IP addressing & CIDR', diff: 'beginner' },
+                    { label: 'TCP handshake', diff: 'intermediate' },
+                    { label: 'UDP use cases', diff: 'intermediate' },
+                    { label: 'NAT & PAT', diff: 'intermediate' },
+                ]},
+                { label: 'DNS', diff: 'intermediate', children: [
+                    { label: 'Record types (A/CNAME/MX)', diff: 'intermediate' },
+                    { label: 'Resolution process', diff: 'intermediate' },
+                    { label: 'DNSSEC', diff: 'advanced' },
+                ]},
+                { label: 'HTTP/HTTPS', diff: 'intermediate', children: [
+                    { label: 'Request/response cycle', diff: 'beginner' },
+                    { label: 'Headers & status codes', diff: 'intermediate' },
+                    { label: 'TLS/SSL handshake', diff: 'advanced' },
+                    { label: 'HTTP/2 & HTTP/3', diff: 'advanced' },
+                ]},
+                { label: 'Routing & Switching', diff: 'advanced', children: [
+                    { label: 'VLANs', diff: 'intermediate' },
+                    { label: 'Static & dynamic routing', diff: 'advanced' },
+                    { label: 'BGP basics', diff: 'advanced' },
+                ]},
+                { label: 'Security', diff: 'intermediate', children: [
+                    { label: 'Firewalls', diff: 'intermediate' },
+                    { label: 'VPNs', diff: 'intermediate' },
+                    { label: 'IDS/IPS', diff: 'advanced' },
+                ]},
+            ]
+        },
+        security: {
+            label: 'Security', desc: 'Information security and cybersecurity fundamentals',
+            children: [
+                { label: 'Foundations', diff: 'beginner', children: [
+                    { label: 'CIA Triad', diff: 'beginner' },
+                    { label: 'Threat modelling', diff: 'intermediate' },
+                    { label: 'Risk assessment', diff: 'intermediate' },
+                    { label: 'Security policies', diff: 'intermediate' },
+                ]},
+                { label: 'Authentication', diff: 'intermediate', children: [
+                    { label: 'Password hashing', diff: 'intermediate' },
+                    { label: 'Multi-factor auth', diff: 'intermediate' },
+                    { label: 'OAuth 2.0 / OIDC', diff: 'advanced' },
+                    { label: 'JWT & sessions', diff: 'intermediate' },
+                ]},
+                { label: 'Cryptography', diff: 'intermediate', children: [
+                    { label: 'Symmetric encryption', diff: 'intermediate' },
+                    { label: 'Asymmetric (RSA/ECC)', diff: 'advanced' },
+                    { label: 'Hashing (SHA/bcrypt)', diff: 'intermediate' },
+                    { label: 'PKI & certificates', diff: 'advanced' },
+                ]},
+                { label: 'Web Security', diff: 'intermediate', children: [
+                    { label: 'OWASP Top 10', diff: 'intermediate' },
+                    { label: 'XSS prevention', diff: 'intermediate' },
+                    { label: 'SQL injection', diff: 'intermediate' },
+                    { label: 'CSRF protection', diff: 'intermediate' },
+                    { label: 'CSP headers', diff: 'advanced' },
+                ]},
+                { label: 'Infrastructure', diff: 'advanced', children: [
+                    { label: 'Hardening', diff: 'advanced' },
+                    { label: 'Zero trust', diff: 'advanced' },
+                    { label: 'Incident response', diff: 'advanced' },
+                ]},
+            ]
+        },
+        llm: {
+            label: 'LLM / AI', desc: 'Large language models, prompt engineering, and AI applications',
+            children: [
+                { label: 'Foundations', diff: 'beginner', children: [
+                    { label: 'What are LLMs', diff: 'beginner' },
+                    { label: 'Tokenization', diff: 'beginner' },
+                    { label: 'Transformers (intuition)', diff: 'intermediate' },
+                    { label: 'Attention mechanism', diff: 'advanced' },
+                ]},
+                { label: 'Prompt Engineering', diff: 'beginner', children: [
+                    { label: 'Zero-shot prompting', diff: 'beginner' },
+                    { label: 'Few-shot examples', diff: 'beginner' },
+                    { label: 'Chain of thought', diff: 'intermediate' },
+                    { label: 'System prompts', diff: 'intermediate' },
+                    { label: 'Structured output', diff: 'intermediate' },
+                ]},
+                { label: 'APIs & Tools', diff: 'intermediate', children: [
+                    { label: 'Chat completions API', diff: 'intermediate' },
+                    { label: 'Tool use / function calling', diff: 'intermediate' },
+                    { label: 'Streaming responses', diff: 'intermediate' },
+                    { label: 'Temperature & sampling', diff: 'intermediate' },
+                ]},
+                { label: 'RAG', diff: 'intermediate', children: [
+                    { label: 'Embeddings', diff: 'intermediate' },
+                    { label: 'Vector databases', diff: 'intermediate' },
+                    { label: 'Chunking strategies', diff: 'intermediate' },
+                    { label: 'Retrieval quality', diff: 'advanced' },
+                ]},
+                { label: 'Agents', diff: 'advanced', children: [
+                    { label: 'ReAct pattern', diff: 'advanced' },
+                    { label: 'Planning & reasoning', diff: 'advanced' },
+                    { label: 'Multi-agent systems', diff: 'advanced' },
+                    { label: 'MCP (Model Context Protocol)', diff: 'advanced' },
+                ]},
+                { label: 'Fine-tuning & Training', diff: 'advanced', children: [
+                    { label: 'LoRA / QLoRA', diff: 'advanced' },
+                    { label: 'Dataset preparation', diff: 'advanced' },
+                    { label: 'RLHF / DPO', diff: 'advanced' },
+                    { label: 'Evaluation & benchmarks', diff: 'advanced' },
+                ]},
+            ]
+        },
+        rust: {
+            label: 'Rust', desc: 'Systems programming language focused on safety and performance',
+            children: [
+                { label: 'Ownership System', diff: 'beginner', children: [
+                    { label: 'Ownership rules', diff: 'beginner' },
+                    { label: 'Borrowing & references', diff: 'beginner' },
+                    { label: 'Lifetimes', diff: 'intermediate' },
+                    { label: 'Lifetime elision', diff: 'advanced' },
+                ]},
+                { label: 'Type System', diff: 'intermediate', children: [
+                    { label: 'Structs & enums', diff: 'beginner' },
+                    { label: 'Pattern matching', diff: 'beginner' },
+                    { label: 'Traits', diff: 'intermediate' },
+                    { label: 'Generics', diff: 'intermediate' },
+                    { label: 'Trait objects (dyn)', diff: 'advanced' },
+                ]},
+                { label: 'Error Handling', diff: 'intermediate', children: [
+                    { label: 'Result & Option', diff: 'beginner' },
+                    { label: '? operator', diff: 'beginner' },
+                    { label: 'Custom error types', diff: 'intermediate' },
+                    { label: 'anyhow / thiserror', diff: 'intermediate' },
+                ]},
+                { label: 'Concurrency', diff: 'advanced', children: [
+                    { label: 'Threads & Arc/Mutex', diff: 'intermediate' },
+                    { label: 'Send & Sync traits', diff: 'advanced' },
+                    { label: 'Async with tokio', diff: 'advanced' },
+                    { label: 'Channels (mpsc)', diff: 'intermediate' },
+                ]},
+                { label: 'Ecosystem', diff: 'intermediate', children: [
+                    { label: 'Cargo & crates.io', diff: 'beginner' },
+                    { label: 'Testing', diff: 'intermediate' },
+                    { label: 'Serde serialization', diff: 'intermediate' },
+                    { label: 'Unsafe Rust', diff: 'advanced' },
+                ]},
+            ]
+        },
+        go: {
+            label: 'Go', desc: 'Statically typed, compiled language by Google',
+            children: [
+                { label: 'Basics', diff: 'beginner', children: [
+                    { label: 'Types & variables', diff: 'beginner' },
+                    { label: 'Functions & methods', diff: 'beginner' },
+                    { label: 'Structs', diff: 'beginner' },
+                    { label: 'Pointers', diff: 'beginner' },
+                ]},
+                { label: 'Concurrency', diff: 'intermediate', children: [
+                    { label: 'Goroutines', diff: 'intermediate' },
+                    { label: 'Channels', diff: 'intermediate' },
+                    { label: 'Select statement', diff: 'intermediate' },
+                    { label: 'sync package', diff: 'advanced' },
+                    { label: 'Context', diff: 'intermediate' },
+                ]},
+                { label: 'Interfaces', diff: 'intermediate', children: [
+                    { label: 'Implicit implementation', diff: 'intermediate' },
+                    { label: 'Empty interface', diff: 'intermediate' },
+                    { label: 'Type assertions', diff: 'intermediate' },
+                    { label: 'Generics', diff: 'intermediate' },
+                ]},
+                { label: 'Error Handling', diff: 'intermediate', children: [
+                    { label: 'Error values', diff: 'beginner' },
+                    { label: 'errors.Is / errors.As', diff: 'intermediate' },
+                    { label: 'Panic & recover', diff: 'advanced' },
+                ]},
+                { label: 'Tooling', diff: 'intermediate', children: [
+                    { label: 'Go modules', diff: 'beginner' },
+                    { label: 'Testing (go test)', diff: 'intermediate' },
+                    { label: 'Benchmarks', diff: 'intermediate' },
+                    { label: 'go vet / staticcheck', diff: 'intermediate' },
+                ]},
+            ]
+        },
+        shell: {
+            label: 'Shell Scripting', desc: 'Bash/POSIX shell scripting for automation',
+            children: [
+                { label: 'Basics', diff: 'beginner', children: [
+                    { label: 'Shebang & execution', diff: 'beginner' },
+                    { label: 'Variables & quoting', diff: 'beginner' },
+                    { label: 'Exit codes', diff: 'beginner' },
+                    { label: 'Command substitution', diff: 'beginner' },
+                ]},
+                { label: 'Control Flow', diff: 'beginner', children: [
+                    { label: 'if / elif / else', diff: 'beginner' },
+                    { label: 'for / while loops', diff: 'beginner' },
+                    { label: 'case statements', diff: 'intermediate' },
+                    { label: 'Test expressions', diff: 'beginner' },
+                ]},
+                { label: 'Functions', diff: 'intermediate', children: [
+                    { label: 'Function syntax', diff: 'intermediate' },
+                    { label: 'Local variables', diff: 'intermediate' },
+                    { label: 'Return values', diff: 'intermediate' },
+                ]},
+                { label: 'Text Processing', diff: 'intermediate', children: [
+                    { label: 'grep & regex', diff: 'intermediate' },
+                    { label: 'sed basics', diff: 'intermediate' },
+                    { label: 'awk basics', diff: 'intermediate' },
+                    { label: 'cut / sort / uniq', diff: 'beginner' },
+                ]},
+                { label: 'Advanced', diff: 'advanced', children: [
+                    { label: 'Traps & signals', diff: 'advanced' },
+                    { label: 'Here documents', diff: 'intermediate' },
+                    { label: 'Process substitution', diff: 'advanced' },
+                    { label: 'Parameter expansion', diff: 'advanced' },
+                    { label: 'set -euo pipefail', diff: 'intermediate' },
+                ]},
+            ]
+        },
+        css: {
+            label: 'CSS', desc: 'Styling and layout for the web',
+            children: [
+                { label: 'Fundamentals', diff: 'beginner', children: [
+                    { label: 'Selectors & specificity', diff: 'beginner' },
+                    { label: 'Box model', diff: 'beginner' },
+                    { label: 'Display property', diff: 'beginner' },
+                    { label: 'Cascade & inheritance', diff: 'intermediate' },
+                ]},
+                { label: 'Layout', diff: 'intermediate', children: [
+                    { label: 'Flexbox', diff: 'beginner' },
+                    { label: 'CSS Grid', diff: 'intermediate' },
+                    { label: 'Position (relative/absolute)', diff: 'beginner' },
+                    { label: 'Container queries', diff: 'advanced' },
+                ]},
+                { label: 'Visual Design', diff: 'intermediate', children: [
+                    { label: 'Typography', diff: 'beginner' },
+                    { label: 'Colors & gradients', diff: 'beginner' },
+                    { label: 'Shadows & filters', diff: 'intermediate' },
+                    { label: 'Custom properties', diff: 'intermediate' },
+                ]},
+                { label: 'Animation', diff: 'intermediate', children: [
+                    { label: 'Transitions', diff: 'beginner' },
+                    { label: 'Keyframe animations', diff: 'intermediate' },
+                    { label: 'Transform (2D/3D)', diff: 'intermediate' },
+                    { label: 'Scroll-driven animations', diff: 'advanced' },
+                ]},
+                { label: 'Responsive Design', diff: 'intermediate', children: [
+                    { label: 'Media queries', diff: 'beginner' },
+                    { label: 'Mobile-first approach', diff: 'intermediate' },
+                    { label: 'Fluid typography (clamp)', diff: 'intermediate' },
+                    { label: 'Logical properties', diff: 'advanced' },
+                ]},
+                { label: 'Modern CSS', diff: 'advanced', children: [
+                    { label: 'Nesting', diff: 'intermediate' },
+                    { label: ':has() selector', diff: 'advanced' },
+                    { label: 'Subgrid', diff: 'advanced' },
+                    { label: 'View transitions', diff: 'advanced' },
+                ]},
+            ]
+        },
+        typescript: {
+            label: 'TypeScript', desc: 'Typed superset of JavaScript',
+            children: [
+                { label: 'Basics', diff: 'beginner', children: [
+                    { label: 'Type annotations', diff: 'beginner' },
+                    { label: 'Interfaces', diff: 'beginner' },
+                    { label: 'Type aliases', diff: 'beginner' },
+                    { label: 'Union & intersection', diff: 'intermediate' },
+                ]},
+                { label: 'Generics', diff: 'intermediate', children: [
+                    { label: 'Generic functions', diff: 'intermediate' },
+                    { label: 'Generic constraints', diff: 'intermediate' },
+                    { label: 'Conditional types', diff: 'advanced' },
+                    { label: 'Mapped types', diff: 'advanced' },
+                ]},
+                { label: 'Utility Types', diff: 'intermediate', children: [
+                    { label: 'Partial / Required', diff: 'intermediate' },
+                    { label: 'Pick / Omit', diff: 'intermediate' },
+                    { label: 'Record / Extract', diff: 'intermediate' },
+                    { label: 'ReturnType / Parameters', diff: 'advanced' },
+                ]},
+                { label: 'Type Guards', diff: 'intermediate', children: [
+                    { label: 'typeof / instanceof', diff: 'beginner' },
+                    { label: 'Narrowing', diff: 'intermediate' },
+                    { label: 'Discriminated unions', diff: 'intermediate' },
+                    { label: 'Custom type guards', diff: 'advanced' },
+                ]},
+                { label: 'Advanced', diff: 'advanced', children: [
+                    { label: 'Template literal types', diff: 'advanced' },
+                    { label: 'Infer keyword', diff: 'advanced' },
+                    { label: 'Declaration files (.d.ts)', diff: 'intermediate' },
+                    { label: 'Module augmentation', diff: 'advanced' },
+                ]},
+                { label: 'Configuration', diff: 'intermediate', children: [
+                    { label: 'tsconfig.json', diff: 'intermediate' },
+                    { label: 'Strict mode options', diff: 'intermediate' },
+                    { label: 'Project references', diff: 'advanced' },
+                ]},
+            ]
+        },
+        system_design: {
+            label: 'System Design', desc: 'Architecture patterns for scalable distributed systems',
+            children: [
+                { label: 'Scalability', diff: 'intermediate', children: [
+                    { label: 'Horizontal vs vertical', diff: 'beginner' },
+                    { label: 'Load balancing', diff: 'intermediate' },
+                    { label: 'Auto-scaling', diff: 'intermediate' },
+                    { label: 'Capacity planning', diff: 'advanced' },
+                ]},
+                { label: 'Data Storage', diff: 'intermediate', children: [
+                    { label: 'SQL vs NoSQL', diff: 'beginner' },
+                    { label: 'Replication strategies', diff: 'intermediate' },
+                    { label: 'Sharding / partitioning', diff: 'advanced' },
+                    { label: 'CAP theorem', diff: 'intermediate' },
+                ]},
+                { label: 'Caching', diff: 'intermediate', children: [
+                    { label: 'Cache strategies', diff: 'intermediate' },
+                    { label: 'Redis / Memcached', diff: 'intermediate' },
+                    { label: 'CDN caching', diff: 'intermediate' },
+                    { label: 'Cache invalidation', diff: 'advanced' },
+                ]},
+                { label: 'Communication', diff: 'intermediate', children: [
+                    { label: 'REST API design', diff: 'beginner' },
+                    { label: 'gRPC', diff: 'intermediate' },
+                    { label: 'Message queues (Kafka)', diff: 'advanced' },
+                    { label: 'Event-driven architecture', diff: 'advanced' },
+                ]},
+                { label: 'Reliability', diff: 'advanced', children: [
+                    { label: 'Circuit breakers', diff: 'advanced' },
+                    { label: 'Rate limiting', diff: 'intermediate' },
+                    { label: 'Retries & backoff', diff: 'intermediate' },
+                    { label: 'Observability', diff: 'advanced' },
+                ]},
+                { label: 'Patterns', diff: 'advanced', children: [
+                    { label: 'Microservices', diff: 'intermediate' },
+                    { label: 'CQRS', diff: 'advanced' },
+                    { label: 'Saga pattern', diff: 'advanced' },
+                    { label: 'Strangler fig', diff: 'advanced' },
+                ]},
+            ]
+        },
+        algorithms: {
+            label: 'Algorithms', desc: 'Data structures and algorithmic problem solving',
+            children: [
+                { label: 'Complexity', diff: 'beginner', children: [
+                    { label: 'Big O notation', diff: 'beginner' },
+                    { label: 'Time complexity', diff: 'beginner' },
+                    { label: 'Space complexity', diff: 'beginner' },
+                    { label: 'Amortized analysis', diff: 'advanced' },
+                ]},
+                { label: 'Data Structures', diff: 'beginner', children: [
+                    { label: 'Arrays & linked lists', diff: 'beginner' },
+                    { label: 'Stacks & queues', diff: 'beginner' },
+                    { label: 'Hash tables', diff: 'intermediate' },
+                    { label: 'Heaps', diff: 'intermediate' },
+                    { label: 'Tries', diff: 'advanced' },
+                ]},
+                { label: 'Sorting', diff: 'intermediate', children: [
+                    { label: 'Bubble / selection / insertion', diff: 'beginner' },
+                    { label: 'Merge sort', diff: 'intermediate' },
+                    { label: 'Quick sort', diff: 'intermediate' },
+                    { label: 'Counting / radix sort', diff: 'advanced' },
+                ]},
+                { label: 'Searching', diff: 'intermediate', children: [
+                    { label: 'Binary search', diff: 'beginner' },
+                    { label: 'DFS & BFS', diff: 'intermediate' },
+                    { label: 'Two pointers', diff: 'intermediate' },
+                    { label: 'Sliding window', diff: 'intermediate' },
+                ]},
+                { label: 'Trees & Graphs', diff: 'intermediate', children: [
+                    { label: 'Binary trees', diff: 'intermediate' },
+                    { label: 'BST operations', diff: 'intermediate' },
+                    { label: 'Graph representations', diff: 'intermediate' },
+                    { label: 'Shortest path (Dijkstra)', diff: 'advanced' },
+                    { label: 'Topological sort', diff: 'advanced' },
+                ]},
+                { label: 'Dynamic Programming', diff: 'advanced', children: [
+                    { label: 'Memoization', diff: 'intermediate' },
+                    { label: 'Tabulation', diff: 'intermediate' },
+                    { label: 'Classic problems', diff: 'advanced' },
+                    { label: 'State machines', diff: 'advanced' },
+                ]},
+                { label: 'Greedy & Backtracking', diff: 'advanced', children: [
+                    { label: 'Greedy strategy', diff: 'intermediate' },
+                    { label: 'Backtracking', diff: 'advanced' },
+                    { label: 'Divide & conquer', diff: 'intermediate' },
+                ]},
+            ]
+        },
+    };
+
+    // ===== STATE =====
+    const state = {
+        currentTopic: null,
+        tree: null,
+        expanded: new Set(),
+        learned: new Set(),
+        customChildren: {},
+        zoom: 1,
+        selectedNodeId: null,
+        nodePositions: new Map(),
+        animate: true,
+    };
+
+    const DEPTH_COLORS = ['#e0f2fe', '#38bdf8', '#a78bfa', '#fb7185', '#fbbf24'];
+    const DEPTH_DIM = ['rgba(224,242,254,0.1)','rgba(56,189,248,0.08)','rgba(167,139,250,0.06)','rgba(251,113,133,0.05)','rgba(251,191,36,0.04)'];
+    const DIFF_COLORS = { beginner: '#4ade80', intermediate: '#fbbf24', advanced: '#f87171' };
+    const RING_RADII = [0, 200, 380, 540, 680];
+    const NODE_H = 34;
+    const CANVAS_PAD = 120;
+
+    // ===== TREE BUILDING =====
+    let idCounter = 0;
+    function buildTree(data, depth) {
+        const id = 'n' + (idCounter++);
+        const children = (data.children || []).map(c => buildTree(c, depth + 1));
+        const customKids = (state.customChildren[id] || []).map(c => buildTree(c, depth + 1));
+        return { id, label: data.label, desc: data.desc || '', diff: data.diff || 'beginner', depth, children: [...children, ...customKids] };
+    }
+
+    function countLeaves(node) {
+        if (!node.children.length || !state.expanded.has(node.id)) return 1;
+        let s = 0;
+        for (const c of node.children) s += countLeaves(c);
+        return Math.max(s, 1);
+    }
+
+    function countAll(node) {
+        let s = 1;
+        for (const c of node.children) s += countAll(c);
+        return s;
+    }
+
+    function findNode(node, id) {
+        if (node.id === id) return node;
+        for (const c of node.children) {
+            const f = findNode(c, id);
+            if (f) return f;
+        }
+        return null;
+    }
+
+    function findParent(node, id) {
+        for (const c of node.children) {
+            if (c.id === id) return node;
+            const f = findParent(c, id);
+            if (f) return f;
+        }
+        return null;
+    }
+
+    // ===== LAYOUT =====
+    function computeLayout(root) {
+        const positions = new Map();
+        const svgW = Math.max(1200, 2 * (RING_RADII[Math.min(maxVisibleDepth(root), 4)] + 300));
+        const svgH = svgW * 0.75;
+        const cx = svgW / 2, cy = svgH / 2;
+
+        positions.set(root.id, { x: cx, y: cy, depth: 0 });
+
+        if (state.expanded.has(root.id) && root.children.length) {
+            layoutChildren(root, cx, cy, -Math.PI, Math.PI, 1, positions);
+        }
+        return { positions, width: svgW, height: svgH };
+    }
+
+    function maxVisibleDepth(node) {
+        if (!state.expanded.has(node.id) || !node.children.length) return node.depth;
+        let m = node.depth;
+        for (const c of node.children) m = Math.max(m, maxVisibleDepth(c));
+        return m;
+    }
+
+    function layoutChildren(parent, cx, cy, startAngle, endAngle, depth, positions) {
+        const children = parent.children;
+        const totalWeight = children.reduce((s, c) => s + countLeaves(c), 0);
+        const radius = RING_RADII[Math.min(depth, RING_RADII.length - 1)] || (RING_RADII[RING_RADII.length - 1] + (depth - RING_RADII.length + 1) * 140);
+        const range = endAngle - startAngle;
+        const minGap = 0.08;
+        let angle = startAngle;
+
+        for (const child of children) {
+            const weight = countLeaves(child);
+            const sweep = Math.max((weight / totalWeight) * range, minGap);
+            const midAngle = angle + sweep / 2;
+            const x = cx + radius * Math.cos(midAngle);
+            const y = cy + radius * Math.sin(midAngle);
+            positions.set(child.id, { x, y, depth: child.depth });
+
+            if (state.expanded.has(child.id) && child.children.length) {
+                layoutChildren(child, cx, cy, angle, angle + sweep, depth + 1, positions);
+            }
+            angle += sweep;
+        }
+    }
+
+    // ===== TEXT MEASUREMENT =====
+    const measureCanvas = document.createElement('canvas').getContext('2d');
+    measureCanvas.font = '12px IBM Plex Mono, monospace';
+    function textWidth(text) {
+        return measureCanvas.measureText(text).width;
+    }
+
+    // ===== SVG HELPERS =====
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    function svgEl(tag, attrs) {
+        const el = document.createElementNS(SVG_NS, tag);
+        for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+        return el;
+    }
+
+    // ===== RENDER =====
+    function render() {
+        if (!state.tree) return;
+        const svg = document.getElementById('mindmap-svg');
+        const container = document.getElementById('mindmap-container');
+        document.getElementById('empty-state').style.display = 'none';
+
+        const { positions, width, height } = computeLayout(state.tree);
+        state.nodePositions = positions;
+
+        // Adjust canvas size
+        const canvasW = width + CANVAS_PAD * 2;
+        const canvasH = height + CANVAS_PAD * 2;
+        const scaledW = canvasW * state.zoom;
+        const scaledH = canvasH * state.zoom;
+        svg.setAttribute('width', scaledW);
+        svg.setAttribute('height', scaledH);
+        svg.setAttribute('viewBox', `${-CANVAS_PAD} ${-CANVAS_PAD} ${canvasW} ${canvasH}`);
+
+        // Clear
+        svg.innerHTML = '';
+
+        // Defs (glow filters)
+        const defs = svgEl('defs');
+        DEPTH_COLORS.forEach((color, i) => {
+            const filter = svgEl('filter', { id: 'glow' + i, x: '-50%', y: '-50%', width: '200%', height: '200%' });
+            const blur = svgEl('feGaussianBlur', { stdDeviation: '3', result: 'blur' });
+            const merge = svgEl('feMerge');
+            merge.appendChild(svgEl('feMergeNode', { in: 'blur' }));
+            merge.appendChild(svgEl('feMergeNode', { in: 'SourceGraphic' }));
+            filter.appendChild(blur);
+            filter.appendChild(merge);
+            defs.appendChild(filter);
+        });
+        // Learned glow
+        const lf = svgEl('filter', { id: 'glowLearned', x: '-50%', y: '-50%', width: '200%', height: '200%' });
+        const lb = svgEl('feGaussianBlur', { stdDeviation: '4', result: 'blur' });
+        const lm = svgEl('feMerge');
+        lm.appendChild(svgEl('feMergeNode', { in: 'blur' }));
+        lm.appendChild(svgEl('feMergeNode', { in: 'SourceGraphic' }));
+        lf.appendChild(lb); lf.appendChild(lm);
+        defs.appendChild(lf);
+        svg.appendChild(defs);
+
+        // Connections layer
+        const connLayer = svgEl('g', { class: 'connections-layer' });
+        svg.appendChild(connLayer);
+        // Nodes layer
+        const nodeLayer = svgEl('g', { class: 'nodes-layer' });
+        svg.appendChild(nodeLayer);
+
+        // Draw connections & nodes recursively
+        let animDelay = 0;
+        function drawNode(node, parentPos) {
+            const pos = positions.get(node.id);
+            if (!pos) return;
+
+            // Connection from parent
+            if (parentPos) {
+                const dx = pos.x - parentPos.x;
+                const dy = pos.y - parentPos.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const cpLen = dist * 0.4;
+                const angle = Math.atan2(dy, dx);
+                const pAngle = Math.atan2(parentPos.y - (height / 2), parentPos.x - (width / 2));
+                const cx1 = parentPos.x + cpLen * Math.cos(angle);
+                const cy1 = parentPos.y + cpLen * Math.sin(angle) * 0.3;
+                const cx2 = pos.x - cpLen * Math.cos(angle);
+                const cy2 = pos.y - cpLen * Math.sin(angle) * 0.3;
+
+                const dCol = DEPTH_COLORS[Math.min(node.depth, DEPTH_COLORS.length - 1)];
+                const isLearned = state.learned.has(node.id);
+                const path = svgEl('path', {
+                    d: `M${parentPos.x},${parentPos.y} C${cx1},${cy1} ${cx2},${cy2} ${pos.x},${pos.y}`,
+                    fill: 'none',
+                    stroke: isLearned ? '#4ade80' : dCol,
+                    'stroke-width': isLearned ? '2' : '1.5',
+                    'stroke-opacity': isLearned ? '0.6' : '0.25',
+                });
+                if (state.animate) {
+                    path.style.strokeDasharray = '500';
+                    path.style.animation = `connDraw 0.4s ${animDelay * 0.03}s ease-out both`;
+                }
+                connLayer.appendChild(path);
+            }
+
+            // Node group
+            const isRoot = node.depth === 0;
+            const isLearned = state.learned.has(node.id);
+            const isExpanded = state.expanded.has(node.id);
+            const hasChildren = node.children.length > 0;
+            const depthIdx = Math.min(node.depth, DEPTH_COLORS.length - 1);
+            const color = isLearned ? '#4ade80' : DEPTH_COLORS[depthIdx];
+            const dimColor = isLearned ? 'rgba(74,222,128,0.12)' : DEPTH_DIM[depthIdx];
+            const label = node.label;
+            const tw = textWidth(label);
+            const nodeW = Math.max(tw + 28, isRoot ? 140 : 90);
+            const nodeH = isRoot ? 42 : NODE_H;
+
+            const g = svgEl('g', { class: 'node-group', 'data-id': node.id });
+            g.style.cursor = 'pointer';
+            if (state.animate && parentPos) {
+                g.style.transformOrigin = `${pos.x}px ${pos.y}px`;
+                g.style.animation = `nodeAppear 0.3s ${animDelay * 0.03}s ease-out both`;
+            }
+
+            // Rect
+            const rect = svgEl('rect', {
+                class: 'node-rect',
+                x: pos.x - nodeW / 2,
+                y: pos.y - nodeH / 2,
+                width: nodeW,
+                height: nodeH,
+                rx: isRoot ? 10 : 6,
+                fill: dimColor,
+                stroke: color,
+                'stroke-width': isRoot ? '2' : '1.2',
+                filter: isLearned ? 'url(#glowLearned)' : `url(#glow${depthIdx})`,
+            });
+            g.appendChild(rect);
+
+            // Label
+            const text = svgEl('text', {
+                class: 'node-label',
+                x: pos.x,
+                y: pos.y + (isRoot ? 1 : 0.5),
+                'text-anchor': 'middle',
+                'dominant-baseline': 'central',
+                fill: color,
+                'font-family': "'IBM Plex Mono', monospace",
+                'font-size': isRoot ? '14' : '11.5',
+                'font-weight': isRoot ? '600' : '400',
+            });
+            text.textContent = label;
+            g.appendChild(text);
+
+            // Learned checkmark
+            if (isLearned) {
+                const check = svgEl('text', {
+                    x: pos.x + nodeW / 2 - 6,
+                    y: pos.y - nodeH / 2 + 6,
+                    fill: '#4ade80',
+                    'font-size': '10',
+                    'text-anchor': 'middle',
+                    'dominant-baseline': 'central',
+                });
+                check.textContent = '\u2713';
+                g.appendChild(check);
+            }
+
+            // Expand badge
+            if (hasChildren && !isExpanded) {
+                const badge = svgEl('text', {
+                    class: 'expand-badge',
+                    x: pos.x + nodeW / 2 + 8,
+                    y: pos.y,
+                    fill: color,
+                    'font-size': '10',
+                    'font-family': "'IBM Plex Mono', monospace",
+                    'text-anchor': 'start',
+                    'dominant-baseline': 'central',
+                    opacity: '0.5',
+                });
+                const childTotal = node.children.reduce((s, c) => s + countAll(c), 0);
+                badge.textContent = '+' + childTotal;
+                g.appendChild(badge);
+            }
+
+            // Difficulty indicator dot
+            if (!isRoot && node.diff) {
+                const dot = svgEl('circle', {
+                    cx: pos.x - nodeW / 2 + 8,
+                    cy: pos.y,
+                    r: 3,
+                    fill: DIFF_COLORS[node.diff] || DIFF_COLORS.beginner,
+                    opacity: '0.7',
+                });
+                g.appendChild(dot);
+            }
+
+            nodeLayer.appendChild(g);
+
+            // Event listeners
+            g.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // If node has collapsed children, expand first
+                if (hasChildren && !isExpanded) {
+                    state.expanded.add(node.id);
+                    state.selectedNodeId = null;
+                    hideNodeActions();
+                    state.animate = true;
+                    render();
+                    saveState();
+                    return;
+                }
+                // If already selected, deselect
+                if (state.selectedNodeId === node.id) {
+                    state.selectedNodeId = null;
+                    hideNodeActions();
+                    return;
+                }
+                // Select this node and show action buttons
+                state.selectedNodeId = node.id;
+                const containerRect = document.getElementById('mindmap-container').getBoundingClientRect();
+                const scrollLeft = document.getElementById('mindmap-container').scrollLeft;
+                const scrollTop = document.getElementById('mindmap-container').scrollTop;
+                const scale = state.zoom;
+                const screenX = containerRect.left + (pos.x + CANVAS_PAD) * scale - scrollLeft;
+                const screenY = containerRect.top + (pos.y + CANVAS_PAD) * scale - scrollTop - nodeH * scale / 2 - 36;
+                showNodeActions(screenX, screenY, node.id);
+            });
+
+            g.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                openEditModal(node.id);
+            });
+
+            g.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showContextMenu(e.clientX, e.clientY, node.id);
+            });
+
+            animDelay++;
+
+            // Recurse into expanded children
+            if (isExpanded && hasChildren) {
+                for (const child of node.children) {
+                    drawNode(child, pos);
+                }
+            }
+        }
+
+        drawNode(state.tree, null);
+        updateProgress();
+        state.animate = false;
+    }
+
+    function collapseSubtree(node) {
+        state.expanded.delete(node.id);
+        for (const c of node.children) collapseSubtree(c);
+    }
+
+    // ===== NODE ACTIONS (inline buttons) =====
+    function showNodeActions(x, y, nodeId) {
+        const el = document.getElementById('node-actions');
+        el.classList.add('visible');
+        // Clamp to viewport
+        const w = 100;
+        el.style.left = Math.max(4, Math.min(x - w / 2, window.innerWidth - w - 4)) + 'px';
+        el.style.top = Math.max(4, y) + 'px';
+        state.selectedNodeId = nodeId;
+        // Hide delete for root
+        const isRoot = state.tree && state.tree.id === nodeId;
+        document.getElementById('na-delete').style.display = isRoot ? 'none' : 'flex';
+        // Show collapse only for expanded nodes with children
+        const node = findNode(state.tree, nodeId);
+        const canCollapse = node && node.children.length && state.expanded.has(nodeId);
+        document.getElementById('na-collapse').style.display = canCollapse ? 'flex' : 'none';
+    }
+
+    function hideNodeActions() {
+        document.getElementById('node-actions').classList.remove('visible');
+    }
+
+    document.getElementById('na-add').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state.selectedNodeId) openEditModal(null, state.selectedNodeId);
+        hideNodeActions();
+    });
+
+    document.getElementById('na-learned').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!state.selectedNodeId) return;
+        if (state.learned.has(state.selectedNodeId)) state.learned.delete(state.selectedNodeId);
+        else state.learned.add(state.selectedNodeId);
+        hideNodeActions();
+        state.selectedNodeId = null;
+        state.animate = false;
+        render();
+        saveState();
+    });
+
+    document.getElementById('na-collapse').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!state.selectedNodeId) return;
+        const node = findNode(state.tree, state.selectedNodeId);
+        if (node) collapseSubtree(node);
+        hideNodeActions();
+        state.selectedNodeId = null;
+        state.animate = true;
+        render();
+        saveState();
+    });
+
+    document.getElementById('na-delete').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state.selectedNodeId) deleteNode(state.selectedNodeId);
+        hideNodeActions();
+        state.selectedNodeId = null;
+    });
+
+    // Hide actions when clicking elsewhere
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#node-actions') && !e.target.closest('.node-group')) {
+            hideNodeActions();
+            state.selectedNodeId = null;
+        }
+    });
+
+    // Hide actions on scroll (positions would be stale)
+    document.getElementById('mindmap-container').addEventListener('scroll', () => {
+        hideNodeActions();
+    });
+
+    // ===== TOPIC CHIPS =====
+    function buildTopicChips() {
+        const container = document.getElementById('topic-chips');
+        container.innerHTML = Object.keys(TOPICS).map(k =>
+            `<button class="topic-chip" data-topic="${k}">${TOPICS[k].label}</button>`
+        ).join('');
+        container.addEventListener('click', (e) => {
+            const chip = e.target.closest('.topic-chip');
+            if (!chip) return;
+            const key = chip.dataset.topic;
+            // Update active state
+            container.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            // Update search input
+            document.getElementById('topic-input').value = TOPICS[key].label;
+            document.getElementById('autocomplete-dropdown').style.display = 'none';
+            loadTopic(key);
+        });
+    }
+
+    // ===== TOPIC LOADING =====
+    function loadTopic(key) {
+        idCounter = 0;
+        state.currentTopic = key;
+        hideNodeActions();
+        state.selectedNodeId = null;
+        // Highlight active chip
+        document.querySelectorAll('.topic-chip').forEach(c => {
+            c.classList.toggle('active', c.dataset.topic === key);
+        });
+        const data = TOPICS[key];
+        if (!data) return;
+        state.tree = buildTree(data, 0);
+        // Auto-expand root
+        state.expanded = new Set([state.tree.id]);
+        state.learned = new Set();
+        state.customChildren = {};
+        state.zoom = 1;
+        state.animate = true;
+
+        // Check for saved state
+        const saved = loadSavedState();
+        if (saved && saved.currentTopic === key) {
+            state.expanded = new Set(saved.expanded || [state.tree.id]);
+            state.learned = new Set(saved.learned || []);
+            state.zoom = saved.zoom || 1;
+        }
+
+        render();
+        // Center scroll
+        const container = document.getElementById('mindmap-container');
+        const svg = document.getElementById('mindmap-svg');
+        const svgW = parseFloat(svg.getAttribute('width'));
+        const svgH = parseFloat(svg.getAttribute('height'));
+        container.scrollLeft = (svgW - container.clientWidth) / 2;
+        container.scrollTop = (svgH - container.clientHeight) / 2;
+    }
+
+    function createCustomTopic(label) {
+        idCounter = 0;
+        state.currentTopic = 'custom';
+        state.tree = { id: 'n0', label, desc: '', diff: 'beginner', depth: 0, children: [] };
+        state.expanded = new Set(['n0']);
+        state.learned = new Set();
+        state.customChildren = {};
+        state.zoom = 1;
+        state.animate = true;
+        render();
+        saveState();
+    }
+
+    // ===== CONTEXT MENU =====
+    function showContextMenu(x, y, nodeId) {
+        state.selectedNodeId = nodeId;
+        const menu = document.getElementById('context-menu');
+        menu.style.display = 'block';
+        menu.style.left = Math.min(x, window.innerWidth - 180) + 'px';
+        menu.style.top = Math.min(y, window.innerHeight - 200) + 'px';
+    }
+
+    function hideContextMenu() {
+        document.getElementById('context-menu').style.display = 'none';
+        state.selectedNodeId = null;
+    }
+
+    document.getElementById('context-menu').addEventListener('click', (e) => {
+        const action = e.target.dataset.action;
+        if (!action || !state.selectedNodeId) return;
+        const node = findNode(state.tree, state.selectedNodeId);
+        if (!node) { hideContextMenu(); return; }
+
+        switch (action) {
+            case 'toggle':
+                if (node.children.length) {
+                    if (state.expanded.has(node.id)) collapseSubtree(node);
+                    else state.expanded.add(node.id);
+                    state.animate = true;
+                    render();
+                    saveState();
+                }
+                break;
+            case 'add-child':
+                openEditModal(null, node.id);
+                break;
+            case 'edit':
+                openEditModal(node.id);
+                break;
+            case 'toggle-learned':
+                if (state.learned.has(node.id)) state.learned.delete(node.id);
+                else state.learned.add(node.id);
+                state.animate = false;
+                render();
+                saveState();
+                break;
+            case 'delete':
+                deleteNode(node.id);
+                break;
+        }
+        hideContextMenu();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#context-menu')) hideContextMenu();
+    });
+
+    // ===== EDIT MODAL =====
+    let modalMode = null; // 'edit' or 'add'
+    let modalTargetId = null;
+    let modalParentId = null;
+
+    function openEditModal(nodeId, parentId) {
+        const overlay = document.getElementById('modal-overlay');
+        const labelInput = document.getElementById('modal-label');
+        const descInput = document.getElementById('modal-desc');
+        const title = document.getElementById('modal-title');
+
+        if (nodeId) {
+            modalMode = 'edit';
+            modalTargetId = nodeId;
+            const node = findNode(state.tree, nodeId);
+            title.textContent = 'Edit Node';
+            labelInput.value = node ? node.label : '';
+            descInput.value = node ? node.desc : '';
+        } else {
+            modalMode = 'add';
+            modalParentId = parentId;
+            title.textContent = 'Add Child Node';
+            labelInput.value = '';
+            descInput.value = '';
+        }
+        overlay.style.display = 'flex';
+        labelInput.focus();
+    }
+
+    function closeModal() {
+        document.getElementById('modal-overlay').style.display = 'none';
+        modalMode = null;
+        modalTargetId = null;
+        modalParentId = null;
+    }
+
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+    });
+
+    document.getElementById('modal-save').addEventListener('click', () => {
+        const label = document.getElementById('modal-label').value.trim();
+        if (!label) return;
+        const desc = document.getElementById('modal-desc').value.trim();
+
+        if (modalMode === 'edit' && modalTargetId) {
+            const node = findNode(state.tree, modalTargetId);
+            if (node) {
+                node.label = label;
+                node.desc = desc;
+            }
+        } else if (modalMode === 'add' && modalParentId) {
+            const parent = findNode(state.tree, modalParentId);
+            if (parent) {
+                const newId = 'n' + (idCounter++);
+                const newNode = { id: newId, label, desc, diff: 'beginner', depth: parent.depth + 1, children: [] };
+                parent.children.push(newNode);
+                state.expanded.add(parent.id);
+            }
+        }
+        state.animate = true;
+        render();
+        saveState();
+        closeModal();
+    });
+
+    // Enter key in modal
+    document.getElementById('modal-label').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('modal-save').click();
+    });
+
+    // ===== DELETE =====
+    function deleteNode(nodeId) {
+        if (!state.tree || state.tree.id === nodeId) return; // can't delete root
+        const parent = findParent(state.tree, nodeId);
+        if (parent) {
+            parent.children = parent.children.filter(c => c.id !== nodeId);
+            state.expanded.delete(nodeId);
+            state.learned.delete(nodeId);
+            state.animate = true;
+            render();
+            saveState();
+        }
+    }
+
+    // ===== AUTOCOMPLETE =====
+    function setupAutocomplete() {
+        const input = document.getElementById('topic-input');
+        const dropdown = document.getElementById('autocomplete-dropdown');
+
+        input.addEventListener('input', () => {
+            const q = input.value.toLowerCase().trim();
+            if (!q) { dropdown.style.display = 'none'; return; }
+
+            const matches = Object.keys(TOPICS).filter(k =>
+                k.replace('_', ' ').includes(q) || TOPICS[k].label.toLowerCase().includes(q)
+            );
+
+            if (!matches.length) {
+                dropdown.innerHTML = '<div class="ac-item ac-custom">Press Enter to create: "' + escHtml(input.value) + '"</div>';
+            } else {
+                dropdown.innerHTML = matches.map(k =>
+                    `<div class="ac-item" data-topic="${k}"><strong>${escHtml(TOPICS[k].label)}</strong><span>${escHtml(TOPICS[k].desc || '')}</span></div>`
+                ).join('');
+            }
+            dropdown.style.display = 'block';
+        });
+
+        dropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.ac-item');
+            if (item && item.dataset.topic) {
+                input.value = TOPICS[item.dataset.topic].label;
+                dropdown.style.display = 'none';
+                loadTopic(item.dataset.topic);
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const q = input.value.toLowerCase().trim();
+                const match = Object.keys(TOPICS).find(k =>
+                    k === q || k.replace('_', ' ') === q || TOPICS[k].label.toLowerCase() === q
+                );
+                if (match) {
+                    input.value = TOPICS[match].label;
+                    loadTopic(match);
+                } else if (input.value.trim()) {
+                    createCustomTopic(input.value.trim());
+                }
+                dropdown.style.display = 'none';
+            }
+            if (e.key === 'Escape') dropdown.style.display = 'none';
+        });
+
+        input.addEventListener('blur', () => {
+            setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+        });
+    }
+
+    function escHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    // ===== PROGRESS =====
+    function updateProgress() {
+        if (!state.tree) {
+            document.getElementById('progress-text').textContent = '0 / 0';
+            document.getElementById('progress-fill').style.width = '0%';
+            return;
+        }
+        const total = countAll(state.tree);
+        const learned = state.learned.size;
+        const pct = total > 0 ? Math.round((learned / total) * 100) : 0;
+        document.getElementById('progress-fill').style.width = pct + '%';
+        document.getElementById('progress-text').textContent = `${learned} / ${total} learned (${pct}%)`;
+    }
+
+    // ===== PERSISTENCE =====
+    function saveState() {
+        try {
+            localStorage.setItem('mindmapState', JSON.stringify({
+                currentTopic: state.currentTopic,
+                expanded: [...state.expanded],
+                learned: [...state.learned],
+                zoom: state.zoom,
+            }));
+        } catch {}
+    }
+
+    function loadSavedState() {
+        try {
+            const s = localStorage.getItem('mindmapState');
+            return s ? JSON.parse(s) : null;
+        } catch { return null; }
+    }
+
+    // ===== EXPORT =====
+    function exportSVG() {
+        const svg = document.getElementById('mindmap-svg');
+        const clone = svg.cloneNode(true);
+        // Add background rect
+        const bg = document.createElementNS(SVG_NS, 'rect');
+        const vb = clone.getAttribute('viewBox').split(' ').map(Number);
+        bg.setAttribute('x', vb[0]); bg.setAttribute('y', vb[1]);
+        bg.setAttribute('width', vb[2]); bg.setAttribute('height', vb[3]);
+        bg.setAttribute('fill', '#06080f');
+        clone.insertBefore(bg, clone.firstChild);
+
+        const blob = new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `mindmap-${state.currentTopic || 'custom'}.svg`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function exportPNG() {
+        const svg = document.getElementById('mindmap-svg');
+        const clone = svg.cloneNode(true);
+        const vb = clone.getAttribute('viewBox').split(' ').map(Number);
+        const bg = document.createElementNS(SVG_NS, 'rect');
+        bg.setAttribute('x', vb[0]); bg.setAttribute('y', vb[1]);
+        bg.setAttribute('width', vb[2]); bg.setAttribute('height', vb[3]);
+        bg.setAttribute('fill', '#06080f');
+        clone.insertBefore(bg, clone.firstChild);
+
+        const data = new XMLSerializer().serializeToString(clone);
+        const img = new Image();
+        const blob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = vb[2] * 2; canvas.height = vb[3] * 2;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(2, 2);
+            ctx.drawImage(img, 0, 0, vb[2], vb[3]);
+            canvas.toBlob(b => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(b);
+                a.download = `mindmap-${state.currentTopic || 'custom'}.png`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }, 'image/png');
+            URL.revokeObjectURL(url);
+        };
+        img.src = url;
+    }
+
+    // ===== TOOLBAR BUTTONS =====
+    document.getElementById('btn-expand').addEventListener('click', () => {
+        if (!state.tree) return;
+        function expandAll(node) {
+            if (node.children.length) state.expanded.add(node.id);
+            node.children.forEach(expandAll);
+        }
+        expandAll(state.tree);
+        state.animate = true;
+        render();
+        saveState();
+    });
+
+    document.getElementById('btn-collapse').addEventListener('click', () => {
+        if (!state.tree) return;
+        state.expanded = new Set([state.tree.id]);
+        state.animate = true;
+        render();
+        saveState();
+    });
+
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+        state.zoom = Math.min(2, state.zoom + 0.15);
+        const svg = document.getElementById('mindmap-svg');
+        const vb = svg.getAttribute('viewBox').split(' ').map(Number);
+        svg.setAttribute('width', vb[2] * state.zoom);
+        svg.setAttribute('height', vb[3] * state.zoom);
+        saveState();
+    });
+
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+        state.zoom = Math.max(0.3, state.zoom - 0.15);
+        const svg = document.getElementById('mindmap-svg');
+        const vb = svg.getAttribute('viewBox').split(' ').map(Number);
+        svg.setAttribute('width', vb[2] * state.zoom);
+        svg.setAttribute('height', vb[3] * state.zoom);
+        saveState();
+    });
+
+    document.getElementById('btn-export-svg').addEventListener('click', () => { if (state.tree) exportSVG(); });
+    document.getElementById('btn-export-png').addEventListener('click', () => { if (state.tree) exportPNG(); });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+        if (!state.tree) return;
+        state.learned = new Set();
+        state.expanded = new Set([state.tree.id]);
+        state.zoom = 1;
+        state.animate = true;
+        render();
+        saveState();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            hideContextMenu();
+            closeModal();
+        }
+        // Don't handle shortcuts when typing in inputs
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === '=' || e.key === '+') document.getElementById('btn-zoom-in').click();
+        if (e.key === '-') document.getElementById('btn-zoom-out').click();
+    });
+
+    // ===== INIT =====
+    function init() {
+        buildTopicChips();
+        setupAutocomplete();
+
+        // Try to restore previous session
+        const saved = loadSavedState();
+        if (saved && saved.currentTopic && (TOPICS[saved.currentTopic] || saved.currentTopic === 'custom')) {
+            const input = document.getElementById('topic-input');
+            if (saved.currentTopic !== 'custom' && TOPICS[saved.currentTopic]) {
+                input.value = TOPICS[saved.currentTopic].label;
+                loadTopic(saved.currentTopic);
+            }
+        }
+    }
+
+    init();
+    </script>
+</body>
+</html>

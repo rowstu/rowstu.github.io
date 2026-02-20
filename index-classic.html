@@ -142,6 +142,12 @@
 		.section:nth-child(6) { animation-delay: 0.35s; }
 		.section:nth-child(7) { animation-delay: 0.4s; }
 		.section:nth-child(8) { animation-delay: 0.45s; }
+		.section:nth-child(9) { animation-delay: 0.5s; }
+		.section:nth-child(10) { animation-delay: 0.55s; }
+		.section:nth-child(11) { animation-delay: 0.6s; }
+		.section:nth-child(12) { animation-delay: 0.65s; }
+		.section:nth-child(13) { animation-delay: 0.7s; }
+		.section:nth-child(14) { animation-delay: 0.75s; }
 
 		@keyframes fadeInUp {
 			from {
@@ -248,6 +254,48 @@
 		.games .card:hover {
 			border-color: #f472b6;
 			box-shadow: 0 8px 24px rgba(244, 114, 182, 0.2);
+		}
+
+		.tools-encoding .section-title::before { background: #ff6b35; }
+		.tools-encoding .card::before { background: #ff6b35; }
+		.tools-encoding .card:hover {
+			border-color: #ff6b35;
+			box-shadow: 0 8px 24px rgba(255, 107, 53, 0.2);
+		}
+
+		.tools-network .section-title::before { background: #ff4757; }
+		.tools-network .card::before { background: #ff4757; }
+		.tools-network .card:hover {
+			border-color: #ff4757;
+			box-shadow: 0 8px 24px rgba(255, 71, 87, 0.2);
+		}
+
+		.tools-data .section-title::before { background: #2ed573; }
+		.tools-data .card::before { background: #2ed573; }
+		.tools-data .card:hover {
+			border-color: #2ed573;
+			box-shadow: 0 8px 24px rgba(46, 213, 115, 0.2);
+		}
+
+		.tools-config .section-title::before { background: #ffa502; }
+		.tools-config .card::before { background: #ffa502; }
+		.tools-config .card:hover {
+			border-color: #ffa502;
+			box-shadow: 0 8px 24px rgba(255, 165, 2, 0.2);
+		}
+
+		.tools-science .section-title::before { background: #70a1ff; }
+		.tools-science .card::before { background: #70a1ff; }
+		.tools-science .card:hover {
+			border-color: #70a1ff;
+			box-shadow: 0 8px 24px rgba(112, 161, 255, 0.2);
+		}
+
+		.tools-utils .section-title::before { background: #a29bfe; }
+		.tools-utils .card::before { background: #a29bfe; }
+		.tools-utils .card:hover {
+			border-color: #a29bfe;
+			box-shadow: 0 8px 24px rgba(162, 155, 254, 0.2);
 		}
 
 		.card-title {
@@ -761,8 +809,8 @@
 			</div>
 		</section>
 
-		<section class="section tools">
-			<h2 class="section-title">Interactive Tools</h2>
+		<section class="section tools-encoding">
+			<h2 class="section-title">Encoding & Cryptography</h2>
 			<div class="grid">
 				<div class="card">
 					<a href="base64.html">
@@ -774,36 +822,6 @@
 					<a href="caeser.html">
 						<div class="card-title">Caesar Cipher</div>
 						<div class="card-desc">Classic shift cipher tool</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="cisco-cracker.html">
-						<div class="card-title">Cisco</div>
-						<div class="card-desc">Recover Cisco 5 & 7 password console tool</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="chmod.html">
-						<div class="card-title">Chmod Calculator</div>
-						<div class="card-desc">Unix permission calculator</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="roman-numerals.html">
-						<div class="card-title">Roman Numerals</div>
-						<div class="card-desc">Convert to/from Roman numerals</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="temp-conv.html">
-						<div class="card-title">Temperature</div>
-						<div class="card-desc">Convert between temperature units</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="vat-calc.html">
-						<div class="card-title">VAT Calculator</div>
-						<div class="card-desc">Calculate VAT amounts</div>
 					</a>
 				</div>
 				<div class="card">
@@ -819,57 +837,39 @@
 					</a>
 				</div>
 				<div class="card">
-					<a href="ssl-checker.html">
-						<div class="card-title">SSL Checker</div>
-						<div class="card-desc">Check SSL certificate expiry dates</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="json-formatter.html">
-						<div class="card-title">JSON Formatter</div>
-						<div class="card-desc">Format and validate JSON</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="yaml-json.html">
-						<div class="card-title">YAML/JSON</div>
-						<div class="card-desc">Convert between YAML and JSON</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="regex-tester.html">
-						<div class="card-title">Regex Tester</div>
-						<div class="card-desc">Test regex patterns with highlighting</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="diff-tool.html">
-						<div class="card-title">Diff Tool</div>
-						<div class="card-desc">Compare text side-by-side</div>
-					</a>
-				</div>
-				<div class="card">
 					<a href="hash-generator.html">
 						<div class="card-title">Hash Generator</div>
 						<div class="card-desc">MD5, SHA-1, SHA-256, SHA-512 hashes</div>
 					</a>
 				</div>
 				<div class="card">
-					<a href="uuid-generator.html">
-						<div class="card-title">UUID Generator</div>
-						<div class="card-desc">Generate v1 and v4 UUIDs</div>
+					<a href="password-generator.html">
+						<div class="card-title">Password Generator</div>
+						<div class="card-desc">Generate secure random passwords</div>
 					</a>
 				</div>
 				<div class="card">
-					<a href="markdown-preview.html">
-						<div class="card-title">Markdown Preview</div>
-						<div class="card-desc">Live markdown to HTML preview</div>
+					<a href="jwt-decoder.html">
+						<div class="card-title">JWT Decoder</div>
+						<div class="card-desc">Decode and inspect JWT tokens</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="section tools-network">
+			<h2 class="section-title">Networking & Security</h2>
+			<div class="grid">
+				<div class="card">
+					<a href="cisco-cracker.html">
+						<div class="card-title">Cisco</div>
+						<div class="card-desc">Recover Cisco 5 & 7 password console tool</div>
 					</a>
 				</div>
 				<div class="card">
-					<a href="csv-json.html">
-						<div class="card-title">CSV to JSON</div>
-						<div class="card-desc">Convert CSV data to JSON</div>
+					<a href="ssl-checker.html">
+						<div class="card-title">SSL Checker</div>
+						<div class="card-desc">Check SSL certificate expiry dates</div>
 					</a>
 				</div>
 				<div class="card">
@@ -891,9 +891,69 @@
 					</a>
 				</div>
 				<div class="card">
-					<a href="cron-builder.html">
-						<div class="card-title">Cron Builder</div>
-						<div class="card-desc">Build cron schedule expressions</div>
+					<a href="iptables-builder.html">
+						<div class="card-title">Firewall Rule Builder</div>
+						<div class="card-desc">Build iptables and nftables firewall rules with presets</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="fail2ban-builder.html">
+						<div class="card-title">Fail2ban Builder</div>
+						<div class="card-desc">Generate fail2ban jail configurations with known filters and presets</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="chmod.html">
+						<div class="card-title">Chmod Calculator</div>
+						<div class="card-desc">Unix permission calculator</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="section tools-data">
+			<h2 class="section-title">Data & Text Processing</h2>
+			<div class="grid">
+				<div class="card">
+					<a href="json-formatter.html">
+						<div class="card-title">JSON Formatter</div>
+						<div class="card-desc">Format and validate JSON</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="yaml-json.html">
+						<div class="card-title">YAML/JSON</div>
+						<div class="card-desc">Convert between YAML and JSON</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="yaml-linter.html">
+						<div class="card-title">YAML Linter</div>
+						<div class="card-desc">Validate, lint, and convert YAML with instant feedback</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="csv-json.html">
+						<div class="card-title">CSV to JSON</div>
+						<div class="card-desc">Convert CSV data to JSON</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="regex-tester.html">
+						<div class="card-title">Regex Tester</div>
+						<div class="card-desc">Test regex patterns with highlighting</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="diff-tool.html">
+						<div class="card-title">Diff Tool</div>
+						<div class="card-desc">Compare text side-by-side</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="markdown-preview.html">
+						<div class="card-title">Markdown Preview</div>
+						<div class="card-desc">Live markdown to HTML preview</div>
 					</a>
 				</div>
 				<div class="card">
@@ -909,9 +969,15 @@
 					</a>
 				</div>
 				<div class="card">
-					<a href="jwt-decoder.html">
-						<div class="card-title">JWT Decoder</div>
-						<div class="card-desc">Decode and inspect JWT tokens</div>
+					<a href="uri-decoder.html">
+						<div class="card-title">URI Decoder</div>
+						<div class="card-desc">Analyze URLs and find tracking params</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="uuid-generator.html">
+						<div class="card-title">UUID Generator</div>
+						<div class="card-desc">Generate v1 and v4 UUIDs</div>
 					</a>
 				</div>
 				<div class="card">
@@ -920,106 +986,28 @@
 						<div class="card-desc">Convert timestamps and dates</div>
 					</a>
 				</div>
+			</div>
+		</section>
+
+		<section class="section tools-config">
+			<h2 class="section-title">Config Generators</h2>
+			<div class="grid">
 				<div class="card">
-					<a href="password-generator.html">
-						<div class="card-title">Password Generator</div>
-						<div class="card-desc">Generate secure random passwords</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="uri-decoder.html">
-						<div class="card-title">URI Decoder</div>
-						<div class="card-desc">Analyze URLs and find tracking params</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="emoji-translator.html">
-						<div class="card-title">Emoji Translator</div>
-						<div class="card-desc">Decode hidden meanings in emoji messages</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="apptainer/index.html">
-						<div class="card-title">Apptainer Generator</div>
-						<div class="card-desc">Bioconda Apptainer container definitions</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="resistor-calc.html">
-						<div class="card-title">Resistor Calculator</div>
-						<div class="card-desc">Colour band resistance calculator</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="tools/chord-finder/index.html">
-						<div class="card-title">Chord and Key Finder</div>
-						<div class="card-desc">Song Chord and Key Finder demo</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="tools/incusos-preseed/index.html">
-						<div class="card-title">IncusOS PreSeed Generator</div>
-						<div class="card-desc">Generate a PreSeed file for IncosOS Installer</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="preseed-generator.html">
-						<div class="card-title">Preseed Generator</div>
-						<div class="card-desc">Debian/Ubuntu automated installation config</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="kickstart-generator.html">
-						<div class="card-title">Kickstart Generator</div>
-						<div class="card-desc">RHEL/Rocky/Alma automated installation config</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="collective-nouns.html">
-						<div class="card-title">Collective Nouns</div>
-						<div class="card-desc">Search collective nouns for animals and people</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="periodic-table.html">
-						<div class="card-title">Periodic Table</div>
-						<div class="card-desc">Interactive periodic table with quizzes and element details</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="daylight.html">
-						<div class="card-title">UK Daylight Tracker</div>
-						<div class="card-desc">Sunrise, sunset, and daylight hours across Britain</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="countdown.html">
-						<div class="card-title">Countdown Timer</div>
-						<div class="card-desc">Countdown to any date with working days and milestones</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="newsboat-yt.html">
-						<div class="card-title">YouTube → Newsboat</div>
-						<div class="card-desc">Get a Newsboat RSS feed URL from any YouTube channel</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="ytdlp-builder.html">
-						<div class="card-title">yt-dlp Builder</div>
-						<div class="card-desc">Build yt-dlp commands with presets and options</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="dhcp-migrate.html">
-						<div class="card-title">DHCP → dnsmasq</div>
-						<div class="card-desc">Migrate ISC DHCP server configs to dnsmasq format</div>
+					<a href="cron-builder.html">
+						<div class="card-title">Cron Builder</div>
+						<div class="card-desc">Build cron schedule expressions</div>
 					</a>
 				</div>
 				<div class="card">
 					<a href="ssh-config.html">
 						<div class="card-title">SSH Config Builder</div>
 						<div class="card-desc">Visually build ~/.ssh/config files with presets and import</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="mutt-config.html">
+						<div class="card-title">Mutt Config Generator</div>
+						<div class="card-desc">Build a complete ~/.muttrc for Gmail, Office 365, Fastmail, and more</div>
 					</a>
 				</div>
 				<div class="card">
@@ -1047,39 +1035,81 @@
 					</a>
 				</div>
 				<div class="card">
-					<a href="iptables-builder.html">
-						<div class="card-title">Firewall Rule Builder</div>
-						<div class="card-desc">Build iptables and nftables firewall rules with presets</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="colour-picker.html">
-						<div class="card-title">Colour Picker</div>
-						<div class="card-desc">Pick colours, generate palettes, and check WCAG contrast</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="ascii-art.html">
-						<div class="card-title">ASCII Art Generator</div>
-						<div class="card-desc">Convert text into ASCII art banners with multiple fonts</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="fail2ban-builder.html">
-						<div class="card-title">Fail2ban Builder</div>
-						<div class="card-desc">Generate fail2ban jail configurations with known filters and presets</div>
-					</a>
-				</div>
-				<div class="card">
 					<a href="logrotate-builder.html">
 						<div class="card-title">Logrotate Builder</div>
 						<div class="card-desc">Build logrotate config files with presets and live preview</div>
 					</a>
 				</div>
 				<div class="card">
-					<a href="yaml-linter.html">
-						<div class="card-title">YAML Linter</div>
-						<div class="card-desc">Validate, lint, and convert YAML with instant feedback</div>
+					<a href="preseed-generator.html">
+						<div class="card-title">Preseed Generator</div>
+						<div class="card-desc">Debian/Ubuntu automated installation config</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="kickstart-generator.html">
+						<div class="card-title">Kickstart Generator</div>
+						<div class="card-desc">RHEL/Rocky/Alma automated installation config</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="tools/incusos-preseed/index.html">
+						<div class="card-title">IncusOS PreSeed Generator</div>
+						<div class="card-desc">Generate a PreSeed file for IncosOS Installer</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="dhcp-migrate.html">
+						<div class="card-title">DHCP → dnsmasq</div>
+						<div class="card-desc">Migrate ISC DHCP server configs to dnsmasq format</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="apptainer/index.html">
+						<div class="card-title">Apptainer Generator</div>
+						<div class="card-desc">Bioconda Apptainer container definitions</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="section tools-science">
+			<h2 class="section-title">Science & Education</h2>
+			<div class="grid">
+				<div class="card">
+					<a href="periodic-table.html">
+						<div class="card-title">Periodic Table</div>
+						<div class="card-desc">Interactive periodic table with quizzes and element details</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="physics-solver.html">
+						<div class="card-title">Physics Equation Solver</div>
+						<div class="card-desc">Solve 20+ GCSE physics equations with step-by-step working</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="equation-balancer.html">
+						<div class="card-title">Chemical Equation Balancer</div>
+						<div class="card-desc">Balance chemical equations with atom counts and verification</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="punnett-square.html">
+						<div class="card-title">Punnett Square Generator</div>
+						<div class="card-desc">Predict genetic outcomes with monohybrid and dihybrid crosses</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="formula-wall.html">
+						<div class="card-title">GCSE Formula Wall</div>
+						<div class="card-desc">Every equation for GCSE Science and Maths in one place</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="literary-devices.html">
+						<div class="card-title">Literary Devices Quiz</div>
+						<div class="card-desc">Identify literary techniques from examples in poetry and prose</div>
 					</a>
 				</div>
 				<div class="card">
@@ -1107,39 +1137,99 @@
 					</a>
 				</div>
 				<div class="card">
-					<a href="physics-solver.html">
-						<div class="card-title">Physics Equation Solver</div>
-						<div class="card-desc">Solve 20+ GCSE physics equations with step-by-step working</div>
-					</a>
-				</div>
-				<div class="card">
-					<a href="equation-balancer.html">
-						<div class="card-title">Chemical Equation Balancer</div>
-						<div class="card-desc">Balance chemical equations with atom counts and verification</div>
-					</a>
-				</div>
-				<div class="card">
 					<a href="graph-plotter.html">
 						<div class="card-title">Graph Plotter</div>
 						<div class="card-desc">Plot mathematical functions on an interactive coordinate grid</div>
 					</a>
 				</div>
 				<div class="card">
-					<a href="punnett-square.html">
-						<div class="card-title">Punnett Square Generator</div>
-						<div class="card-desc">Predict genetic outcomes with monohybrid and dihybrid crosses</div>
+					<a href="mindmap.html">
+						<div class="card-title">Learning Mindmap</div>
+						<div class="card-desc">Interactive mindmap generator for exploring tech learning paths</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="section tools-utils">
+			<h2 class="section-title">Converters & Utilities</h2>
+			<div class="grid">
+				<div class="card">
+					<a href="roman-numerals.html">
+						<div class="card-title">Roman Numerals</div>
+						<div class="card-desc">Convert to/from Roman numerals</div>
 					</a>
 				</div>
 				<div class="card">
-					<a href="literary-devices.html">
-						<div class="card-title">Literary Devices Quiz</div>
-						<div class="card-desc">Identify literary techniques from examples in poetry and prose</div>
+					<a href="temp-conv.html">
+						<div class="card-title">Temperature</div>
+						<div class="card-desc">Convert between temperature units</div>
 					</a>
 				</div>
 				<div class="card">
-					<a href="formula-wall.html">
-						<div class="card-title">GCSE Formula Wall</div>
-						<div class="card-desc">Every equation for GCSE Science and Maths in one place</div>
+					<a href="vat-calc.html">
+						<div class="card-title">VAT Calculator</div>
+						<div class="card-desc">Calculate VAT amounts</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="resistor-calc.html">
+						<div class="card-title">Resistor Calculator</div>
+						<div class="card-desc">Colour band resistance calculator</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="countdown.html">
+						<div class="card-title">Countdown Timer</div>
+						<div class="card-desc">Countdown to any date with working days and milestones</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="daylight.html">
+						<div class="card-title">UK Daylight Tracker</div>
+						<div class="card-desc">Sunrise, sunset, and daylight hours across Britain</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="colour-picker.html">
+						<div class="card-title">Colour Picker</div>
+						<div class="card-desc">Pick colours, generate palettes, and check WCAG contrast</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="ascii-art.html">
+						<div class="card-title">ASCII Art Generator</div>
+						<div class="card-desc">Convert text into ASCII art banners with multiple fonts</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="emoji-translator.html">
+						<div class="card-title">Emoji Translator</div>
+						<div class="card-desc">Decode hidden meanings in emoji messages</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="collective-nouns.html">
+						<div class="card-title">Collective Nouns</div>
+						<div class="card-desc">Search collective nouns for animals and people</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="tools/chord-finder/index.html">
+						<div class="card-title">Chord and Key Finder</div>
+						<div class="card-desc">Song Chord and Key Finder demo</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="newsboat-yt.html">
+						<div class="card-title">YouTube → Newsboat</div>
+						<div class="card-desc">Get a Newsboat RSS feed URL from any YouTube channel</div>
+					</a>
+				</div>
+				<div class="card">
+					<a href="ytdlp-builder.html">
+						<div class="card-title">yt-dlp Builder</div>
+						<div class="card-desc">Build yt-dlp commands with presets and options</div>
 					</a>
 				</div>
 			</div>
