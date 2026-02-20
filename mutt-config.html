@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mutt Config Generator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0e1015;
+			--surface: #161920;
+			--surface-alt: #1c2028;
+			--border: #2a2e3a;
+			--border-bright: #3d4352;
+			--text: #c9cdd8;
+			--text-muted: #6c7286;
+			--accent: #e8a849;
+			--accent-hover: #f0b85e;
+			--accent-dim: rgba(232, 168, 73, 0.08);
+			--accent-glow: rgba(232, 168, 73, 0.2);
+			--keyword: #c4a7e7;
+			--value: #9ccfd8;
+			--comment: #524f67;
+			--string: #f6c177;
+			--tag: #ea9a97;
+			--success: #9ccfd8;
+			--warning: #f6c177;
+			--danger: #eb6f92;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'DM Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding-top: 60px;
+			background-image:
+				radial-gradient(ellipse at 15% 5%, rgba(232, 168, 73, 0.03) 0%, transparent 50%),
+				radial-gradient(ellipse at 85% 95%, rgba(196, 167, 231, 0.03) 0%, transparent 50%);
+		}
+
+		.app { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+		header { margin-bottom: 2rem; }
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 500;
+			color: var(--accent);
+			margin-bottom: 0.3rem;
+			letter-spacing: -0.02em;
+		}
+
+		.subtitle { color: var(--text-muted); font-size: 0.75rem; font-weight: 300; }
+
+		.layout {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1.5rem;
+			align-items: start;
+		}
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 10px;
+			overflow: hidden;
+		}
+
+		.panel-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0.7rem 1rem;
+			background: var(--surface-alt);
+			border-bottom: 1px solid var(--border);
+			font-size: 0.72rem;
+			color: var(--text-muted);
+		}
+
+		.panel-header .dot {
+			width: 7px; height: 7px;
+			border-radius: 50%;
+			background: var(--accent);
+			box-shadow: 0 0 6px var(--accent-glow);
+			margin-right: 0.5rem;
+			display: inline-block;
+		}
+
+		.panel-header-left {
+			display: flex;
+			align-items: center;
+		}
+
+		.panel-body { padding: 1rem; }
+
+		/* Form sections */
+		.form-section {
+			margin-bottom: 1.25rem;
+			padding-bottom: 1.25rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.form-section:last-child {
+			margin-bottom: 0;
+			padding-bottom: 0;
+			border-bottom: none;
+		}
+
+		.section-label {
+			font-size: 0.68rem;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--keyword);
+			margin-bottom: 0.75rem;
+			font-weight: 500;
+		}
+
+		.field {
+			margin-bottom: 0.7rem;
+		}
+
+		.field:last-child { margin-bottom: 0; }
+
+		.field label {
+			display: block;
+			font-size: 0.7rem;
+			color: var(--text-muted);
+			margin-bottom: 0.25rem;
+		}
+
+		.field input, .field select, .field textarea {
+			width: 100%;
+			padding: 0.5rem 0.65rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.75rem;
+			transition: border-color 0.2s;
+		}
+
+		.field input:focus, .field select:focus, .field textarea:focus {
+			outline: none;
+			border-color: var(--accent);
+			box-shadow: 0 0 0 2px var(--accent-dim);
+		}
+
+		.field select {
+			cursor: pointer;
+			appearance: none;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236c7286'/%3E%3C/svg%3E");
+			background-repeat: no-repeat;
+			background-position: right 0.6rem center;
+			padding-right: 1.8rem;
+		}
+
+		.field select option {
+			background: var(--surface);
+			color: var(--text);
+		}
+
+		/* Toggle switches */
+		.toggles {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.5rem;
+		}
+
+		.toggle-row {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.4rem 0.55rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			cursor: pointer;
+			transition: border-color 0.2s;
+		}
+
+		.toggle-row:hover { border-color: var(--border-bright); }
+		.toggle-row.active { border-color: var(--accent); background: var(--accent-dim); }
+
+		.toggle-dot {
+			width: 8px; height: 8px;
+			border-radius: 50%;
+			border: 1.5px solid var(--border-bright);
+			transition: all 0.2s;
+			flex-shrink: 0;
+		}
+
+		.toggle-row.active .toggle-dot {
+			background: var(--accent);
+			border-color: var(--accent);
+			box-shadow: 0 0 4px var(--accent-glow);
+		}
+
+		.toggle-label {
+			font-size: 0.68rem;
+			color: var(--text-muted);
+			line-height: 1.2;
+		}
+
+		.toggle-row.active .toggle-label { color: var(--text); }
+
+		/* Config output */
+		.config-output {
+			position: sticky;
+			top: 70px;
+		}
+
+		.config-pre {
+			padding: 1rem;
+			font-size: 0.7rem;
+			line-height: 1.65;
+			overflow-x: auto;
+			max-height: 75vh;
+			overflow-y: auto;
+			tab-size: 4;
+			white-space: pre;
+		}
+
+		.config-pre::-webkit-scrollbar { width: 5px; height: 5px; }
+		.config-pre::-webkit-scrollbar-track { background: transparent; }
+		.config-pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+		/* Syntax highlighting classes */
+		.cm { color: var(--comment); }
+		.kw { color: var(--keyword); }
+		.val { color: var(--value); }
+		.str { color: var(--string); }
+		.tg { color: var(--tag); }
+
+		/* Action buttons */
+		.actions {
+			display: flex;
+			gap: 0.4rem;
+		}
+
+		.btn {
+			padding: 0.35rem 0.7rem;
+			border: 1px solid var(--border);
+			border-radius: 5px;
+			background: var(--surface-alt);
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.65rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.btn:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.btn.copied {
+			border-color: var(--success);
+			color: var(--success);
+		}
+
+		/* Provider cards */
+		.provider-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 0.5rem;
+		}
+
+		.provider-card {
+			padding: 0.55rem 0.5rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			cursor: pointer;
+			text-align: center;
+			transition: all 0.2s;
+		}
+
+		.provider-card:hover { border-color: var(--border-bright); }
+
+		.provider-card.active {
+			border-color: var(--accent);
+			background: var(--accent-dim);
+		}
+
+		.provider-icon {
+			font-size: 1.1rem;
+			margin-bottom: 0.2rem;
+		}
+
+		.provider-name {
+			font-size: 0.65rem;
+			color: var(--text-muted);
+		}
+
+		.provider-card.active .provider-name { color: var(--text); }
+
+		/* Info callout */
+		.callout {
+			padding: 0.6rem 0.75rem;
+			background: var(--accent-dim);
+			border: 1px solid rgba(232, 168, 73, 0.15);
+			border-radius: 6px;
+			font-size: 0.68rem;
+			color: var(--text-muted);
+			line-height: 1.5;
+			margin-top: 0.75rem;
+		}
+
+		.callout strong { color: var(--accent); font-weight: 500; }
+
+		/* Password method */
+		.password-method { margin-top: 0.5rem; }
+
+		/* Scrollbar for form */
+		.form-scroll {
+			max-height: 80vh;
+			overflow-y: auto;
+		}
+
+		.form-scroll::-webkit-scrollbar { width: 5px; }
+		.form-scroll::-webkit-scrollbar-track { background: transparent; }
+		.form-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+		@media (max-width: 800px) {
+			.layout {
+				grid-template-columns: 1fr;
+			}
+
+			.config-output {
+				position: static;
+			}
+
+			.provider-grid {
+				grid-template-columns: repeat(3, 1fr);
+			}
+
+			.toggles {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		@media (max-width: 500px) {
+			.app { padding: 1rem 0.75rem; }
+
+			h1 { font-size: 1.2rem; }
+
+			.provider-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+	</style>
+</head>
+<body>
+	<script src="assets/shared-nav.js"></script>
+
+	<div class="app">
+		<header>
+			<h1>Mutt Config Generator</h1>
+			<p class="subtitle">Build a complete ~/.muttrc for any mail provider</p>
+		</header>
+
+		<div class="layout">
+			<div class="panel">
+				<div class="panel-header">
+					<div class="panel-header-left"><span class="dot"></span> Configuration</div>
+				</div>
+				<div class="panel-body form-scroll">
+					<!-- Provider -->
+					<div class="form-section">
+						<div class="section-label">Mail Provider</div>
+						<div class="provider-grid">
+							<div class="provider-card active" data-provider="gmail" onclick="selectProvider('gmail')">
+								<div class="provider-icon">G</div>
+								<div class="provider-name">Gmail</div>
+							</div>
+							<div class="provider-card" data-provider="office365" onclick="selectProvider('office365')">
+								<div class="provider-icon">O</div>
+								<div class="provider-name">Office 365</div>
+							</div>
+							<div class="provider-card" data-provider="fastmail" onclick="selectProvider('fastmail')">
+								<div class="provider-icon">F</div>
+								<div class="provider-name">Fastmail</div>
+							</div>
+							<div class="provider-card" data-provider="protonmail" onclick="selectProvider('protonmail')">
+								<div class="provider-icon">P</div>
+								<div class="provider-name">ProtonMail</div>
+							</div>
+							<div class="provider-card" data-provider="imap" onclick="selectProvider('imap')">
+								<div class="provider-icon">@</div>
+								<div class="provider-name">Custom IMAP</div>
+							</div>
+							<div class="provider-card" data-provider="maildir" onclick="selectProvider('maildir')">
+								<div class="provider-icon">D</div>
+								<div class="provider-name">Local Maildir</div>
+							</div>
+						</div>
+						<div class="callout" id="provider-note"></div>
+					</div>
+
+					<!-- Identity -->
+					<div class="form-section">
+						<div class="section-label">Identity</div>
+						<div class="field">
+							<label>Real Name</label>
+							<input type="text" id="realname" placeholder="Your Name" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>Email Address</label>
+							<input type="text" id="email" placeholder="you@example.com" oninput="generate()">
+						</div>
+					</div>
+
+					<!-- Server Settings (for custom IMAP) -->
+					<div class="form-section" id="server-section" style="display:none;">
+						<div class="section-label">Server Settings</div>
+						<div class="field">
+							<label>IMAP Server</label>
+							<input type="text" id="imap-server" placeholder="imap.example.com" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>IMAP Port</label>
+							<input type="text" id="imap-port" placeholder="993" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>SMTP Server</label>
+							<input type="text" id="smtp-server" placeholder="smtp.example.com" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>SMTP Port</label>
+							<input type="text" id="smtp-port" placeholder="465" oninput="generate()">
+						</div>
+					</div>
+
+					<!-- Maildir Settings -->
+					<div class="form-section" id="maildir-section" style="display:none;">
+						<div class="section-label">Maildir Settings</div>
+						<div class="field">
+							<label>Mail Directory</label>
+							<input type="text" id="maildir-path" placeholder="~/mail/work" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>Sent Folder Name</label>
+							<input type="text" id="maildir-sent" placeholder="Sent" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>Drafts Folder Name</label>
+							<input type="text" id="maildir-drafts" placeholder="Drafts" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>Trash Folder Name</label>
+							<input type="text" id="maildir-trash" placeholder="Trash" oninput="generate()">
+						</div>
+					</div>
+
+					<!-- Folder Overrides -->
+					<div class="form-section" id="folder-section">
+						<div class="section-label">Folder Names</div>
+						<div class="field">
+							<label>Sent Folder</label>
+							<input type="text" id="sent-folder" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>Drafts Folder</label>
+							<input type="text" id="drafts-folder" oninput="generate()">
+						</div>
+						<div class="field">
+							<label>Trash Folder</label>
+							<input type="text" id="trash-folder" oninput="generate()">
+						</div>
+					</div>
+
+					<!-- Password Security -->
+					<div class="form-section">
+						<div class="section-label">Password Method</div>
+						<div class="field">
+							<select id="password-method" onchange="generate()">
+								<option value="plain">Plain text (not recommended)</option>
+								<option value="pass" selected>pass (password-store)</option>
+								<option value="gpg">GPG encrypted file</option>
+								<option value="secret-tool">secret-tool (GNOME Keyring)</option>
+							</select>
+						</div>
+						<div class="field password-method" id="pass-name-field">
+							<label>pass entry name</label>
+							<input type="text" id="pass-name" placeholder="email/work" oninput="generate()">
+						</div>
+						<div class="field password-method" id="gpg-file-field" style="display:none;">
+							<label>GPG encrypted file path</label>
+							<input type="text" id="gpg-file" placeholder="~/.config/mutt/pass.gpg" oninput="generate()">
+						</div>
+						<div class="field password-method" id="secret-tool-field" style="display:none;">
+							<label>secret-tool account label</label>
+							<input type="text" id="secret-tool-account" placeholder="work" oninput="generate()">
+						</div>
+					</div>
+
+					<!-- Editor -->
+					<div class="form-section">
+						<div class="section-label">Editor</div>
+						<div class="field">
+							<select id="editor" onchange="generate()">
+								<option value="nvim">Neovim (nvim)</option>
+								<option value="vim">Vim</option>
+								<option value="nano">Nano</option>
+								<option value="emacs">Emacs</option>
+								<option value="micro">Micro</option>
+							</select>
+						</div>
+					</div>
+
+					<!-- Features -->
+					<div class="form-section">
+						<div class="section-label">Features</div>
+						<div class="toggles">
+							<div class="toggle-row active" onclick="toggleFeature(this, 'vim-keys')">
+								<div class="toggle-dot"></div>
+								<span class="toggle-label">Vim keybindings</span>
+							</div>
+							<div class="toggle-row active" onclick="toggleFeature(this, 'sidebar')">
+								<div class="toggle-dot"></div>
+								<span class="toggle-label">Sidebar (NeoMutt)</span>
+							</div>
+							<div class="toggle-row active" onclick="toggleFeature(this, 'html')">
+								<div class="toggle-dot"></div>
+								<span class="toggle-label">HTML rendering</span>
+							</div>
+							<div class="toggle-row active" onclick="toggleFeature(this, 'colours')">
+								<div class="toggle-dot"></div>
+								<span class="toggle-label">Colour scheme</span>
+							</div>
+							<div class="toggle-row" onclick="toggleFeature(this, 'abook')">
+								<div class="toggle-dot"></div>
+								<span class="toggle-label">abook contacts</span>
+							</div>
+							<div class="toggle-row active" onclick="toggleFeature(this, 'threading')">
+								<div class="toggle-dot"></div>
+								<span class="toggle-label">Threaded view</span>
+							</div>
+							<div class="toggle-row active" onclick="toggleFeature(this, 'signature')">
+								<div class="toggle-dot"></div>
+								<span class="toggle-label">Signature file</span>
+							</div>
+							<div class="toggle-row" onclick="toggleFeature(this, 'notmuch')">
+								<div class="toggle-dot"></div>
+								<span class="toggle-label">notmuch search</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel config-output">
+				<div class="panel-header">
+					<div class="panel-header-left"><span class="dot"></span> ~/.muttrc</div>
+					<div class="actions">
+						<button class="btn" onclick="copyConfig()" id="copy-btn">copy</button>
+						<button class="btn" onclick="downloadConfig()">download</button>
+					</div>
+				</div>
+				<pre class="config-pre" id="config-output"></pre>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	'use strict';
+
+	const state = {
+		provider: 'gmail',
+		features: new Set(['vim-keys', 'sidebar', 'html', 'colours', 'threading', 'signature'])
+	};
+
+	const PROVIDERS = {
+		gmail: {
+			label: 'Gmail',
+			imap: 'imap.gmail.com',
+			imapPort: 993,
+			smtp: 'smtp.gmail.com',
+			smtpPort: 465,
+			smtpProto: 'smtps',
+			sent: '[Gmail]/Sent Mail',
+			drafts: '[Gmail]/Drafts',
+			trash: '[Gmail]/Bin',
+			note: '<strong>Gmail</strong> requires an App Password if 2FA is on. Generate one at myaccount.google.com > Security > 2-Step Verification > App passwords. Gmail copies sent mail server-side, so <code>unset record</code> is used.',
+			extras: ['set delete = yes', 'unset confirmappend', 'set move = no', 'unset record']
+		},
+		office365: {
+			label: 'Office 365',
+			imap: 'outlook.office365.com',
+			imapPort: 993,
+			smtp: 'smtp.office365.com',
+			smtpPort: 587,
+			smtpProto: 'smtp',
+			sent: 'Sent Items',
+			drafts: 'Drafts',
+			trash: 'Deleted Items',
+			note: '<strong>Office 365</strong> may require OAuth2 for modern auth. If basic auth is blocked, use NeoMutt with <code>mutt_oauth2.py</code> or DavMail as a local bridge.',
+			extras: ['set smtp_authenticators = "login"'],
+			smtpSuffix: ''
+		},
+		fastmail: {
+			label: 'Fastmail',
+			imap: 'imap.fastmail.com',
+			imapPort: 993,
+			smtp: 'smtp.fastmail.com',
+			smtpPort: 465,
+			smtpProto: 'smtps',
+			sent: 'Sent',
+			drafts: 'Drafts',
+			trash: 'Trash',
+			note: '<strong>Fastmail</strong> uses App Passwords. Generate one at Settings > Privacy & Security > Integrations > App Passwords.',
+			extras: []
+		},
+		protonmail: {
+			label: 'ProtonMail',
+			imap: '127.0.0.1',
+			imapPort: 1143,
+			smtp: '127.0.0.1',
+			smtpPort: 1025,
+			smtpProto: 'smtp',
+			imapProto: 'imap',
+			sent: 'Sent',
+			drafts: 'Drafts',
+			trash: 'Trash',
+			note: '<strong>ProtonMail</strong> requires Proton Bridge running locally. Install it from proton.me, log in, and use the bridge-generated password.',
+			extras: ['set ssl_verify_host = no', 'set ssl_verify_dates = no']
+		},
+		imap: {
+			label: 'Custom IMAP',
+			imap: '',
+			imapPort: 993,
+			smtp: '',
+			smtpPort: 465,
+			smtpProto: 'smtps',
+			sent: 'Sent',
+			drafts: 'Drafts',
+			trash: 'Trash',
+			note: '<strong>Custom IMAP</strong> — enter your server details below. Check your provider\'s documentation for the correct ports and folder names.',
+			extras: []
+		},
+		maildir: {
+			label: 'Local Maildir',
+			note: '<strong>Local Maildir</strong> — for use with mbsync/isync, offlineimap, or fetchmail. Mail is read from a local directory.',
+			extras: ['set mbox_type = Maildir']
+		}
+	};
+
+	function selectProvider(name) {
+		state.provider = name;
+		document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('active'));
+		document.querySelector(`[data-provider="${name}"]`).classList.add('active');
+
+		const p = PROVIDERS[name];
+		document.getElementById('provider-note').innerHTML = p.note;
+
+		// Show/hide server fields
+		document.getElementById('server-section').style.display = name === 'imap' ? '' : 'none';
+		document.getElementById('maildir-section').style.display = name === 'maildir' ? '' : 'none';
+		document.getElementById('folder-section').style.display = name === 'maildir' ? 'none' : '';
+
+		// Update folder defaults
+		if (name !== 'maildir') {
+			document.getElementById('sent-folder').value = p.sent;
+			document.getElementById('drafts-folder').value = p.drafts;
+			document.getElementById('trash-folder').value = p.trash;
+		}
+
+		generate();
+	}
+
+	function toggleFeature(el, feat) {
+		el.classList.toggle('active');
+		if (state.features.has(feat)) {
+			state.features.delete(feat);
+		} else {
+			state.features.add(feat);
+		}
+		generate();
+	}
+
+	function getPasswordCmd() {
+		const method = document.getElementById('password-method').value;
+
+		// Show/hide method-specific fields
+		document.getElementById('pass-name-field').style.display = method === 'pass' ? '' : 'none';
+		document.getElementById('gpg-file-field').style.display = method === 'gpg' ? '' : 'none';
+		document.getElementById('secret-tool-field').style.display = method === 'secret-tool' ? '' : 'none';
+
+		switch (method) {
+			case 'plain':
+				return '"your-password-here"';
+			case 'pass': {
+				const name = document.getElementById('pass-name').value || 'email/work';
+				return '`pass ' + name + '`';
+			}
+			case 'gpg': {
+				const file = document.getElementById('gpg-file').value || '~/.config/mutt/pass.gpg';
+				return '`gpg --quiet --batch --decrypt ' + file + '`';
+			}
+			case 'secret-tool': {
+				const acct = document.getElementById('secret-tool-account').value || 'work';
+				return '`secret-tool lookup service mutt account ' + acct + '`';
+			}
+		}
+	}
+
+	function esc(s) {
+		return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	}
+
+	function line(keyword, value, comment) {
+		let s = '<span class="kw">set</span> ' + esc(keyword) + ' = <span class="val">' + esc(value) + '</span>';
+		if (comment) s += '  <span class="cm"># ' + esc(comment) + '</span>';
+		return s;
+	}
+
+	function comment(text) {
+		return '<span class="cm"># ' + esc(text) + '</span>';
+	}
+
+	function section(text) {
+		return '<span class="cm"># ── ' + esc(text) + ' ' + '─'.repeat(Math.max(1, 50 - text.length)) + '</span>';
+	}
+
+	function rawLine(keyword, value) {
+		return '<span class="kw">' + esc(keyword) + '</span> <span class="val">' + esc(value) + '</span>';
+	}
+
+	function generate() {
+		const p = PROVIDERS[state.provider];
+		const email = document.getElementById('email').value || 'you@example.com';
+		const realname = document.getElementById('realname').value || 'Your Name';
+		const passCmd = getPasswordCmd();
+		const editor = document.getElementById('editor').value;
+		const lines = [];
+
+		// Header comment
+		lines.push(comment('~/.muttrc — generated by rowstu.net/mutt-config.html'));
+		lines.push(comment('Provider: ' + p.label));
+		lines.push('');
+
+		// Identity
+		lines.push(section('Identity'));
+		lines.push(line('realname', '"' + realname + '"'));
+		lines.push(line('from', '"' + email + '"'));
+		lines.push('');
+
+		if (state.provider === 'maildir') {
+			// Maildir config
+			const mailPath = document.getElementById('maildir-path').value || '~/mail/work';
+			const sent = document.getElementById('maildir-sent').value || 'Sent';
+			const drafts = document.getElementById('maildir-drafts').value || 'Drafts';
+			const trash = document.getElementById('maildir-trash').value || 'Trash';
+
+			lines.push(section('Maildir'));
+			lines.push(line('folder', '"' + mailPath + '"'));
+			lines.push(line('mbox_type', 'Maildir'));
+			lines.push(line('spoolfile', '"+INBOX"'));
+			lines.push(line('record', '"+' + sent + '"'));
+			lines.push(line('postponed', '"+' + drafts + '"'));
+			lines.push(line('trash', '"+' + trash + '"'));
+			lines.push('');
+
+			// SMTP for sending from maildir
+			lines.push(section('SMTP'));
+			lines.push(comment('Configure SMTP for sending (adjust to your provider)'));
+			lines.push(comment('set smtp_url = "smtps://you@example.com@smtp.example.com:465/"'));
+			lines.push(comment('set smtp_pass = ' + passCmd));
+			lines.push('');
+		} else {
+			// IMAP
+			const imapServer = state.provider === 'imap'
+				? (document.getElementById('imap-server').value || 'imap.example.com')
+				: p.imap;
+			const imapPort = state.provider === 'imap'
+				? (document.getElementById('imap-port').value || '993')
+				: p.imapPort;
+			const smtpServer = state.provider === 'imap'
+				? (document.getElementById('smtp-server').value || 'smtp.example.com')
+				: p.smtp;
+			const smtpPort = state.provider === 'imap'
+				? (document.getElementById('smtp-port').value || '465')
+				: p.smtpPort;
+
+			const sentFolder = document.getElementById('sent-folder').value || p.sent;
+			const draftsFolder = document.getElementById('drafts-folder').value || p.drafts;
+			const trashFolder = document.getElementById('trash-folder').value || p.trash;
+
+			const imapProto = p.imapProto || 'imaps';
+			const smtpProto = p.smtpProto || 'smtps';
+
+			lines.push(section('IMAP'));
+			lines.push(line('imap_user', '"' + email + '"'));
+			lines.push(line('imap_pass', passCmd));
+			lines.push(line('folder', '"' + imapProto + '://' + imapServer + ':' + imapPort + '/"'));
+			lines.push(line('spoolfile', '"+INBOX"'));
+
+			// Gmail special: unset record
+			if (state.provider === 'gmail') {
+				lines.push(comment('Gmail copies sent mail server-side'));
+			} else {
+				lines.push(line('record', '"+' + sentFolder + '"'));
+			}
+			lines.push(line('postponed', '"+' + draftsFolder + '"'));
+			lines.push(line('trash', '"+' + trashFolder + '"'));
+			lines.push('');
+
+			// SMTP
+			lines.push(section('SMTP'));
+			const smtpUrl = smtpProto + '://' + email + '@' + smtpServer + ':' + smtpPort + '/';
+			lines.push(line('smtp_url', '"' + smtpUrl + '"'));
+			lines.push(line('smtp_pass', passCmd));
+			lines.push('');
+
+			// TLS
+			if (state.provider !== 'protonmail') {
+				lines.push(section('TLS'));
+				lines.push(line('ssl_force_tls', 'yes'));
+				lines.push(line('ssl_starttls', 'yes'));
+				lines.push('');
+			}
+
+			// Provider extras
+			if (p.extras.length > 0) {
+				lines.push(section(p.label + ' specifics'));
+				p.extras.forEach(e => {
+					if (e.startsWith('unset ')) {
+						lines.push('<span class="kw">unset</span> <span class="val">' + esc(e.slice(6)) + '</span>');
+					} else if (e.startsWith('set ')) {
+						const parts = e.slice(4).split(' = ');
+						lines.push(line(parts[0], parts[1]));
+					}
+				});
+				lines.push('');
+			}
+		}
+
+		// Editor
+		lines.push(section('Compose'));
+		const editorCmd = {
+			nvim: 'nvim +/^$ ++1',
+			vim: 'vim +/^$ ++1',
+			nano: 'nano',
+			emacs: 'emacs',
+			micro: 'micro'
+		};
+		lines.push(line('editor', '"' + editorCmd[editor] + '"'));
+		lines.push(line('edit_headers', 'yes'));
+		lines.push(line('autoedit', 'yes'));
+		lines.push(line('fast_reply', 'yes'));
+		lines.push(line('include', 'yes', 'include original in reply'));
+		lines.push(line('forward_format', '"Fwd: %s"'));
+		lines.push(line('attribution', '"On %d, %n wrote:"'));
+		lines.push(line('text_flowed', 'yes', 'mobile-friendly wrapping'));
+		lines.push('');
+
+		// Signature
+		if (state.features.has('signature')) {
+			lines.push(line('signature', '"~/.config/mutt/signature"'));
+			lines.push('');
+		}
+
+		// Misc
+		lines.push(section('General'));
+		lines.push(line('sleep_time', '0', 'no pause between folders'));
+		lines.push(line('wait_key', 'no'));
+		lines.push(line('timeout', '30'));
+		lines.push(line('mail_check', '60'));
+		lines.push(line('beep_new', 'yes'));
+		lines.push(line('pipe_decode', 'yes'));
+		lines.push(line('thorough_search', 'yes'));
+		lines.push(line('help', 'no', 'hide help bar'));
+		lines.push(line('confirmappend', 'no'));
+		lines.push(line('quit', 'ask-yes'));
+		lines.push(line('mark_old', 'no'));
+		lines.push(line('mime_forward', 'yes'));
+		lines.push(line('forward_decode', 'yes'));
+		lines.push(line('reply_to', 'yes'));
+		lines.push(line('reverse_name', 'yes'));
+		lines.push(line('charset', '"utf-8"'));
+		lines.push(line('assumed_charset', '"utf-8"'));
+		lines.push(line('send_charset', '"utf-8:iso-8859-1:us-ascii"'));
+		lines.push('');
+
+		// Index / Threading
+		if (state.features.has('threading')) {
+			lines.push(section('Index & Threading'));
+			lines.push(line('index_format', '" %Z  %<[y?%<[d?%[%H:%M]&%[%b %d]>&%[%b %Y]>  %-20.20L  %s"'));
+			lines.push(line('sort', 'threads'));
+			lines.push(line('sort_aux', 'reverse-last-date-received'));
+			lines.push(line('collapse_all', 'yes'));
+			lines.push('');
+		}
+
+		// Pager
+		lines.push(section('Pager'));
+		lines.push(line('pager_index_lines', '10'));
+		lines.push(line('pager_context', '3'));
+		lines.push(line('pager_stop', 'yes'));
+		lines.push(line('tilde', 'yes'));
+		lines.push(line('markers', 'no'));
+		lines.push(line('wrap', '120'));
+		lines.push('');
+		lines.push(comment('Show useful headers only'));
+		lines.push('<span class="kw">ignore</span> <span class="val">*</span>');
+		lines.push('<span class="kw">unignore</span> <span class="val">from: to: cc: date: subject: reply-to:</span>');
+		lines.push('<span class="kw">unhdr_order</span> <span class="val">*</span>');
+		lines.push('<span class="kw">hdr_order</span> <span class="val">from: to: cc: date: subject:</span>');
+		lines.push('');
+
+		// Status bar
+		lines.push(section('Status Bar'));
+		lines.push(line('status_format', '" %f [%m messages%?n?, %n new?%?d?, %d deleted?%?t?, %t tagged?] %> %P "'));
+		lines.push('');
+
+		// Sidebar
+		if (state.features.has('sidebar')) {
+			lines.push(section('Sidebar (NeoMutt)'));
+			lines.push(line('sidebar_visible', 'yes'));
+			lines.push(line('sidebar_width', '28'));
+			lines.push(line('sidebar_format', '"%D%* %?N?[%N]?"'));
+			lines.push(line('sidebar_short_path', 'yes'));
+			lines.push(line('sidebar_delim_chars', '"/."'));
+			lines.push(line('sidebar_folder_indent', 'yes'));
+			lines.push(line('sidebar_indent_string', '"  "'));
+			lines.push(line('mail_check_stats', 'yes'));
+			lines.push('');
+			lines.push(rawLine('bind', 'index,pager \\Cp sidebar-prev'));
+			lines.push(rawLine('bind', 'index,pager \\Cn sidebar-next'));
+			lines.push(rawLine('bind', 'index,pager \\Co sidebar-open'));
+			lines.push('');
+		}
+
+		// Vim keybindings
+		if (state.features.has('vim-keys')) {
+			lines.push(section('Keybindings (vim-style)'));
+			lines.push(rawLine('bind', 'index gg first-entry'));
+			lines.push(rawLine('bind', 'index G  last-entry'));
+			lines.push(rawLine('bind', 'index j  next-entry'));
+			lines.push(rawLine('bind', 'index k  previous-entry'));
+			lines.push(rawLine('bind', 'pager j  next-line'));
+			lines.push(rawLine('bind', 'pager k  previous-line'));
+			lines.push(rawLine('bind', 'pager gg top'));
+			lines.push(rawLine('bind', 'pager G  bottom'));
+			lines.push('');
+			lines.push(rawLine('bind', 'index r  reply'));
+			lines.push(rawLine('bind', 'index R  group-reply'));
+			lines.push(rawLine('bind', 'index f  forward-message'));
+			lines.push(rawLine('bind', 'index t  tag-entry'));
+			lines.push(rawLine('bind', 'index /  search'));
+			lines.push(rawLine('bind', 'index n  search-next'));
+			lines.push(rawLine('bind', 'index N  search-opposite'));
+			lines.push(rawLine('bind', 'index <space> collapse-thread'));
+			lines.push('');
+		}
+
+		// HTML handling
+		if (state.features.has('html')) {
+			lines.push(section('HTML Email'));
+			lines.push(line('mailcap_path', '"~/.config/mutt/mailcap"'));
+			lines.push('<span class="kw">auto_view</span> <span class="val">text/html</span>');
+			lines.push('<span class="kw">alternative_order</span> <span class="val">text/plain text/enriched text/html</span>');
+			lines.push('');
+			lines.push(comment('Create ~/.config/mutt/mailcap with:'));
+			lines.push(comment('text/html; lynx -dump -assume_charset=%{charset} %s; nametemplate=%s.html; copiousoutput'));
+			lines.push('');
+		}
+
+		// Address book
+		if (state.features.has('abook')) {
+			lines.push(section('Address Book (abook)'));
+			lines.push(line('query_command', '"abook --mutt-query \'%s\'"'));
+			lines.push('<span class="kw">macro</span> <span class="val">index,pager a "&lt;pipe-message&gt;abook --add-email-quiet&lt;return&gt;"</span> <span class="str">"Add sender to abook"</span>');
+			lines.push('');
+		}
+
+		// notmuch
+		if (state.features.has('notmuch')) {
+			lines.push(section('notmuch Search'));
+			lines.push(line('nm_default_url', '"notmuch:///home/' + (realname.toLowerCase().split(' ')[0] || 'user') + '/mail"'));
+			lines.push('<span class="kw">macro</span> <span class="val">index \\\\ "&lt;vfolder-from-query&gt;"</span> <span class="str">"Search with notmuch"</span>');
+			lines.push('');
+		}
+
+		// Colour scheme
+		if (state.features.has('colours')) {
+			lines.push(section('Colours'));
+			lines.push(comment('Basic'));
+			lines.push(rawLine('color', 'normal        default       default'));
+			lines.push(rawLine('color', 'error         color1        default'));
+			lines.push(rawLine('color', 'message       color2        default'));
+			lines.push(rawLine('color', 'indicator     color0        color4'));
+			lines.push(rawLine('color', 'status        color7        color8'));
+			lines.push(rawLine('color', 'tree          color8        default'));
+			lines.push('');
+			lines.push(comment('Index'));
+			lines.push(rawLine('color', 'index         color4        default  "~N"'));
+			lines.push(rawLine('color', 'index         color2        default  "~F"'));
+			lines.push(rawLine('color', 'index         color1        default  "~D"'));
+			lines.push(rawLine('color', 'index         color8        default  "~R !~N"'));
+			lines.push('');
+			lines.push(comment('Message body'));
+			lines.push(rawLine('color', 'body          color4        default  "([a-z]+://[^ ]+)"'));
+			lines.push(rawLine('color', 'body          color2        default  "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+"'));
+			lines.push('');
+			lines.push(comment('Headers'));
+			lines.push(rawLine('color', 'hdrdefault    color8        default'));
+			lines.push(rawLine('color', 'header        color4        default  "^(From|To|Cc):"'));
+			lines.push(rawLine('color', 'header        color2        default  "^Subject:"'));
+			lines.push(rawLine('color', 'header        color8        default  "^Date:"'));
+			lines.push('');
+			lines.push(comment('Quoted text'));
+			lines.push(rawLine('color', 'quoted        color6        default'));
+			lines.push(rawLine('color', 'quoted1       color4        default'));
+			lines.push(rawLine('color', 'quoted2       color2        default'));
+			lines.push(rawLine('color', 'quoted3       color8        default'));
+			lines.push('');
+			if (state.features.has('sidebar')) {
+				lines.push(comment('Sidebar'));
+				lines.push(rawLine('color', 'sidebar_new       color2   default'));
+				lines.push(rawLine('color', 'sidebar_flagged   color1   default'));
+				lines.push(rawLine('color', 'sidebar_indicator color0   color4'));
+				lines.push('');
+			}
+		}
+
+		document.getElementById('config-output').innerHTML = lines.join('\n');
+	}
+
+	function getPlainText() {
+		const el = document.getElementById('config-output');
+		return el.textContent || el.innerText;
+	}
+
+	function copyConfig() {
+		const text = getPlainText();
+		navigator.clipboard.writeText(text).then(() => {
+			const btn = document.getElementById('copy-btn');
+			btn.textContent = 'copied';
+			btn.classList.add('copied');
+			setTimeout(() => {
+				btn.textContent = 'copy';
+				btn.classList.remove('copied');
+			}, 1500);
+		});
+	}
+
+	function downloadConfig() {
+		const text = getPlainText();
+		const blob = new Blob([text], { type: 'text/plain' });
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = 'muttrc';
+		a.click();
+		URL.revokeObjectURL(a.href);
+	}
+
+	// Password method field visibility
+	document.getElementById('password-method').addEventListener('change', function() {
+		document.getElementById('pass-name-field').style.display = this.value === 'pass' ? '' : 'none';
+		document.getElementById('gpg-file-field').style.display = this.value === 'gpg' ? '' : 'none';
+		document.getElementById('secret-tool-field').style.display = this.value === 'secret-tool' ? '' : 'none';
+	});
+
+	// Init
+	selectProvider('gmail');
+	</script>
+</body>
+</html>
