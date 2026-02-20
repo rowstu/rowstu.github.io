@@ -335,11 +335,100 @@
 
 		.back-link:hover { color: var(--accent); }
 
+		#fallbackPanel { display: none; }
+		#fallbackPanel.visible { display: block; }
+
+		.fallback-tabs {
+			display: flex;
+			gap: 0;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.fallback-tab {
+			flex: 1;
+			padding: 0.65rem 1rem;
+			background: transparent;
+			border: none;
+			border-bottom: 2px solid transparent;
+			border-radius: 0;
+			color: var(--text-muted);
+			font-size: 0.78rem;
+			cursor: pointer;
+			transition: all 0.2s;
+			text-align: center;
+		}
+
+		.fallback-tab:hover {
+			color: var(--text);
+			background: rgba(255,255,255,0.03);
+		}
+
+		.fallback-tab.active {
+			color: var(--accent);
+			border-bottom-color: var(--accent);
+		}
+
+		.fallback-content { display: none; padding: 1rem; }
+		.fallback-content.active { display: block; }
+
+		.fallback-content p {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			line-height: 1.6;
+			margin-bottom: 0.75rem;
+		}
+
+		.fallback-content textarea {
+			width: 100%;
+			min-height: 120px;
+			padding: 0.75rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.78rem;
+			outline: none;
+			resize: vertical;
+			margin-bottom: 0.5rem;
+		}
+
+		.fallback-content textarea:focus { border-color: var(--accent); }
+
+		.fallback-content .manual-id-row {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.fallback-content .hint {
+			font-size: 0.72rem;
+			color: var(--text-muted);
+			opacity: 0.7;
+			margin-top: 0.35rem;
+		}
+
+		.fallback-content ol {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			line-height: 1.8;
+			padding-left: 1.25rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.fallback-content ol code {
+			background: var(--surface-hover);
+			padding: 0.1rem 0.35rem;
+			border-radius: 3px;
+			color: var(--success);
+			font-size: 0.75rem;
+		}
+
 		@media (max-width: 600px) {
 			.input-row { flex-direction: column; }
 			.result-row { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
 			.result-label { min-width: auto; }
 			.copy-row { flex-direction: column; }
+			.fallback-content .manual-id-row { flex-direction: column; }
 		}
 	</style>
 </head>
@@ -391,6 +480,34 @@
 			</div>
 		</div>
 
+		<div class="panel" id="fallbackPanel">
+			<div class="panel-header">
+				<span class="label">Auto-resolve failed — try manually</span>
+			</div>
+			<div class="fallback-tabs">
+				<button class="fallback-tab active" onclick="switchFallbackTab('source')">Paste Page Source</button>
+				<button class="fallback-tab" onclick="switchFallbackTab('manual')">Enter Channel ID</button>
+			</div>
+			<div class="fallback-content active" id="fallback-source">
+				<ol>
+					<li>Go to the YouTube channel page</li>
+					<li>Right-click anywhere → <code>View Page Source</code></li>
+					<li>Select all (<code>Ctrl+A</code>) and copy (<code>Ctrl+C</code>)</li>
+					<li>Paste into the box below</li>
+				</ol>
+				<textarea id="sourceInput" placeholder="Paste the page source HTML here..."></textarea>
+				<button class="primary" onclick="extractFromSource()">Extract Channel ID</button>
+			</div>
+			<div class="fallback-content" id="fallback-manual">
+				<p>Enter a YouTube channel ID directly. You can find it in the channel's page URL or page source — it starts with <code>UC</code> and is 24 characters long.</p>
+				<div class="manual-id-row">
+					<input type="text" id="manualIdInput" placeholder="UCxxxxxxxxxxxxxxxxxxxxxxxx">
+					<button class="primary" onclick="useManualId()">Use This ID</button>
+				</div>
+				<p class="hint">Example: UCYO_jab_esuFRV4b17AJtAw</p>
+			</div>
+		</div>
+
 		<div class="info-panel">
 			<h3>Usage</h3>
 			<p>Paste a YouTube URL or <code>@handle</code> and this tool resolves the channel ID, then builds the RSS feed URL for <a href="https://newsboat.org" target="_blank" style="color: var(--info);">Newsboat</a>.</p>
@@ -411,7 +528,9 @@
 
 		const CORS_PROXIES = [
 			url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-			url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+			url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+			url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+			url => `https://thingproxy.freeboard.io/fetch/${url}`
 		];
 
 		const PIPED_INSTANCES = [
@@ -507,21 +626,29 @@
 
 			const channelId = idMatch[1];
 
-			// Try several patterns for the channel name
-			let name = channelId;
+			// Try several patterns for the channel name (most specific first)
+			let name = null;
 			const namePatterns = [
+				// Video page patterns
 				/"ownerChannelName"\s*:\s*"([^"]+)"/,
 				/"author"\s*:\s*"([^"]+)"/,
+				// Channel page metadata
+				/"channelMetadataRenderer"[\s\S]{0,500}?"title"\s*:\s*"([^"]+)"/,
+				/"microformatDataRenderer"[\s\S]{0,500}?"title"\s*:\s*"([^"]+)"/,
 				/"channelName"\s*:\s*"([^"]+)"/,
+				// HTML meta tags
+				/<meta property="og:title" content="([^"]+)">/,
+				/<meta name="title" content="([^"]+)">/,
 				/<link itemprop="name" content="([^"]+)">/,
-				/<meta property="og:title" content="([^"]+)">/
+				// Page title (strip " - YouTube" suffix)
+				/<title>(.+?)\s*-\s*YouTube<\/title>/
 			];
 			for (const pat of namePatterns) {
 				const m = html.match(pat);
 				if (m) { name = m[1]; break; }
 			}
 
-			return { id: channelId, name };
+			return { id: channelId, name: name || channelId };
 		}
 
 		// Build all resolver promises — CORS proxies + Piped + Invidious
@@ -614,10 +741,10 @@
 			}
 
 			resultPanel.classList.remove('visible');
+			document.getElementById('fallbackPanel').classList.remove('visible');
 			resolveBtn.disabled = true;
 
 			if (parsed.type === 'channel_id') {
-				// We already have the ID — try to look up the name but don't block on it
 				showStatus('Resolving channel name...', 'loading');
 				const promises = buildResolvers('channel_id', parsed.value);
 				let name = parsed.value;
@@ -635,16 +762,24 @@
 			showStatus(`Resolving channel from ${label}...`, 'loading');
 
 			const promises = buildResolvers(parsed.type, parsed.value);
+			const proxyCount = CORS_PROXIES.length;
+			const pipedCount = PIPED_INSTANCES.length;
+			const invCount = INVIDIOUS_INSTANCES.length;
 
 			try {
 				const result = await Promise.any(promises);
 				hideStatus();
 				showResult(result.id, result.name);
 			} catch (e) {
+				let hint = '';
+				if (parsed.type === 'handle') {
+					hint = ' Try pasting a video URL from the channel instead — video lookups have better coverage.';
+				}
 				showStatus(
-					`Could not resolve channel. You can find the channel ID manually: visit the YouTube page, view page source, and search for <code>"channelId"</code>.`,
+					`Tried ${proxyCount} CORS proxies, ${pipedCount} Piped, and ${invCount} Invidious instances — all failed.${hint} Use the manual methods below.`,
 					'error'
 				);
+				document.getElementById('fallbackPanel').classList.add('visible');
 			}
 
 			resolveBtn.disabled = false;
@@ -674,7 +809,50 @@
 			ytInput.value = '';
 			hideStatus();
 			resultPanel.classList.remove('visible');
+			document.getElementById('fallbackPanel').classList.remove('visible');
 			ytInput.focus();
+		}
+
+		function switchFallbackTab(tab) {
+			document.querySelectorAll('.fallback-tab').forEach(t => t.classList.remove('active'));
+			document.querySelectorAll('.fallback-content').forEach(c => c.classList.remove('active'));
+			document.getElementById('fallback-' + tab).classList.add('active');
+			document.querySelector(`.fallback-tab[onclick*="${tab}"]`).classList.add('active');
+		}
+
+		function extractFromSource() {
+			const html = document.getElementById('sourceInput').value;
+			if (!html.trim()) {
+				showStatus('Paste the page source HTML first.', 'error');
+				return;
+			}
+			const result = extractFromHTML(html);
+			if (result) {
+				hideStatus();
+				document.getElementById('fallbackPanel').classList.remove('visible');
+				showResult(result.id, result.name);
+			} else {
+				showStatus('Could not find a channel ID in the pasted HTML. Make sure you copied the full page source.', 'error');
+			}
+		}
+
+		function useManualId() {
+			const raw = document.getElementById('manualIdInput').value.trim();
+			// Accept raw ID or URL containing channel ID
+			const match = raw.match(/(UC[\w-]{22,})/);
+			if (match) {
+				hideStatus();
+				document.getElementById('fallbackPanel').classList.remove('visible');
+				// Try to resolve the name via API, but show result immediately
+				showResult(match[1], match[1]);
+				// Attempt name lookup in background
+				const promises = buildResolvers('channel_id', match[1]);
+				Promise.any(promises).then(r => {
+					if (r.name && r.name !== match[1]) showResult(match[1], r.name);
+				}).catch(() => {});
+			} else {
+				showStatus('Enter a valid channel ID (starts with UC, at least 24 characters).', 'error');
+			}
 		}
 	</script>
 	<script src="/assets/shared-nav.js"></script>
