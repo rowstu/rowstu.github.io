@@ -645,10 +645,23 @@
 			];
 			for (const pat of namePatterns) {
 				const m = html.match(pat);
-				if (m) { name = m[1]; break; }
+				if (m && m[1].trim()) { name = m[1].trim(); break; }
 			}
 
 			return { id: channelId, name: name || channelId };
+		}
+
+		// Resolve channel name from the RSS feed XML (small, stable, always has <name>)
+		function resolveNameFromFeed(channelId) {
+			const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+			const promises = CORS_PROXIES.map(makeUrl =>
+				fetchWithTimeout(makeUrl(feedUrl), 8000).then(r => r.text()).then(xml => {
+					const m = xml.match(/<author>\s*<name>([^<]+)<\/name>/);
+					if (!m || !m[1].trim()) throw new Error('no name in feed');
+					return m[1].trim();
+				})
+			);
+			return Promise.any(promises);
 		}
 
 		// Build all resolver promises — CORS proxies + Piped + Invidious
@@ -786,6 +799,18 @@
 		}
 
 		function showResult(channelId, channelName) {
+			channelName = (channelName && channelName.trim()) ? channelName.trim() : channelId;
+			renderResult(channelId, channelName);
+
+			// If name is still the raw ID, try the RSS feed as a reliable fallback
+			if (channelName === channelId) {
+				resolveNameFromFeed(channelId).then(name => {
+					renderResult(channelId, name);
+				}).catch(() => {});
+			}
+		}
+
+		function renderResult(channelId, channelName) {
 			document.getElementById('channelName').textContent = channelName;
 			document.getElementById('channelId').textContent = channelId;
 
