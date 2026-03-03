@@ -410,10 +410,13 @@
             <button class="btn" id="btn-zoom-out">&minus;</button>
             <button class="btn" id="btn-export-svg">SVG</button>
             <button class="btn" id="btn-export-png">PNG</button>
+            <button class="btn btn-accent" id="btn-save-json">Save</button>
+            <button class="btn" id="btn-load-json">Load</button>
             <button class="btn" id="btn-reset">Reset</button>
         </div>
     </div>
 
+    <input type="file" id="file-import" accept=".json" style="display:none">
     <div class="topic-chips" id="topic-chips"></div>
 
     <div id="node-actions" class="node-actions">
@@ -1277,24 +1280,51 @@
 
     function layoutChildren(parent, cx, cy, startAngle, endAngle, depth, positions) {
         const children = parent.children;
-        const totalWeight = children.reduce((s, c) => s + countLeaves(c), 0);
+        const n = children.length;
+        if (!n) return;
         const radius = RING_RADII[Math.min(depth, RING_RADII.length - 1)] || (RING_RADII[RING_RADII.length - 1] + (depth - RING_RADII.length + 1) * 140);
         const range = endAngle - startAngle;
-        const minGap = 0.08;
-        let angle = startAngle;
+        const isFullCircle = Math.abs(range - 2 * Math.PI) < 0.01;
 
-        for (const child of children) {
-            const weight = countLeaves(child);
-            const sweep = Math.max((weight / totalWeight) * range, minGap);
-            const midAngle = angle + sweep / 2;
-            const x = cx + radius * Math.cos(midAngle);
-            const y = cy + radius * Math.sin(midAngle);
-            positions.set(child.id, { x, y, depth: child.depth });
+        // For root's direct children (full circle), distribute evenly
+        // For deeper levels or sub-arcs, use proportional allocation
+        if (isFullCircle) {
+            // Even angular spacing around the circle
+            const totalWeight = children.reduce((s, c) => s + countLeaves(c), 0);
+            const useEven = totalWeight <= n * 2; // roughly equal subtrees
+            let angle = startAngle;
+            for (let i = 0; i < n; i++) {
+                const weight = countLeaves(children[i]);
+                const sweep = useEven ? (range / n) : Math.max((weight / totalWeight) * range, 0.15);
+                const midAngle = angle + sweep / 2;
+                const x = cx + radius * Math.cos(midAngle);
+                const y = cy + radius * Math.sin(midAngle);
+                positions.set(children[i].id, { x, y, depth: children[i].depth });
 
-            if (state.expanded.has(child.id) && child.children.length) {
-                layoutChildren(child, cx, cy, angle, angle + sweep, depth + 1, positions);
+                if (state.expanded.has(children[i].id) && children[i].children.length) {
+                    layoutChildren(children[i], cx, cy, angle, angle + sweep, depth + 1, positions);
+                }
+                angle += sweep;
             }
-            angle += sweep;
+        } else {
+            // Sub-arc: distribute proportionally within the wedge
+            const totalWeight = children.reduce((s, c) => s + countLeaves(c), 0);
+            // Ensure minimum angular spacing per child
+            const minSweep = Math.min(0.3, range / n);
+            let angle = startAngle;
+            for (const child of children) {
+                const weight = countLeaves(child);
+                const sweep = Math.max((weight / totalWeight) * range, minSweep);
+                const midAngle = angle + sweep / 2;
+                const x = cx + radius * Math.cos(midAngle);
+                const y = cy + radius * Math.sin(midAngle);
+                positions.set(child.id, { x, y, depth: child.depth });
+
+                if (state.expanded.has(child.id) && child.children.length) {
+                    layoutChildren(child, cx, cy, angle, angle + sweep, depth + 1, positions);
+                }
+                angle += sweep;
+            }
         }
     }
 
@@ -1688,7 +1718,7 @@
     }
 
     function createCustomTopic(label) {
-        idCounter = 0;
+        idCounter = 1;
         state.currentTopic = 'custom';
         state.tree = { id: 'n0', label, desc: '', diff: 'beginner', depth: 0, children: [] };
         state.expanded = new Set(['n0']);
@@ -1985,6 +2015,79 @@
         img.src = url;
     }
 
+    // ===== JSON EXPORT / IMPORT =====
+    function serializeTree(node) {
+        const obj = { label: node.label, diff: node.diff };
+        if (node.desc) obj.desc = node.desc;
+        if (state.learned.has(node.id)) obj.learned = true;
+        if (node.children.length) obj.children = node.children.map(c => serializeTree(c));
+        return obj;
+    }
+
+    function exportJSON() {
+        if (!state.tree) return;
+        const data = {
+            version: 1,
+            topic: state.currentTopic,
+            tree: serializeTree(state.tree),
+            expanded: [...state.expanded],
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `mindmap-${state.tree.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function importJSON(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!data.tree || !data.tree.label) { alert('Invalid mindmap file.'); return; }
+                idCounter = 0;
+                state.currentTopic = data.topic || 'custom';
+                state.tree = rebuildImported(data.tree, 0);
+                state.expanded = new Set(data.expanded || [state.tree.id]);
+                // Rebuild learned set from tree markers
+                state.learned = new Set();
+                collectLearned(data.tree, state.tree);
+                state.zoom = 1;
+                state.animate = true;
+                // Update UI
+                document.getElementById('topic-input').value = state.tree.label;
+                document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+                render();
+                saveState();
+                // Center scroll
+                const container = document.getElementById('mindmap-container');
+                const svg = document.getElementById('mindmap-svg');
+                const svgW = parseFloat(svg.getAttribute('width'));
+                const svgH = parseFloat(svg.getAttribute('height'));
+                container.scrollLeft = (svgW - container.clientWidth) / 2;
+                container.scrollTop = (svgH - container.clientHeight) / 2;
+            } catch (err) {
+                alert('Failed to load mindmap: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function rebuildImported(data, depth) {
+        const id = 'n' + (idCounter++);
+        const children = (data.children || []).map(c => rebuildImported(c, depth + 1));
+        return { id, label: data.label, desc: data.desc || '', diff: data.diff || 'beginner', depth, children };
+    }
+
+    function collectLearned(srcNode, treeNode) {
+        if (srcNode.learned) state.learned.add(treeNode.id);
+        const srcKids = srcNode.children || [];
+        for (let i = 0; i < srcKids.length && i < treeNode.children.length; i++) {
+            collectLearned(srcKids[i], treeNode.children[i]);
+        }
+    }
+
     // ===== TOOLBAR BUTTONS =====
     document.getElementById('btn-expand').addEventListener('click', () => {
         if (!state.tree) return;
@@ -2026,6 +2129,12 @@
 
     document.getElementById('btn-export-svg').addEventListener('click', () => { if (state.tree) exportSVG(); });
     document.getElementById('btn-export-png').addEventListener('click', () => { if (state.tree) exportPNG(); });
+    document.getElementById('btn-save-json').addEventListener('click', () => { if (state.tree) exportJSON(); });
+    document.getElementById('btn-load-json').addEventListener('click', () => { document.getElementById('file-import').click(); });
+    document.getElementById('file-import').addEventListener('change', (e) => {
+        if (e.target.files.length) importJSON(e.target.files[0]);
+        e.target.value = '';
+    });
 
     document.getElementById('btn-reset').addEventListener('click', () => {
         if (!state.tree) return;

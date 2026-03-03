@@ -335,6 +335,67 @@
 
 		.back-link:hover { color: var(--accent); }
 
+		.paste-toggle {
+			margin-bottom: 1rem;
+		}
+
+		.toggle-link {
+			background: none;
+			border: none;
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 0.78rem;
+			cursor: pointer;
+			padding: 0;
+			transition: color 0.2s;
+		}
+
+		.toggle-link:hover { color: var(--accent); }
+
+		.paste-source-panel {
+			display: none;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.paste-source-panel.visible { display: block; }
+
+		.paste-source-panel ol {
+			font-size: 0.8rem;
+			color: var(--text-muted);
+			line-height: 1.8;
+			padding-left: 1.25rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.paste-source-panel ol code {
+			background: var(--surface-hover);
+			padding: 0.1rem 0.35rem;
+			border-radius: 3px;
+			color: var(--success);
+			font-size: 0.75rem;
+		}
+
+		.paste-source-panel textarea {
+			width: 100%;
+			min-height: 120px;
+			padding: 0.75rem;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			font-family: inherit;
+			font-size: 0.78rem;
+			outline: none;
+			resize: vertical;
+			margin-bottom: 0.5rem;
+		}
+
+		.paste-source-panel textarea:focus { border-color: var(--accent); }
+
 		#fallbackPanel { display: none; }
 		#fallbackPanel.visible { display: block; }
 
@@ -450,6 +511,21 @@
 			<button class="example-btn" onclick="tryExample('https://www.youtube.com/watch?v=dQw4w9WgXcQ')">Video URL</button>
 			<button class="example-btn" onclick="tryExample('https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw')">Channel URL</button>
 			<button class="example-btn" onclick="tryExample('https://www.youtube.com/@NetworkChuck')">@NetworkChuck</button>
+		</div>
+
+		<div class="paste-toggle">
+			<button class="toggle-link" id="pasteToggle" onclick="togglePasteSource()">Have the page source? Paste it directly &darr;</button>
+		</div>
+
+		<div class="paste-source-panel" id="pasteSourcePanel">
+			<ol>
+				<li>Go to the YouTube channel page</li>
+				<li>Right-click anywhere &rarr; <code>View Page Source</code></li>
+				<li>Select all (<code>Ctrl+A</code>) and copy (<code>Ctrl+C</code>)</li>
+				<li>Paste below</li>
+			</ol>
+			<textarea id="directSourceInput" placeholder="Paste the page source HTML here..."></textarea>
+			<button class="primary" onclick="extractFromDirectSource()">Extract Channel ID</button>
 		</div>
 
 		<div class="status" id="status"></div>
@@ -843,6 +919,36 @@
 			document.querySelectorAll('.fallback-content').forEach(c => c.classList.remove('active'));
 			document.getElementById('fallback-' + tab).classList.add('active');
 			document.querySelector(`.fallback-tab[onclick*="${tab}"]`).classList.add('active');
+		}
+
+		function togglePasteSource() {
+			const panel = document.getElementById('pasteSourcePanel');
+			const btn = document.getElementById('pasteToggle');
+			panel.classList.toggle('visible');
+			if (panel.classList.contains('visible')) {
+				btn.innerHTML = 'Hide paste source &uarr;';
+				document.getElementById('directSourceInput').focus();
+			} else {
+				btn.innerHTML = 'Have the page source? Paste it directly &darr;';
+			}
+		}
+
+		function extractFromDirectSource() {
+			const html = document.getElementById('directSourceInput').value;
+			if (!html.trim()) {
+				showStatus('Paste the page source HTML first.', 'error');
+				return;
+			}
+			const result = extractFromHTML(html);
+			if (result) {
+				hideStatus();
+				document.getElementById('pasteSourcePanel').classList.remove('visible');
+				document.getElementById('pasteToggle').innerHTML = 'Have the page source? Paste it directly &darr;';
+				document.getElementById('fallbackPanel').classList.remove('visible');
+				showResult(result.id, result.name);
+			} else {
+				showStatus('Could not find a channel ID in the pasted HTML. Make sure you copied the full page source.', 'error');
+			}
 		}
 
 		function extractFromSource() {
