@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HTTP Status Codes</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0f1117;
+			--surface: #161b27;
+			--surface2: #1e2535;
+			--border: #2a3449;
+			--text: #e2e8f0;
+			--muted: #64748b;
+			--c1xx: #6b8cff;
+			--c1xx-bg: #0d1433;
+			--c1xx-border: #1e2d66;
+			--c2xx: #22d3a0;
+			--c2xx-bg: #0a1f1a;
+			--c2xx-border: #164033;
+			--c3xx: #f59e0b;
+			--c3xx-bg: #1c1506;
+			--c3xx-border: #3d2e0a;
+			--c4xx: #f97316;
+			--c4xx-bg: #1c0e06;
+			--c4xx-border: #3d1e0a;
+			--c5xx: #ef4444;
+			--c5xx-bg: #1c0808;
+			--c5xx-border: #3d1010;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Outfit', sans-serif;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image:
+				radial-gradient(ellipse at 70% 0%, rgba(107, 140, 255, 0.05) 0%, transparent 50%),
+				radial-gradient(ellipse at 20% 100%, rgba(239, 68, 68, 0.04) 0%, transparent 50%);
+		}
+
+		.container { max-width: 1100px; margin: 0 auto; }
+
+		header {
+			margin-bottom: 2rem;
+			padding-bottom: 1.5rem;
+			border-bottom: 1px solid var(--border);
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-end;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		h1 {
+			font-size: 1.9rem;
+			font-weight: 700;
+			letter-spacing: -0.5px;
+			color: var(--text);
+		}
+
+		h1 span {
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.9em;
+			color: var(--c2xx);
+		}
+
+		.subtitle {
+			color: var(--muted);
+			font-size: 0.85rem;
+			margin-top: 0.2rem;
+		}
+
+		.count {
+			font-size: 0.8rem;
+			color: var(--muted);
+			text-align: right;
+		}
+
+		.count strong { color: var(--text); font-weight: 600; }
+
+		.controls {
+			display: flex;
+			gap: 0.75rem;
+			margin-bottom: 1.5rem;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		.search-wrap {
+			flex: 1;
+			min-width: 200px;
+			position: relative;
+		}
+
+		.search-wrap::before {
+			content: '⌕';
+			position: absolute;
+			left: 0.75rem;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--muted);
+			font-size: 1.1rem;
+			pointer-events: none;
+		}
+
+		#search {
+			width: 100%;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text);
+			font-family: 'Outfit', sans-serif;
+			font-size: 0.9rem;
+			padding: 0.55rem 0.75rem 0.55rem 2.2rem;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+
+		#search:focus { border-color: var(--c2xx); }
+		#search::placeholder { color: var(--muted); }
+
+		.filters {
+			display: flex;
+			gap: 0.4rem;
+			flex-wrap: wrap;
+		}
+
+		.filter-btn {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			color: var(--muted);
+			padding: 0.45rem 0.8rem;
+			border-radius: 5px;
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.72rem;
+			font-weight: 700;
+			cursor: pointer;
+			transition: all 0.15s;
+			letter-spacing: 0.03em;
+		}
+
+		.filter-btn:hover { color: var(--text); border-color: var(--muted); }
+		.filter-btn.active { background: var(--surface2); border-color: var(--text); color: var(--text); }
+		.filter-btn[data-cat="1xx"].active { border-color: var(--c1xx); color: var(--c1xx); background: var(--c1xx-bg); }
+		.filter-btn[data-cat="2xx"].active { border-color: var(--c2xx); color: var(--c2xx); background: var(--c2xx-bg); }
+		.filter-btn[data-cat="3xx"].active { border-color: var(--c3xx); color: var(--c3xx); background: var(--c3xx-bg); }
+		.filter-btn[data-cat="4xx"].active { border-color: var(--c4xx); color: var(--c4xx); background: var(--c4xx-bg); }
+		.filter-btn[data-cat="5xx"].active { border-color: var(--c5xx); color: var(--c5xx); background: var(--c5xx-bg); }
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+			gap: 0.6rem;
+		}
+
+		.card {
+			border-radius: 7px;
+			border: 1px solid;
+			overflow: hidden;
+			cursor: pointer;
+			transition: transform 0.15s, box-shadow 0.15s;
+		}
+
+		.card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+		.card.open { transform: none; }
+
+		.card[data-cat="1xx"] { background: var(--c1xx-bg); border-color: var(--c1xx-border); }
+		.card[data-cat="2xx"] { background: var(--c2xx-bg); border-color: var(--c2xx-border); }
+		.card[data-cat="3xx"] { background: var(--c3xx-bg); border-color: var(--c3xx-border); }
+		.card[data-cat="4xx"] { background: var(--c4xx-bg); border-color: var(--c4xx-border); }
+		.card[data-cat="5xx"] { background: var(--c5xx-bg); border-color: var(--c5xx-border); }
+
+		.card-main {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			padding: 0.8rem 1rem;
+		}
+
+		.code-num {
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 1.5rem;
+			font-weight: 700;
+			flex-shrink: 0;
+			min-width: 3.2rem;
+		}
+
+		.card[data-cat="1xx"] .code-num { color: var(--c1xx); }
+		.card[data-cat="2xx"] .code-num { color: var(--c2xx); }
+		.card[data-cat="3xx"] .code-num { color: var(--c3xx); }
+		.card[data-cat="4xx"] .code-num { color: var(--c4xx); }
+		.card[data-cat="5xx"] .code-num { color: var(--c5xx); }
+
+		.code-info { flex: 1; min-width: 0; }
+
+		.code-name {
+			font-size: 0.88rem;
+			font-weight: 600;
+			color: var(--text);
+			margin-bottom: 0.15rem;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.code-desc {
+			font-size: 0.78rem;
+			color: var(--muted);
+			line-height: 1.4;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+
+		.expand-icon {
+			font-size: 0.7rem;
+			color: var(--muted);
+			flex-shrink: 0;
+			transition: transform 0.2s;
+		}
+
+		.card.open .expand-icon { transform: rotate(180deg); }
+
+		.card-detail {
+			display: none;
+			padding: 0 1rem 0.9rem 1rem;
+			padding-left: calc(1rem + 3.2rem + 1rem);
+			font-size: 0.8rem;
+			line-height: 1.6;
+			color: var(--muted);
+			border-top: 1px solid;
+		}
+
+		.card[data-cat="1xx"] .card-detail { border-color: var(--c1xx-border); }
+		.card[data-cat="2xx"] .card-detail { border-color: var(--c2xx-border); }
+		.card[data-cat="3xx"] .card-detail { border-color: var(--c3xx-border); }
+		.card[data-cat="4xx"] .card-detail { border-color: var(--c4xx-border); }
+		.card[data-cat="5xx"] .card-detail { border-color: var(--c5xx-border); }
+
+		.card.open .card-detail { display: block; }
+
+		.card-detail p { margin-top: 0.6rem; }
+		.card-detail p:first-child { margin-top: 0.5rem; }
+
+		.detail-label {
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.68rem;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--border);
+			margin-bottom: 0.15rem;
+		}
+
+		.no-results {
+			grid-column: 1 / -1;
+			text-align: center;
+			padding: 4rem;
+			color: var(--muted);
+			font-size: 1rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<div>
+				<h1>HTTP <span>Status</span> Codes</h1>
+				<p class="subtitle">Click any card to expand details</p>
+			</div>
+			<div class="count">Showing <strong id="shown">0</strong> of <strong id="total">0</strong> codes</div>
+		</header>
+
+		<div class="controls">
+			<div class="search-wrap">
+				<input type="text" id="search" placeholder="Search by code or name..." autocomplete="off" autofocus>
+			</div>
+			<div class="filters">
+				<button class="filter-btn active" data-cat="all">All</button>
+				<button class="filter-btn" data-cat="1xx">1xx</button>
+				<button class="filter-btn" data-cat="2xx">2xx</button>
+				<button class="filter-btn" data-cat="3xx">3xx</button>
+				<button class="filter-btn" data-cat="4xx">4xx</button>
+				<button class="filter-btn" data-cat="5xx">5xx</button>
+			</div>
+		</div>
+
+		<div class="grid" id="grid"></div>
+	</div>
+
+	<script>
+		const codes = [
+			// 1xx Informational
+			{ code: 100, name: 'Continue', desc: 'The server has received the request headers and the client should proceed to send the request body.', detail: 'Used in large uploads to avoid sending the body if the server would reject the request. Client sends an Expect: 100-continue header, waits for this response, then sends the body.' },
+			{ code: 101, name: 'Switching Protocols', desc: 'The server is switching protocols as requested by the client via the Upgrade header.', detail: 'Common when upgrading an HTTP connection to WebSocket. The server agrees to the protocol switch and future communication uses the new protocol.' },
+			{ code: 102, name: 'Processing', desc: 'The server has received and is processing the request but no response is available yet.', detail: 'WebDAV extension (RFC 2518). Prevents the client from timing out on long-running requests. Deprecated in RFC 4918 but still encountered.' },
+			{ code: 103, name: 'Early Hints', desc: 'Allows the server to send preliminary response headers before the final response, enabling preloading.', detail: 'Used to preload resources (stylesheets, scripts) while the server prepares the full response. Significantly improves perceived load time. Supported in modern browsers and CDNs.' },
+
+			// 2xx Success
+			{ code: 200, name: 'OK', desc: 'The request has succeeded. The response body contains the requested resource or result.', detail: 'The most common success status. GET returns a document, POST returns the result of the action, PUT confirms the update, DELETE confirms removal (though 204 is more common for DELETE).' },
+			{ code: 201, name: 'Created', desc: 'The request has succeeded and a new resource has been created as a result.', detail: 'Returned by POST and sometimes PUT requests. The Location header should point to the newly created resource. Common in REST APIs when creating a new record.' },
+			{ code: 202, name: 'Accepted', desc: 'The request has been accepted for processing, but the processing has not been completed yet.', detail: 'Used for async operations. The server acknowledges receipt but cannot guarantee the processing will succeed. Common in queue-based systems, batch jobs, and background processing.' },
+			{ code: 203, name: 'Non-Authoritative Information', desc: 'The returned metadata is not from the origin server but from a local or third-party copy.', detail: 'Rarely used in practice. A proxy or cache is returning information that differs from the origin. The response body is still valid but metadata may have been modified.' },
+			{ code: 204, name: 'No Content', desc: 'The server successfully processed the request and is not returning any content.', detail: 'Common response to DELETE requests, PUT updates, and PATCH operations where no body is needed. The client should not update its view. Browser should not navigate away.' },
+			{ code: 205, name: 'Reset Content', desc: 'The request was successful; the client should reset the document view, such as clearing a form.', detail: 'Similar to 204 but instructs the client (browser) to reset the document. Tells the browser to clear the form that submitted the request.' },
+			{ code: 206, name: 'Partial Content', desc: 'The server is delivering only part of the resource due to a Range header in the request.', detail: 'Used for resumable downloads, video streaming, and partial file transfers. The response includes Content-Range to indicate which part is being sent. Supports parallel downloads.' },
+			{ code: 207, name: 'Multi-Status', desc: 'The response body contains multiple separate response codes for multiple sub-requests.', detail: 'WebDAV (RFC 4918). Used by PROPFIND and other WebDAV methods that act on multiple resources simultaneously. The body is XML containing individual status codes for each resource.' },
+			{ code: 208, name: 'Already Reported', desc: 'Members of a DAV binding have already been enumerated in a previous reply and are not included again.', detail: 'WebDAV (RFC 5842). Used inside 207 Multi-Status responses to avoid enumerating internal DAV binding members more than once.' },
+			{ code: 226, name: 'IM Used', desc: 'The server has fulfilled a GET request and the response is a representation of the result of one or more instance-manipulations.', detail: 'HTTP Delta encoding (RFC 3229). The server applied delta encoding to the response. Very rarely implemented — allows sending only the diff rather than the full response body.' },
+
+			// 3xx Redirection
+			{ code: 300, name: 'Multiple Choices', desc: 'The request has more than one possible response; the user or agent should choose one.', detail: 'Rarely used in practice. May return a list of links in the body. The server may also indicate a preferred choice via the Location header.' },
+			{ code: 301, name: 'Moved Permanently', desc: 'The requested resource has been permanently moved to a new URL.', detail: 'Search engines and clients should update their bookmarks/links. The new URL is given in the Location header. Browsers will redirect GET requests automatically. Note: POST may be converted to GET (use 308 to preserve method).' },
+			{ code: 302, name: 'Found', desc: 'The requested resource has been temporarily moved to a different URL.', detail: 'Historically meant "Moved Temporarily". Many clients (wrongly) changed POST to GET on redirect — use 307 to strictly preserve the method. Widely used for temporary redirects in practice.' },
+			{ code: 303, name: 'See Other', desc: 'The server is redirecting the client to a different resource using GET, typically after a POST.', detail: 'The Post/Redirect/Get (PRG) pattern. After a form POST, redirect to a results page so refreshing doesn\'t resubmit. The redirect target is always retrieved with GET regardless of the original method.' },
+			{ code: 304, name: 'Not Modified', desc: 'The resource has not been modified since the version specified in the request headers.', detail: 'Caching response. Used with conditional requests (If-Modified-Since, If-None-Match). The client\'s cached version is still valid — no body is sent, saving bandwidth.' },
+			{ code: 307, name: 'Temporary Redirect', desc: 'The request should be repeated using the same method and body at the provided URL.', detail: 'Like 302 but strictly preserves the HTTP method. A POST will remain POST on redirect. Introduced to fix the ambiguity in 302\'s handling of non-GET methods.' },
+			{ code: 308, name: 'Permanent Redirect', desc: 'The resource has been permanently moved; future requests should use the new URL with the same method.', detail: 'Like 301 but strictly preserves the HTTP method. A POST will remain POST on redirect. Useful for API versioning migrations and canonical URL enforcement.' },
+
+			// 4xx Client Errors
+			{ code: 400, name: 'Bad Request', desc: 'The server cannot process the request due to malformed syntax or invalid request message framing.', detail: 'Generic client error. Could be malformed JSON, invalid query parameters, missing required fields, or a request that violates protocol rules. Check the response body for details.' },
+			{ code: 401, name: 'Unauthorized', desc: 'Authentication is required and has failed or has not been provided.', detail: 'Despite the name, this means "unauthenticated". The WWW-Authenticate header tells the client how to authenticate. The user needs to log in or provide a valid token. Distinct from 403 (authenticated but forbidden).' },
+			{ code: 402, name: 'Payment Required', desc: 'Reserved for future use; some services use it to indicate payment is required.', detail: 'Originally intended for digital payment systems but never standardized. Used by some APIs (Stripe, Twilio) to indicate insufficient quota or subscription required.' },
+			{ code: 403, name: 'Forbidden', desc: 'The server understood the request but refuses to authorize it.', detail: 'Authentication won\'t help — the server knows who you are but won\'t allow access. Could be ACL rules, IP restrictions, or missing permissions. Unlike 401, re-authenticating will not help.' },
+			{ code: 404, name: 'Not Found', desc: 'The server cannot find the requested resource. The URL is not recognized.', detail: 'The most famous HTTP status code. The resource doesn\'t exist at this path. May also be used to hide the existence of a forbidden resource (instead of 403). Check the URL for typos.' },
+			{ code: 405, name: 'Method Not Allowed', desc: 'The HTTP method is not supported for the target resource.', detail: 'The server must include an Allow header listing the supported methods. Common causes: using GET on a write-only endpoint, or POST on a read-only resource.' },
+			{ code: 406, name: 'Not Acceptable', desc: 'The server cannot produce a response matching the list of acceptable values in the request\'s headers.', detail: 'Content negotiation failure. The client\'s Accept, Accept-Language, or Accept-Encoding headers can\'t be satisfied. The server should return the list of supported content types.' },
+			{ code: 407, name: 'Proxy Authentication Required', desc: 'Authentication must be done with the proxy rather than the origin server.', detail: 'Similar to 401 but for proxies. The Proxy-Authenticate header describes the authentication method. Used in corporate networks with authenticated forward proxies.' },
+			{ code: 408, name: 'Request Timeout', desc: 'The server timed out waiting for the request to be sent completely.', detail: 'The client took too long to send the request. The server chose to close the connection rather than wait. The client may retry the request.' },
+			{ code: 409, name: 'Conflict', desc: 'The request conflicts with the current state of the target resource.', detail: 'Optimistic concurrency conflicts: two users editing the same record, version mismatches, duplicate unique keys. Common in REST APIs with ETags or version fields. The body should explain the conflict.' },
+			{ code: 410, name: 'Gone', desc: 'The target resource is no longer available and this condition is likely to be permanent.', detail: 'Like 404 but explicitly permanent. The resource used to exist but has been intentionally removed. Search engines should deindex it. Good for permanently deleted user accounts or retired API endpoints.' },
+			{ code: 411, name: 'Length Required', desc: 'The server refuses to accept the request without a defined Content-Length header.', detail: 'The server needs to know the size of the request body in advance. Chunked transfer encoding is not supported for this endpoint.' },
+			{ code: 412, name: 'Precondition Failed', desc: 'One or more conditions in the request header fields were evaluated as false.', detail: 'Used with conditional requests (If-Match, If-Unmodified-Since). Optimistic locking: the resource was modified since you last fetched it, so the update is rejected to prevent overwriting changes.' },
+			{ code: 413, name: 'Content Too Large', desc: 'The request body is larger than the server is willing or able to process.', detail: 'Formerly "Request Entity Too Large". Common when uploading files that exceed the server\'s size limit. The server may close the connection. Check nginx\'s client_max_body_size or equivalent.' },
+			{ code: 414, name: 'URI Too Long', desc: 'The URI requested by the client is longer than the server is willing to interpret.', detail: 'Very long query strings, usually from infinite redirect loops or overly large form submissions using GET. Maximum URL length varies by server (Nginx default: 8KB, Apache: 8KB, IIS: 16KB).' },
+			{ code: 415, name: 'Unsupported Media Type', desc: 'The media format of the requested data is not supported by the server.', detail: 'The Content-Type header indicates a format the server won\'t process. Common: sending XML to an endpoint that only accepts JSON, or the wrong encoding. Check the API docs for accepted content types.' },
+			{ code: 416, name: 'Range Not Satisfiable', desc: 'The range specified in the Range header cannot be fulfilled.', detail: 'The requested byte range is outside the file. E.g., requesting bytes 500-999 on a 200-byte file. The server should include a Content-Range header showing the actual resource size.' },
+			{ code: 417, name: 'Expectation Failed', desc: 'The expectation given in the Expect header could not be met by the server.', detail: 'Usually from Expect: 100-continue. The server is indicating it won\'t process the request body. The client should not send the body.' },
+			{ code: 418, name: "I'm a Teapot", desc: 'Any attempt to brew coffee with a teapot should result in the error code 418.', detail: 'April Fools RFC 2324 (1998), Hyper Text Coffee Pot Control Protocol (HTCPCP). Despite being a joke, it\'s officially maintained in the HTTP spec and implemented by some servers for fun.' },
+			{ code: 421, name: 'Misdirected Request', desc: 'The request was directed at a server that is not able to produce a response.', detail: 'HTTP/2 connection reuse: the client sent a request to a server using a connection established for a different host, and the server refuses to honor it. Try a fresh connection.' },
+			{ code: 422, name: 'Unprocessable Content', desc: 'The request was well-formed but contains semantic errors that prevent it from being processed.', detail: 'Formerly "Unprocessable Entity" (WebDAV). Now RFC 9110. Common in REST APIs for validation errors — the JSON is valid but fails business logic (e.g., negative price, invalid date range). Should include details of what failed.' },
+			{ code: 423, name: 'Locked', desc: 'The source or destination resource is locked.', detail: 'WebDAV (RFC 4918). The resource is currently locked by another process or user. Used in collaborative editing and file management systems.' },
+			{ code: 424, name: 'Failed Dependency', desc: 'The method could not be performed because the requested action depended on another action that failed.', detail: 'WebDAV (RFC 4918). Used inside Multi-Status responses. A batch operation failed because a prerequisite operation failed first.' },
+			{ code: 425, name: 'Too Early', desc: 'Indicates that the server is unwilling to risk processing a request that might be replayed.', detail: 'Protects against TLS 1.3 early data (0-RTT) replay attacks. The server is cautious about processing requests that arrived in the early data stream before the TLS handshake completed.' },
+			{ code: 426, name: 'Upgrade Required', desc: 'The server refuses to perform the request using the current protocol but will accept using an upgraded protocol.', detail: 'The server wants the client to upgrade to a newer protocol version. The Upgrade header specifies which protocol. Common for forcing TLS upgrades.' },
+			{ code: 428, name: 'Precondition Required', desc: 'The origin server requires the request to be conditional to prevent lost updates.', detail: 'RFC 6585. The server requires If-Match or similar conditional headers to prevent the "lost update" problem. Forces clients to fetch current state before making changes.' },
+			{ code: 429, name: 'Too Many Requests', desc: 'The user has sent too many requests in a given amount of time (rate limiting).', detail: 'RFC 6585. Rate limiting response. Should include Retry-After header. Common in public APIs, authentication endpoints, and web scrapers. Implement exponential backoff when receiving this.' },
+			{ code: 431, name: 'Request Header Fields Too Large', desc: 'The server is unwilling to process the request because its header fields are too large.', detail: 'RFC 6585. Can apply to a single header or all headers combined. Common with very large cookies, JWT tokens, or excessive custom headers. Check Nginx\'s large_client_header_buffers setting.' },
+			{ code: 451, name: 'Unavailable For Legal Reasons', desc: 'The server is denying access to the resource as a consequence of a legal demand.', detail: 'RFC 7725. Named for Ray Bradbury\'s Fahrenheit 451. Used when content is censored due to government orders, DMCA takedowns, GDPR requests, or court orders. Should include information about the legal authority.' },
+
+			// 5xx Server Errors
+			{ code: 500, name: 'Internal Server Error', desc: 'The server encountered an unexpected condition that prevented it from fulfilling the request.', detail: 'Generic server error. Could be an unhandled exception, a crashed application, a misconfiguration, or a database error. Check server logs. The client can try again but the same error will likely recur until the server issue is fixed.' },
+			{ code: 501, name: 'Not Implemented', desc: 'The server does not support the functionality required to fulfill the request.', detail: 'The HTTP method is not supported at all by the server (unlike 405 which means not supported for this path). Rarely returned in practice — usually means the server developer hasn\'t built the feature yet.' },
+			{ code: 502, name: 'Bad Gateway', desc: 'The server, acting as a gateway or proxy, received an invalid response from an upstream server.', detail: 'The upstream server (backend app, API, microservice) returned garbage, crashed, or disconnected unexpectedly. The gateway (nginx, load balancer) couldn\'t pass a valid response. Check backend health.' },
+			{ code: 503, name: 'Service Unavailable', desc: 'The server is not ready to handle the request, usually due to maintenance or overload.', detail: 'Temporary condition. Should include Retry-After header. Common causes: the app is starting up, scheduled maintenance, server is overloaded, or circuit breaker is open. Clients should back off and retry.' },
+			{ code: 504, name: 'Gateway Timeout', desc: 'The server, acting as a gateway, did not get a timely response from an upstream server.', detail: 'Like 502 but specifically the upstream timed out rather than erroring. The upstream server is alive but slow. Common with database timeouts, slow microservices, or network issues. Check upstream latency.' },
+			{ code: 505, name: 'HTTP Version Not Supported', desc: 'The HTTP version used in the request is not supported by the server.', detail: 'The server doesn\'t support the major HTTP version (HTTP/1.0, HTTP/1.1, HTTP/2, HTTP/3). Very rarely seen in practice as servers typically support multiple versions.' },
+			{ code: 506, name: 'Variant Also Negotiates', desc: 'The server has an internal configuration error in content negotiation.', detail: 'RFC 2295. The chosen variant is itself configured to use transparent content negotiation, creating a circular reference. A misconfiguration in the server\'s variant selection.' },
+			{ code: 507, name: 'Insufficient Storage', desc: 'The server cannot store the representation needed to complete the request.', detail: 'WebDAV (RFC 4918). The server ran out of disk space or storage quota while trying to store the uploaded content. Clean up storage or increase quota.' },
+			{ code: 508, name: 'Loop Detected', desc: 'The server detected an infinite loop while processing the request.', detail: 'WebDAV (RFC 5842). A Depth: infinity operation (like COPY or MOVE) detected an infinite loop in the directory structure. Prevents server from hanging on circular directory references.' },
+			{ code: 510, name: 'Not Extended', desc: 'Further extensions to the request are required for the server to fulfil it.', detail: 'RFC 2774. The request used an HTTP extension that the server requires but the client didn\'t provide. Rarely seen in modern applications.' },
+			{ code: 511, name: 'Network Authentication Required', desc: 'The client needs to authenticate to gain network access, typically a captive portal.', detail: 'RFC 6585. Used by captive portals (hotel Wi-Fi, airport hotspots). The response should include a link to the login page. Clients should not cache this response.' },
+		];
+
+		let activeFilter = 'all';
+
+		function getCat(code) {
+			if (code < 200) return '1xx';
+			if (code < 300) return '2xx';
+			if (code < 400) return '3xx';
+			if (code < 500) return '4xx';
+			return '5xx';
+		}
+
+		function render() {
+			const query = document.getElementById('search').value.toLowerCase().trim();
+			const grid = document.getElementById('grid');
+			grid.innerHTML = '';
+
+			const filtered = codes.filter(c => {
+				const cat = getCat(c.code);
+				if (activeFilter !== 'all' && cat !== activeFilter) return false;
+				if (query) {
+					return String(c.code).includes(query) ||
+						c.name.toLowerCase().includes(query) ||
+						c.desc.toLowerCase().includes(query);
+				}
+				return true;
+			});
+
+			document.getElementById('shown').textContent = filtered.length;
+			document.getElementById('total').textContent = codes.length;
+
+			if (!filtered.length) {
+				const msg = document.createElement('div');
+				msg.className = 'no-results';
+				msg.textContent = 'No codes match your search.';
+				grid.appendChild(msg);
+				return;
+			}
+
+			filtered.forEach(c => {
+				const cat = getCat(c.code);
+				const card = document.createElement('div');
+				card.className = 'card';
+				card.dataset.cat = cat;
+				card.innerHTML = `
+					<div class="card-main">
+						<div class="code-num">${c.code}</div>
+						<div class="code-info">
+							<div class="code-name">${c.name}</div>
+							<div class="code-desc">${c.desc}</div>
+						</div>
+						<div class="expand-icon">▼</div>
+					</div>
+					<div class="card-detail">
+						<div class="detail-label">Details</div>
+						<p>${c.detail}</p>
+					</div>
+				`;
+				card.addEventListener('click', () => card.classList.toggle('open'));
+				grid.appendChild(card);
+			});
+		}
+
+		document.getElementById('search').addEventListener('input', render);
+
+		document.querySelectorAll('.filter-btn').forEach(btn => {
+			btn.addEventListener('click', () => {
+				document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+				activeFilter = btn.dataset.cat;
+				render();
+			});
+		});
+
+		render();
+	</script>
+	<script src="assets/shared-nav.js"></script>
+</body>
+</html>

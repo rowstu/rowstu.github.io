@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>String Case Converter</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #13111a;
+			--surface: #1e1b28;
+			--surface2: #272433;
+			--border: #352f47;
+			--text: #e8e0f5;
+			--muted: #8b7fa8;
+			--accent: #c084fc;
+			--accent2: #f0abfc;
+			--accent3: #818cf8;
+			--green: #4ade80;
+			--copied: #34d399;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Fira Code', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+			background-image:
+				radial-gradient(ellipse at 10% 0%, rgba(192, 132, 252, 0.08) 0%, transparent 50%),
+				radial-gradient(ellipse at 90% 100%, rgba(129, 140, 248, 0.06) 0%, transparent 50%);
+		}
+
+		.container { max-width: 900px; margin: 0 auto; }
+
+		header {
+			margin-bottom: 2rem;
+			padding-bottom: 1.5rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		h1 {
+			font-family: 'Fraunces', serif;
+			font-size: 2rem;
+			font-weight: 700;
+			color: var(--accent);
+			letter-spacing: -0.5px;
+			margin-bottom: 0.3rem;
+		}
+
+		.subtitle {
+			color: var(--muted);
+			font-size: 0.85rem;
+		}
+
+		.input-section {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			overflow: hidden;
+			margin-bottom: 1.5rem;
+		}
+
+		.input-label {
+			padding: 0.6rem 1rem;
+			font-size: 0.75rem;
+			color: var(--muted);
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			border-bottom: 1px solid var(--border);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.word-count {
+			font-size: 0.7rem;
+			color: var(--muted);
+		}
+
+		textarea {
+			width: 100%;
+			background: transparent;
+			border: none;
+			outline: none;
+			color: var(--text);
+			font-family: 'Fira Code', monospace;
+			font-size: 1rem;
+			padding: 1rem;
+			resize: vertical;
+			min-height: 80px;
+		}
+
+		textarea::placeholder { color: var(--muted); }
+
+		.actions {
+			padding: 0.5rem 1rem;
+			border-top: 1px solid var(--border);
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.btn-clear {
+			background: none;
+			border: 1px solid var(--border);
+			color: var(--muted);
+			padding: 0.3rem 0.75rem;
+			border-radius: 4px;
+			font-family: 'Fira Code', monospace;
+			font-size: 0.75rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.btn-clear:hover {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+			gap: 0.75rem;
+		}
+
+		.case-card {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			overflow: hidden;
+			transition: border-color 0.2s;
+		}
+
+		.case-card:hover { border-color: var(--accent); }
+
+		.case-header {
+			padding: 0.6rem 1rem;
+			border-bottom: 1px solid var(--border);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.case-name {
+			font-size: 0.72rem;
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			color: var(--muted);
+			font-weight: 500;
+		}
+
+		.case-example {
+			font-size: 0.65rem;
+			color: var(--border);
+			font-style: italic;
+		}
+
+		.copy-btn {
+			background: none;
+			border: none;
+			cursor: pointer;
+			color: var(--muted);
+			font-family: 'Fira Code', monospace;
+			font-size: 0.7rem;
+			padding: 0.2rem 0.5rem;
+			border-radius: 3px;
+			transition: all 0.2s;
+		}
+
+		.copy-btn:hover { color: var(--accent); }
+		.copy-btn.copied { color: var(--copied); }
+
+		.case-output {
+			padding: 0.75rem 1rem;
+			font-size: 0.9rem;
+			color: var(--text);
+			word-break: break-all;
+			min-height: 2.5rem;
+			line-height: 1.5;
+		}
+
+		.case-output.empty { color: var(--muted); font-style: italic; }
+
+		.accent-camel .case-name { color: #c084fc; }
+		.accent-pascal .case-name { color: #f0abfc; }
+		.accent-snake .case-name { color: #818cf8; }
+		.accent-screaming .case-name { color: #fb923c; }
+		.accent-kebab .case-name { color: #34d399; }
+		.accent-screaming-kebab .case-name { color: #f87171; }
+		.accent-dot .case-name { color: #fbbf24; }
+		.accent-title .case-name { color: #60a5fa; }
+		.accent-sentence .case-name { color: #a3e635; }
+		.accent-train .case-name { color: #22d3ee; }
+		.accent-upper .case-name { color: #e879f9; }
+		.accent-lower .case-name { color: #94a3b8; }
+
+		.empty-state {
+			text-align: center;
+			padding: 3rem;
+			color: var(--muted);
+			font-family: 'Fraunces', serif;
+			font-size: 1.1rem;
+			font-style: italic;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>String Case Converter</h1>
+			<p class="subtitle">Paste any text — spaces, underscores, hyphens, camelCase — and get every case at once</p>
+		</header>
+
+		<div class="input-section">
+			<div class="input-label">
+				<span>Input</span>
+				<span class="word-count" id="wordCount">0 words</span>
+			</div>
+			<textarea id="input" placeholder="helloWorld, hello-world, Hello World..." rows="3" autofocus></textarea>
+			<div class="actions">
+				<button class="btn-clear" onclick="clearInput()">clear</button>
+			</div>
+		</div>
+
+		<div class="grid" id="outputGrid"></div>
+		<div class="empty-state" id="emptyState">Type something above to see all cases</div>
+	</div>
+
+	<script>
+		const cases = [
+			{
+				id: 'camel',
+				name: 'camelCase',
+				example: 'helloWorldFoo',
+				cls: 'accent-camel',
+				fn: words => words[0].toLowerCase() + words.slice(1).map(capitalize).join('')
+			},
+			{
+				id: 'pascal',
+				name: 'PascalCase',
+				example: 'HelloWorldFoo',
+				cls: 'accent-pascal',
+				fn: words => words.map(capitalize).join('')
+			},
+			{
+				id: 'snake',
+				name: 'snake_case',
+				example: 'hello_world_foo',
+				cls: 'accent-snake',
+				fn: words => words.map(w => w.toLowerCase()).join('_')
+			},
+			{
+				id: 'screaming',
+				name: 'SCREAMING_SNAKE',
+				example: 'HELLO_WORLD_FOO',
+				cls: 'accent-screaming',
+				fn: words => words.map(w => w.toUpperCase()).join('_')
+			},
+			{
+				id: 'kebab',
+				name: 'kebab-case',
+				example: 'hello-world-foo',
+				cls: 'accent-kebab',
+				fn: words => words.map(w => w.toLowerCase()).join('-')
+			},
+			{
+				id: 'screaming-kebab',
+				name: 'SCREAMING-KEBAB',
+				example: 'HELLO-WORLD-FOO',
+				cls: 'accent-screaming-kebab',
+				fn: words => words.map(w => w.toUpperCase()).join('-')
+			},
+			{
+				id: 'dot',
+				name: 'dot.case',
+				example: 'hello.world.foo',
+				cls: 'accent-dot',
+				fn: words => words.map(w => w.toLowerCase()).join('.')
+			},
+			{
+				id: 'train',
+				name: 'Train-Case',
+				example: 'Hello-World-Foo',
+				cls: 'accent-train',
+				fn: words => words.map(capitalize).join('-')
+			},
+			{
+				id: 'title',
+				name: 'Title Case',
+				example: 'Hello World Foo',
+				cls: 'accent-title',
+				fn: words => words.map(capitalize).join(' ')
+			},
+			{
+				id: 'sentence',
+				name: 'Sentence case',
+				example: 'Hello world foo',
+				cls: 'accent-sentence',
+				fn: words => {
+					const result = words.map(w => w.toLowerCase());
+					result[0] = capitalize(result[0]);
+					return result.join(' ');
+				}
+			},
+			{
+				id: 'upper',
+				name: 'UPPER CASE',
+				example: 'HELLO WORLD FOO',
+				cls: 'accent-upper',
+				fn: words => words.map(w => w.toUpperCase()).join(' ')
+			},
+			{
+				id: 'lower',
+				name: 'lower case',
+				example: 'hello world foo',
+				cls: 'accent-lower',
+				fn: words => words.map(w => w.toLowerCase()).join(' ')
+			},
+		];
+
+		function capitalize(w) {
+			if (!w) return w;
+			return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+		}
+
+		function parseWords(input) {
+			if (!input.trim()) return [];
+			// Split on whitespace, underscores, hyphens, dots
+			let s = input.replace(/[\s_\-\.]+/g, ' ').trim();
+			// Split camelCase/PascalCase transitions
+			s = s.replace(/([a-z])([A-Z])/g, '$1 $2');
+			s = s.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+			return s.split(/\s+/).filter(Boolean);
+		}
+
+		function buildGrid(words) {
+			const grid = document.getElementById('outputGrid');
+			const empty = document.getElementById('emptyState');
+
+			if (!words.length) {
+				grid.innerHTML = '';
+				empty.style.display = 'block';
+				return;
+			}
+			empty.style.display = 'none';
+
+			grid.innerHTML = '';
+			cases.forEach(c => {
+				const output = c.fn(words);
+				const card = document.createElement('div');
+				card.className = `case-card ${c.cls}`;
+				card.innerHTML = `
+					<div class="case-header">
+						<span class="case-name">${c.name}</span>
+						<button class="copy-btn" onclick="copyOutput(this, '${escapeQuote(output)}')" title="Copy">copy</button>
+					</div>
+					<div class="case-output">${escapeHTML(output)}</div>
+				`;
+				grid.appendChild(card);
+			});
+		}
+
+		function escapeHTML(s) {
+			return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+		}
+
+		function escapeQuote(s) {
+			return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+		}
+
+		function copyOutput(btn, text) {
+			navigator.clipboard.writeText(text).then(() => {
+				btn.textContent = 'copied!';
+				btn.classList.add('copied');
+				setTimeout(() => {
+					btn.textContent = 'copy';
+					btn.classList.remove('copied');
+				}, 1500);
+			});
+		}
+
+		function clearInput() {
+			document.getElementById('input').value = '';
+			document.getElementById('wordCount').textContent = '0 words';
+			buildGrid([]);
+		}
+
+		document.getElementById('input').addEventListener('input', function() {
+			const words = parseWords(this.value);
+			document.getElementById('wordCount').textContent = words.length + (words.length === 1 ? ' word' : ' words');
+			buildGrid(words);
+		});
+	</script>
+	<script src="assets/shared-nav.js"></script>
+</body>
+</html>

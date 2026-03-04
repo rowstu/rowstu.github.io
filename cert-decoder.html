@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Certificate Decoder</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
+	<style>
+		:root {
+			--bg: #050a05;
+			--surface: #0a110a;
+			--surface2: #0f190f;
+			--border: #1a2e1a;
+			--text: #c8e6c9;
+			--muted: #4a6e4a;
+			--green: #39d353;
+			--green-bright: #6bff6b;
+			--green-dim: #2a5a2a;
+			--amber: #ffa726;
+			--red: #f44336;
+			--cyan: #26c6da;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'IBM Plex Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 960px; margin: 0 auto; }
+
+		header {
+			margin-bottom: 1.5rem;
+			padding-bottom: 1rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		h1 {
+			font-family: 'VT323', monospace;
+			font-size: 2.8rem;
+			color: var(--green);
+			letter-spacing: 2px;
+			text-shadow: 0 0 20px rgba(57, 211, 83, 0.4);
+			line-height: 1;
+			margin-bottom: 0.3rem;
+		}
+
+		.subtitle { color: var(--muted); font-size: 0.78rem; }
+
+		.input-area {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			margin-bottom: 1.5rem;
+			overflow: hidden;
+		}
+
+		.input-header {
+			padding: 0.5rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.7rem;
+			color: var(--muted);
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.prompt { color: var(--green); }
+
+		textarea {
+			width: 100%;
+			background: transparent;
+			border: none;
+			outline: none;
+			color: var(--green);
+			font-family: 'IBM Plex Mono', monospace;
+			font-size: 0.78rem;
+			padding: 0.75rem 1rem;
+			resize: vertical;
+			min-height: 120px;
+			line-height: 1.4;
+		}
+
+		textarea::placeholder { color: var(--green-dim); }
+
+		.btn-row {
+			padding: 0.5rem 1rem;
+			border-top: 1px solid var(--border);
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.btn {
+			background: none;
+			border: 1px solid var(--green-dim);
+			color: var(--green);
+			padding: 0.35rem 0.9rem;
+			font-family: 'IBM Plex Mono', monospace;
+			font-size: 0.78rem;
+			cursor: pointer;
+			border-radius: 2px;
+			transition: all 0.15s;
+		}
+
+		.btn:hover { background: var(--green-dim); border-color: var(--green); }
+		.btn-primary { border-color: var(--green); background: var(--green-dim); }
+		.btn-primary:hover { background: rgba(57,211,83,0.2); }
+
+		.error-box {
+			background: rgba(244, 67, 54, 0.1);
+			border: 1px solid rgba(244, 67, 54, 0.3);
+			border-radius: 4px;
+			padding: 0.75rem 1rem;
+			color: var(--red);
+			font-size: 0.8rem;
+			margin-bottom: 1.5rem;
+			display: none;
+		}
+
+		.results { display: none; }
+
+		.cert-block {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.cert-block-header {
+			padding: 0.5rem 1rem;
+			background: var(--surface2);
+			border-bottom: 1px solid var(--border);
+			font-size: 0.7rem;
+			color: var(--muted);
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.cert-num {
+			background: var(--green-dim);
+			color: var(--green);
+			padding: 0.1rem 0.4rem;
+			border-radius: 2px;
+			font-size: 0.65rem;
+		}
+
+		.validity-badge {
+			padding: 0.2rem 0.6rem;
+			border-radius: 2px;
+			font-size: 0.7rem;
+			font-weight: 600;
+		}
+
+		.valid { background: rgba(57,211,83,0.15); color: var(--green); border: 1px solid var(--green-dim); }
+		.expiring { background: rgba(255,167,38,0.15); color: var(--amber); border: 1px solid rgba(255,167,38,0.3); }
+		.expired { background: rgba(244,67,54,0.15); color: var(--red); border: 1px solid rgba(244,67,54,0.3); }
+		.self-signed { background: rgba(38,198,218,0.1); color: var(--cyan); border: 1px solid rgba(38,198,218,0.2); }
+
+		.fields { padding: 0.5rem 0; }
+
+		.field {
+			display: grid;
+			grid-template-columns: 200px 1fr;
+			padding: 0.35rem 1rem;
+			border-bottom: 1px solid rgba(26, 46, 26, 0.5);
+			gap: 1rem;
+		}
+
+		.field:last-child { border-bottom: none; }
+
+		.field-key {
+			color: var(--muted);
+			font-size: 0.75rem;
+			padding-top: 0.05rem;
+			flex-shrink: 0;
+		}
+
+		.field-val {
+			color: var(--text);
+			font-size: 0.8rem;
+			word-break: break-all;
+			line-height: 1.5;
+		}
+
+		.field-val.mono { font-family: 'IBM Plex Mono', monospace; color: var(--green); }
+		.field-val.alert { color: var(--red); }
+		.field-val.warn { color: var(--amber); }
+
+		.tag {
+			display: inline-block;
+			background: var(--green-dim);
+			color: var(--green);
+			padding: 0.1rem 0.45rem;
+			border-radius: 2px;
+			font-size: 0.72rem;
+			margin: 0.1rem 0.2rem 0.1rem 0;
+		}
+
+		.tag.cyan { background: rgba(38,198,218,0.1); color: var(--cyan); }
+		.tag.amber { background: rgba(255,167,38,0.1); color: var(--amber); }
+
+		.section-divider {
+			padding: 0.35rem 1rem;
+			background: var(--surface2);
+			border-bottom: 1px solid var(--border);
+			border-top: 1px solid var(--border);
+			font-size: 0.65rem;
+			color: var(--muted);
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+		}
+
+		.placeholder {
+			text-align: center;
+			padding: 3rem;
+			color: var(--muted);
+			font-size: 0.85rem;
+		}
+
+		.placeholder .big {
+			font-family: 'VT323', monospace;
+			font-size: 3rem;
+			color: var(--green-dim);
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+
+		@media (max-width: 600px) {
+			.field { grid-template-columns: 1fr; gap: 0.1rem; }
+			.field-key { font-size: 0.65rem; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>CERT DECODER</h1>
+			<p class="subtitle">Paste a PEM certificate (or chain) to inspect its contents</p>
+		</header>
+
+		<div class="input-area">
+			<div class="input-header">
+				<span><span class="prompt">$</span> paste certificate</span>
+				<span>PEM / X.509</span>
+			</div>
+			<textarea id="pemInput" placeholder="-----BEGIN CERTIFICATE-----&#10;MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw&#10;...&#10;-----END CERTIFICATE-----" spellcheck="false"></textarea>
+			<div class="btn-row">
+				<button class="btn btn-primary" onclick="decode()">decode</button>
+				<button class="btn" onclick="loadExample()">load example</button>
+				<button class="btn" onclick="clearAll()">clear</button>
+			</div>
+		</div>
+
+		<div class="error-box" id="errorBox"></div>
+
+		<div class="results" id="results">
+			<div id="certsContainer"></div>
+		</div>
+
+		<div id="placeholder" class="cert-block">
+			<div class="placeholder">
+				<span class="big">[ _ ]</span>
+				Paste a certificate above and press decode
+			</div>
+		</div>
+	</div>
+
+	<script>
+		function showError(msg) {
+			const box = document.getElementById('errorBox');
+			box.textContent = '⚠ ' + msg;
+			box.style.display = 'block';
+		}
+
+		function hideError() {
+			document.getElementById('errorBox').style.display = 'none';
+		}
+
+		function clearAll() {
+			document.getElementById('pemInput').value = '';
+			document.getElementById('results').style.display = 'none';
+			document.getElementById('placeholder').style.display = 'block';
+			hideError();
+		}
+
+		function getAttr(dn, key) {
+			const attr = dn.getField(key);
+			return attr ? attr.value : null;
+		}
+
+		function formatDN(dn) {
+			const parts = [];
+			const fields = [
+				['CN', 'CN'], ['O', 'O'], ['OU', 'OU'],
+				['L', 'L'], ['ST', 'ST'], ['C', 'C']
+			];
+			fields.forEach(([key, label]) => {
+				const v = getAttr(dn, key);
+				if (v) parts.push(`${label}=${v}`);
+			});
+			return parts.join(', ') || '(none)';
+		}
+
+		function daysBetween(a, b) {
+			return Math.round((b - a) / (1000 * 60 * 60 * 24));
+		}
+
+		function formatDate(d) {
+			return d.toUTCString().replace(' GMT', ' UTC');
+		}
+
+		function hexColon(hex) {
+			return hex.match(/.{1,2}/g).join(':');
+		}
+
+		function parseCertSafe(pem) {
+			try {
+				return forge.pki.certificateFromPem(pem);
+			} catch (e) {
+				// Forge can't parse non-RSA public keys — patch around it and retry
+				if (e.message && (e.message.includes('public key') || e.message.includes('RSAPublicKey'))) {
+					const orig = forge.pki.publicKeyFromAsn1;
+					forge.pki.publicKeyFromAsn1 = function(asn1) {
+						try { return orig.call(forge.pki, asn1); }
+						catch (e2) { return { _unknownKey: true }; }
+					};
+					try {
+						return forge.pki.certificateFromPem(pem);
+					} finally {
+						forge.pki.publicKeyFromAsn1 = orig;
+					}
+				}
+				throw e;
+			}
+		}
+
+		function getKeyInfo(cert) {
+			try {
+				const pk = cert.publicKey;
+				if (!pk || pk._unknownKey) return 'Unknown (unsupported key type)';
+				if (pk.n) {
+					const bits = pk.n.bitLength();
+					return `RSA ${bits}-bit`;
+				}
+				if (pk.curve) return `EC (${pk.curve})`;
+				if (pk.p && pk.q) return 'DSA';
+				return 'Unknown';
+			} catch { return 'Unknown'; }
+		}
+
+		function getSANs(cert) {
+			try {
+				const san = cert.getExtension('subjectAltName');
+				if (!san) return [];
+				return (san.altNames || []).map(n => {
+					if (n.type === 2) return { type: 'DNS', value: n.value };
+					if (n.type === 7) return { type: 'IP', value: n.ip };
+					if (n.type === 1) return { type: 'Email', value: n.value };
+					if (n.type === 6) return { type: 'URI', value: n.value };
+					return { type: 'Other', value: n.value };
+				});
+			} catch { return []; }
+		}
+
+		function getKeyUsage(cert) {
+			try {
+				const ku = cert.getExtension('keyUsage');
+				if (!ku) return null;
+				const uses = [];
+				if (ku.digitalSignature) uses.push('Digital Signature');
+				if (ku.nonRepudiation) uses.push('Non Repudiation');
+				if (ku.keyEncipherment) uses.push('Key Encipherment');
+				if (ku.dataEncipherment) uses.push('Data Encipherment');
+				if (ku.keyAgreement) uses.push('Key Agreement');
+				if (ku.keyCertSign) uses.push('Certificate Signing');
+				if (ku.cRLSign) uses.push('CRL Signing');
+				return uses;
+			} catch { return null; }
+		}
+
+		function getExtKeyUsage(cert) {
+			try {
+				const eku = cert.getExtension('extKeyUsage');
+				if (!eku) return null;
+				const uses = [];
+				if (eku.serverAuth) uses.push('TLS Server Auth');
+				if (eku.clientAuth) uses.push('TLS Client Auth');
+				if (eku.codeSigning) uses.push('Code Signing');
+				if (eku.emailProtection) uses.push('Email Protection');
+				if (eku.timeStamping) uses.push('Time Stamping');
+				if (eku.ocspSigning) uses.push('OCSP Signing');
+				return uses;
+			} catch { return null; }
+		}
+
+		function isCA(cert) {
+			try {
+				const bc = cert.getExtension('basicConstraints');
+				return bc && bc.cA === true;
+			} catch { return false; }
+		}
+
+		function isSelfSigned(cert) {
+			try {
+				return cert.isIssuer(cert);
+			} catch {
+				return formatDN(cert.subject) === formatDN(cert.issuer);
+			}
+		}
+
+		function fingerprint(cert, algo) {
+			try {
+				const der = forge.asn1.toDer(forge.pki.certificateToAsn1(cert));
+				const md = algo === 'sha256' ? forge.md.sha256.create() : forge.md.sha1.create();
+				md.update(der.getBytes());
+				return hexColon(md.digest().toHex().toUpperCase());
+			} catch { return 'N/A'; }
+		}
+
+		function extractPEMs(raw) {
+			const regex = /-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g;
+			return raw.match(regex) || [];
+		}
+
+		function field(key, val, cls) {
+			return `<div class="field">
+				<span class="field-key">${key}</span>
+				<span class="field-val${cls ? ' ' + cls : ''}">${val}</span>
+			</div>`;
+		}
+
+		function tags(items, cls) {
+			return items.map(i => `<span class="tag${cls ? ' ' + cls : ''}">${i}</span>`).join('');
+		}
+
+		function renderCert(cert, idx, total) {
+			const now = new Date();
+			const notBefore = cert.validity.notBefore;
+			const notAfter = cert.validity.notAfter;
+			const daysLeft = daysBetween(now, notAfter);
+			const selfSigned = isSelfSigned(cert);
+			const ca = isCA(cert);
+
+			let validityBadge = '';
+			let validCls = '';
+			if (now < notBefore) {
+				validityBadge = '<span class="validity-badge expired">NOT YET VALID</span>';
+				validCls = 'alert';
+			} else if (now > notAfter) {
+				validityBadge = '<span class="validity-badge expired">EXPIRED</span>';
+				validCls = 'alert';
+			} else if (daysLeft <= 30) {
+				validityBadge = `<span class="validity-badge expiring">EXPIRING (${daysLeft}d)</span>`;
+				validCls = 'warn';
+			} else {
+				validityBadge = `<span class="validity-badge valid">VALID (${daysLeft}d left)</span>`;
+			}
+
+			const sans = getSANs(cert);
+			const ku = getKeyUsage(cert);
+			const eku = getExtKeyUsage(cert);
+
+			let html = `<div class="cert-block">
+				<div class="cert-block-header">
+					<span>
+						<span class="cert-num">#${idx + 1}${total > 1 ? ' of ' + total : ''}</span>
+						${ca ? ' &nbsp;<span class="tag cyan">CA Certificate</span>' : ''}
+						${selfSigned ? ' <span class="tag amber">Self-Signed</span>' : ''}
+					</span>
+					${validityBadge}
+				</div>
+				<div class="fields">
+					<div class="section-divider">Subject</div>
+					${field('Common Name (CN)', getAttr(cert.subject, 'CN') || '<em style="color:var(--muted)">(none)</em>')}
+					${getAttr(cert.subject, 'O') ? field('Organisation (O)', getAttr(cert.subject, 'O')) : ''}
+					${getAttr(cert.subject, 'OU') ? field('Org Unit (OU)', getAttr(cert.subject, 'OU')) : ''}
+					${getAttr(cert.subject, 'L') ? field('Locality (L)', getAttr(cert.subject, 'L')) : ''}
+					${getAttr(cert.subject, 'ST') ? field('State (ST)', getAttr(cert.subject, 'ST')) : ''}
+					${getAttr(cert.subject, 'C') ? field('Country (C)', getAttr(cert.subject, 'C')) : ''}
+
+					<div class="section-divider">Issuer</div>
+					${field('Common Name (CN)', getAttr(cert.issuer, 'CN') || '<em style="color:var(--muted)">(none)</em>')}
+					${getAttr(cert.issuer, 'O') ? field('Organisation (O)', getAttr(cert.issuer, 'O')) : ''}
+					${getAttr(cert.issuer, 'C') ? field('Country (C)', getAttr(cert.issuer, 'C')) : ''}
+
+					<div class="section-divider">Validity</div>
+					${field('Not Before', formatDate(notBefore))}
+					${field('Not After', formatDate(notAfter), validCls)}
+					${field('Days Remaining', daysLeft > 0 ? daysLeft + ' days' : Math.abs(daysLeft) + ' days ago', validCls)}
+
+					<div class="section-divider">Certificate Details</div>
+					${field('Serial Number', cert.serialNumber ? hexColon(cert.serialNumber.toUpperCase()) : 'N/A', 'mono')}
+					${field('Signature Algorithm', cert.siginfo ? cert.siginfo.algorithmOid : (cert.signatureOid || 'N/A'))}
+					${field('Public Key', getKeyInfo(cert))}
+					${field('SHA-256 Fingerprint', fingerprint(cert, 'sha256'), 'mono')}
+					${field('SHA-1 Fingerprint', fingerprint(cert, 'sha1'), 'mono')}
+			`;
+
+			if (sans.length > 0) {
+				html += `<div class="section-divider">Subject Alternative Names (${sans.length})</div>`;
+				html += `<div class="field"><span class="field-key">SANs</span><span class="field-val">`;
+				html += sans.map(s => `<span class="tag${s.type === 'IP' ? ' cyan' : ''}">${s.type}: ${s.value}</span>`).join('');
+				html += `</span></div>`;
+			}
+
+			if (ku && ku.length > 0) {
+				html += `<div class="section-divider">Key Usage</div>`;
+				html += `<div class="field"><span class="field-key">Usage</span><span class="field-val">${tags(ku)}</span></div>`;
+			}
+
+			if (eku && eku.length > 0) {
+				html += `<div class="section-divider">Extended Key Usage</div>`;
+				html += `<div class="field"><span class="field-key">Extended Usage</span><span class="field-val">${tags(eku, 'cyan')}</span></div>`;
+			}
+
+			html += `</div></div>`;
+			return html;
+		}
+
+		function decode() {
+			hideError();
+			const raw = document.getElementById('pemInput').value.trim();
+			if (!raw) { showError('Paste a PEM certificate first.'); return; }
+
+			const pems = extractPEMs(raw);
+			if (!pems.length) {
+				showError('No valid PEM certificate found. Make sure it includes -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- headers.');
+				return;
+			}
+
+			const container = document.getElementById('certsContainer');
+			container.innerHTML = '';
+
+			let allHtml = '';
+			const errors = [];
+
+			pems.forEach((pem, i) => {
+				try {
+					const cert = parseCertSafe(pem);
+					allHtml += renderCert(cert, i, pems.length);
+				} catch (e) {
+					errors.push(`Certificate #${i + 1}: ${e.message}`);
+				}
+			});
+
+			container.innerHTML = allHtml;
+
+			if (errors.length) {
+				showError('Some certificates could not be parsed: ' + errors.join('; '));
+			}
+
+			document.getElementById('placeholder').style.display = 'none';
+			document.getElementById('results').style.display = 'block';
+		}
+
+		function loadExample() {
+			// Let's Encrypt ISRG Root X1 (self-signed CA cert — public)
+			document.getElementById('pemInput').value = `-----BEGIN CERTIFICATE-----
+MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
+WhcNMzUwNjA0MTEwNDM4WjBPMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJu
+ZXQgU2VjdXJpdHkgUmVzZWFyY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBY
+MTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoBggIBAK3oJHP0FDfzm54rVygc
+h77ct984kIxuPOZXoHj3dcKi/vVqbvYATyjb3miGbESTtrFj/RQSa78f0uoxmyF+
+0TM8ukj13Xnfs7j/EvEhmkvBioZxaUpmZmyPfjxwv60pIgbz5MDmgK7iS4+3mX6U
+A5/TR5d8mUgjU+g4rk8Kb4Mu0UlXjIB0ttov0DiNewNwIRt18jA8+o+u3dpjq+sW
+T8KOEUt+zwvo/7V3LvSye0rgTBIlDHCNAymg4VMk7BPZ7hm/ELNKjD+Jo2FR3qyH
+B5T0Y3HsLuJvW5iB4YlcNHlsdu87kGJ55tukmi8mxdAQ4Q7e2RCOFvu396j3x+UC
+B5iPNgiV5+I3lg02dZ77DnKxHZu8A/lJBdiB3QW0KtZB6awBdpUKD9jf1b0SHzUv
+KBds0pjBqAlkd25HN7rOrFleaJ1/ctaJxQZBKT5ZPt0m9STJEadao0xAH0ahmbWn
+OlFuhjuefXKnEgV4We0+UXgVCwOPjdAvBbI+e0ocS3MFEvzG6uBQE3xDk3SzynTn
+jh8BCNAw1FtxNrQHusEwMFxIt4I7mKZ9YIqioymCzLq9gwQbooMDQaHWBfEbwrbw
+qHyGO0aoSCqI3Haadr8faqU9GY/rOPNk3sgrDQoo//fb4hVC1CLQJ13hef4Y53CI
+rU7m2Ys6xt0nUW7/vGT1M0NPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNV
+HRMBAf8EBTADAQH/MB0GA1UdDgQWBBR5tFnme7bl5AFzgAiIyBpY9umbbjANBgkq
+hkiG9w0BAQsFAAOCAgEAVR9YqbyyqFDQDLHYGmkgJykIrGF1XIpu+ILlaS/V9lZL
+ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ
+3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
+NFtY2PwByVS5uCbMiogziUwthDyC3+6WVwW6LLv3xLfHTjuCvjHIInNzktHCgKQ5
+ORAzI4JMPJ+GslWYHb4phowim57iaztXOoJwTdwJx4nLCgdNbOhdjsnvzqvHu7Ur
+TkXWStAmzOVyyghqpZXjFaH3pO3JLF+l+/+sKAIuvtd7u+Nxe5AW0wdeRlN8NwdC
+jNPElpzVmbUq4JUagEiuTDkHzsxHpFKVK7q4+63SM1N95R1NbdWhscdCb+ZAJzVc
+oyi3B43njTOQ5yOf+1CceWxG1bQVs5ZufpsMljq4Ui0/1lvh+wjChP4kqKOJ2qxq
+4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA
+mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
+emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
+-----END CERTIFICATE-----`;
+			decode();
+		}
+
+		// Auto-decode on paste
+		document.getElementById('pemInput').addEventListener('paste', () => {
+			setTimeout(decode, 50);
+		});
+	</script>
+	<script src="assets/shared-nav.js"></script>
+</body>
+</html>

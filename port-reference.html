@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Port Reference</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0a0e1a;
+			--surface: #0f1525;
+			--surface2: #141c30;
+			--border: #1e2a44;
+			--text: #c5cfe8;
+			--muted: #546078;
+			--cyan: #00e5ff;
+			--blue: #4a9eff;
+			--orange: #ff8c42;
+			--purple: #b06ef3;
+			--green: #3ddc84;
+			--amber: #ffc107;
+			--red: #ff5252;
+			--tcp-bg: rgba(74,158,255,0.1);
+			--udp-bg: rgba(255,140,66,0.1);
+			--both-bg: rgba(176,110,243,0.1);
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Barlow', sans-serif;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			padding: 1.5rem;
+		}
+
+		.container { max-width: 1200px; margin: 0 auto; }
+
+		header {
+			margin-bottom: 1.5rem;
+			padding-bottom: 1.25rem;
+			border-bottom: 1px solid var(--border);
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-end;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		h1 {
+			font-size: 1.7rem;
+			font-weight: 600;
+			color: var(--cyan);
+			letter-spacing: -0.3px;
+		}
+
+		.subtitle { color: var(--muted); font-size: 0.82rem; margin-top: 0.2rem; }
+
+		.count { font-size: 0.8rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+		.count span { color: var(--cyan); }
+
+		.controls {
+			display: flex;
+			gap: 0.75rem;
+			margin-bottom: 1rem;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		.search-wrap {
+			flex: 1;
+			min-width: 200px;
+			max-width: 360px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			display: flex;
+			align-items: center;
+			padding: 0 0.75rem;
+			transition: border-color 0.2s;
+		}
+
+		.search-wrap:focus-within { border-color: var(--cyan); }
+
+		.search-icon { color: var(--muted); font-size: 0.85rem; margin-right: 0.5rem; }
+
+		input[type="search"] {
+			background: none;
+			border: none;
+			outline: none;
+			color: var(--text);
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.85rem;
+			padding: 0.55rem 0;
+			width: 100%;
+		}
+
+		input[type="search"]::placeholder { color: var(--muted); }
+
+		.filter-group {
+			display: flex;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			overflow: hidden;
+		}
+
+		.filter-btn {
+			padding: 0.45rem 0.9rem;
+			background: none;
+			border: none;
+			color: var(--muted);
+			font-family: 'Barlow', sans-serif;
+			font-size: 0.8rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.15s;
+			border-right: 1px solid var(--border);
+		}
+
+		.filter-btn:last-child { border-right: none; }
+
+		.filter-btn:hover { color: var(--text); background: var(--surface2); }
+
+		.filter-btn.active { color: #111; font-weight: 600; }
+		.filter-btn.active.f-all  { background: var(--cyan); }
+		.filter-btn.active.f-tcp  { background: var(--blue); }
+		.filter-btn.active.f-udp  { background: var(--orange); }
+		.filter-btn.active.f-both { background: var(--purple); }
+		.filter-btn.active.f-sys  { background: var(--green); }
+		.filter-btn.active.f-db   { background: var(--amber); color: #111; }
+		.filter-btn.active.f-devops { background: var(--red); }
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.85rem;
+		}
+
+		thead {
+			position: sticky;
+			top: 56px;
+			z-index: 10;
+		}
+
+		th {
+			background: var(--surface2);
+			border-bottom: 2px solid var(--border);
+			padding: 0.6rem 0.75rem;
+			text-align: left;
+			font-weight: 600;
+			font-size: 0.72rem;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--muted);
+			cursor: pointer;
+			user-select: none;
+			white-space: nowrap;
+		}
+
+		th:hover { color: var(--text); }
+
+		td {
+			padding: 0.5rem 0.75rem;
+			border-bottom: 1px solid var(--border);
+			vertical-align: middle;
+		}
+
+		tr:hover td { background: var(--surface); }
+
+		.port-num {
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.9rem;
+			color: var(--cyan);
+			font-weight: 500;
+			white-space: nowrap;
+		}
+
+		.proto-badge {
+			display: inline-block;
+			padding: 0.15rem 0.45rem;
+			border-radius: 3px;
+			font-size: 0.7rem;
+			font-weight: 600;
+			font-family: 'JetBrains Mono', monospace;
+		}
+
+		.proto-tcp  { background: var(--tcp-bg);  color: var(--blue);   border: 1px solid rgba(74,158,255,0.3); }
+		.proto-udp  { background: var(--udp-bg);  color: var(--orange); border: 1px solid rgba(255,140,66,0.3); }
+		.proto-both { background: var(--both-bg); color: var(--purple); border: 1px solid rgba(176,110,243,0.3); }
+
+		.service-name {
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.8rem;
+			color: var(--text);
+			white-space: nowrap;
+		}
+
+		.cat-badge {
+			display: inline-block;
+			padding: 0.1rem 0.4rem;
+			border-radius: 3px;
+			font-size: 0.65rem;
+			font-weight: 600;
+			white-space: nowrap;
+		}
+
+		.cat-system    { background: rgba(61,220,132,0.1);  color: var(--green);  border: 1px solid rgba(61,220,132,0.2); }
+		.cat-mail      { background: rgba(0,229,255,0.1);   color: var(--cyan);   border: 1px solid rgba(0,229,255,0.2); }
+		.cat-database  { background: rgba(255,193,7,0.12);  color: var(--amber);  border: 1px solid rgba(255,193,7,0.2); }
+		.cat-devops    { background: rgba(255,82,82,0.1);   color: var(--red);    border: 1px solid rgba(255,82,82,0.2); }
+		.cat-security  { background: rgba(176,110,243,0.1); color: var(--purple); border: 1px solid rgba(176,110,243,0.2); }
+		.cat-messaging { background: rgba(255,140,66,0.1);  color: var(--orange); border: 1px solid rgba(255,140,66,0.2); }
+
+		.desc-col { color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
+
+		.warn-icon { color: var(--red); margin-right: 0.3rem; font-size: 0.7rem; }
+
+		.no-results {
+			text-align: center;
+			padding: 3rem;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+
+		@media (max-width: 768px) {
+			.cat-col, .cat-head { display: none; }
+			table { font-size: 0.78rem; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<div>
+				<h1>Port Reference</h1>
+				<p class="subtitle">Well-known and registered TCP/UDP ports</p>
+			</div>
+			<div class="count">Showing <span id="shownCount">0</span> of <span id="totalCount">0</span> ports</div>
+		</header>
+
+		<div class="controls">
+			<div class="search-wrap">
+				<span class="search-icon">⌕</span>
+				<input type="search" id="search" placeholder="port, service, or keyword..." autofocus>
+			</div>
+			<div class="filter-group" id="protoFilters">
+				<button class="filter-btn f-all active" data-proto="all" onclick="setFilter('proto','all',this)">All</button>
+				<button class="filter-btn f-tcp"  data-proto="TCP"  onclick="setFilter('proto','TCP',this)">TCP</button>
+				<button class="filter-btn f-udp"  data-proto="UDP"  onclick="setFilter('proto','UDP',this)">UDP</button>
+				<button class="filter-btn f-both" data-proto="TCP/UDP" onclick="setFilter('proto','TCP/UDP',this)">Both</button>
+			</div>
+			<div class="filter-group">
+				<button class="filter-btn f-all active" data-cat="all"      onclick="setFilter('cat','all',this)">All</button>
+				<button class="filter-btn f-sys"  data-cat="system"  onclick="setFilter('cat','system',this)">System</button>
+				<button class="filter-btn f-db"   data-cat="database" onclick="setFilter('cat','database',this)">Databases</button>
+				<button class="filter-btn f-devops" data-cat="devops" onclick="setFilter('cat','devops',this)">DevOps</button>
+				<button class="filter-btn f-both"  data-cat="security" onclick="setFilter('cat','security',this)">Security</button>
+			</div>
+		</div>
+
+		<table>
+			<thead>
+				<tr>
+					<th onclick="sortBy('port')">Port ▾</th>
+					<th>Proto</th>
+					<th>Service</th>
+					<th class="cat-head">Category</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody id="tableBody"></tbody>
+		</table>
+		<div class="no-results" id="noResults" style="display:none">No ports match your search.</div>
+	</div>
+
+	<script>
+		const PORTS = [
+			[20,'TCP','FTP-DATA','system','FTP data transfer'],
+			[21,'TCP','FTP','system','FTP command/control'],
+			[22,'TCP','SSH','system','Secure Shell'],
+			[23,'TCP','TELNET','system','<span class="warn-icon">⚠</span>Telnet (cleartext — avoid)'],
+			[25,'TCP','SMTP','mail','SMTP mail transfer'],
+			[53,'TCP/UDP','DNS','system','Domain Name System'],
+			[67,'UDP','DHCP','system','DHCP server (assigns IPs to clients)'],
+			[68,'UDP','DHCP','system','DHCP client'],
+			[69,'UDP','TFTP','system','Trivial FTP — used for PXE boot, network configs'],
+			[80,'TCP','HTTP','system','Hypertext Transfer Protocol'],
+			[88,'TCP/UDP','Kerberos','security','Kerberos authentication (Active Directory)'],
+			[110,'TCP','POP3','mail','Post Office Protocol v3'],
+			[111,'TCP/UDP','RPC','system','Remote Procedure Call (portmapper)'],
+			[119,'TCP','NNTP','system','Network News Transfer Protocol (Usenet)'],
+			[123,'UDP','NTP','system','Network Time Protocol — clock sync'],
+			[135,'TCP/UDP','MSRPC','system','Microsoft RPC — required for AD, DCOM'],
+			[137,'UDP','NetBIOS-NS','system','NetBIOS Name Service'],
+			[138,'UDP','NetBIOS-DGM','system','NetBIOS Datagram Service'],
+			[139,'TCP','NetBIOS-SSN','system','NetBIOS Session Service'],
+			[143,'TCP','IMAP','mail','Internet Message Access Protocol'],
+			[161,'UDP','SNMP','system','SNMP polling (network monitoring)'],
+			[162,'UDP','SNMPTRAP','system','SNMP trap notifications'],
+			[179,'TCP','BGP','system','Border Gateway Protocol (internet routing)'],
+			[194,'TCP','IRC','system','Internet Relay Chat'],
+			[389,'TCP/UDP','LDAP','security','Lightweight Directory Access Protocol'],
+			[443,'TCP','HTTPS','system','HTTP over TLS/SSL'],
+			[445,'TCP','SMB','system','Server Message Block (Windows file sharing)'],
+			[465,'TCP','SMTPS','mail','<span class="warn-icon">⚠</span>SMTP over TLS — deprecated, use port 587'],
+			[500,'UDP','IKE','security','Internet Key Exchange (IPSec VPN)'],
+			[502,'TCP','Modbus','system','Modbus industrial control protocol'],
+			[514,'UDP','Syslog','system','BSD Syslog protocol'],
+			[514,'TCP','RSH','system','<span class="warn-icon">⚠</span>Remote Shell (cleartext — avoid)'],
+			[515,'TCP','LPD','system','Line Printer Daemon'],
+			[520,'UDP','RIP','system','Routing Information Protocol'],
+			[554,'TCP/UDP','RTSP','system','Real Time Streaming Protocol (media)'],
+			[587,'TCP','SMTP-SUBM','mail','SMTP Submission (authenticated outbound mail)'],
+			[631,'TCP/UDP','IPP','system','Internet Printing Protocol (CUPS)'],
+			[636,'TCP','LDAPS','security','LDAP over TLS'],
+			[873,'TCP','rsync','system','rsync file transfer daemon'],
+			[902,'TCP','VMware','devops','VMware ESXi management'],
+			[993,'TCP','IMAPS','mail','IMAP over TLS'],
+			[995,'TCP','POP3S','mail','POP3 over TLS'],
+			[1080,'TCP','SOCKS','security','SOCKS proxy'],
+			[1194,'UDP','OpenVPN','security','OpenVPN (default port)'],
+			[1433,'TCP','MSSQL','database','Microsoft SQL Server'],
+			[1521,'TCP','Oracle','database','Oracle Database listener'],
+			[1701,'UDP','L2TP','security','Layer 2 Tunneling Protocol'],
+			[1723,'TCP','PPTP','security','<span class="warn-icon">⚠</span>PPTP VPN (weak crypto — avoid)'],
+			[1812,'UDP','RADIUS','security','RADIUS authentication'],
+			[1813,'UDP','RADIUS-ACC','security','RADIUS accounting'],
+			[2049,'TCP/UDP','NFS','system','Network File System'],
+			[2181,'TCP','ZooKeeper','devops','Apache ZooKeeper coordination'],
+			[2222,'TCP','SSH-alt','system','SSH on alternate port'],
+			[2375,'TCP','Docker','devops','<span class="warn-icon">⚠</span>Docker daemon (unencrypted — never expose)'],
+			[2376,'TCP','Docker-TLS','devops','Docker daemon (TLS)'],
+			[2379,'TCP','etcd-client','devops','etcd client API (Kubernetes control plane)'],
+			[2380,'TCP','etcd-peer','devops','etcd peer communication'],
+			[3000,'TCP','Grafana','devops','Grafana dashboards (default dev port)'],
+			[3128,'TCP','Squid','system','Squid HTTP proxy'],
+			[3268,'TCP','GC','security','Active Directory Global Catalog'],
+			[3269,'TCP','GC-SSL','security','Active Directory Global Catalog (TLS)'],
+			[3306,'TCP','MySQL','database','MySQL / MariaDB'],
+			[3389,'TCP','RDP','system','Remote Desktop Protocol'],
+			[3690,'TCP','SVN','devops','Subversion version control'],
+			[4369,'TCP','EPMD','messaging','Erlang Port Mapper — used by RabbitMQ'],
+			[4443,'TCP','HTTPS-alt','system','HTTPS on alternate port'],
+			[4500,'UDP','IPSec-NAT','security','IPSec NAT traversal'],
+			[5000,'TCP','Docker-Reg','devops','Docker Registry / Flask dev server'],
+			[5044,'TCP','Beats','devops','Logstash Beats input (Elastic Stack)'],
+			[5353,'UDP','mDNS','system','Multicast DNS (Bonjour/Avahi)'],
+			[5355,'UDP','LLMNR','system','Link-Local Multicast Name Resolution'],
+			[5432,'TCP','PostgreSQL','database','PostgreSQL database'],
+			[5601,'TCP','Kibana','devops','Kibana web UI (Elastic Stack)'],
+			[5672,'TCP','AMQP','messaging','AMQP — RabbitMQ default'],
+			[5900,'TCP','VNC','system','VNC remote desktop'],
+			[6379,'TCP','Redis','database','Redis in-memory data store'],
+			[6443,'TCP','K8s-API','devops','Kubernetes API server'],
+			[6514,'TCP','Syslog-TLS','system','Syslog over TLS (RFC 5425)'],
+			[7070,'TCP','RTSP-alt','system','RTSP alternate port'],
+			[8006,'TCP','Proxmox','devops','Proxmox VE web UI'],
+			[8080,'TCP','HTTP-alt','system','HTTP alternate / common proxy port'],
+			[8123,'TCP','Home-Asst','devops','Home Assistant web UI'],
+			[8443,'TCP','HTTPS-alt','system','HTTPS alternate port'],
+			[8500,'TCP','Consul','devops','Consul HTTP API and web UI'],
+			[8600,'UDP','Consul-DNS','devops','Consul DNS interface'],
+			[8888,'TCP','Jupyter','devops','Jupyter Notebook (default)'],
+			[9000,'TCP','SonarQube','devops','SonarQube web UI / PHP-FPM'],
+			[9090,'TCP','Prometheus','devops','Prometheus metrics web UI'],
+			[9092,'TCP','Kafka','messaging','Apache Kafka broker'],
+			[9100,'TCP','Node-Exp','devops','Prometheus Node Exporter'],
+			[9200,'TCP','ES-HTTP','database','Elasticsearch REST API'],
+			[9300,'TCP','ES-Trans','database','Elasticsearch inter-node transport'],
+			[9418,'TCP','Git','devops','Git protocol'],
+			[10250,'TCP','Kubelet','devops','Kubernetes Kubelet API'],
+			[10255,'TCP','Kubelet-ro','devops','Kubernetes Kubelet read-only API'],
+			[11211,'TCP/UDP','Memcached','database','Memcached in-memory cache'],
+			[15672,'TCP','RabbitMQ-UI','messaging','RabbitMQ Management web UI'],
+			[25565,'TCP','Minecraft','system','Minecraft Java Edition game server'],
+			[27017,'TCP','MongoDB','database','MongoDB'],
+			[51820,'UDP','WireGuard','security','WireGuard VPN (default port)'],
+		];
+
+		let activeProto = 'all';
+		let activeCat = 'all';
+		let sortCol = 'port';
+		let sortAsc = true;
+
+		function setFilter(type, val, btn) {
+			if (type === 'proto') {
+				activeProto = val;
+				document.querySelectorAll('#protoFilters .filter-btn').forEach(b => b.classList.remove('active'));
+			} else {
+				activeCat = val;
+				// deactivate cat buttons in the same group
+				btn.closest('.filter-group').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+			}
+			btn.classList.add('active');
+			render();
+		}
+
+		function sortBy(col) {
+			if (sortCol === col) sortAsc = !sortAsc;
+			else { sortCol = col; sortAsc = true; }
+			render();
+		}
+
+		function protoBadge(p) {
+			const cls = p === 'TCP' ? 'tcp' : p === 'UDP' ? 'udp' : 'both';
+			return `<span class="proto-badge proto-${cls}">${p}</span>`;
+		}
+
+		function catBadge(c) {
+			return `<span class="cat-badge cat-${c}">${c}</span>`;
+		}
+
+		function render() {
+			const q = document.getElementById('search').value.toLowerCase().trim();
+			const tbody = document.getElementById('tableBody');
+
+			let rows = PORTS.filter(r => {
+				const [port, proto, service, cat, desc] = r;
+				if (activeProto !== 'all' && proto !== activeProto) return false;
+				if (activeCat !== 'all' && cat !== activeCat) return false;
+				if (q) {
+					const searchable = `${port} ${proto} ${service} ${cat} ${desc}`.toLowerCase();
+					if (!searchable.includes(q)) return false;
+				}
+				return true;
+			});
+
+			rows.sort((a, b) => {
+				let va = a[0], vb = b[0];
+				if (sortCol === 'service') { va = a[2]; vb = b[2]; }
+				if (typeof va === 'string') va = va.toLowerCase();
+				if (typeof vb === 'string') vb = vb.toLowerCase();
+				if (va < vb) return sortAsc ? -1 : 1;
+				if (va > vb) return sortAsc ? 1 : -1;
+				return 0;
+			});
+
+			document.getElementById('shownCount').textContent = rows.length;
+			document.getElementById('totalCount').textContent = PORTS.length;
+			document.getElementById('noResults').style.display = rows.length ? 'none' : 'block';
+
+			tbody.innerHTML = rows.map(r => {
+				const [port, proto, service, cat, desc] = r;
+				return `<tr>
+					<td><span class="port-num">${port}</span></td>
+					<td>${protoBadge(proto)}</td>
+					<td><span class="service-name">${service}</span></td>
+					<td class="cat-col">${catBadge(cat)}</td>
+					<td class="desc-col">${desc}</td>
+				</tr>`;
+			}).join('');
+		}
+
+		document.getElementById('search').addEventListener('input', render);
+		render();
+	</script>
+	<script src="assets/shared-nav.js"></script>
+</body>
+</html>
