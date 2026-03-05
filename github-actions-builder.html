@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitHub Actions Builder // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0d1117;
+			--surface: #161b22;
+			--surface2: #21262d;
+			--border: #30363d;
+			--border-bright: #3d444d;
+			--accent: #3fb950;
+			--accent-dim: rgba(63,185,80,0.08);
+			--blue: #79c0ff;
+			--purple: #d2a8ff;
+			--orange: #ffa657;
+			--red: #ff7b72;
+			--yellow: #e3b341;
+			--text: #c9d1d9;
+			--text-dim: #6e7681;
+			--text-bright: #f0f6fc;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'JetBrains Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+		}
+
+		.layout { display: grid; grid-template-columns: 380px 1fr; min-height: 100vh; }
+
+		/* LEFT PANEL */
+		.left-panel {
+			background: var(--surface); border-right: 1px solid var(--border);
+			overflow-y: auto; padding: 1rem;
+		}
+
+		.logo {
+			font-size: 1rem; font-weight: 700; color: var(--accent);
+			margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;
+		}
+		.logo-icon { width: 18px; height: 18px; fill: var(--accent); }
+		.tagline { font-size: 0.65rem; color: var(--text-dim); margin-bottom: 1rem; }
+
+		.presets-row { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1rem; }
+		.preset-btn {
+			padding: 0.3rem 0.6rem; background: var(--surface2); border: 1px solid var(--border);
+			border-radius: 4px; color: var(--text-dim); font-family: inherit; font-size: 0.62rem;
+			cursor: pointer; transition: all 0.12s;
+		}
+		.preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+		.section { margin-bottom: 1rem; }
+		.section-label {
+			font-size: 0.6rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase;
+			letter-spacing: 0.08em; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.3rem;
+		}
+		.section-label::after {
+			content: ''; flex: 1; height: 1px; background: var(--border);
+		}
+
+		.field { margin-bottom: 0.6rem; }
+		.field label { display: block; font-size: 0.62rem; color: var(--text-dim); margin-bottom: 0.25rem; }
+		.field input, .field select {
+			width: 100%; background: var(--bg); border: 1px solid var(--border);
+			border-radius: 4px; padding: 0.4rem 0.6rem;
+			color: var(--text-bright); font-family: inherit; font-size: 0.78rem;
+			outline: none; transition: border-color 0.12s;
+		}
+		.field input:focus, .field select:focus { border-color: var(--accent); }
+		.field select option { background: var(--surface); }
+
+		/* Triggers */
+		.trigger-group { margin-bottom: 0.5rem; }
+		.trigger-header {
+			display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
+			padding: 0.35rem 0.5rem; border-radius: 4px; transition: background 0.1s;
+		}
+		.trigger-header:hover { background: var(--surface2); }
+		.trigger-header input[type=checkbox] { accent-color: var(--accent); width: 13px; height: 13px; cursor: pointer; }
+		.trigger-header label { font-size: 0.75rem; color: var(--text); cursor: pointer; font-weight: 500; }
+		.trigger-opts { padding: 0.4rem 0.5rem 0.4rem 1.7rem; display: none; }
+		.trigger-opts.open { display: block; }
+		.trigger-opts .field { margin-bottom: 0.4rem; }
+		.trigger-opts label { font-size: 0.6rem; }
+
+		/* Steps */
+		.step-list { display: flex; flex-direction: column; gap: 0.5rem; }
+		.step-item {
+			background: var(--surface2); border: 1px solid var(--border);
+			border-radius: 6px; overflow: hidden;
+		}
+		.step-header {
+			display: flex; align-items: center; gap: 0.5rem;
+			padding: 0.45rem 0.6rem; cursor: pointer;
+		}
+		.step-header:hover { background: rgba(255,255,255,0.03); }
+		.step-num { font-size: 0.6rem; color: var(--text-dim); min-width: 14px; }
+		.step-name-preview { flex: 1; font-size: 0.72rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.step-del {
+			background: none; border: none; color: var(--text-dim); cursor: pointer;
+			font-size: 0.9rem; padding: 0.1rem 0.3rem; border-radius: 3px;
+			transition: all 0.1s; line-height: 1;
+		}
+		.step-del:hover { background: rgba(255,123,114,0.15); color: var(--red); }
+		.step-body { padding: 0.6rem; border-top: 1px solid var(--border); display: none; }
+		.step-body.open { display: block; }
+		.step-body .field { margin-bottom: 0.45rem; }
+
+		.add-step-btn {
+			width: 100%; padding: 0.45rem; background: none; border: 1px dashed var(--border);
+			border-radius: 6px; color: var(--text-dim); font-family: inherit; font-size: 0.72rem;
+			cursor: pointer; transition: all 0.12s; margin-top: 0.5rem;
+		}
+		.add-step-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+		.step-type-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.3rem; margin-bottom: 0.5rem; }
+		.stype-btn {
+			padding: 0.3rem 0.2rem; background: var(--bg); border: 1px solid var(--border);
+			border-radius: 3px; color: var(--text-dim); font-family: inherit; font-size: 0.6rem;
+			cursor: pointer; text-align: center; transition: all 0.1s;
+		}
+		.stype-btn.on { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+		/* RIGHT PANEL */
+		.right-panel { display: flex; flex-direction: column; }
+		.output-bar {
+			display: flex; justify-content: space-between; align-items: center;
+			padding: 0.6rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
+			position: sticky; top: 0; z-index: 10;
+		}
+		.output-title { font-size: 0.7rem; color: var(--text-dim); }
+		.copy-btn {
+			padding: 0.35rem 0.8rem; background: var(--surface2); border: 1px solid var(--border);
+			border-radius: 4px; color: var(--text); font-family: inherit; font-size: 0.7rem;
+			cursor: pointer; transition: all 0.12s;
+		}
+		.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+		.copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+
+		.yaml-output {
+			flex: 1; padding: 1.25rem 1.5rem; font-size: 0.78rem; line-height: 1.65;
+			white-space: pre; overflow-x: auto; tab-size: 2;
+		}
+
+		/* YAML syntax coloring */
+		.y-key { color: var(--blue); }
+		.y-str { color: var(--orange); }
+		.y-comment { color: var(--text-dim); font-style: italic; }
+		.y-bool { color: var(--purple); }
+		.y-anchor { color: var(--yellow); }
+		.y-dash { color: var(--text-dim); }
+		.y-uses { color: var(--accent); }
+		.y-run { color: var(--text); }
+
+		@media (max-width: 780px) {
+			.layout { grid-template-columns: 1fr; }
+			.left-panel { max-height: 50vh; }
+		}
+	</style>
+</head>
+<body>
+<div class="layout">
+	<!-- ===== LEFT PANEL ===== -->
+	<div class="left-panel">
+		<div class="logo">
+			<svg class="logo-icon" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+			GitHub Actions Builder
+		</div>
+		<div class="tagline">Generate workflow YAML for CI/CD pipelines</div>
+
+		<div class="presets-row">
+			<button class="preset-btn" onclick="loadPreset('nodejs')">Node.js CI</button>
+			<button class="preset-btn" onclick="loadPreset('python')">Python CI</button>
+			<button class="preset-btn" onclick="loadPreset('docker')">Docker Build</button>
+			<button class="preset-btn" onclick="loadPreset('pages')">GitHub Pages</button>
+			<button class="preset-btn" onclick="loadPreset('blank')">Blank</button>
+		</div>
+
+		<!-- Workflow name -->
+		<div class="section">
+			<div class="section-label">Workflow</div>
+			<div class="field">
+				<label>Name</label>
+				<input type="text" id="wf-name" value="CI" oninput="generate()" placeholder="e.g. CI, Build, Deploy">
+			</div>
+		</div>
+
+		<!-- Triggers -->
+		<div class="section">
+			<div class="section-label">Triggers</div>
+
+			<div class="trigger-group">
+				<div class="trigger-header" onclick="toggleTrigger('push')">
+					<input type="checkbox" id="trg-push" onchange="generate(); toggleTriggerOpts('push')" onclick="event.stopPropagation()">
+					<label for="trg-push">push</label>
+				</div>
+				<div class="trigger-opts" id="opts-push">
+					<div class="field">
+						<label>Branches (comma-separated)</label>
+						<input type="text" id="push-branches" value="main" placeholder="main, develop" oninput="generate()">
+					</div>
+					<div class="field">
+						<label>Tags (optional)</label>
+						<input type="text" id="push-tags" placeholder="v*, v[0-9]*" oninput="generate()">
+					</div>
+				</div>
+			</div>
+
+			<div class="trigger-group">
+				<div class="trigger-header" onclick="toggleTrigger('pr')">
+					<input type="checkbox" id="trg-pr" onchange="generate(); toggleTriggerOpts('pr')" onclick="event.stopPropagation()">
+					<label for="trg-pr">pull_request</label>
+				</div>
+				<div class="trigger-opts" id="opts-pr">
+					<div class="field">
+						<label>Branches</label>
+						<input type="text" id="pr-branches" value="main" placeholder="main, develop" oninput="generate()">
+					</div>
+				</div>
+			</div>
+
+			<div class="trigger-group">
+				<div class="trigger-header" onclick="toggleTrigger('dispatch')">
+					<input type="checkbox" id="trg-dispatch" onchange="generate(); toggleTriggerOpts('dispatch')" onclick="event.stopPropagation()">
+					<label for="trg-dispatch">workflow_dispatch</label>
+				</div>
+			</div>
+
+			<div class="trigger-group">
+				<div class="trigger-header" onclick="toggleTrigger('schedule')">
+					<input type="checkbox" id="trg-schedule" onchange="generate(); toggleTriggerOpts('schedule')" onclick="event.stopPropagation()">
+					<label for="trg-schedule">schedule (cron)</label>
+				</div>
+				<div class="trigger-opts" id="opts-schedule">
+					<div class="field">
+						<label>Cron expression</label>
+						<input type="text" id="schedule-cron" value="0 0 * * *" placeholder="0 0 * * *" oninput="generate()">
+					</div>
+				</div>
+			</div>
+
+			<div class="trigger-group">
+				<div class="trigger-header" onclick="toggleTrigger('release')">
+					<input type="checkbox" id="trg-release" onchange="generate(); toggleTriggerOpts('release')" onclick="event.stopPropagation()">
+					<label for="trg-release">release (published)</label>
+				</div>
+			</div>
+		</div>
+
+		<!-- Job -->
+		<div class="section">
+			<div class="section-label">Job</div>
+			<div class="field">
+				<label>Job name (id)</label>
+				<input type="text" id="job-name" value="build" oninput="generate()" placeholder="build, test, deploy">
+			</div>
+			<div class="field">
+				<label>Runs on</label>
+				<select id="runner" onchange="generate()">
+					<option value="ubuntu-latest" selected>ubuntu-latest</option>
+					<option value="ubuntu-22.04">ubuntu-22.04</option>
+					<option value="ubuntu-20.04">ubuntu-20.04</option>
+					<option value="windows-latest">windows-latest</option>
+					<option value="macos-latest">macos-latest</option>
+				</select>
+			</div>
+		</div>
+
+		<!-- Steps -->
+		<div class="section">
+			<div class="section-label">Steps</div>
+			<div class="step-list" id="step-list"></div>
+			<button class="add-step-btn" onclick="addStep()">+ Add step</button>
+		</div>
+	</div>
+
+	<!-- ===== RIGHT PANEL ===== -->
+	<div class="right-panel">
+		<div class="output-bar">
+			<span class="output-title">.github/workflows/ci.yml</span>
+			<button class="copy-btn" id="copy-btn" onclick="copyYAML()">Copy</button>
+		</div>
+		<div class="yaml-output" id="yaml-output"></div>
+	</div>
+</div>
+
+<script>
+// Step model
+let steps = [];
+let stepCounter = 0;
+
+const STEP_TYPES = {
+	checkout: { label: 'Checkout', uses: 'actions/checkout@v4', fields: [] },
+	node: { label: 'Setup Node', uses: 'actions/setup-node@v4', fields: ['node-version'] },
+	python: { label: 'Setup Python', uses: 'actions/setup-python@v5', fields: ['python-version'] },
+	java: { label: 'Setup Java', uses: 'actions/setup-java@v4', fields: ['java-version', 'distribution'] },
+	cache: { label: 'Cache', uses: 'actions/cache@v4', fields: ['cache-path', 'cache-key'] },
+	run: { label: 'Run command', uses: null, fields: ['run-cmd', 'working-dir'] },
+	docker_login: { label: 'Docker Login', uses: 'docker/login-action@v3', fields: ['registry', 'docker-username'] },
+	docker_build: { label: 'Docker Build', uses: 'docker/build-push-action@v6', fields: ['docker-image', 'docker-push'] },
+	custom: { label: 'Custom uses', uses: null, fields: ['custom-uses', 'custom-with'] },
+};
+
+function makeStep(typeKey, opts) {
+	return { id: ++stepCounter, type: typeKey, opts: opts || {}, open: true };
+}
+
+function addStep(typeKey, opts) {
+	typeKey = typeKey || 'run';
+	steps.push(makeStep(typeKey, opts));
+	renderSteps();
+	generate();
+}
+
+function removeStep(id) {
+	steps = steps.filter(s => s.id !== id);
+	renderSteps();
+	generate();
+}
+
+function toggleStepBody(id) {
+	const step = steps.find(s => s.id === id);
+	if (step) { step.open = !step.open; renderSteps(); }
+}
+
+function stepTypeChanged(id, type) {
+	const step = steps.find(s => s.id === id);
+	if (step) { step.type = type; step.opts = {}; renderSteps(); generate(); }
+}
+
+function stepOptChanged(id, key, value) {
+	const step = steps.find(s => s.id === id);
+	if (step) { step.opts[key] = value; generate(); }
+}
+
+function stepNameChanged(id, value) {
+	const step = steps.find(s => s.id === id);
+	if (step) { step.opts['name'] = value; generate(); }
+}
+
+function renderSteps() {
+	const list = document.getElementById('step-list');
+	list.innerHTML = '';
+
+	steps.forEach((step, idx) => {
+		const td = STEP_TYPES[step.type];
+		const preview = step.opts['name'] || td.label;
+
+		const item = document.createElement('div');
+		item.className = 'step-item';
+
+		const header = document.createElement('div');
+		header.className = 'step-header';
+		header.innerHTML = `
+			<span class="step-num">${idx + 1}</span>
+			<span class="step-name-preview">${preview}</span>
+			<button class="step-del" onclick="removeStep(${step.id})" title="Remove">×</button>
+		`;
+		header.onclick = (e) => { if (!e.target.classList.contains('step-del')) toggleStepBody(step.id); };
+
+		const body = document.createElement('div');
+		body.className = 'step-body' + (step.open ? ' open' : '');
+
+		// Type selector
+		let typeHTML = '<div class="step-type-btns">';
+		Object.entries(STEP_TYPES).forEach(([key, def]) => {
+			typeHTML += `<button class="stype-btn${step.type === key ? ' on' : ''}" onclick="stepTypeChanged(${step.id},'${key}')">${def.label}</button>`;
+		});
+		typeHTML += '</div>';
+
+		// Name field
+		typeHTML += `<div class="field"><label>Step name</label><input type="text" value="${escHtml(step.opts['name']||'')}" placeholder="${td.label}" oninput="stepNameChanged(${step.id},this.value)"></div>`;
+
+		// Type-specific fields
+		if (step.type === 'node') {
+			typeHTML += field(step.id, 'node-version', 'Node.js version', step.opts['node-version'] || '20', '18, 20, 22');
+		} else if (step.type === 'python') {
+			typeHTML += field(step.id, 'python-version', 'Python version', step.opts['python-version'] || '3.12', '3.10, 3.11, 3.12');
+		} else if (step.type === 'java') {
+			typeHTML += field(step.id, 'java-version', 'Java version', step.opts['java-version'] || '21', '17, 21');
+			typeHTML += field(step.id, 'distribution', 'Distribution', step.opts['distribution'] || 'temurin', 'temurin, corretto, zulu');
+		} else if (step.type === 'cache') {
+			typeHTML += field(step.id, 'cache-path', 'Path', step.opts['cache-path'] || '', '~/.npm, ~/.cache/pip');
+			typeHTML += field(step.id, 'cache-key', 'Key', step.opts['cache-key'] || '', '${{ runner.os }}-node-${{ hashFiles(\'**/package-lock.json\') }}');
+		} else if (step.type === 'run') {
+			typeHTML += `<div class="field"><label>Command(s)</label><input type="text" value="${escHtml(step.opts['run-cmd']||'')}" placeholder="npm test" oninput="stepOptChanged(${step.id},'run-cmd',this.value)"></div>`;
+			typeHTML += field(step.id, 'working-dir', 'Working directory (optional)', step.opts['working-dir'] || '', './src');
+		} else if (step.type === 'docker_login') {
+			typeHTML += field(step.id, 'registry', 'Registry (optional)', step.opts['registry'] || '', 'ghcr.io, docker.io');
+			typeHTML += field(step.id, 'docker-username', 'Username secret', step.opts['docker-username'] || '${{ secrets.DOCKER_USERNAME }}', '${{ secrets.DOCKER_USERNAME }}');
+		} else if (step.type === 'docker_build') {
+			typeHTML += field(step.id, 'docker-image', 'Image name', step.opts['docker-image'] || 'user/myapp', 'ghcr.io/org/app');
+			typeHTML += `<div class="field"><label>Push to registry</label><select onchange="stepOptChanged(${step.id},'docker-push',this.value)"><option value="true"${step.opts['docker-push']!=='false'?' selected':''}>Yes</option><option value="false"${step.opts['docker-push']==='false'?' selected':''}>No (build only)</option></select></div>`;
+		} else if (step.type === 'custom') {
+			typeHTML += field(step.id, 'custom-uses', 'Uses (action@version)', step.opts['custom-uses'] || '', 'actions/upload-artifact@v4');
+			typeHTML += field(step.id, 'custom-with', 'with: (key: value lines)', step.opts['custom-with'] || '', 'name: my-artifact\npath: dist/');
+		}
+
+		body.innerHTML = typeHTML;
+		item.appendChild(header);
+		item.appendChild(body);
+		list.appendChild(item);
+	});
+}
+
+function field(stepId, key, label, value, placeholder) {
+	return `<div class="field"><label>${label}</label><input type="text" value="${escHtml(value)}" placeholder="${escHtml(placeholder)}" oninput="stepOptChanged(${stepId},'${key}',this.value)"></div>`;
+}
+
+function escHtml(s) {
+	return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Triggers
+function toggleTrigger(name) {
+	const cb = document.getElementById('trg-' + name);
+	cb.checked = !cb.checked;
+	toggleTriggerOpts(name);
+	generate();
+}
+
+function toggleTriggerOpts(name) {
+	const opts = document.getElementById('opts-' + name);
+	if (opts) opts.classList.toggle('open', document.getElementById('trg-' + name).checked);
+}
+
+// YAML Generation
+function generate() {
+	const name = document.getElementById('wf-name').value || 'CI';
+	const jobId = (document.getElementById('job-name').value || 'build').replace(/\s+/g, '_');
+	const runner = document.getElementById('runner').value;
+
+	const pushOn = document.getElementById('trg-push').checked;
+	const prOn = document.getElementById('trg-pr').checked;
+	const dispatchOn = document.getElementById('trg-dispatch').checked;
+	const scheduleOn = document.getElementById('trg-schedule').checked;
+	const releaseOn = document.getElementById('trg-release').checked;
+
+	let lines = [];
+
+	function kv(indent, key, val) {
+		lines.push(' '.repeat(indent) + `<span class="y-key">${escHtml(key)}:</span> <span class="y-str">${escHtml(val)}</span>`);
+	}
+	function k(indent, key) {
+		lines.push(' '.repeat(indent) + `<span class="y-key">${escHtml(key)}:</span>`);
+	}
+	function dash(indent, val) {
+		lines.push(' '.repeat(indent) + `<span class="y-dash">-</span> <span class="y-str">${escHtml(val)}</span>`);
+	}
+	function raw(indent, text) {
+		lines.push(' '.repeat(indent) + text);
+	}
+	function comment(text) {
+		lines.push(`<span class="y-comment"># ${text}</span>`);
+	}
+	function blank() { lines.push(''); }
+
+	comment(`Generated by rowstu.net/github-actions-builder.html`);
+	blank();
+	kv(0, 'name', name);
+	blank();
+	k(0, 'on');
+
+	if (!pushOn && !prOn && !dispatchOn && !scheduleOn && !releaseOn) {
+		raw(2, `<span class="y-comment"># no triggers selected</span>`);
+	}
+
+	if (pushOn) {
+		k(2, 'push');
+		const branches = (document.getElementById('push-branches').value || 'main').split(',').map(s => s.trim()).filter(Boolean);
+		k(4, 'branches');
+		branches.forEach(b => dash(6, b));
+		const tags = (document.getElementById('push-tags').value || '').split(',').map(s => s.trim()).filter(Boolean);
+		if (tags.length) {
+			k(4, 'tags');
+			tags.forEach(t => dash(6, t));
+		}
+	}
+
+	if (prOn) {
+		k(2, 'pull_request');
+		const branches = (document.getElementById('pr-branches').value || 'main').split(',').map(s => s.trim()).filter(Boolean);
+		k(4, 'branches');
+		branches.forEach(b => dash(6, b));
+	}
+
+	if (dispatchOn) {
+		lines.push(`  <span class="y-key">workflow_dispatch:</span>`);
+	}
+
+	if (scheduleOn) {
+		const cron = document.getElementById('schedule-cron').value || '0 0 * * *';
+		k(2, 'schedule');
+		lines.push(`    <span class="y-dash">-</span> <span class="y-key">cron:</span> <span class="y-str">'${escHtml(cron)}'</span>`);
+	}
+
+	if (releaseOn) {
+		k(2, 'release');
+		k(4, 'types');
+		dash(6, 'published');
+	}
+
+	blank();
+	k(0, 'jobs');
+	k(2, jobId);
+	kv(4, 'runs-on', runner);
+
+	// Steps
+	if (steps.length === 0) {
+		k(4, 'steps');
+		raw(6, `<span class="y-comment"># no steps added yet</span>`);
+	} else {
+		k(4, 'steps');
+
+		steps.forEach((step, idx) => {
+			const td = STEP_TYPES[step.type];
+			blank();
+
+			const stepName = step.opts['name'] || td.label;
+			raw(6, `<span class="y-dash">-</span> <span class="y-key">name:</span> <span class="y-str">${escHtml(stepName)}</span>`);
+
+			if (step.type === 'run') {
+				const cmd = step.opts['run-cmd'] || '# command';
+				const workDir = step.opts['working-dir'];
+				const multiline = cmd.includes('\n');
+				if (multiline) {
+					raw(8, `<span class="y-key">run:</span> <span class="y-anchor">|</span>`);
+					cmd.split('\n').forEach(line => raw(10, `<span class="y-run">${escHtml(line)}</span>`));
+				} else {
+					raw(8, `<span class="y-key">run:</span> <span class="y-run">${escHtml(cmd)}</span>`);
+				}
+				if (workDir) kv(8, 'working-directory', workDir);
+			} else if (step.type === 'custom') {
+				const usesVal = step.opts['custom-uses'] || 'owner/action@v1';
+				raw(8, `<span class="y-key">uses:</span> <span class="y-uses">${escHtml(usesVal)}</span>`);
+				const withLines = (step.opts['custom-with'] || '').split('\n').map(s => s.trim()).filter(Boolean);
+				if (withLines.length) {
+					k(8, 'with');
+					withLines.forEach(wl => {
+						const [k2, ...rest] = wl.split(':');
+						if (rest.length) {
+							raw(10, `<span class="y-key">${escHtml(k2.trim())}:</span> <span class="y-str">${escHtml(rest.join(':').trim())}</span>`);
+						}
+					});
+				}
+			} else {
+				const usesVal = td.uses;
+				raw(8, `<span class="y-key">uses:</span> <span class="y-uses">${escHtml(usesVal)}</span>`);
+
+				let withParts = [];
+				if (step.type === 'node') {
+					const v = step.opts['node-version'] || '20';
+					withParts.push(`node-version: '${v}'`);
+				} else if (step.type === 'python') {
+					const v = step.opts['python-version'] || '3.12';
+					withParts.push(`python-version: '${v}'`);
+				} else if (step.type === 'java') {
+					withParts.push(`java-version: '${step.opts['java-version'] || '21'}'`);
+					withParts.push(`distribution: '${step.opts['distribution'] || 'temurin'}'`);
+				} else if (step.type === 'cache') {
+					const path = step.opts['cache-path'] || '~/.npm';
+					const key = step.opts['cache-key'] || '${{ runner.os }}-cache';
+					withParts.push(`path: ${path}`);
+					withParts.push(`key: ${key}`);
+				} else if (step.type === 'docker_login') {
+					const reg = step.opts['registry'];
+					if (reg) withParts.push(`registry: ${reg}`);
+					withParts.push(`username: ${step.opts['docker-username'] || '${{ secrets.DOCKER_USERNAME }}'}`);
+					withParts.push(`password: \${{ secrets.DOCKER_PASSWORD }}`);
+				} else if (step.type === 'docker_build') {
+					const img = step.opts['docker-image'] || 'user/myapp';
+					withParts.push(`context: .`);
+					withParts.push(`push: ${step.opts['docker-push'] !== 'false'}`);
+					withParts.push(`tags: ${img}:latest`);
+				}
+
+				if (withParts.length) {
+					k(8, 'with');
+					withParts.forEach(wp => {
+						const [k2, ...rest] = wp.split(':');
+						const val = rest.join(':').trim();
+						if (val.startsWith('${{')) {
+							raw(10, `<span class="y-key">${escHtml(k2.trim())}:</span> <span class="y-anchor">${escHtml(val)}</span>`);
+						} else {
+							raw(10, `<span class="y-key">${escHtml(k2.trim())}:</span> <span class="y-str">${escHtml(val)}</span>`);
+						}
+					});
+				}
+			}
+		});
+	}
+
+	document.getElementById('yaml-output').innerHTML = lines.join('\n');
+}
+
+function copyYAML() {
+	const el = document.getElementById('yaml-output');
+	const text = el.innerText || el.textContent;
+	navigator.clipboard.writeText(text).then(() => {
+		const btn = document.getElementById('copy-btn');
+		btn.textContent = 'Copied!';
+		btn.classList.add('copied');
+		setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+	});
+}
+
+// Presets
+function loadPreset(name) {
+	// Reset triggers
+	['push','pr','dispatch','schedule','release'].forEach(t => {
+		document.getElementById('trg-' + t).checked = false;
+		const opts = document.getElementById('opts-' + t);
+		if (opts) opts.classList.remove('open');
+	});
+	steps = [];
+	stepCounter = 0;
+
+	if (name === 'nodejs') {
+		document.getElementById('wf-name').value = 'Node.js CI';
+		document.getElementById('job-name').value = 'build';
+		document.getElementById('runner').value = 'ubuntu-latest';
+		document.getElementById('trg-push').checked = true;
+		document.getElementById('opts-push').classList.add('open');
+		document.getElementById('push-branches').value = 'main';
+		document.getElementById('trg-pr').checked = true;
+		document.getElementById('opts-pr').classList.add('open');
+		document.getElementById('pr-branches').value = 'main';
+		steps = [
+			makeStep('checkout', {}),
+			makeStep('node', { name: 'Set up Node.js', 'node-version': '20' }),
+			makeStep('run', { name: 'Install dependencies', 'run-cmd': 'npm ci' }),
+			makeStep('run', { name: 'Run tests', 'run-cmd': 'npm test' }),
+			makeStep('run', { name: 'Build', 'run-cmd': 'npm run build --if-present' }),
+		];
+	} else if (name === 'python') {
+		document.getElementById('wf-name').value = 'Python CI';
+		document.getElementById('job-name').value = 'test';
+		document.getElementById('runner').value = 'ubuntu-latest';
+		document.getElementById('trg-push').checked = true;
+		document.getElementById('opts-push').classList.add('open');
+		document.getElementById('push-branches').value = 'main';
+		document.getElementById('trg-pr').checked = true;
+		document.getElementById('opts-pr').classList.add('open');
+		document.getElementById('pr-branches').value = 'main';
+		steps = [
+			makeStep('checkout', {}),
+			makeStep('python', { name: 'Set up Python', 'python-version': '3.12' }),
+			makeStep('run', { name: 'Install dependencies', 'run-cmd': 'pip install -r requirements.txt' }),
+			makeStep('run', { name: 'Run tests', 'run-cmd': 'pytest' }),
+		];
+	} else if (name === 'docker') {
+		document.getElementById('wf-name').value = 'Docker Build & Push';
+		document.getElementById('job-name').value = 'build';
+		document.getElementById('runner').value = 'ubuntu-latest';
+		document.getElementById('trg-push').checked = true;
+		document.getElementById('opts-push').classList.add('open');
+		document.getElementById('push-branches').value = 'main';
+		steps = [
+			makeStep('checkout', {}),
+			makeStep('docker_login', { name: 'Log in to Docker Hub', registry: '', 'docker-username': '${{ secrets.DOCKER_USERNAME }}' }),
+			makeStep('docker_build', { name: 'Build and push image', 'docker-image': '${{ secrets.DOCKER_USERNAME }}/myapp', 'docker-push': 'true' }),
+		];
+	} else if (name === 'pages') {
+		document.getElementById('wf-name').value = 'Deploy to GitHub Pages';
+		document.getElementById('job-name').value = 'deploy';
+		document.getElementById('runner').value = 'ubuntu-latest';
+		document.getElementById('trg-push').checked = true;
+		document.getElementById('opts-push').classList.add('open');
+		document.getElementById('push-branches').value = 'main';
+		steps = [
+			makeStep('checkout', {}),
+			makeStep('node', { name: 'Set up Node.js', 'node-version': '20' }),
+			makeStep('run', { name: 'Build site', 'run-cmd': 'npm run build' }),
+			makeStep('custom', { name: 'Upload Pages artifact', 'custom-uses': 'actions/upload-pages-artifact@v3', 'custom-with': 'path: ./dist' }),
+			makeStep('custom', { name: 'Deploy to GitHub Pages', 'custom-uses': 'actions/deploy-pages@v4' }),
+		];
+	} else {
+		// blank
+		document.getElementById('wf-name').value = 'CI';
+		document.getElementById('job-name').value = 'build';
+		document.getElementById('runner').value = 'ubuntu-latest';
+		document.getElementById('trg-push').checked = true;
+		document.getElementById('opts-push').classList.add('open');
+		document.getElementById('push-branches').value = 'main';
+		steps = [makeStep('checkout', {})];
+	}
+
+	renderSteps();
+	generate();
+}
+
+// Init with Node.js preset
+loadPreset('nodejs');
+</script>
+
+<script src="assets/shared-nav.js"></script>
+</body>
+</html>

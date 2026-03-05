@@ -1156,7 +1156,157 @@ Default output format [None]: json
 &lt;/ul&gt;
 &lt;hr&gt;
 &lt;h2 id="initial-configuration-dialog"&gt;Initial Configuration Dialog&lt;/h2&gt;
-&lt;p&gt;On first boot, the switch will prompt:&lt;/p&gt;</description></item><item><title>Book.Thinking</title><link>https://rowstu.net/books/book.thinking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/book.thinking/</guid><description>&lt;h1 id="key-lessons-from-dont-believe-everything-you-think"&gt;Key lessons from Don&amp;rsquo;t Believe Everything You Think&lt;/h1&gt;
+&lt;p&gt;On first boot, the switch will prompt:&lt;/p&gt;</description></item><item><title>Basics</title><link>https://rowstu.net/python/basics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/basics/</guid><description>&lt;h1 id="python-basics"&gt;Python Basics&lt;/h1&gt;
+&lt;h2 id="variables--types"&gt;Variables &amp;amp; Types&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Dynamic typing — no declaration needed&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;42&lt;/span&gt; &lt;span style="color:#75715e"&gt;# int&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;y &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;3.14&lt;/span&gt; &lt;span style="color:#75715e"&gt;# float&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;name &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;Alice&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# str&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;flag &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;True&lt;/span&gt; &lt;span style="color:#75715e"&gt;# bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;nothing &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;None&lt;/span&gt; &lt;span style="color:#75715e"&gt;# NoneType&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Check type&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;type(x) &lt;span style="color:#75715e"&gt;# &amp;lt;class &amp;#39;int&amp;#39;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;isinstance(x, int) &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Multiple assignment&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;a, b, c &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;a &lt;span style="color:#f92672"&gt;=&lt;/span&gt; b &lt;span style="color:#f92672"&gt;=&lt;/span&gt; c &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="strings"&gt;Strings&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;hello world&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Common methods&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s&lt;span style="color:#f92672"&gt;.&lt;/span&gt;upper() &lt;span style="color:#75715e"&gt;# &amp;#39;HELLO WORLD&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s&lt;span style="color:#f92672"&gt;.&lt;/span&gt;capitalize() &lt;span style="color:#75715e"&gt;# &amp;#39;Hello world&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s&lt;span style="color:#f92672"&gt;.&lt;/span&gt;title() &lt;span style="color:#75715e"&gt;# &amp;#39;Hello World&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s&lt;span style="color:#f92672"&gt;.&lt;/span&gt;strip() &lt;span style="color:#75715e"&gt;# remove whitespace&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s&lt;span style="color:#f92672"&gt;.&lt;/span&gt;replace(&lt;span style="color:#e6db74"&gt;&amp;#34;o&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;0&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;hell0 w0rld&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s&lt;span style="color:#f92672"&gt;.&lt;/span&gt;split(&lt;span style="color:#e6db74"&gt;&amp;#34; &amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# [&amp;#39;hello&amp;#39;, &amp;#39;world&amp;#39;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s&lt;span style="color:#f92672"&gt;.&lt;/span&gt;startswith(&lt;span style="color:#e6db74"&gt;&amp;#34;hel&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s&lt;span style="color:#f92672"&gt;.&lt;/span&gt;count(&lt;span style="color:#e6db74"&gt;&amp;#34;l&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;len(s) &lt;span style="color:#75715e"&gt;# 11&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Slicing&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s[&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;:&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# &amp;#39;hello&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s[&lt;span style="color:#f92672"&gt;-&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;:] &lt;span style="color:#75715e"&gt;# &amp;#39;world&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s[::&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# &amp;#39;hlowrd&amp;#39; (every 2nd char)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;s[::&lt;span style="color:#f92672"&gt;-&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# &amp;#39;dlrow olleh&amp;#39; (reversed)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# f-strings (Python 3.6+)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;name &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;Alice&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;age &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;30&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Name: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;, Age: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;age&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;Name: Alice, Age: 30&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;3.14159&lt;/span&gt;&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;.2f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;3.14&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1000000&lt;/span&gt;&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;,&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;1,000,000&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;42&lt;/span&gt;&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;gt;10&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39; 42&amp;#39; (right-align, width 10)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;42&lt;/span&gt;&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;0&amp;gt;5&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;00042&amp;#39; (zero-pad)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Multiline strings&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;text &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;&amp;#34;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;line one
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;line two
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="numbers--operators"&gt;Numbers &amp;amp; Operators&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Arithmetic&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;7&lt;/span&gt; &lt;span style="color:#f92672"&gt;+&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#75715e"&gt;# 9&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;7&lt;/span&gt; &lt;span style="color:#f92672"&gt;-&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#75715e"&gt;# 5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;7&lt;/span&gt; &lt;span style="color:#f92672"&gt;*&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#75715e"&gt;# 14&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;7&lt;/span&gt; &lt;span style="color:#f92672"&gt;/&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#75715e"&gt;# 3.5 (always float)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;7&lt;/span&gt; &lt;span style="color:#f92672"&gt;//&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#75715e"&gt;# 3 (floor division)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;7&lt;/span&gt; &lt;span style="color:#f92672"&gt;%&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#75715e"&gt;# 1 (modulo)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;7&lt;/span&gt; &lt;span style="color:#f92672"&gt;**&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#75715e"&gt;# 49 (power)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Augmented assignment&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;+=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;-=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;*=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;//=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Comparison&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;==&lt;/span&gt; y &lt;span style="color:#75715e"&gt;# equal&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;!=&lt;/span&gt; y &lt;span style="color:#75715e"&gt;# not equal&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;&amp;gt;&lt;/span&gt; y &lt;span style="color:#75715e"&gt;# greater&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;&amp;lt;&lt;/span&gt; y &lt;span style="color:#75715e"&gt;# less&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;&amp;gt;=&lt;/span&gt; y &lt;span style="color:#75715e"&gt;# greater or equal&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;&amp;lt;=&lt;/span&gt; y &lt;span style="color:#75715e"&gt;# less or equal&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Logical&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;True&lt;/span&gt; &lt;span style="color:#f92672"&gt;and&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;False&lt;/span&gt; &lt;span style="color:#75715e"&gt;# False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;True&lt;/span&gt; &lt;span style="color:#f92672"&gt;or&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;False&lt;/span&gt; &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;not&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;True&lt;/span&gt; &lt;span style="color:#75715e"&gt;# False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Identity / membership&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;is&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;None&lt;/span&gt; &lt;span style="color:#75715e"&gt;# True if x is None&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;is&lt;/span&gt; &lt;span style="color:#f92672"&gt;not&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;None&lt;/span&gt; &lt;span style="color:#75715e"&gt;# True if x is not None&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt; &lt;span style="color:#f92672"&gt;in&lt;/span&gt; [&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;a&amp;#34;&lt;/span&gt; &lt;span style="color:#f92672"&gt;not&lt;/span&gt; &lt;span style="color:#f92672"&gt;in&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;dog&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Useful builtins&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;abs(&lt;span style="color:#f92672"&gt;-&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;round(&lt;span style="color:#ae81ff"&gt;3.567&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 3.57&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;min(&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;max(&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sum([&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;]) &lt;span style="color:#75715e"&gt;# 6&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;divmod(&lt;span style="color:#ae81ff"&gt;7&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# (3, 1) — quotient and remainder&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;pow(&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;10&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 1024&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="control-flow"&gt;Control Flow&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# if / elif / else&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;42&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; x &lt;span style="color:#f92672"&gt;&amp;gt;&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;100&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;&amp;#34;big&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;elif&lt;/span&gt; x &lt;span style="color:#f92672"&gt;&amp;gt;&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;10&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;&amp;#34;medium&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;else&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;&amp;#34;small&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Ternary (one-liner)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;result &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;even&amp;#34;&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; x &lt;span style="color:#f92672"&gt;%&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;else&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;odd&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# for loops&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; i &lt;span style="color:#f92672"&gt;in&lt;/span&gt; range(&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;): &lt;span style="color:#75715e"&gt;# 0, 1, 2, 3, 4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(i)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; i &lt;span style="color:#f92672"&gt;in&lt;/span&gt; range(&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;10&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;): &lt;span style="color:#75715e"&gt;# 2, 4, 6, 8&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(i)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; item &lt;span style="color:#f92672"&gt;in&lt;/span&gt; [&lt;span style="color:#e6db74"&gt;&amp;#34;a&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;b&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;c&amp;#34;&lt;/span&gt;]:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(item)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# enumerate — index + value&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; i, val &lt;span style="color:#f92672"&gt;in&lt;/span&gt; enumerate([&lt;span style="color:#e6db74"&gt;&amp;#34;a&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;b&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;c&amp;#34;&lt;/span&gt;]):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(i, val) &lt;span style="color:#75715e"&gt;# 0 a, 1 b, 2 c&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# while&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;while&lt;/span&gt; x &lt;span style="color:#f92672"&gt;&amp;lt;&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; x &lt;span style="color:#f92672"&gt;+=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# break / continue&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; i &lt;span style="color:#f92672"&gt;in&lt;/span&gt; range(&lt;span style="color:#ae81ff"&gt;10&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; i &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;continue&lt;/span&gt; &lt;span style="color:#75715e"&gt;# skip 3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; i &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;7&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;break&lt;/span&gt; &lt;span style="color:#75715e"&gt;# stop at 7&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="type-conversion"&gt;Type Conversion&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;int(&lt;span style="color:#e6db74"&gt;&amp;#34;42&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 42&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;int(&lt;span style="color:#ae81ff"&gt;3.9&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 3 (truncates)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;float(&lt;span style="color:#e6db74"&gt;&amp;#34;3.14&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 3.14&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;str(&lt;span style="color:#ae81ff"&gt;42&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;42&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;bool(&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;bool(&lt;span style="color:#e6db74"&gt;&amp;#34;&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;bool([]) &lt;span style="color:#75715e"&gt;# False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;bool(&lt;span style="color:#66d9ef"&gt;None&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;bool(&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;bool(&lt;span style="color:#e6db74"&gt;&amp;#34;x&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;list((&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;)) &lt;span style="color:#75715e"&gt;# [1, 2, 3]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;tuple([&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;]) &lt;span style="color:#75715e"&gt;# (1, 2, 3)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;set([&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;]) &lt;span style="color:#75715e"&gt;# {1, 2, 3}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item><item><title>Book.Thinking</title><link>https://rowstu.net/books/book.thinking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/book.thinking/</guid><description>&lt;h1 id="key-lessons-from-dont-believe-everything-you-think"&gt;Key lessons from Don&amp;rsquo;t Believe Everything You Think&lt;/h1&gt;
 &lt;p&gt;Thinking is an active process.&lt;/p&gt;
 &lt;p&gt;Thoughts happen all by them selves.&lt;/p&gt;
 &lt;p&gt;The two are similar but not the same thing.&lt;/p&gt;
@@ -1862,7 +2012,47 @@ Switch(config-line)# exit
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="budget-actions"&gt;Budget Actions&lt;/h2&gt;
-&lt;p&gt;Automatically respond to budget thresholds.&lt;/p&gt;</description></item><item><title>Debasing 64</title><link>https://rowstu.net/hackattic/debasing_64/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/debasing_64/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import base64
+&lt;p&gt;Automatically respond to budget thresholds.&lt;/p&gt;</description></item><item><title>Data Structures</title><link>https://rowstu.net/python/data-structures/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/data-structures/</guid><description>&lt;h1 id="python-data-structures"&gt;Python Data Structures&lt;/h1&gt;
+&lt;h2 id="lists"&gt;Lists&lt;/h2&gt;
+&lt;p&gt;Ordered, mutable, allows duplicates.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [&lt;span style="color:#e6db74"&gt;&amp;#34;apple&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;banana&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;cherry&amp;#34;&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Access&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits[&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# &amp;#39;apple&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits[&lt;span style="color:#f92672"&gt;-&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# &amp;#39;cherry&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits[&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;:&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# [&amp;#39;banana&amp;#39;, &amp;#39;cherry&amp;#39;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Modify&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;append(&lt;span style="color:#e6db74"&gt;&amp;#34;date&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# add to end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;insert(&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;blueberry&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# insert at index&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;extend([&lt;span style="color:#e6db74"&gt;&amp;#34;elderberry&amp;#34;&lt;/span&gt;]) &lt;span style="color:#75715e"&gt;# add multiple&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;remove(&lt;span style="color:#e6db74"&gt;&amp;#34;banana&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# remove by value&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;del&lt;/span&gt; fruits[&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# remove by index&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;popped &lt;span style="color:#f92672"&gt;=&lt;/span&gt; fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;pop() &lt;span style="color:#75715e"&gt;# remove &amp;amp; return last&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;popped &lt;span style="color:#f92672"&gt;=&lt;/span&gt; fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;pop(&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# remove &amp;amp; return index 0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Search&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;apple&amp;#34;&lt;/span&gt; &lt;span style="color:#f92672"&gt;in&lt;/span&gt; fruits &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;index(&lt;span style="color:#e6db74"&gt;&amp;#34;cherry&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# returns index or raises ValueError&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;count(&lt;span style="color:#e6db74"&gt;&amp;#34;apple&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# count occurrences&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Sort&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;sort() &lt;span style="color:#75715e"&gt;# in-place, ascending&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;sort(reverse&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;True&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# in-place, descending&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sorted_copy &lt;span style="color:#f92672"&gt;=&lt;/span&gt; sorted(fruits) &lt;span style="color:#75715e"&gt;# returns new list&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;reverse() &lt;span style="color:#75715e"&gt;# reverse in-place&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Other&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;len(fruits) &lt;span style="color:#75715e"&gt;# length&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;copy() &lt;span style="color:#75715e"&gt;# shallow copy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;fruits&lt;span style="color:#f92672"&gt;.&lt;/span&gt;clear() &lt;span style="color:#75715e"&gt;# empty the list&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Unpack&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;a, b, c &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;first, &lt;span style="color:#f92672"&gt;*&lt;/span&gt;rest &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;] &lt;span style="color:#75715e"&gt;# first=1, rest=[2,3,4]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="tuples"&gt;Tuples&lt;/h2&gt;
+&lt;p&gt;Ordered, &lt;strong&gt;immutable&lt;/strong&gt;, allows duplicates. Faster than lists for iteration.&lt;/p&gt;</description></item><item><title>Debasing 64</title><link>https://rowstu.net/hackattic/debasing_64/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/debasing_64/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import base64
 import sys
 
 
@@ -3023,7 +3213,154 @@ Shift Left:
 &lt;p&gt;Fear conquered by greater fear of something worse is still fear&lt;/p&gt;
 &lt;h1 id="conquering-fear"&gt;Conquering Fear&lt;/h1&gt;
 &lt;p&gt;Excerpts from the writings of Paramahansa Yogananda&lt;/p&gt;
-&lt;p&gt;Do not take life&amp;rsquo;s experiences too seriously. Above all, do not let them hurt you, for in reality they are nothing but dream experiences&amp;hellip;.Trust in God and destroy fear, which paralyzes all efforts to succeed and attracts the very thing you fear.&lt;/p&gt;</description></item><item><title>File Transfer and Disk Images on the C64</title><link>https://rowstu.net/commodore/file-transfer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/commodore/file-transfer/</guid><description>&lt;p&gt;Getting software onto a real C64 from a modern PC is a common task. This covers the file formats, tools, and workflows for moving data between the two worlds.&lt;/p&gt;
+&lt;p&gt;Do not take life&amp;rsquo;s experiences too seriously. Above all, do not let them hurt you, for in reality they are nothing but dream experiences&amp;hellip;.Trust in God and destroy fear, which paralyzes all efforts to succeed and attracts the very thing you fear.&lt;/p&gt;</description></item><item><title>File I/O</title><link>https://rowstu.net/python/file-io/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/file-io/</guid><description>&lt;h1 id="file-io"&gt;File I/O&lt;/h1&gt;
+&lt;h2 id="reading-files"&gt;Reading Files&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Read entire file as string&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;data.txt&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; content &lt;span style="color:#f92672"&gt;=&lt;/span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Read line by line (memory efficient)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;data.txt&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; line &lt;span style="color:#f92672"&gt;in&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(line&lt;span style="color:#f92672"&gt;.&lt;/span&gt;strip())
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Read all lines into a list&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;data.txt&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; lines &lt;span style="color:#f92672"&gt;=&lt;/span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;readlines() &lt;span style="color:#75715e"&gt;# includes \n&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; lines &lt;span style="color:#f92672"&gt;=&lt;/span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read()&lt;span style="color:#f92672"&gt;.&lt;/span&gt;splitlines() &lt;span style="color:#75715e"&gt;# strips \n&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Specify encoding&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;data.txt&amp;#34;&lt;/span&gt;, encoding&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;utf-8&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; content &lt;span style="color:#f92672"&gt;=&lt;/span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read()
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="writing-files"&gt;Writing Files&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Write (overwrites existing)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;output.txt&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;w&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;write(&lt;span style="color:#e6db74"&gt;&amp;#34;Hello&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;\n&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;write(&lt;span style="color:#e6db74"&gt;&amp;#34;World&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;\n&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Append&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;log.txt&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;a&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;write(&lt;span style="color:#e6db74"&gt;&amp;#34;New log entry&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;\n&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Write multiple lines&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;lines &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [&lt;span style="color:#e6db74"&gt;&amp;#34;line1&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;line2&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;line3&amp;#34;&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;output.txt&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;w&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;writelines(line &lt;span style="color:#f92672"&gt;+&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;\n&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; line &lt;span style="color:#f92672"&gt;in&lt;/span&gt; lines)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# File modes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# &amp;#39;r&amp;#39; — read (default)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# &amp;#39;w&amp;#39; — write (truncates existing)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# &amp;#39;a&amp;#39; — append&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# &amp;#39;x&amp;#39; — exclusive create (fails if exists)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# &amp;#39;b&amp;#39; — binary mode (e.g. &amp;#39;rb&amp;#39;, &amp;#39;wb&amp;#39;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# &amp;#39;+&amp;#39; — read+write (e.g. &amp;#39;r+&amp;#39;, &amp;#39;w+&amp;#39;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="pathlib-preferred-over-ospath"&gt;pathlib (preferred over os.path)&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;from&lt;/span&gt; pathlib &lt;span style="color:#f92672"&gt;import&lt;/span&gt; Path
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p &lt;span style="color:#f92672"&gt;=&lt;/span&gt; Path(&lt;span style="color:#e6db74"&gt;&amp;#34;/home/user/docs/report.txt&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Parts&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;name &lt;span style="color:#75715e"&gt;# &amp;#39;report.txt&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;stem &lt;span style="color:#75715e"&gt;# &amp;#39;report&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;suffix &lt;span style="color:#75715e"&gt;# &amp;#39;.txt&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;parent &lt;span style="color:#75715e"&gt;# Path(&amp;#39;/home/user/docs&amp;#39;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;parts &lt;span style="color:#75715e"&gt;# (&amp;#39;/&amp;#39;, &amp;#39;home&amp;#39;, &amp;#39;user&amp;#39;, &amp;#39;docs&amp;#39;, &amp;#39;report.txt&amp;#39;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Navigation&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;home &lt;span style="color:#f92672"&gt;=&lt;/span&gt; Path&lt;span style="color:#f92672"&gt;.&lt;/span&gt;home() &lt;span style="color:#75715e"&gt;# /home/user&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;cwd &lt;span style="color:#f92672"&gt;=&lt;/span&gt; Path&lt;span style="color:#f92672"&gt;.&lt;/span&gt;cwd() &lt;span style="color:#75715e"&gt;# current directory&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config &lt;span style="color:#f92672"&gt;=&lt;/span&gt; home &lt;span style="color:#f92672"&gt;/&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;.config&amp;#34;&lt;/span&gt; &lt;span style="color:#f92672"&gt;/&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;myapp&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# join with /&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Check existence&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;exists()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;is_file()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;is_dir()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Read / write (no need to open())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;text &lt;span style="color:#f92672"&gt;=&lt;/span&gt; p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read_text(encoding&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;utf-8&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;write_text(&lt;span style="color:#e6db74"&gt;&amp;#34;Hello world&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;\n&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;data &lt;span style="color:#f92672"&gt;=&lt;/span&gt; p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read_bytes()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;write_bytes(&lt;span style="color:#e6db74"&gt;b&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;\x00\x01&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Create / delete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;mkdir(parents&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;True&lt;/span&gt;, exist_ok&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;True&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;unlink() &lt;span style="color:#75715e"&gt;# delete file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;rmdir() &lt;span style="color:#75715e"&gt;# delete empty dir&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# List directory&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; f &lt;span style="color:#f92672"&gt;in&lt;/span&gt; Path(&lt;span style="color:#e6db74"&gt;&amp;#34;.&amp;#34;&lt;/span&gt;)&lt;span style="color:#f92672"&gt;.&lt;/span&gt;iterdir():
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(f)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Glob patterns&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; py_file &lt;span style="color:#f92672"&gt;in&lt;/span&gt; Path(&lt;span style="color:#e6db74"&gt;&amp;#34;.&amp;#34;&lt;/span&gt;)&lt;span style="color:#f92672"&gt;.&lt;/span&gt;glob(&lt;span style="color:#e6db74"&gt;&amp;#34;**/*.py&amp;#34;&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(py_file)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Rename / copy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;rename(&lt;span style="color:#e6db74"&gt;&amp;#34;new_name.txt&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;import&lt;/span&gt; shutil
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;shutil&lt;span style="color:#f92672"&gt;.&lt;/span&gt;copy(p, &lt;span style="color:#e6db74"&gt;&amp;#34;backup.txt&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;shutil&lt;span style="color:#f92672"&gt;.&lt;/span&gt;copytree(&lt;span style="color:#e6db74"&gt;&amp;#34;src_dir&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;dst_dir&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Get file info&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;stat &lt;span style="color:#f92672"&gt;=&lt;/span&gt; p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;stat()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;stat&lt;span style="color:#f92672"&gt;.&lt;/span&gt;st_size &lt;span style="color:#75715e"&gt;# file size in bytes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;stat&lt;span style="color:#f92672"&gt;.&lt;/span&gt;st_mtime &lt;span style="color:#75715e"&gt;# modification time&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="csv"&gt;CSV&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;import&lt;/span&gt; csv
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Read&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;data.csv&amp;#34;&lt;/span&gt;, newline&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; reader &lt;span style="color:#f92672"&gt;=&lt;/span&gt; csv&lt;span style="color:#f92672"&gt;.&lt;/span&gt;DictReader(f)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; row &lt;span style="color:#f92672"&gt;in&lt;/span&gt; reader:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(row[&lt;span style="color:#e6db74"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;], row[&lt;span style="color:#e6db74"&gt;&amp;#34;age&amp;#34;&lt;/span&gt;])
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Write&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;data &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [{&lt;span style="color:#e6db74"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;Alice&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;age&amp;#34;&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;30&lt;/span&gt;}, {&lt;span style="color:#e6db74"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;Bob&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;age&amp;#34;&lt;/span&gt;: &lt;span style="color:#ae81ff"&gt;25&lt;/span&gt;}]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;out.csv&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;w&amp;#34;&lt;/span&gt;, newline&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; writer &lt;span style="color:#f92672"&gt;=&lt;/span&gt; csv&lt;span style="color:#f92672"&gt;.&lt;/span&gt;DictWriter(f, fieldnames&lt;span style="color:#f92672"&gt;=&lt;/span&gt;[&lt;span style="color:#e6db74"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;age&amp;#34;&lt;/span&gt;])
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; writer&lt;span style="color:#f92672"&gt;.&lt;/span&gt;writeheader()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; writer&lt;span style="color:#f92672"&gt;.&lt;/span&gt;writerows(data)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="json"&gt;JSON&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;import&lt;/span&gt; json
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Read JSON file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;data.json&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; data &lt;span style="color:#f92672"&gt;=&lt;/span&gt; json&lt;span style="color:#f92672"&gt;.&lt;/span&gt;load(f)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Write JSON file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;out.json&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;w&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; json&lt;span style="color:#f92672"&gt;.&lt;/span&gt;dump(data, f, indent&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# String conversion&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;text &lt;span style="color:#f92672"&gt;=&lt;/span&gt; json&lt;span style="color:#f92672"&gt;.&lt;/span&gt;dumps({&lt;span style="color:#e6db74"&gt;&amp;#34;key&amp;#34;&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;value&amp;#34;&lt;/span&gt;}, indent&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;data &lt;span style="color:#f92672"&gt;=&lt;/span&gt; json&lt;span style="color:#f92672"&gt;.&lt;/span&gt;loads(&lt;span style="color:#e6db74"&gt;&amp;#39;{&amp;#34;key&amp;#34;: &amp;#34;value&amp;#34;}&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Handle non-serialisable types&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;from&lt;/span&gt; datetime &lt;span style="color:#f92672"&gt;import&lt;/span&gt; datetime
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;json&lt;span style="color:#f92672"&gt;.&lt;/span&gt;dumps({&lt;span style="color:#e6db74"&gt;&amp;#34;date&amp;#34;&lt;/span&gt;: datetime&lt;span style="color:#f92672"&gt;.&lt;/span&gt;now()}, default&lt;span style="color:#f92672"&gt;=&lt;/span&gt;str)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="error-handling-for-files"&gt;Error Handling for Files&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;from&lt;/span&gt; pathlib &lt;span style="color:#f92672"&gt;import&lt;/span&gt; Path
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Check before opening&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;p &lt;span style="color:#f92672"&gt;=&lt;/span&gt; Path(&lt;span style="color:#e6db74"&gt;&amp;#34;config.txt&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;exists():
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; text &lt;span style="color:#f92672"&gt;=&lt;/span&gt; p&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read_text()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Or catch the exception&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;try&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;config.txt&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; content &lt;span style="color:#f92672"&gt;=&lt;/span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;except&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;FileNotFoundError&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; content &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;except&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;PermissionError&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;&amp;#34;Access denied&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item><item><title>File Transfer and Disk Images on the C64</title><link>https://rowstu.net/commodore/file-transfer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/commodore/file-transfer/</guid><description>&lt;p&gt;Getting software onto a real C64 from a modern PC is a common task. This covers the file formats, tools, and workflows for moving data between the two worlds.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2 id="file-formats"&gt;File Formats&lt;/h2&gt;
 &lt;table&gt;
@@ -3095,7 +3432,52 @@ Shift Left:
 &lt;p&gt;For day-to-day use, you&amp;rsquo;ll mostly deal with &lt;strong&gt;D64&lt;/strong&gt; and &lt;strong&gt;PRG&lt;/strong&gt; files.&lt;/p&gt;</description></item><item><title>Flow</title><link>https://rowstu.net/books/flow/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/flow/</guid><description>&lt;p&gt;Notes on the book Flow: The Psychology of Optimal Experience by Mihaly Csikszentmihalyi&lt;/p&gt;
 &lt;p&gt;The book explores the concept of &amp;ldquo;flow,&amp;rdquo; which is a state of mind characterized by total immersion in an activity.&lt;/p&gt;
 &lt;p&gt;In flow, people typically feel a sense of control, loss of self-consciousness, and enjoyment.&lt;/p&gt;
-&lt;p&gt;The book says that people are happiest when they are in a state of flow, and that achieving flow is essential for leading a fulfilling life.&lt;/p&gt;</description></item><item><title>Git Commands Cheatsheet</title><link>https://rowstu.net/linux/git/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/git/</guid><description>&lt;h2 id="git-basics"&gt;Git Basics&lt;/h2&gt;
+&lt;p&gt;The book says that people are happiest when they are in a state of flow, and that achieving flow is essential for leading a fulfilling life.&lt;/p&gt;</description></item><item><title>Functions</title><link>https://rowstu.net/python/functions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/functions/</guid><description>&lt;h1 id="python-functions"&gt;Python Functions&lt;/h1&gt;
+&lt;h2 id="defining-functions"&gt;Defining Functions&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;greet&lt;/span&gt;(name):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Hello, &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;!&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;greet(&lt;span style="color:#e6db74"&gt;&amp;#34;Alice&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;Hello, Alice!&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Default arguments&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;greet&lt;/span&gt;(name, greeting&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Hello&amp;#34;&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;greeting&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;, &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;!&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;greet(&lt;span style="color:#e6db74"&gt;&amp;#34;Bob&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;Hello, Bob!&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;greet(&lt;span style="color:#e6db74"&gt;&amp;#34;Bob&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;Hi&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;Hi, Bob!&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;greet(&lt;span style="color:#e6db74"&gt;&amp;#34;Bob&amp;#34;&lt;/span&gt;, greeting&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Hey&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;Hey, Bob!&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="args-and-kwargs"&gt;*args and **kwargs&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# *args — variable positional args (tuple)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;total&lt;/span&gt;(&lt;span style="color:#f92672"&gt;*&lt;/span&gt;nums):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; sum(nums)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;total(&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 6&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;total(&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# 10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# **kwargs — variable keyword args (dict)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;show&lt;/span&gt;(&lt;span style="color:#f92672"&gt;**&lt;/span&gt;info):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; key, val &lt;span style="color:#f92672"&gt;in&lt;/span&gt; info&lt;span style="color:#f92672"&gt;.&lt;/span&gt;items():
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;key&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;val&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;show(name&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Alice&amp;#34;&lt;/span&gt;, age&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;30&lt;/span&gt;, city&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;London&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Combining&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;func&lt;/span&gt;(required, &lt;span style="color:#f92672"&gt;*&lt;/span&gt;args, &lt;span style="color:#f92672"&gt;**&lt;/span&gt;kwargs):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(required, args, kwargs)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;func(&lt;span style="color:#e6db74"&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, x&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;, y&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# hello (1, 2) {&amp;#39;x&amp;#39;: 3, &amp;#39;y&amp;#39;: 4}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Unpacking when calling&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;nums &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(&lt;span style="color:#f92672"&gt;*&lt;/span&gt;nums) &lt;span style="color:#75715e"&gt;# 1 2 3 (unpack list as positional)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;config &lt;span style="color:#f92672"&gt;=&lt;/span&gt; {&lt;span style="color:#e6db74"&gt;&amp;#34;sep&amp;#34;&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;, &amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;end&amp;#34;&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;!&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;\n&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(&lt;span style="color:#e6db74"&gt;&amp;#34;a&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;b&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;c&amp;#34;&lt;/span&gt;, &lt;span style="color:#f92672"&gt;**&lt;/span&gt;config) &lt;span style="color:#75715e"&gt;# a, b, c!&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="lambda-functions"&gt;Lambda Functions&lt;/h2&gt;
+&lt;p&gt;Anonymous one-liner functions.&lt;/p&gt;</description></item><item><title>Git Commands Cheatsheet</title><link>https://rowstu.net/linux/git/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/git/</guid><description>&lt;h2 id="git-basics"&gt;Git Basics&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Initialize a new repository&lt;/strong&gt;:&lt;/p&gt;
@@ -4741,7 +5123,161 @@ EOF
 &lt;pre tabindex="0"&gt;&lt;code&gt;killall nextcloud
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;You can see for yourself here:&lt;/p&gt;</description></item><item><title>Ocsp Stapling</title><link>https://rowstu.net/sec/ocsp-stapling/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/sec/ocsp-stapling/</guid><description>&lt;h1 id="ocsp-stapling"&gt;OCSP Stapling&lt;/h1&gt;
 &lt;p&gt;OCSP stapling, also known as TLS Certificate Status Request extension or the Online Certificate Status Protocol (OCSP) Stapling, is a security feature in the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is designed to enhance the security and performance of SSL/TLS connections, particularly in web servers.&lt;/p&gt;
-&lt;p&gt;When you visit a website secured with SSL/TLS, your browser typically checks the validity of the SSL/TLS certificate presented by the web server. One way to do this is by using OCSP (Online Certificate Status Protocol), which allows the browser to ask the certificate authority (CA) whether the certificate is still valid.&lt;/p&gt;</description></item><item><title>Open Parens</title><link>https://rowstu.net/hackattic/open-parens/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/open-parens/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
+&lt;p&gt;When you visit a website secured with SSL/TLS, your browser typically checks the validity of the SSL/TLS certificate presented by the web server. One way to do this is by using OCSP (Online Certificate Status Protocol), which allows the browser to ask the certificate authority (CA) whether the certificate is still valid.&lt;/p&gt;</description></item><item><title>OOP</title><link>https://rowstu.net/python/oop/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/oop/</guid><description>&lt;h1 id="object-oriented-programming"&gt;Object-Oriented Programming&lt;/h1&gt;
+&lt;h2 id="classes"&gt;Classes&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;Dog&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; species &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;Canis lupus&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# class variable (shared)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(self, name, breed):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;name &lt;span style="color:#f92672"&gt;=&lt;/span&gt; name &lt;span style="color:#75715e"&gt;# instance variables&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;breed &lt;span style="color:#f92672"&gt;=&lt;/span&gt; breed
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;_age &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt; &lt;span style="color:#75715e"&gt;# convention: &amp;#34;private&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;bark&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt; says: Woof!&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__repr__&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Dog(name=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;!r}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;, breed=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;breed&lt;span style="color:#e6db74"&gt;!r}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__str__&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt; the &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;breed&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;rex &lt;span style="color:#f92672"&gt;=&lt;/span&gt; Dog(&lt;span style="color:#e6db74"&gt;&amp;#34;Rex&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;Labrador&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;rex&lt;span style="color:#f92672"&gt;.&lt;/span&gt;bark() &lt;span style="color:#75715e"&gt;# &amp;#39;Rex says: Woof!&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;str(rex) &lt;span style="color:#75715e"&gt;# &amp;#39;Rex the Labrador&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;repr(rex) &lt;span style="color:#75715e"&gt;# &amp;#34;Dog(name=&amp;#39;Rex&amp;#39;, breed=&amp;#39;Labrador&amp;#39;)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;rex&lt;span style="color:#f92672"&gt;.&lt;/span&gt;species &lt;span style="color:#75715e"&gt;# &amp;#39;Canis lupus&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="inheritance"&gt;Inheritance&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;Animal&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(self, name):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;name &lt;span style="color:#f92672"&gt;=&lt;/span&gt; name
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;speak&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;raise&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;NotImplementedError&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;Dog&lt;/span&gt;(Animal):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;speak&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;: Woof!&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;Cat&lt;/span&gt;(Animal):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;speak&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;: Meow!&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Call parent with super()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;PoliceDog&lt;/span&gt;(Dog):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(self, name, badge):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; super()&lt;span style="color:#f92672"&gt;.&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(name)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;badge &lt;span style="color:#f92672"&gt;=&lt;/span&gt; badge
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;speak&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; super()&lt;span style="color:#f92672"&gt;.&lt;/span&gt;speak() &lt;span style="color:#f92672"&gt;+&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34; (police)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Check inheritance&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;isinstance(Dog(&lt;span style="color:#e6db74"&gt;&amp;#34;Rex&amp;#34;&lt;/span&gt;), Animal) &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;issubclass(Dog, Animal) &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Multiple inheritance&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;A&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;hello&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;A&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;B&lt;/span&gt;(A):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;hello&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;B&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;C&lt;/span&gt;(A):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;hello&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;C&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;D&lt;/span&gt;(B, C):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;pass&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;D()&lt;span style="color:#f92672"&gt;.&lt;/span&gt;hello() &lt;span style="color:#75715e"&gt;# &amp;#39;B&amp;#39; (MRO: D → B → C → A)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;D&lt;span style="color:#f92672"&gt;.&lt;/span&gt;__mro__ &lt;span style="color:#75715e"&gt;# method resolution order&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="properties"&gt;Properties&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;Circle&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(self, radius):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;_radius &lt;span style="color:#f92672"&gt;=&lt;/span&gt; radius
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;@property&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;radius&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;_radius
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;@radius.setter&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;radius&lt;/span&gt;(self, value):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; value &lt;span style="color:#f92672"&gt;&amp;lt;&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;raise&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ValueError&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;&amp;#34;Radius cannot be negative&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;_radius &lt;span style="color:#f92672"&gt;=&lt;/span&gt; value
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;@property&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;area&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;import&lt;/span&gt; math
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; math&lt;span style="color:#f92672"&gt;.&lt;/span&gt;pi &lt;span style="color:#f92672"&gt;*&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;_radius &lt;span style="color:#f92672"&gt;**&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;c &lt;span style="color:#f92672"&gt;=&lt;/span&gt; Circle(&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;c&lt;span style="color:#f92672"&gt;.&lt;/span&gt;radius &lt;span style="color:#75715e"&gt;# 5 (calls getter)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;c&lt;span style="color:#f92672"&gt;.&lt;/span&gt;radius &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;10&lt;/span&gt; &lt;span style="color:#75715e"&gt;# calls setter&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;c&lt;span style="color:#f92672"&gt;.&lt;/span&gt;area &lt;span style="color:#75715e"&gt;# 314.159...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="class--static-methods"&gt;Class &amp;amp; Static Methods&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;Counter&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; count &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Counter&lt;span style="color:#f92672"&gt;.&lt;/span&gt;count &lt;span style="color:#f92672"&gt;+=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;@classmethod&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;reset&lt;/span&gt;(cls):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; cls&lt;span style="color:#f92672"&gt;.&lt;/span&gt;count &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt; &lt;span style="color:#75715e"&gt;# access class, not instance&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#a6e22e"&gt;@staticmethod&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;info&lt;/span&gt;():
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;A simple counter class&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# no self or cls&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Counter()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Counter()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Counter&lt;span style="color:#f92672"&gt;.&lt;/span&gt;count &lt;span style="color:#75715e"&gt;# 2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Counter&lt;span style="color:#f92672"&gt;.&lt;/span&gt;reset()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Counter&lt;span style="color:#f92672"&gt;.&lt;/span&gt;count &lt;span style="color:#75715e"&gt;# 0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Counter&lt;span style="color:#f92672"&gt;.&lt;/span&gt;info() &lt;span style="color:#75715e"&gt;# &amp;#39;A simple counter class&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="dunder-methods"&gt;Dunder Methods&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;Vector&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(self, x, y):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;x &lt;span style="color:#f92672"&gt;=&lt;/span&gt; x
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;y &lt;span style="color:#f92672"&gt;=&lt;/span&gt; y
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__repr__&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Vector(&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;x&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;, &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;y&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__add__&lt;/span&gt;(self, other):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; Vector(self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;x &lt;span style="color:#f92672"&gt;+&lt;/span&gt; other&lt;span style="color:#f92672"&gt;.&lt;/span&gt;x, self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;y &lt;span style="color:#f92672"&gt;+&lt;/span&gt; other&lt;span style="color:#f92672"&gt;.&lt;/span&gt;y)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__mul__&lt;/span&gt;(self, scalar):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; Vector(self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;x &lt;span style="color:#f92672"&gt;*&lt;/span&gt; scalar, self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;y &lt;span style="color:#f92672"&gt;*&lt;/span&gt; scalar)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__len__&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__eq__&lt;/span&gt;(self, other):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;x &lt;span style="color:#f92672"&gt;==&lt;/span&gt; other&lt;span style="color:#f92672"&gt;.&lt;/span&gt;x &lt;span style="color:#f92672"&gt;and&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;y &lt;span style="color:#f92672"&gt;==&lt;/span&gt; other&lt;span style="color:#f92672"&gt;.&lt;/span&gt;y
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__iter__&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;yield&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;x
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;yield&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;y
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;v1 &lt;span style="color:#f92672"&gt;=&lt;/span&gt; Vector(&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;v2 &lt;span style="color:#f92672"&gt;=&lt;/span&gt; Vector(&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;v1 &lt;span style="color:#f92672"&gt;+&lt;/span&gt; v2 &lt;span style="color:#75715e"&gt;# Vector(4, 6)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;v1 &lt;span style="color:#f92672"&gt;*&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;3&lt;/span&gt; &lt;span style="color:#75715e"&gt;# Vector(3, 6)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;len(v1) &lt;span style="color:#75715e"&gt;# 2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;v1 &lt;span style="color:#f92672"&gt;==&lt;/span&gt; v1 &lt;span style="color:#75715e"&gt;# True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;x, y &lt;span style="color:#f92672"&gt;=&lt;/span&gt; v1 &lt;span style="color:#75715e"&gt;# unpack via __iter__&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="dataclasses"&gt;Dataclasses&lt;/h2&gt;
+&lt;p&gt;Reduces boilerplate for data-holding classes.&lt;/p&gt;</description></item><item><title>Open Parens</title><link>https://rowstu.net/hackattic/open-parens/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/hackattic/open-parens/</guid><description>&lt;pre tabindex="0"&gt;&lt;code&gt;import sys
 
 def main():
  
@@ -5755,37 +6291,338 @@ net user user newpassword
 &lt;p&gt;Open a terminal window in /Windows/System32/Config&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;# list users
 chntpw -l SAM
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Perform action on the account&lt;/p&gt;</description></item><item><title>Resources</title><link>https://rowstu.net/osint/resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/osint/resources/</guid><description>&lt;h1 id="osint-recon-sites"&gt;OSINT Recon sites&lt;/h1&gt;
-&lt;h3 id="resources"&gt;Resources&lt;/h3&gt;
-&lt;p&gt;inteltechniques.com
-Google Dorks Database: &lt;a href="https://www.exploit-db.com/google-hac"&gt;https://www.exploit-db.com/google-hac&lt;/a&gt;&amp;hellip;&lt;/p&gt;
-&lt;h3 id="search-for-people"&gt;Search For People:&lt;/h3&gt;
-&lt;p&gt;&lt;a href="https://www.spokeo.com"&gt;https://www.spokeo.com&lt;/a&gt;
-&lt;a href="https://thatsthem.com"&gt;https://thatsthem.com&lt;/a&gt;
-&lt;a href="https://www.beenverified.com"&gt;https://www.beenverified.com&lt;/a&gt;
-&lt;a href="https://www.fastpeoplesearch.com"&gt;https://www.fastpeoplesearch.com&lt;/a&gt;
-&lt;a href="https://www.truepeoplesearch.com"&gt;https://www.truepeoplesearch.com&lt;/a&gt;
-&lt;a href="https://www.familytreenow.com"&gt;https://www.familytreenow.com&lt;/a&gt;
-&lt;a href="https://people.yandex.ru"&gt;https://people.yandex.ru&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id="databases-breaches"&gt;Databases Breaches:&lt;/h3&gt;
-&lt;p&gt;&lt;a href="https://www.haveibeenpwned.com"&gt;https://www.haveibeenpwned.com&lt;/a&gt;
-&lt;a href="https://www.dehashed.com"&gt;https://www.dehashed.com&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id="phone-numbers"&gt;Phone Numbers:&lt;/h3&gt;
-&lt;p&gt;&lt;a href="https://www.whocalledme.com"&gt;https://www.whocalledme.com&lt;/a&gt;
-&lt;a href="https://github.com/sundowndev/phonein"&gt;https://github.com/sundowndev/phonein&lt;/a&gt;&amp;hellip;&lt;/p&gt;
-&lt;h3 id="images"&gt;Images:&lt;/h3&gt;
-&lt;p&gt;&lt;a href="https://www.google.com/imghp?hl=en"&gt;https://www.google.com/imghp?hl=en&lt;/a&gt;
-&lt;a href="https://www.Tineye.com"&gt;https://www.Tineye.com&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id="exif-tools"&gt;Exif Tools:&lt;/h3&gt;
-&lt;p&gt;&lt;a href="https://exiftool.org/"&gt;https://exiftool.org/&lt;/a&gt;
-&lt;a href="https://exifdata.com/"&gt;https://exifdata.com/&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id="socmint"&gt;SOCMINT:&lt;/h3&gt;
-&lt;p&gt;Facebook Sleep Stats: &lt;a href="https://github.com/sqren/fb-sleep-stats"&gt;https://github.com/sqren/fb-sleep-stats&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id="automating-osint"&gt;Automating OSINT:&lt;/h3&gt;
-&lt;p&gt;SpiderFoot: &lt;a href="https://github.com/smicallef/spiderfoot"&gt;https://github.com/smicallef/spiderfoot&lt;/a&gt;
-theHarvester: &lt;a href="https://github.com/laramies/theHarvester"&gt;https://github.com/laramies/theHarvester&lt;/a&gt;
-Recon-ng: &lt;a href="https://github.com/lanmaster53/recon-ng"&gt;https://github.com/lanmaster53/recon-ng&lt;/a&gt;
-Maltego: &lt;a href="https://www.maltego.com/"&gt;https://www.maltego.com/&lt;/a&gt;&lt;/p&gt;</description></item><item><title>S3 Buckets</title><link>https://rowstu.net/tf/s3/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/tf/s3/</guid><description>&lt;h1 id="s3-buckets"&gt;S3 Buckets&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Perform action on the account&lt;/p&gt;</description></item><item><title>Resources</title><link>https://rowstu.net/osint/resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/osint/resources/</guid><description>&lt;h1 id="osint-resource-directory"&gt;OSINT Resource Directory&lt;/h1&gt;
+&lt;h3 id="general-intelligence-platforms"&gt;General Intelligence Platforms&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Description&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://inteltechniques.com"&gt;IntelTechniques&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Tools and training by Michael Bazzell&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://osintframework.com"&gt;OSINT Framework&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Mind-map of categorised OSINT tools&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://bellingcat.gitbook.io/toolkit/"&gt;Bellingcat Toolkit&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Investigative journalism resource collection&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.exploit-db.com/google-hacking-database"&gt;Exploit-DB Google Hacks&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Google Dorks database&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="people-search"&gt;People Search&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.spokeo.com"&gt;Spokeo&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;US-focused people aggregator&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://thatsthem.com"&gt;ThatsThem&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Reverse email/phone lookup&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.beenverified.com"&gt;BeenVerified&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Background check aggregator&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.fastpeoplesearch.com"&gt;FastPeopleSearch&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Free US people search&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.truepeoplesearch.com"&gt;TruePeopleSearch&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Free reverse address/phone&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.familytreenow.com"&gt;FamilyTreeNow&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Family history + current addresses&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://people.yandex.ru"&gt;Yandex People&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Russian social search&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="email--username"&gt;Email &amp;amp; Username&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://hunter.io"&gt;Hunter.io&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Find professional email addresses by domain&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://epieos.com"&gt;Epieos&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Reverse email lookup (Google/Gravatar data)&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://github.com/megadose/holehe"&gt;Holehe&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Check email registration across 120+ sites&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://github.com/soxoj/maigret"&gt;Maigret&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Username OSINT across 2000+ sites&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://github.com/sherlock-project/sherlock"&gt;Sherlock&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Hunt down social accounts by username&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://whatsmyname.app"&gt;WhatsMyName&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Username enumeration across platforms&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="data-breaches"&gt;Data Breaches&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://haveibeenpwned.com"&gt;HaveIBeenPwned&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Check email/password exposure&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://dehashed.com"&gt;DeHashed&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Search leaked credentials (paid)&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://breachdirectory.org"&gt;BreachDirectory&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Free breach search&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://leakcheck.io"&gt;LeakCheck&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Email/username breach lookup&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="phone-numbers"&gt;Phone Numbers&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.whocalledme.com"&gt;WhoCalledMe&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Community-reported number database&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://github.com/sundowndev/phoneinfoga"&gt;PhoneInfoga&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;International phone number OSINT tool&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.calleridtest.com"&gt;CallerID Test&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Caller ID lookup&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.truecaller.com"&gt;Truecaller&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Crowdsourced caller identification&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="images--media"&gt;Images &amp;amp; Media&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://images.google.com"&gt;Google Images&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Reverse image search&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://tineye.com"&gt;TinEye&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Reverse image search, tracks image history&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://yandex.com/images"&gt;Yandex Images&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Often finds faces better than Google&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://pimeyes.com"&gt;PimEyes&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Face recognition reverse search&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://fotoforensics.com"&gt;FotoForensics&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Error level analysis on images&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.invid-project.eu/tools-and-services/invid-verification-plugin/"&gt;InVID/WeVerify&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Video verification browser plugin&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="geolocation--mapping"&gt;Geolocation &amp;amp; Mapping&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.geoguessr.com"&gt;GeoGuessr&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Train geolocation recognition skills&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://suncalc.org"&gt;SunCalc&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Calculate sun position to estimate photo time/location&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.shadowspro.com"&gt;Shadows Pro&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Shadow-based time/date analysis&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.sentinel-hub.com"&gt;Sentinel Hub&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Satellite imagery&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://overpass-turbo.eu"&gt;Overpass Turbo&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;OpenStreetMap data query tool&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="social-media"&gt;Social Media&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://map.snapchat.com"&gt;Snapchat Map&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Public Snapchat story locations&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://twitter.com/search-advanced"&gt;Twitter Advanced Search&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Filter tweets by date, location, account&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://github.com/sqren/fb-sleep-stats"&gt;FB Sleep Stats&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Infer sleep patterns from Facebook activity&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.social-searcher.com"&gt;Social Searcher&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Cross-platform social media search&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://sowdust.github.io/fb-search/"&gt;Sowdust Facebook Search&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Advanced Facebook graph search&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="domain--ip"&gt;Domain &amp;amp; IP&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.shodan.io"&gt;Shodan&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Search engine for internet-connected devices&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://censys.io"&gt;Censys&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Certificate and host discovery&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.virustotal.com"&gt;VirusTotal&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;IP/domain reputation and analysis&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://dnsdumpster.com"&gt;DNSDumpster&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;DNS recon and subdomain mapping&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://who.is"&gt;WHOIS Lookup&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Domain registration data&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://securitytrails.com"&gt;SecurityTrails&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Historical DNS data&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://bgp.he.net"&gt;BGP Toolkit&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;ASN and IP range lookup&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://www.shodan.io/search?query=http.favicon.hash:"&gt;Shodan Favicon&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Find services by favicon hash&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h3 id="exif--metadata"&gt;EXIF &amp;amp; Metadata&lt;/h3&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;Resource&lt;/th&gt;
+ &lt;th&gt;Notes&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://exiftool.org"&gt;ExifTool&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Extract metadata from files (CLI)&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://exifdata.com"&gt;ExifData&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Online EXIF viewer&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="http://exif.regex.info/exif.cgi"&gt;Jeffrey&amp;rsquo;s Exif Viewer&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Detailed GPS and camera data&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;&lt;a href="https://0xacab.org/jvoisin/mat2"&gt;Mat2&lt;/a&gt;&lt;/td&gt;
+ &lt;td&gt;Strip metadata from files&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;</description></item><item><title>S3 Buckets</title><link>https://rowstu.net/tf/s3/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/tf/s3/</guid><description>&lt;h1 id="s3-buckets"&gt;S3 Buckets&lt;/h1&gt;
 &lt;p&gt;Creating and configuring S3 buckets with Terraform.&lt;/p&gt;
 &lt;h2 id="basic-bucket"&gt;Basic Bucket&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-hcl" data-lang="hcl"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;resource&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;aws_s3_bucket&amp;#34; &amp;#34;main&amp;#34;&lt;/span&gt; {
@@ -6352,7 +7189,23 @@ sudo sssctl user-checks username
 &lt;/ul&gt;
 &lt;hr&gt;
 &lt;h1 id="what-to-teach-them-about-fear"&gt;What to teach them about fear&lt;/h1&gt;
-&lt;p&gt;Right now, your main job in life is to handle your fears and learn from the challenges you face every day. These challenges are things like school, gymnastics, and relationships with your friends and family.&lt;/p&gt;</description></item><item><title>Test a Linux ISO file</title><link>https://rowstu.net/linux/test-iso/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/test-iso/</guid><description>&lt;p&gt;If you&amp;rsquo;ve downloaded a Linux ISO, such as the installer for Ubuntu, Debian, or ArchLinux, and want to test it before writing it to a USB stick, you can use QEMU with VNC to quickly check that it boots.&lt;/p&gt;
+&lt;p&gt;Right now, your main job in life is to handle your fears and learn from the challenges you face every day. These challenges are things like school, gymnastics, and relationships with your friends and family.&lt;/p&gt;</description></item><item><title>Techniques</title><link>https://rowstu.net/osint/techniques/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/osint/techniques/</guid><description>&lt;h1 id="osint-techniques"&gt;OSINT Techniques&lt;/h1&gt;
+&lt;h2 id="google-dorking"&gt;Google Dorking&lt;/h2&gt;
+&lt;p&gt;Google advanced search operators to surface hidden data.&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;site:example.com # restrict to domain
+filetype:pdf # specific file type
+intitle:&amp;#34;index of&amp;#34; # directory listings
+inurl:admin # URL contains string
+&amp;#34;@gmail.com&amp;#34; site:pastebin.com # find leaked emails
+cache:example.com # cached version of page
+link:example.com # pages linking to site
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Combine operators:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;site:linkedin.com intitle:&amp;#34;at CompanyName&amp;#34;
+filetype:xls site:gov.uk password
+inurl:&amp;#34;/wp-content/uploads/&amp;#34; filetype:pdf confidential
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id="email-header-analysis"&gt;Email Header Analysis&lt;/h2&gt;
+&lt;p&gt;Email headers reveal routing, originating IP, mail client, and spam indicators.&lt;/p&gt;</description></item><item><title>Test a Linux ISO file</title><link>https://rowstu.net/linux/test-iso/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/linux/test-iso/</guid><description>&lt;p&gt;If you&amp;rsquo;ve downloaded a Linux ISO, such as the installer for Ubuntu, Debian, or ArchLinux, and want to test it before writing it to a USB stick, you can use QEMU with VNC to quickly check that it boots.&lt;/p&gt;
 &lt;p&gt;Run the following command in your terminal:&lt;/p&gt;
 &lt;pre tabindex="0"&gt;&lt;code&gt;qemu-system-x86_64 -boot d -cdrom /path/to/your/live.iso -m 2048 -enable-kvm
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, use a VNC viewer like TigerVNC to connect to display port :5900. If the ISO is good, you&amp;rsquo;ll see the live disk OS booting.&lt;/p&gt;</description></item><item><title>The Four Agreements</title><link>https://rowstu.net/books/the-four-agreements/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/books/the-four-agreements/</guid><description>&lt;p&gt;Notes on the book The Four Agreements by Don Miguel Ruiz&lt;/p&gt;
@@ -6478,7 +7331,38 @@ if __name__ == &amp;#34;__main__&amp;#34;:
 &lt;li&gt;
 &lt;p&gt;Horror: THX 1138, The Thing&lt;/p&gt;
 &lt;/li&gt;
-&lt;/ul&gt;</description></item><item><title>Transit Gateway</title><link>https://rowstu.net/tf/transit-gateway/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/tf/transit-gateway/</guid><description>&lt;h1 id="transit-gateway"&gt;Transit Gateway&lt;/h1&gt;
+&lt;/ul&gt;</description></item><item><title>Tools</title><link>https://rowstu.net/osint/tools/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/osint/tools/</guid><description>&lt;h1 id="osint-tools-reference"&gt;OSINT Tools Reference&lt;/h1&gt;
+&lt;h2 id="command-line-tools"&gt;Command-Line Tools&lt;/h2&gt;
+&lt;h3 id="sherlock"&gt;Sherlock&lt;/h3&gt;
+&lt;p&gt;Hunt down social media accounts by username across 300+ platforms.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Install&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;pip install sherlock-project
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Basic usage&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sherlock username
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Output to file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sherlock username --output results.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Check specific sites&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;sherlock username --site Twitter --site Instagram
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id="maigret"&gt;Maigret&lt;/h3&gt;
+&lt;p&gt;Username OSINT across 2000+ sites with detailed reports.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Install&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;pip install maigret
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Run against username&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;maigret username
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Generate PDF report&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;maigret username --pdf
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# JSON output&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;maigret username --json report.json
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id="holehe"&gt;Holehe&lt;/h3&gt;
+&lt;p&gt;Check whether an email address is registered on 120+ websites.&lt;/p&gt;</description></item><item><title>Transit Gateway</title><link>https://rowstu.net/tf/transit-gateway/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/tf/transit-gateway/</guid><description>&lt;h1 id="transit-gateway"&gt;Transit Gateway&lt;/h1&gt;
 &lt;p&gt;Connecting multiple VPCs and on-premises networks with AWS Transit Gateway.&lt;/p&gt;
 &lt;h2 id="basic-transit-gateway"&gt;Basic Transit Gateway&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-hcl" data-lang="hcl"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;resource&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;aws_ec2_transit_gateway&amp;#34; &amp;#34;main&amp;#34;&lt;/span&gt; {
@@ -6599,7 +7483,215 @@ if __name__ == &amp;#34;__main__&amp;#34;:
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; transit_gateway_route_table_id &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;aws_ec2_transit_gateway_route_table&lt;/span&gt;.&lt;span style="color:#66d9ef"&gt;production&lt;/span&gt;.&lt;span style="color:#66d9ef"&gt;id&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="vpc-route-tables"&gt;VPC Route Tables&lt;/h2&gt;
-&lt;p&gt;Update VPC route tables to send traffic to Transit Gateway.&lt;/p&gt;</description></item><item><title>Vagrant – Notes, Procedures, and Best Practices</title><link>https://rowstu.net/vagrant/vagrant/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vagrant/vagrant/</guid><description>&lt;p&gt;Vagrant is a tool for building, configuring, and managing reproducible development environments. It provides a consistent workflow on top of virtualization and container technologies, allowing developers and operators to spin up identical environments across different machines.&lt;/p&gt;
+&lt;p&gt;Update VPC route tables to send traffic to Transit Gateway.&lt;/p&gt;</description></item><item><title>Useful Patterns</title><link>https://rowstu.net/python/useful-patterns/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/python/useful-patterns/</guid><description>&lt;h1 id="useful-python-patterns"&gt;Useful Python Patterns&lt;/h1&gt;
+&lt;h2 id="context-managers"&gt;Context Managers&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Built-in — auto-close file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; open(&lt;span style="color:#e6db74"&gt;&amp;#34;file.txt&amp;#34;&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; data &lt;span style="color:#f92672"&gt;=&lt;/span&gt; f&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Custom context manager&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;from&lt;/span&gt; contextlib &lt;span style="color:#f92672"&gt;import&lt;/span&gt; contextmanager
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#a6e22e"&gt;@contextmanager&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;timer&lt;/span&gt;():
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#f92672"&gt;import&lt;/span&gt; time
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; start &lt;span style="color:#f92672"&gt;=&lt;/span&gt; time&lt;span style="color:#f92672"&gt;.&lt;/span&gt;perf_counter()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;try&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;yield&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;finally&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Elapsed: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;time&lt;span style="color:#f92672"&gt;.&lt;/span&gt;perf_counter() &lt;span style="color:#f92672"&gt;-&lt;/span&gt; start&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;.3f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;s&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;with&lt;/span&gt; timer():
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; expensive_operation()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Class-based&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ManagedDB&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__enter__&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;conn &lt;span style="color:#f92672"&gt;=&lt;/span&gt; connect()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;conn
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__exit__&lt;/span&gt;(self, exc_type, exc_val, exc_tb):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;conn&lt;span style="color:#f92672"&gt;.&lt;/span&gt;close()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;False&lt;/span&gt; &lt;span style="color:#75715e"&gt;# don&amp;#39;t suppress exceptions&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="error-handling"&gt;Error Handling&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Basic try/except&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;try&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; result &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;10&lt;/span&gt; &lt;span style="color:#f92672"&gt;/&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;except&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ZeroDivisionError&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; e:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Error: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;e&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;except&lt;/span&gt; (&lt;span style="color:#a6e22e"&gt;TypeError&lt;/span&gt;, &lt;span style="color:#a6e22e"&gt;ValueError&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;&amp;#34;Type or value error&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;except&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;Exception&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; e:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Unexpected: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;e&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;else&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;&amp;#34;No error occurred&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# runs if no exception&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;finally&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(&lt;span style="color:#e6db74"&gt;&amp;#34;Always runs&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# cleanup goes here&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Raise exceptions&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;parse_age&lt;/span&gt;(s):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; age &lt;span style="color:#f92672"&gt;=&lt;/span&gt; int(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; age &lt;span style="color:#f92672"&gt;&amp;lt;&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;raise&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ValueError&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Age cannot be negative: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;age&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; age
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Custom exceptions&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;AppError&lt;/span&gt;(&lt;span style="color:#a6e22e"&gt;Exception&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;pass&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ValidationError&lt;/span&gt;(AppError):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(self, field, message):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; super()&lt;span style="color:#f92672"&gt;.&lt;/span&gt;&lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;field&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;message&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;field &lt;span style="color:#f92672"&gt;=&lt;/span&gt; field
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="comprehensions--generators"&gt;Comprehensions &amp;amp; Generators&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# List&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;squares &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [x&lt;span style="color:#f92672"&gt;**&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; x &lt;span style="color:#f92672"&gt;in&lt;/span&gt; range(&lt;span style="color:#ae81ff"&gt;10&lt;/span&gt;) &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; x &lt;span style="color:#f92672"&gt;%&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Dict&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;lengths &lt;span style="color:#f92672"&gt;=&lt;/span&gt; {w: len(w) &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; w &lt;span style="color:#f92672"&gt;in&lt;/span&gt; [&lt;span style="color:#e6db74"&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;world&amp;#34;&lt;/span&gt;]}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Set&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;unique &lt;span style="color:#f92672"&gt;=&lt;/span&gt; {c&lt;span style="color:#f92672"&gt;.&lt;/span&gt;lower() &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; c &lt;span style="color:#f92672"&gt;in&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;Hello World&amp;#34;&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Generator (lazy — doesn&amp;#39;t build list)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;gen &lt;span style="color:#f92672"&gt;=&lt;/span&gt; (x&lt;span style="color:#f92672"&gt;**&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; x &lt;span style="color:#f92672"&gt;in&lt;/span&gt; range(&lt;span style="color:#ae81ff"&gt;10&lt;/span&gt;&lt;span style="color:#f92672"&gt;**&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;9&lt;/span&gt;)) &lt;span style="color:#75715e"&gt;# fine, no memory issue&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;total &lt;span style="color:#f92672"&gt;=&lt;/span&gt; sum(x&lt;span style="color:#f92672"&gt;**&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; x &lt;span style="color:#f92672"&gt;in&lt;/span&gt; range(&lt;span style="color:#ae81ff"&gt;1000&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Flatten nested list&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;nested &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [[&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;], [&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;], [&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;6&lt;/span&gt;]]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;flat &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [x &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; sub &lt;span style="color:#f92672"&gt;in&lt;/span&gt; nested &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; x &lt;span style="color:#f92672"&gt;in&lt;/span&gt; sub] &lt;span style="color:#75715e"&gt;# [1,2,3,4,5,6]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Conditional transform&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;result &lt;span style="color:#f92672"&gt;=&lt;/span&gt; [&lt;span style="color:#e6db74"&gt;&amp;#34;even&amp;#34;&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; x &lt;span style="color:#f92672"&gt;%&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt; &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;else&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;odd&amp;#34;&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; x &lt;span style="color:#f92672"&gt;in&lt;/span&gt; range(&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;)]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="string-formatting-patterns"&gt;String Formatting Patterns&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;name, score, ratio &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;Alice&amp;#34;&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;1042&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;0.8765&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Alignment and padding&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;lt;10&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;Alice &amp;#39; (left, 10 wide)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;gt;10&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39; Alice&amp;#39; (right)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;^10&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39; Alice &amp;#39; (centered)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;*^10&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;**Alice***&amp;#39; (fill with *)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Numbers&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;score&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;,&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;1,042&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;score&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;08d&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;00001042&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;ratio&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;.2%&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;87.65%&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;ratio&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;.4f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;0.8765&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;score&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;e&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;1.042000e+03&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;255&lt;/span&gt;&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;#x&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;0xff&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;255&lt;/span&gt;&lt;span style="color:#e6db74"&gt;:&lt;/span&gt;&lt;span style="color:#e6db74"&gt;#010b&lt;/span&gt;&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;0b11111111&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Useful string methods&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;, &amp;#34;&lt;/span&gt;&lt;span style="color:#f92672"&gt;.&lt;/span&gt;join([&lt;span style="color:#e6db74"&gt;&amp;#34;a&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;b&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;c&amp;#34;&lt;/span&gt;]) &lt;span style="color:#75715e"&gt;# &amp;#39;a, b, c&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;hello world&amp;#34;&lt;/span&gt;&lt;span style="color:#f92672"&gt;.&lt;/span&gt;title() &lt;span style="color:#75715e"&gt;# &amp;#39;Hello World&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34; spaced &amp;#34;&lt;/span&gt;&lt;span style="color:#f92672"&gt;.&lt;/span&gt;strip() &lt;span style="color:#75715e"&gt;# &amp;#39;spaced&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;&lt;span style="color:#f92672"&gt;.&lt;/span&gt;center(&lt;span style="color:#ae81ff"&gt;11&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;-&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;---hello---&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;na &amp;#34;&lt;/span&gt; &lt;span style="color:#f92672"&gt;*&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;4&lt;/span&gt; &lt;span style="color:#f92672"&gt;+&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;batman&amp;#34;&lt;/span&gt; &lt;span style="color:#75715e"&gt;# &amp;#39;na na na na batman&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="working-with-dates--times"&gt;Working with Dates &amp;amp; Times&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;from&lt;/span&gt; datetime &lt;span style="color:#f92672"&gt;import&lt;/span&gt; datetime, date, timedelta
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;now &lt;span style="color:#f92672"&gt;=&lt;/span&gt; datetime&lt;span style="color:#f92672"&gt;.&lt;/span&gt;now()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;today &lt;span style="color:#f92672"&gt;=&lt;/span&gt; date&lt;span style="color:#f92672"&gt;.&lt;/span&gt;today()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Format&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;now&lt;span style="color:#f92672"&gt;.&lt;/span&gt;strftime(&lt;span style="color:#e6db74"&gt;&amp;#34;%Y-%m-&lt;/span&gt;&lt;span style="color:#e6db74"&gt;%d&lt;/span&gt;&lt;span style="color:#e6db74"&gt; %H:%M:%S&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;2025-03-01 14:30:00&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;now&lt;span style="color:#f92672"&gt;.&lt;/span&gt;strftime(&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;%d&lt;/span&gt;&lt;span style="color:#e6db74"&gt;/%m/%Y&amp;#34;&lt;/span&gt;) &lt;span style="color:#75715e"&gt;# &amp;#39;01/03/2025&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Parse&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;dt &lt;span style="color:#f92672"&gt;=&lt;/span&gt; datetime&lt;span style="color:#f92672"&gt;.&lt;/span&gt;strptime(&lt;span style="color:#e6db74"&gt;&amp;#34;2025-01-15&amp;#34;&lt;/span&gt;, &lt;span style="color:#e6db74"&gt;&amp;#34;%Y-%m-&lt;/span&gt;&lt;span style="color:#e6db74"&gt;%d&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Arithmetic&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;tomorrow &lt;span style="color:#f92672"&gt;=&lt;/span&gt; today &lt;span style="color:#f92672"&gt;+&lt;/span&gt; timedelta(days&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;next_week &lt;span style="color:#f92672"&gt;=&lt;/span&gt; now &lt;span style="color:#f92672"&gt;+&lt;/span&gt; timedelta(weeks&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;two_hours &lt;span style="color:#f92672"&gt;=&lt;/span&gt; now &lt;span style="color:#f92672"&gt;+&lt;/span&gt; timedelta(hours&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Difference&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;delta &lt;span style="color:#f92672"&gt;=&lt;/span&gt; datetime(&lt;span style="color:#ae81ff"&gt;2025&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;12&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;25&lt;/span&gt;) &lt;span style="color:#f92672"&gt;-&lt;/span&gt; datetime&lt;span style="color:#f92672"&gt;.&lt;/span&gt;now()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;delta&lt;span style="color:#f92672"&gt;.&lt;/span&gt;days &lt;span style="color:#75715e"&gt;# days until Christmas&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# ISO format&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;now&lt;span style="color:#f92672"&gt;.&lt;/span&gt;isoformat() &lt;span style="color:#75715e"&gt;# &amp;#39;2025-03-01T14:30:00.123456&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;datetime&lt;span style="color:#f92672"&gt;.&lt;/span&gt;fromisoformat(&lt;span style="color:#e6db74"&gt;&amp;#34;2025-03-01&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="itertools"&gt;Itertools&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;import&lt;/span&gt; itertools
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Chain — flatten iterables&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;list(itertools&lt;span style="color:#f92672"&gt;.&lt;/span&gt;chain([&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;], [&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;], [&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;])) &lt;span style="color:#75715e"&gt;# [1,2,3,4,5]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Cycle — repeat forever&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;counter &lt;span style="color:#f92672"&gt;=&lt;/span&gt; itertools&lt;span style="color:#f92672"&gt;.&lt;/span&gt;cycle([&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;])
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;next(counter) &lt;span style="color:#75715e"&gt;# 0, 1, 2, 0, 1, 2...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Combinations &amp;amp; permutations&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;list(itertools&lt;span style="color:#f92672"&gt;.&lt;/span&gt;combinations(&lt;span style="color:#e6db74"&gt;&amp;#34;ABC&amp;#34;&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;)) &lt;span style="color:#75715e"&gt;# [(&amp;#39;A&amp;#39;,&amp;#39;B&amp;#39;),(&amp;#39;A&amp;#39;,&amp;#39;C&amp;#39;),(&amp;#39;B&amp;#39;,&amp;#39;C&amp;#39;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;list(itertools&lt;span style="color:#f92672"&gt;.&lt;/span&gt;permutations(&lt;span style="color:#e6db74"&gt;&amp;#34;ABC&amp;#34;&lt;/span&gt;, &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;)) &lt;span style="color:#75715e"&gt;# [(&amp;#39;A&amp;#39;,&amp;#39;B&amp;#39;),(&amp;#39;A&amp;#39;,&amp;#39;C&amp;#39;),...]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Groupby — group consecutive same-key elements&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;data &lt;span style="color:#f92672"&gt;=&lt;/span&gt; sorted([(&lt;span style="color:#e6db74"&gt;&amp;#34;a&amp;#34;&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;),(&lt;span style="color:#e6db74"&gt;&amp;#34;b&amp;#34;&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;),(&lt;span style="color:#e6db74"&gt;&amp;#34;a&amp;#34;&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;)], key&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;lambda&lt;/span&gt; x: x[&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;])
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; key, group &lt;span style="color:#f92672"&gt;in&lt;/span&gt; itertools&lt;span style="color:#f92672"&gt;.&lt;/span&gt;groupby(data, key&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;lambda&lt;/span&gt; x: x[&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;]):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(key, list(group))
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# islice — lazy slice of iterator&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;list(itertools&lt;span style="color:#f92672"&gt;.&lt;/span&gt;islice(range(&lt;span style="color:#ae81ff"&gt;1000000&lt;/span&gt;), &lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;)) &lt;span style="color:#75715e"&gt;# [0,1,2,3,4]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# zip_longest — zip with fill value for unequal lengths&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;list(itertools&lt;span style="color:#f92672"&gt;.&lt;/span&gt;zip_longest([&lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;3&lt;/span&gt;], [&lt;span style="color:#ae81ff"&gt;4&lt;/span&gt;,&lt;span style="color:#ae81ff"&gt;5&lt;/span&gt;], fillvalue&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# [(1,4), (2,5), (3,0)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="type-hints"&gt;Type Hints&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;from&lt;/span&gt; typing &lt;span style="color:#f92672"&gt;import&lt;/span&gt; Optional, Union, Any
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;greet&lt;/span&gt;(name: str) &lt;span style="color:#f92672"&gt;-&amp;gt;&lt;/span&gt; str:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#e6db74"&gt;f&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;Hello, &lt;/span&gt;&lt;span style="color:#e6db74"&gt;{&lt;/span&gt;name&lt;span style="color:#e6db74"&gt;}&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;divide&lt;/span&gt;(a: float, b: float) &lt;span style="color:#f92672"&gt;-&amp;gt;&lt;/span&gt; Optional[float]:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; b &lt;span style="color:#f92672"&gt;==&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;None&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; a &lt;span style="color:#f92672"&gt;/&lt;/span&gt; b
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;process&lt;/span&gt;(data: list[int]) &lt;span style="color:#f92672"&gt;-&amp;gt;&lt;/span&gt; dict[str, int]:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; {&lt;span style="color:#e6db74"&gt;&amp;#34;sum&amp;#34;&lt;/span&gt;: sum(data), &lt;span style="color:#e6db74"&gt;&amp;#34;count&amp;#34;&lt;/span&gt;: len(data)}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Union (Python 3.10+: use X | Y)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;stringify&lt;/span&gt;(val: int &lt;span style="color:#f92672"&gt;|&lt;/span&gt; float &lt;span style="color:#f92672"&gt;|&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;None&lt;/span&gt;) &lt;span style="color:#f92672"&gt;-&amp;gt;&lt;/span&gt; str:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; str(val) &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; val &lt;span style="color:#f92672"&gt;is&lt;/span&gt; &lt;span style="color:#f92672"&gt;not&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;None&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;else&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# TypeAlias&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Vector &lt;span style="color:#f92672"&gt;=&lt;/span&gt; list[float]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;scale&lt;/span&gt;(v: Vector, factor: float) &lt;span style="color:#f92672"&gt;-&amp;gt;&lt;/span&gt; Vector:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; [x &lt;span style="color:#f92672"&gt;*&lt;/span&gt; factor &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; x &lt;span style="color:#f92672"&gt;in&lt;/span&gt; v]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="logging"&gt;Logging&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;import&lt;/span&gt; logging
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;logging&lt;span style="color:#f92672"&gt;.&lt;/span&gt;basicConfig(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; level&lt;span style="color:#f92672"&gt;=&lt;/span&gt;logging&lt;span style="color:#f92672"&gt;.&lt;/span&gt;DEBUG,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; format&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;&lt;span style="color:#e6db74"&gt;%(asctime)s&lt;/span&gt;&lt;span style="color:#e6db74"&gt; &lt;/span&gt;&lt;span style="color:#e6db74"&gt;%(levelname)s&lt;/span&gt;&lt;span style="color:#e6db74"&gt; &lt;/span&gt;&lt;span style="color:#e6db74"&gt;%(name)s&lt;/span&gt;&lt;span style="color:#e6db74"&gt;: &lt;/span&gt;&lt;span style="color:#e6db74"&gt;%(message)s&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;logger &lt;span style="color:#f92672"&gt;=&lt;/span&gt; logging&lt;span style="color:#f92672"&gt;.&lt;/span&gt;getLogger(__name__)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;logger&lt;span style="color:#f92672"&gt;.&lt;/span&gt;debug(&lt;span style="color:#e6db74"&gt;&amp;#34;Debug message&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;logger&lt;span style="color:#f92672"&gt;.&lt;/span&gt;info(&lt;span style="color:#e6db74"&gt;&amp;#34;Info message&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;logger&lt;span style="color:#f92672"&gt;.&lt;/span&gt;warning(&lt;span style="color:#e6db74"&gt;&amp;#34;Warning&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;logger&lt;span style="color:#f92672"&gt;.&lt;/span&gt;error(&lt;span style="color:#e6db74"&gt;&amp;#34;Error occurred&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;logger&lt;span style="color:#f92672"&gt;.&lt;/span&gt;critical(&lt;span style="color:#e6db74"&gt;&amp;#34;Critical failure&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Log to file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;logging&lt;span style="color:#f92672"&gt;.&lt;/span&gt;basicConfig(filename&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#34;app.log&amp;#34;&lt;/span&gt;, level&lt;span style="color:#f92672"&gt;=&lt;/span&gt;logging&lt;span style="color:#f92672"&gt;.&lt;/span&gt;INFO)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;# Log exception with traceback&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;try&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt; &lt;span style="color:#f92672"&gt;/&lt;/span&gt; &lt;span style="color:#ae81ff"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;except&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ZeroDivisionError&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; logger&lt;span style="color:#f92672"&gt;.&lt;/span&gt;exception(&lt;span style="color:#e6db74"&gt;&amp;#34;Division failed&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item><item><title>Vagrant – Notes, Procedures, and Best Practices</title><link>https://rowstu.net/vagrant/vagrant/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://rowstu.net/vagrant/vagrant/</guid><description>&lt;p&gt;Vagrant is a tool for building, configuring, and managing reproducible development environments. It provides a consistent workflow on top of virtualization and container technologies, allowing developers and operators to spin up identical environments across different machines.&lt;/p&gt;
 &lt;h3 id="core-terminology"&gt;Core Terminology&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Box&lt;/strong&gt;: A packaged base image (e.g. Ubuntu, CentOS) used to create VMs.&lt;/li&gt;

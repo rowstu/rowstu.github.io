@@ -1,0 +1,163 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Functions // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Functions</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/pythonfunctions/>Pythonfunctions</a></div><div class="card markdown-content"><h1 id=python-functions>Python Functions</h1><h2 id=defining-functions>Defining Functions</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>greet</span>(name):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Hello, </span><span style=color:#e6db74>{</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74>!&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>greet(<span style=color:#e6db74>&#34;Alice&#34;</span>)   <span style=color:#75715e># &#39;Hello, Alice!&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Default arguments</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>greet</span>(name, greeting<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Hello&#34;</span>):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>greeting<span style=color:#e6db74>}</span><span style=color:#e6db74>, </span><span style=color:#e6db74>{</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74>!&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>greet(<span style=color:#e6db74>&#34;Bob&#34;</span>)              <span style=color:#75715e># &#39;Hello, Bob!&#39;</span>
+</span></span><span style=display:flex><span>greet(<span style=color:#e6db74>&#34;Bob&#34;</span>, <span style=color:#e6db74>&#34;Hi&#34;</span>)        <span style=color:#75715e># &#39;Hi, Bob!&#39;</span>
+</span></span><span style=display:flex><span>greet(<span style=color:#e6db74>&#34;Bob&#34;</span>, greeting<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Hey&#34;</span>)  <span style=color:#75715e># &#39;Hey, Bob!&#39;</span>
+</span></span></code></pre></div><hr><h2 id=args-and-kwargs>*args and **kwargs</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># *args — variable positional args (tuple)</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>total</span>(<span style=color:#f92672>*</span>nums):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> sum(nums)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>total(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>)     <span style=color:#75715e># 6</span>
+</span></span><span style=display:flex><span>total(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>4</span>)  <span style=color:#75715e># 10</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># **kwargs — variable keyword args (dict)</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>show</span>(<span style=color:#f92672>**</span>info):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> key, val <span style=color:#f92672>in</span> info<span style=color:#f92672>.</span>items():
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>key<span style=color:#e6db74>}</span><span style=color:#e6db74>: </span><span style=color:#e6db74>{</span>val<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>show(name<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Alice&#34;</span>, age<span style=color:#f92672>=</span><span style=color:#ae81ff>30</span>, city<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;London&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Combining</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>func</span>(required, <span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>kwargs):
+</span></span><span style=display:flex><span>    print(required, args, kwargs)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>func(<span style=color:#e6db74>&#34;hello&#34;</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, x<span style=color:#f92672>=</span><span style=color:#ae81ff>3</span>, y<span style=color:#f92672>=</span><span style=color:#ae81ff>4</span>)
+</span></span><span style=display:flex><span><span style=color:#75715e># hello (1, 2) {&#39;x&#39;: 3, &#39;y&#39;: 4}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Unpacking when calling</span>
+</span></span><span style=display:flex><span>nums <span style=color:#f92672>=</span> [<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>]
+</span></span><span style=display:flex><span>print(<span style=color:#f92672>*</span>nums)          <span style=color:#75715e># 1 2 3  (unpack list as positional)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>config <span style=color:#f92672>=</span> {<span style=color:#e6db74>&#34;sep&#34;</span>: <span style=color:#e6db74>&#34;, &#34;</span>, <span style=color:#e6db74>&#34;end&#34;</span>: <span style=color:#e6db74>&#34;!</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>}
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;a&#34;</span>, <span style=color:#e6db74>&#34;b&#34;</span>, <span style=color:#e6db74>&#34;c&#34;</span>, <span style=color:#f92672>**</span>config)   <span style=color:#75715e># a, b, c!</span>
+</span></span></code></pre></div><hr><h2 id=lambda-functions>Lambda Functions</h2><p>Anonymous one-liner functions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>square <span style=color:#f92672>=</span> <span style=color:#66d9ef>lambda</span> x: x <span style=color:#f92672>**</span> <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>square(<span style=color:#ae81ff>5</span>)    <span style=color:#75715e># 25</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Common with sorted / map / filter</span>
+</span></span><span style=display:flex><span>nums <span style=color:#f92672>=</span> [<span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>4</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>5</span>, <span style=color:#ae81ff>9</span>]
+</span></span><span style=display:flex><span>sorted(nums, key<span style=color:#f92672>=</span><span style=color:#66d9ef>lambda</span> x: <span style=color:#f92672>-</span>x)      <span style=color:#75715e># reverse sort</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>people <span style=color:#f92672>=</span> [{<span style=color:#e6db74>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;Bob&#34;</span>, <span style=color:#e6db74>&#34;age&#34;</span>: <span style=color:#ae81ff>25</span>}, {<span style=color:#e6db74>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;Alice&#34;</span>, <span style=color:#e6db74>&#34;age&#34;</span>: <span style=color:#ae81ff>30</span>}]
+</span></span><span style=display:flex><span>sorted(people, key<span style=color:#f92672>=</span><span style=color:#66d9ef>lambda</span> p: p[<span style=color:#e6db74>&#34;age&#34;</span>])
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># map — apply function to each element</span>
+</span></span><span style=display:flex><span>doubled <span style=color:#f92672>=</span> list(map(<span style=color:#66d9ef>lambda</span> x: x <span style=color:#f92672>*</span> <span style=color:#ae81ff>2</span>, [<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>]))
+</span></span><span style=display:flex><span><span style=color:#75715e># [2, 4, 6]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># filter — keep elements where function is True</span>
+</span></span><span style=display:flex><span>evens <span style=color:#f92672>=</span> list(filter(<span style=color:#66d9ef>lambda</span> x: x <span style=color:#f92672>%</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>, range(<span style=color:#ae81ff>10</span>)))
+</span></span><span style=display:flex><span><span style=color:#75715e># [0, 2, 4, 6, 8]</span>
+</span></span></code></pre></div><hr><h2 id=scope>Scope</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>x <span style=color:#f92672>=</span> <span style=color:#ae81ff>10</span>  <span style=color:#75715e># global</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>outer</span>():
+</span></span><span style=display:flex><span>    y <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>  <span style=color:#75715e># local to outer</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>inner</span>():
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>nonlocal</span> y      <span style=color:#75715e># modify outer&#39;s variable</span>
+</span></span><span style=display:flex><span>        z <span style=color:#f92672>=</span> <span style=color:#ae81ff>30</span>          <span style=color:#75715e># local to inner</span>
+</span></span><span style=display:flex><span>        y <span style=color:#f92672>=</span> <span style=color:#ae81ff>99</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    inner()
+</span></span><span style=display:flex><span>    print(y)   <span style=color:#75715e># 99</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>modify_global</span>():
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>global</span> x
+</span></span><span style=display:flex><span>    x <span style=color:#f92672>=</span> <span style=color:#ae81ff>999</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># LEGB rule: Local → Enclosing → Global → Built-in</span>
+</span></span></code></pre></div><hr><h2 id=return-values>Return Values</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Return multiple values (actually a tuple)</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>min_max</span>(lst):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> min(lst), max(lst)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>lo, hi <span style=color:#f92672>=</span> min_max([<span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>4</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>5</span>])
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Early return</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>find_first</span>(lst, target):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> i, v <span style=color:#f92672>in</span> enumerate(lst):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> v <span style=color:#f92672>==</span> target:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> i
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>   <span style=color:#75715e># not found</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Return None implicitly if no return statement</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>greet</span>(name):
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Hi </span><span style=color:#e6db74>{</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span></code></pre></div><hr><h2 id=generators>Generators</h2><p>Lazy sequences — values produced on demand, don&rsquo;t hold all data in memory.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>countdown</span>(n):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> n <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>yield</span> n
+</span></span><span style=display:flex><span>        n <span style=color:#f92672>-=</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> countdown(<span style=color:#ae81ff>5</span>):
+</span></span><span style=display:flex><span>    print(x)    <span style=color:#75715e># 5, 4, 3, 2, 1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Generator expression (like list comprehension but lazy)</span>
+</span></span><span style=display:flex><span>squares <span style=color:#f92672>=</span> (x<span style=color:#f92672>**</span><span style=color:#ae81ff>2</span> <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>1000000</span>))
+</span></span><span style=display:flex><span>next(squares)   <span style=color:#75715e># 0</span>
+</span></span><span style=display:flex><span>next(squares)   <span style=color:#75715e># 1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Useful for large files</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>read_lines</span>(path):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>with</span> open(path) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> line <span style=color:#f92672>in</span> f:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>yield</span> line<span style=color:#f92672>.</span>strip()
+</span></span></code></pre></div><hr><h2 id=decorators>Decorators</h2><p>Functions that wrap other functions to add behaviour.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>import</span> time
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> functools
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>timer</span>(func):
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@functools.wraps</span>(func)    <span style=color:#75715e># preserve func metadata</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>wrapper</span>(<span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>kwargs):
+</span></span><span style=display:flex><span>        start <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>perf_counter()
+</span></span><span style=display:flex><span>        result <span style=color:#f92672>=</span> func(<span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>kwargs)
+</span></span><span style=display:flex><span>        elapsed <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>perf_counter() <span style=color:#f92672>-</span> start
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>func<span style=color:#f92672>.</span>__name__<span style=color:#e6db74>}</span><span style=color:#e6db74> took </span><span style=color:#e6db74>{</span>elapsed<span style=color:#e6db74>:</span><span style=color:#e6db74>.4f</span><span style=color:#e6db74>}</span><span style=color:#e6db74>s&#34;</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> result
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> wrapper
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@timer</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>slow_func</span>():
+</span></span><span style=display:flex><span>    time<span style=color:#f92672>.</span>sleep(<span style=color:#ae81ff>0.1</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>slow_func()  <span style=color:#75715e># slow_func took 0.1001s</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Decorator with arguments</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>repeat</span>(n):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>decorator</span>(func):
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>@functools.wraps</span>(func)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>wrapper</span>(<span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>kwargs):
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>for</span> _ <span style=color:#f92672>in</span> range(n):
+</span></span><span style=display:flex><span>                func(<span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>kwargs)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> wrapper
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> decorator
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@repeat</span>(<span style=color:#ae81ff>3</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>say</span>(msg):
+</span></span><span style=display:flex><span>    print(msg)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>say(<span style=color:#e6db74>&#34;hello&#34;</span>)  <span style=color:#75715e># prints hello 3 times</span>
+</span></span></code></pre></div><hr><h2 id=useful-built-in-functions>Useful Built-in Functions</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Iteration helpers</span>
+</span></span><span style=display:flex><span>enumerate([<span style=color:#e6db74>&#34;a&#34;</span>,<span style=color:#e6db74>&#34;b&#34;</span>,<span style=color:#e6db74>&#34;c&#34;</span>])      <span style=color:#75715e># (0,&#39;a&#39;), (1,&#39;b&#39;), (2,&#39;c&#39;)</span>
+</span></span><span style=display:flex><span>zip([<span style=color:#ae81ff>1</span>,<span style=color:#ae81ff>2</span>,<span style=color:#ae81ff>3</span>], [<span style=color:#e6db74>&#34;a&#34;</span>,<span style=color:#e6db74>&#34;b&#34;</span>,<span style=color:#e6db74>&#34;c&#34;</span>])   <span style=color:#75715e># (1,&#39;a&#39;), (2,&#39;b&#39;), (3,&#39;c&#39;)</span>
+</span></span><span style=display:flex><span>zip(<span style=color:#f92672>*</span>[[<span style=color:#ae81ff>1</span>,<span style=color:#ae81ff>2</span>],[<span style=color:#ae81ff>3</span>,<span style=color:#ae81ff>4</span>],[<span style=color:#ae81ff>5</span>,<span style=color:#ae81ff>6</span>]])      <span style=color:#75715e># unzip: (1,3,5), (2,4,6)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Map / filter / reduce</span>
+</span></span><span style=display:flex><span>list(map(str, [<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>]))          <span style=color:#75715e># [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;]</span>
+</span></span><span style=display:flex><span>list(filter(bool, [<span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>1</span>, <span style=color:#66d9ef>None</span>, <span style=color:#ae81ff>2</span>])) <span style=color:#75715e># [1, 2]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> functools <span style=color:#f92672>import</span> reduce
+</span></span><span style=display:flex><span>reduce(<span style=color:#66d9ef>lambda</span> a, b: a <span style=color:#f92672>+</span> b, [<span style=color:#ae81ff>1</span>,<span style=color:#ae81ff>2</span>,<span style=color:#ae81ff>3</span>,<span style=color:#ae81ff>4</span>])  <span style=color:#75715e># 10</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># all / any</span>
+</span></span><span style=display:flex><span>all([<span style=color:#66d9ef>True</span>, <span style=color:#66d9ef>True</span>, <span style=color:#66d9ef>True</span>])   <span style=color:#75715e># True</span>
+</span></span><span style=display:flex><span>all([<span style=color:#66d9ef>True</span>, <span style=color:#66d9ef>False</span>, <span style=color:#66d9ef>True</span>])  <span style=color:#75715e># False</span>
+</span></span><span style=display:flex><span>any([<span style=color:#66d9ef>False</span>, <span style=color:#66d9ef>False</span>, <span style=color:#66d9ef>True</span>]) <span style=color:#75715e># True</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># sorted with complex key</span>
+</span></span><span style=display:flex><span>sorted([<span style=color:#e6db74>&#34;fig&#34;</span>, <span style=color:#e6db74>&#34;banana&#34;</span>, <span style=color:#e6db74>&#34;apple&#34;</span>], key<span style=color:#f92672>=</span><span style=color:#66d9ef>lambda</span> s: s[<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>])
+</span></span><span style=display:flex><span><span style=color:#75715e># sorted by last character</span>
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>

@@ -1,0 +1,164 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>OOP // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>OOP</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/pythonoop/>Pythonoop</a></div><div class="card markdown-content"><h1 id=object-oriented-programming>Object-Oriented Programming</h1><h2 id=classes>Classes</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Dog</span>:
+</span></span><span style=display:flex><span>    species <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Canis lupus&#34;</span>  <span style=color:#75715e># class variable (shared)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__init__</span>(self, name, breed):
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>name <span style=color:#f92672>=</span> name     <span style=color:#75715e># instance variables</span>
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>breed <span style=color:#f92672>=</span> breed
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>_age <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>        <span style=color:#75715e># convention: &#34;private&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>bark</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74> says: Woof!&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__repr__</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Dog(name=</span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>name<span style=color:#e6db74>!r}</span><span style=color:#e6db74>, breed=</span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>breed<span style=color:#e6db74>!r}</span><span style=color:#e6db74>)&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__str__</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74> the </span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>breed<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>rex <span style=color:#f92672>=</span> Dog(<span style=color:#e6db74>&#34;Rex&#34;</span>, <span style=color:#e6db74>&#34;Labrador&#34;</span>)
+</span></span><span style=display:flex><span>rex<span style=color:#f92672>.</span>bark()        <span style=color:#75715e># &#39;Rex says: Woof!&#39;</span>
+</span></span><span style=display:flex><span>str(rex)          <span style=color:#75715e># &#39;Rex the Labrador&#39;</span>
+</span></span><span style=display:flex><span>repr(rex)         <span style=color:#75715e># &#34;Dog(name=&#39;Rex&#39;, breed=&#39;Labrador&#39;)&#34;</span>
+</span></span><span style=display:flex><span>rex<span style=color:#f92672>.</span>species       <span style=color:#75715e># &#39;Canis lupus&#39;</span>
+</span></span></code></pre></div><hr><h2 id=inheritance>Inheritance</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Animal</span>:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__init__</span>(self, name):
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>name <span style=color:#f92672>=</span> name
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>speak</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>raise</span> <span style=color:#a6e22e>NotImplementedError</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Dog</span>(Animal):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>speak</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74>: Woof!&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Cat</span>(Animal):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>speak</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74>: Meow!&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Call parent with super()</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>PoliceDog</span>(Dog):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__init__</span>(self, name, badge):
+</span></span><span style=display:flex><span>        super()<span style=color:#f92672>.</span><span style=color:#a6e22e>__init__</span>(name)
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>badge <span style=color:#f92672>=</span> badge
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>speak</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> super()<span style=color:#f92672>.</span>speak() <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34; (police)&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Check inheritance</span>
+</span></span><span style=display:flex><span>isinstance(Dog(<span style=color:#e6db74>&#34;Rex&#34;</span>), Animal)  <span style=color:#75715e># True</span>
+</span></span><span style=display:flex><span>issubclass(Dog, Animal)         <span style=color:#75715e># True</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Multiple inheritance</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>A</span>:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>hello</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;A&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>B</span>(A):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>hello</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;B&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>C</span>(A):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>hello</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;C&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>D</span>(B, C):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pass</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>D()<span style=color:#f92672>.</span>hello()   <span style=color:#75715e># &#39;B&#39;  (MRO: D → B → C → A)</span>
+</span></span><span style=display:flex><span>D<span style=color:#f92672>.</span>__mro__     <span style=color:#75715e># method resolution order</span>
+</span></span></code></pre></div><hr><h2 id=properties>Properties</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Circle</span>:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__init__</span>(self, radius):
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>_radius <span style=color:#f92672>=</span> radius
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@property</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>radius</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> self<span style=color:#f92672>.</span>_radius
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@radius.setter</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>radius</span>(self, value):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> value <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0</span>:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>raise</span> <span style=color:#a6e22e>ValueError</span>(<span style=color:#e6db74>&#34;Radius cannot be negative&#34;</span>)
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>_radius <span style=color:#f92672>=</span> value
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@property</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>area</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#f92672>import</span> math
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> math<span style=color:#f92672>.</span>pi <span style=color:#f92672>*</span> self<span style=color:#f92672>.</span>_radius <span style=color:#f92672>**</span> <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>c <span style=color:#f92672>=</span> Circle(<span style=color:#ae81ff>5</span>)
+</span></span><span style=display:flex><span>c<span style=color:#f92672>.</span>radius      <span style=color:#75715e># 5   (calls getter)</span>
+</span></span><span style=display:flex><span>c<span style=color:#f92672>.</span>radius <span style=color:#f92672>=</span> <span style=color:#ae81ff>10</span> <span style=color:#75715e># calls setter</span>
+</span></span><span style=display:flex><span>c<span style=color:#f92672>.</span>area        <span style=color:#75715e># 314.159...</span>
+</span></span></code></pre></div><hr><h2 id=class--static-methods>Class & Static Methods</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Counter</span>:
+</span></span><span style=display:flex><span>    count <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__init__</span>(self):
+</span></span><span style=display:flex><span>        Counter<span style=color:#f92672>.</span>count <span style=color:#f92672>+=</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@classmethod</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>reset</span>(cls):
+</span></span><span style=display:flex><span>        cls<span style=color:#f92672>.</span>count <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>     <span style=color:#75715e># access class, not instance</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@staticmethod</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>info</span>():
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;A simple counter class&#34;</span>  <span style=color:#75715e># no self or cls</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Counter()
+</span></span><span style=display:flex><span>Counter()
+</span></span><span style=display:flex><span>Counter<span style=color:#f92672>.</span>count    <span style=color:#75715e># 2</span>
+</span></span><span style=display:flex><span>Counter<span style=color:#f92672>.</span>reset()
+</span></span><span style=display:flex><span>Counter<span style=color:#f92672>.</span>count    <span style=color:#75715e># 0</span>
+</span></span><span style=display:flex><span>Counter<span style=color:#f92672>.</span>info()   <span style=color:#75715e># &#39;A simple counter class&#39;</span>
+</span></span></code></pre></div><hr><h2 id=dunder-methods>Dunder Methods</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Vector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__init__</span>(self, x, y):
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>x <span style=color:#f92672>=</span> x
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>y <span style=color:#f92672>=</span> y
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__repr__</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Vector(</span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>x<span style=color:#e6db74>}</span><span style=color:#e6db74>, </span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>y<span style=color:#e6db74>}</span><span style=color:#e6db74>)&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__add__</span>(self, other):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> Vector(self<span style=color:#f92672>.</span>x <span style=color:#f92672>+</span> other<span style=color:#f92672>.</span>x, self<span style=color:#f92672>.</span>y <span style=color:#f92672>+</span> other<span style=color:#f92672>.</span>y)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__mul__</span>(self, scalar):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> Vector(self<span style=color:#f92672>.</span>x <span style=color:#f92672>*</span> scalar, self<span style=color:#f92672>.</span>y <span style=color:#f92672>*</span> scalar)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__len__</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__eq__</span>(self, other):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> self<span style=color:#f92672>.</span>x <span style=color:#f92672>==</span> other<span style=color:#f92672>.</span>x <span style=color:#f92672>and</span> self<span style=color:#f92672>.</span>y <span style=color:#f92672>==</span> other<span style=color:#f92672>.</span>y
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__iter__</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>yield</span> self<span style=color:#f92672>.</span>x
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>yield</span> self<span style=color:#f92672>.</span>y
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>v1 <span style=color:#f92672>=</span> Vector(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>v2 <span style=color:#f92672>=</span> Vector(<span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>4</span>)
+</span></span><span style=display:flex><span>v1 <span style=color:#f92672>+</span> v2        <span style=color:#75715e># Vector(4, 6)</span>
+</span></span><span style=display:flex><span>v1 <span style=color:#f92672>*</span> <span style=color:#ae81ff>3</span>         <span style=color:#75715e># Vector(3, 6)</span>
+</span></span><span style=display:flex><span>len(v1)        <span style=color:#75715e># 2</span>
+</span></span><span style=display:flex><span>v1 <span style=color:#f92672>==</span> v1       <span style=color:#75715e># True</span>
+</span></span><span style=display:flex><span>x, y <span style=color:#f92672>=</span> v1      <span style=color:#75715e># unpack via __iter__</span>
+</span></span></code></pre></div><hr><h2 id=dataclasses>Dataclasses</h2><p>Reduces boilerplate for data-holding classes.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> dataclasses <span style=color:#f92672>import</span> dataclass, field
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@dataclass</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Person</span>:
+</span></span><span style=display:flex><span>    name: str
+</span></span><span style=display:flex><span>    age: int
+</span></span><span style=display:flex><span>    tags: list <span style=color:#f92672>=</span> field(default_factory<span style=color:#f92672>=</span>list)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>greet</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Hi, I&#39;m </span><span style=color:#e6db74>{</span>self<span style=color:#f92672>.</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>p <span style=color:#f92672>=</span> Person(<span style=color:#e6db74>&#34;Alice&#34;</span>, <span style=color:#ae81ff>30</span>)
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>name    <span style=color:#75715e># &#39;Alice&#39;</span>
+</span></span><span style=display:flex><span>str(p)    <span style=color:#75715e># &#39;Person(name=&#39;Alice&#39;, age=30, tags=[])&#39;</span>
+</span></span><span style=display:flex><span>p <span style=color:#f92672>==</span> Person(<span style=color:#e6db74>&#34;Alice&#34;</span>, <span style=color:#ae81ff>30</span>)  <span style=color:#75715e># True (auto __eq__)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Frozen (immutable)</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@dataclass</span>(frozen<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Point</span>:
+</span></span><span style=display:flex><span>    x: float
+</span></span><span style=display:flex><span>    y: float
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>

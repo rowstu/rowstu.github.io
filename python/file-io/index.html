@@ -1,0 +1,136 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>File I/O // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>File I/O</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/pythonfile-io/>Pythonfile Io</a></div><div class="card markdown-content"><h1 id=file-io>File I/O</h1><h2 id=reading-files>Reading Files</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Read entire file as string</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;data.txt&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    content <span style=color:#f92672>=</span> f<span style=color:#f92672>.</span>read()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Read line by line (memory efficient)</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;data.txt&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> line <span style=color:#f92672>in</span> f:
+</span></span><span style=display:flex><span>        print(line<span style=color:#f92672>.</span>strip())
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Read all lines into a list</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;data.txt&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    lines <span style=color:#f92672>=</span> f<span style=color:#f92672>.</span>readlines()          <span style=color:#75715e># includes \n</span>
+</span></span><span style=display:flex><span>    lines <span style=color:#f92672>=</span> f<span style=color:#f92672>.</span>read()<span style=color:#f92672>.</span>splitlines()  <span style=color:#75715e># strips \n</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Specify encoding</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;data.txt&#34;</span>, encoding<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;utf-8&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    content <span style=color:#f92672>=</span> f<span style=color:#f92672>.</span>read()
+</span></span></code></pre></div><hr><h2 id=writing-files>Writing Files</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Write (overwrites existing)</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;output.txt&#34;</span>, <span style=color:#e6db74>&#34;w&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    f<span style=color:#f92672>.</span>write(<span style=color:#e6db74>&#34;Hello</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>    f<span style=color:#f92672>.</span>write(<span style=color:#e6db74>&#34;World</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Append</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;log.txt&#34;</span>, <span style=color:#e6db74>&#34;a&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    f<span style=color:#f92672>.</span>write(<span style=color:#e6db74>&#34;New log entry</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Write multiple lines</span>
+</span></span><span style=display:flex><span>lines <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;line1&#34;</span>, <span style=color:#e6db74>&#34;line2&#34;</span>, <span style=color:#e6db74>&#34;line3&#34;</span>]
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;output.txt&#34;</span>, <span style=color:#e6db74>&#34;w&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    f<span style=color:#f92672>.</span>writelines(line <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span> <span style=color:#66d9ef>for</span> line <span style=color:#f92672>in</span> lines)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># File modes</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># &#39;r&#39;  — read (default)</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># &#39;w&#39;  — write (truncates existing)</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># &#39;a&#39;  — append</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># &#39;x&#39;  — exclusive create (fails if exists)</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># &#39;b&#39;  — binary mode (e.g. &#39;rb&#39;, &#39;wb&#39;)</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># &#39;+&#39;  — read+write (e.g. &#39;r+&#39;, &#39;w+&#39;)</span>
+</span></span></code></pre></div><hr><h2 id=pathlib-preferred-over-ospath>pathlib (preferred over os.path)</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> pathlib <span style=color:#f92672>import</span> Path
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>p <span style=color:#f92672>=</span> Path(<span style=color:#e6db74>&#34;/home/user/docs/report.txt&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Parts</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>name          <span style=color:#75715e># &#39;report.txt&#39;</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>stem          <span style=color:#75715e># &#39;report&#39;</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>suffix        <span style=color:#75715e># &#39;.txt&#39;</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>parent        <span style=color:#75715e># Path(&#39;/home/user/docs&#39;)</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>parts         <span style=color:#75715e># (&#39;/&#39;, &#39;home&#39;, &#39;user&#39;, &#39;docs&#39;, &#39;report.txt&#39;)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Navigation</span>
+</span></span><span style=display:flex><span>home <span style=color:#f92672>=</span> Path<span style=color:#f92672>.</span>home()              <span style=color:#75715e># /home/user</span>
+</span></span><span style=display:flex><span>cwd <span style=color:#f92672>=</span> Path<span style=color:#f92672>.</span>cwd()                <span style=color:#75715e># current directory</span>
+</span></span><span style=display:flex><span>config <span style=color:#f92672>=</span> home <span style=color:#f92672>/</span> <span style=color:#e6db74>&#34;.config&#34;</span> <span style=color:#f92672>/</span> <span style=color:#e6db74>&#34;myapp&#34;</span>  <span style=color:#75715e># join with /</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Check existence</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>exists()
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>is_file()
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>is_dir()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Read / write (no need to open())</span>
+</span></span><span style=display:flex><span>text <span style=color:#f92672>=</span> p<span style=color:#f92672>.</span>read_text(encoding<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;utf-8&#34;</span>)
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>write_text(<span style=color:#e6db74>&#34;Hello world</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>data <span style=color:#f92672>=</span> p<span style=color:#f92672>.</span>read_bytes()
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>write_bytes(<span style=color:#e6db74>b</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\x00\x01</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Create / delete</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>mkdir(parents<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>, exist_ok<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>)
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>unlink()           <span style=color:#75715e># delete file</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>rmdir()            <span style=color:#75715e># delete empty dir</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># List directory</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> f <span style=color:#f92672>in</span> Path(<span style=color:#e6db74>&#34;.&#34;</span>)<span style=color:#f92672>.</span>iterdir():
+</span></span><span style=display:flex><span>    print(f)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Glob patterns</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> py_file <span style=color:#f92672>in</span> Path(<span style=color:#e6db74>&#34;.&#34;</span>)<span style=color:#f92672>.</span>glob(<span style=color:#e6db74>&#34;**/*.py&#34;</span>):
+</span></span><span style=display:flex><span>    print(py_file)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Rename / copy</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>rename(<span style=color:#e6db74>&#34;new_name.txt&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> shutil
+</span></span><span style=display:flex><span>shutil<span style=color:#f92672>.</span>copy(p, <span style=color:#e6db74>&#34;backup.txt&#34;</span>)
+</span></span><span style=display:flex><span>shutil<span style=color:#f92672>.</span>copytree(<span style=color:#e6db74>&#34;src_dir&#34;</span>, <span style=color:#e6db74>&#34;dst_dir&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Get file info</span>
+</span></span><span style=display:flex><span>stat <span style=color:#f92672>=</span> p<span style=color:#f92672>.</span>stat()
+</span></span><span style=display:flex><span>stat<span style=color:#f92672>.</span>st_size    <span style=color:#75715e># file size in bytes</span>
+</span></span><span style=display:flex><span>stat<span style=color:#f92672>.</span>st_mtime   <span style=color:#75715e># modification time</span>
+</span></span></code></pre></div><hr><h2 id=csv>CSV</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>import</span> csv
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Read</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;data.csv&#34;</span>, newline<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    reader <span style=color:#f92672>=</span> csv<span style=color:#f92672>.</span>DictReader(f)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> row <span style=color:#f92672>in</span> reader:
+</span></span><span style=display:flex><span>        print(row[<span style=color:#e6db74>&#34;name&#34;</span>], row[<span style=color:#e6db74>&#34;age&#34;</span>])
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Write</span>
+</span></span><span style=display:flex><span>data <span style=color:#f92672>=</span> [{<span style=color:#e6db74>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;Alice&#34;</span>, <span style=color:#e6db74>&#34;age&#34;</span>: <span style=color:#ae81ff>30</span>}, {<span style=color:#e6db74>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;Bob&#34;</span>, <span style=color:#e6db74>&#34;age&#34;</span>: <span style=color:#ae81ff>25</span>}]
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;out.csv&#34;</span>, <span style=color:#e6db74>&#34;w&#34;</span>, newline<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    writer <span style=color:#f92672>=</span> csv<span style=color:#f92672>.</span>DictWriter(f, fieldnames<span style=color:#f92672>=</span>[<span style=color:#e6db74>&#34;name&#34;</span>, <span style=color:#e6db74>&#34;age&#34;</span>])
+</span></span><span style=display:flex><span>    writer<span style=color:#f92672>.</span>writeheader()
+</span></span><span style=display:flex><span>    writer<span style=color:#f92672>.</span>writerows(data)
+</span></span></code></pre></div><hr><h2 id=json>JSON</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>import</span> json
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Read JSON file</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;data.json&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    data <span style=color:#f92672>=</span> json<span style=color:#f92672>.</span>load(f)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Write JSON file</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;out.json&#34;</span>, <span style=color:#e6db74>&#34;w&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    json<span style=color:#f92672>.</span>dump(data, f, indent<span style=color:#f92672>=</span><span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># String conversion</span>
+</span></span><span style=display:flex><span>text <span style=color:#f92672>=</span> json<span style=color:#f92672>.</span>dumps({<span style=color:#e6db74>&#34;key&#34;</span>: <span style=color:#e6db74>&#34;value&#34;</span>}, indent<span style=color:#f92672>=</span><span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>data <span style=color:#f92672>=</span> json<span style=color:#f92672>.</span>loads(<span style=color:#e6db74>&#39;{&#34;key&#34;: &#34;value&#34;}&#39;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Handle non-serialisable types</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> datetime <span style=color:#f92672>import</span> datetime
+</span></span><span style=display:flex><span>json<span style=color:#f92672>.</span>dumps({<span style=color:#e6db74>&#34;date&#34;</span>: datetime<span style=color:#f92672>.</span>now()}, default<span style=color:#f92672>=</span>str)
+</span></span></code></pre></div><hr><h2 id=error-handling-for-files>Error Handling for Files</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> pathlib <span style=color:#f92672>import</span> Path
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Check before opening</span>
+</span></span><span style=display:flex><span>p <span style=color:#f92672>=</span> Path(<span style=color:#e6db74>&#34;config.txt&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> p<span style=color:#f92672>.</span>exists():
+</span></span><span style=display:flex><span>    text <span style=color:#f92672>=</span> p<span style=color:#f92672>.</span>read_text()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Or catch the exception</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>with</span> open(<span style=color:#e6db74>&#34;config.txt&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>        content <span style=color:#f92672>=</span> f<span style=color:#f92672>.</span>read()
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> <span style=color:#a6e22e>FileNotFoundError</span>:
+</span></span><span style=display:flex><span>    content <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> <span style=color:#a6e22e>PermissionError</span>:
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;Access denied&#34;</span>)
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Anagram Solver // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #faf7f2;
+			--surface: #f0ebe2;
+			--surface2: #e6dfd4;
+			--border: #d3c9bc;
+			--border-strong: #b8ad9f;
+			--accent: #2d1b69;
+			--accent-light: #4a35a8;
+			--accent-dim: rgba(45,27,105,0.08);
+			--tile-bg: #2d1b69;
+			--tile-text: #fff;
+			--gold: #c48a00;
+			--gold-bg: #fff8e6;
+			--text: #2a221a;
+			--text-muted: #7a6e64;
+			--red: #b03030;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Nunito', sans-serif;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+		}
+
+		.container { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+		header { text-align: center; margin-bottom: 2rem; }
+		.logo {
+			font-size: 2rem; font-weight: 900; color: var(--accent);
+			letter-spacing: -0.03em;
+		}
+		.logo span { color: var(--gold); }
+		.tagline { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem; }
+
+		/* Input area */
+		.input-card {
+			background: var(--surface); border: 2px solid var(--border);
+			border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;
+		}
+
+		.letters-display {
+			display: flex; gap: 0.4rem; flex-wrap: wrap;
+			min-height: 52px; margin-bottom: 1rem;
+			justify-content: center; align-items: center;
+		}
+		.letter-tile {
+			width: 48px; height: 52px;
+			background: var(--tile-bg); color: var(--tile-text);
+			border-radius: 6px; display: flex; align-items: center; justify-content: center;
+			font-size: 1.5rem; font-weight: 800; text-transform: uppercase;
+			box-shadow: 0 2px 6px rgba(45,27,105,0.25);
+			transition: transform 0.1s;
+			animation: popIn 0.15s ease-out;
+		}
+		.letter-tile.extra {
+			background: var(--gold); color: #1a1200;
+		}
+		@keyframes popIn {
+			from { transform: scale(0.8); opacity: 0; }
+			to { transform: scale(1); opacity: 1; }
+		}
+
+		.input-row { display: flex; gap: 0.6rem; }
+		.letter-input {
+			flex: 1; background: var(--bg); border: 2px solid var(--border);
+			border-radius: 8px; padding: 0.65rem 1rem;
+			font-family: 'Nunito', sans-serif; font-size: 1.1rem; font-weight: 700;
+			color: var(--accent); outline: none; transition: border-color 0.15s;
+			text-transform: uppercase; letter-spacing: 0.1em;
+		}
+		.letter-input:focus { border-color: var(--accent-light); }
+		.letter-input::placeholder { text-transform: none; letter-spacing: 0; color: var(--text-muted); font-weight: 400; }
+
+		.btn {
+			padding: 0.65rem 1.4rem; font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+			font-weight: 700; border: 2px solid transparent; border-radius: 8px; cursor: pointer;
+			transition: all 0.15s;
+		}
+		.btn-primary { background: var(--accent); color: #fff; }
+		.btn-primary:hover { background: var(--accent-light); }
+		.btn-ghost { background: none; border-color: var(--border); color: var(--text-muted); }
+		.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+		.options-row {
+			display: flex; align-items: center; gap: 1rem; margin-top: 0.8rem;
+			flex-wrap: wrap; font-size: 0.82rem; color: var(--text-muted);
+		}
+		.must-contain { display: flex; align-items: center; gap: 0.4rem; }
+		.must-input {
+			width: 120px; background: var(--bg); border: 1.5px solid var(--border);
+			border-radius: 6px; padding: 0.3rem 0.6rem;
+			font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 600;
+			color: var(--accent); outline: none; text-transform: uppercase; letter-spacing: 0.08em;
+		}
+		.must-input:focus { border-color: var(--accent); }
+
+		/* Status / stats */
+		.stats-row {
+			display: flex; justify-content: space-between; align-items: center;
+			margin-bottom: 1rem; min-height: 1.5rem;
+		}
+		.stats-left { font-size: 0.82rem; color: var(--text-muted); }
+		.stats-count { font-weight: 700; color: var(--accent); }
+		.loading-pill {
+			display: inline-flex; align-items: center; gap: 0.4rem;
+			background: var(--accent-dim); color: var(--accent);
+			border-radius: 20px; padding: 0.2rem 0.7rem; font-size: 0.75rem; font-weight: 600;
+		}
+		.spinner {
+			width: 12px; height: 12px; border: 2px solid var(--accent);
+			border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;
+		}
+		@keyframes spin { to { transform: rotate(360deg); } }
+
+		/* Sort controls */
+		.sort-row { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
+		.sort-btn {
+			padding: 0.3rem 0.75rem; font-family: 'Nunito', sans-serif; font-size: 0.75rem;
+			font-weight: 700; background: var(--surface2); border: 1.5px solid var(--border);
+			border-radius: 20px; cursor: pointer; color: var(--text-muted); transition: all 0.12s;
+		}
+		.sort-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+		/* Results */
+		.results-grid {
+			display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+			gap: 0.5rem;
+		}
+		.word-card {
+			background: var(--surface); border: 1.5px solid var(--border);
+			border-radius: 8px; padding: 0.55rem 0.4rem;
+			text-align: center; cursor: default;
+			transition: all 0.12s; font-size: 0.9rem; font-weight: 700;
+			letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent);
+			animation: fadeUp 0.15s ease-out both;
+		}
+		.word-card:hover { border-color: var(--accent); background: var(--accent-dim); }
+		.word-card.exact { border-color: var(--gold); background: var(--gold-bg); color: var(--gold); }
+		@keyframes fadeUp {
+			from { opacity: 0; transform: translateY(6px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		.empty-msg {
+			text-align: center; padding: 3rem 1rem; color: var(--text-muted);
+			font-size: 0.9rem;
+		}
+		.empty-msg .big { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+		.hint-text {
+			text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 2rem;
+			padding: 1rem; background: var(--surface); border-radius: 10px;
+		}
+		.hint-text b { color: var(--accent); }
+
+		@media (max-width: 480px) {
+			.results-grid { grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); }
+			.letter-tile { width: 40px; height: 44px; font-size: 1.2rem; }
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<header>
+		<div class="logo">Ana<span>gram</span></div>
+		<div class="tagline">Find words from your letters · uses the Craple 13k+ word dictionary</div>
+	</header>
+
+	<div class="input-card">
+		<div class="letters-display" id="tiles"></div>
+		<div class="input-row">
+			<input type="text" class="letter-input" id="letters" placeholder="Type your letters…" maxlength="10" autocomplete="off" autocorrect="off" spellcheck="false" oninput="onInput()" onkeydown="onKey(event)">
+			<button class="btn btn-ghost" onclick="clearInput()">Clear</button>
+		</div>
+		<div class="options-row">
+			<div class="must-contain">
+				<span>Must contain:</span>
+				<input type="text" class="must-input" id="must" placeholder="e.g. AE" maxlength="5" autocomplete="off" autocorrect="off" spellcheck="false" oninput="filter()">
+			</div>
+			<label style="display:flex;align-items:center;gap:0.3rem;cursor:pointer">
+				<input type="checkbox" id="exact-only" onchange="filter()" style="accent-color:var(--accent)">
+				Exact anagrams only
+			</label>
+		</div>
+	</div>
+
+	<div class="stats-row">
+		<div class="stats-left" id="stats"></div>
+		<div id="status"></div>
+	</div>
+
+	<div id="sort-row" class="sort-row" style="display:none">
+		<button class="sort-btn on" onclick="setSort('alpha')" id="sort-alpha">A–Z</button>
+		<button class="sort-btn" onclick="setSort('rev')" id="sort-rev">Z–A</button>
+	</div>
+
+	<div id="results"></div>
+
+	<div class="hint-text" id="hint">
+		Enter up to <b>10 letters</b> to find all valid words you can make.<br>
+		<b>Gold tiles</b> = exact anagram (uses all 5 letters in a different order).
+	</div>
+</div>
+
+<script>
+let wordSet = new Set();
+let allWords = [];
+let currentResults = [];
+let sortMode = 'alpha';
+let loaded = false;
+
+// Load word lists
+document.getElementById('status').innerHTML = '<div class="loading-pill"><div class="spinner"></div> Loading dictionary…</div>';
+Promise.all([
+	fetch('/wordle-answers-alphabetical.txt').then(r => r.text()),
+	fetch('/wordle-allowed-guesses.txt').then(r => r.text())
+]).then(([answers, guesses]) => {
+	const combined = (answers + '\n' + guesses)
+		.split('\n')
+		.map(w => w.trim().toLowerCase())
+		.filter(w => w.length === 5 && /^[a-z]+$/.test(w));
+	wordSet = new Set(combined);
+	allWords = [...wordSet];
+	loaded = true;
+	document.getElementById('status').innerHTML = '';
+	document.getElementById('stats').innerHTML = `<span class="stats-count">${allWords.length.toLocaleString()}</span> words loaded`;
+}).catch(() => {
+	document.getElementById('status').innerHTML = '<span style="color:var(--red);font-size:0.8rem">Failed to load dictionary</span>';
+});
+
+function onInput() {
+	renderTiles();
+	filter();
+}
+
+function onKey(e) {
+	if (e.key === 'Enter') filter();
+}
+
+function renderTiles() {
+	const raw = document.getElementById('letters').value.replace(/[^a-zA-Z]/g,'');
+	document.getElementById('letters').value = raw.toUpperCase();
+	const tiles = document.getElementById('tiles');
+	tiles.innerHTML = '';
+	[...raw.toUpperCase()].forEach((ch, i) => {
+		const div = document.createElement('div');
+		div.className = 'letter-tile' + (i >= 5 ? ' extra' : '');
+		div.textContent = ch;
+		tiles.appendChild(div);
+	});
+}
+
+function clearInput() {
+	document.getElementById('letters').value = '';
+	document.getElementById('must').value = '';
+	document.getElementById('exact-only').checked = false;
+	renderTiles();
+	currentResults = [];
+	document.getElementById('results').innerHTML = '';
+	document.getElementById('stats').textContent = loaded ? `${allWords.length.toLocaleString()} words loaded` : '';
+	document.getElementById('sort-row').style.display = 'none';
+	document.getElementById('hint').style.display = '';
+}
+
+function canMakeWord(word, letters) {
+	const available = {};
+	for (const ch of letters) available[ch] = (available[ch] || 0) + 1;
+	for (const ch of word) {
+		if (!available[ch]) return false;
+		available[ch]--;
+	}
+	return true;
+}
+
+function isExactAnagram(word, letters) {
+	if (word.length !== letters.length) return false;
+	return canMakeWord(word, letters);
+}
+
+function filter() {
+	if (!loaded) return;
+	const raw = document.getElementById('letters').value.replace(/[^a-zA-Z]/g,'').toLowerCase();
+	const must = document.getElementById('must').value.replace(/[^a-zA-Z]/g,'').toLowerCase();
+	const exactOnly = document.getElementById('exact-only').checked;
+
+	if (raw.length < 2) {
+		document.getElementById('results').innerHTML = '';
+		document.getElementById('stats').textContent = loaded ? `${allWords.length.toLocaleString()} words loaded` : '';
+		document.getElementById('sort-row').style.display = 'none';
+		document.getElementById('hint').style.display = '';
+		return;
+	}
+
+	document.getElementById('hint').style.display = 'none';
+
+	currentResults = allWords.filter(word => {
+		if (exactOnly && word.length !== raw.length) return false;
+		if (!canMakeWord(word, raw)) return false;
+		if (must && ![...must].every(ch => word.includes(ch))) return false;
+		return true;
+	});
+
+	renderResults();
+}
+
+function setSort(mode) {
+	sortMode = mode;
+	document.getElementById('sort-alpha').classList.toggle('on', mode === 'alpha');
+	document.getElementById('sort-rev').classList.toggle('on', mode === 'rev');
+	renderResults();
+}
+
+function renderResults() {
+	const raw = document.getElementById('letters').value.replace(/[^a-zA-Z]/g,'').toLowerCase();
+	const sorted = [...currentResults].sort((a,b) => sortMode === 'alpha' ? a.localeCompare(b) : b.localeCompare(a));
+	const exactCount = sorted.filter(w => isExactAnagram(w, raw)).length;
+
+	const statsEl = document.getElementById('stats');
+	const sortRow = document.getElementById('sort-row');
+	const resultsEl = document.getElementById('results');
+
+	if (sorted.length === 0) {
+		statsEl.innerHTML = '<span style="color:var(--red)">No words found</span>';
+		sortRow.style.display = 'none';
+		resultsEl.innerHTML = `
+			<div class="empty-msg">
+				<div class="big">🔤</div>
+				No valid words found with those letters.<br>Try removing a letter or using different combinations.
+			</div>`;
+		return;
+	}
+
+	statsEl.innerHTML = `<span class="stats-count">${sorted.length}</span> word${sorted.length !== 1 ? 's' : ''} found` +
+		(exactCount > 0 ? ` · <span style="color:var(--gold);font-weight:700">${exactCount} exact anagram${exactCount !== 1 ? 's' : ''}</span>` : '');
+
+	sortRow.style.display = sorted.length > 1 ? 'flex' : 'none';
+
+	resultsEl.innerHTML = '<div class="results-grid">' +
+		sorted.map((word, i) => {
+			const exact = isExactAnagram(word, raw);
+			return `<div class="word-card${exact ? ' exact' : ''}" style="animation-delay:${Math.min(i*8,200)}ms">${word.toUpperCase()}</div>`;
+		}).join('') +
+		'</div>';
+}
+</script>
+
+<script src="assets/shared-nav.js"></script>
+</body>
+</html>

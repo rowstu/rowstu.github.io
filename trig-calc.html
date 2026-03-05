@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Trigonometry Calculator // rowstu.net</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #0b1a2e;
+			--surface: #132236;
+			--surface2: #1a2f47;
+			--border: #1e3554;
+			--accent: #00cba8;
+			--accent-dim: rgba(0,203,168,0.08);
+			--gold: #fec84b;
+			--gold-dim: rgba(254,200,75,0.08);
+			--pink: #f97066;
+			--text: #a8c0d8;
+			--text-dim: #3d5a78;
+			--text-bright: #d8ecff;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'DM Mono', monospace;
+			background: var(--bg);
+			color: var(--text);
+			min-height: 100vh;
+			background-image:
+				linear-gradient(rgba(0,203,168,0.015) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(0,203,168,0.015) 1px, transparent 1px);
+			background-size: 32px 32px;
+		}
+
+		.container { max-width: 900px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
+
+		header { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+		.logo { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; }
+		.tagline { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.3rem; }
+
+		.tabs {
+			display: flex; gap: 0; margin-bottom: 1.25rem;
+			border-bottom: 1px solid var(--border);
+		}
+		.tab {
+			padding: 0.55rem 1.1rem; font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 600;
+			color: var(--text-dim); background: none; border: none; border-bottom: 2px solid transparent;
+			cursor: pointer; margin-bottom: -1px; transition: all 0.15s; text-transform: uppercase; letter-spacing: 0.05em;
+		}
+		.tab:hover { color: var(--text); }
+		.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+		.panel { display: none; }
+		.panel.active { display: block; }
+
+		.layout-2 { display: grid; grid-template-columns: 320px 1fr; gap: 1rem; }
+
+		.card {
+			background: var(--surface); border: 1px solid var(--border);
+			border-radius: 8px; padding: 1.1rem;
+		}
+		.card + .card { margin-top: 0.75rem; }
+		.card-title {
+			font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700;
+			color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.9rem;
+		}
+
+		.unit-row {
+			display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem;
+			font-size: 0.65rem; color: var(--text-dim);
+		}
+		.toggle { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+		.toggle-btn {
+			padding: 0.28rem 0.65rem; font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 600;
+			border: none; cursor: pointer; background: none; color: var(--text-dim); transition: all 0.12s;
+		}
+		.toggle-btn.on { background: var(--accent); color: #0b1a2e; }
+
+		.field { margin-bottom: 0.7rem; }
+		.field label {
+			display: flex; justify-content: space-between; align-items: baseline;
+			font-size: 0.62rem; color: var(--text-dim); margin-bottom: 0.28rem;
+			text-transform: uppercase; letter-spacing: 0.05em;
+		}
+		.field label .key {
+			font-family: 'Syne', sans-serif; font-size: 0.68rem; font-weight: 700;
+			color: var(--text-bright);
+		}
+		.field input {
+			width: 100%; background: var(--bg); border: 1px solid var(--border);
+			border-radius: 5px; padding: 0.5rem 0.75rem;
+			color: var(--text-bright); font-family: 'DM Mono', monospace; font-size: 0.9rem;
+			outline: none; transition: border-color 0.15s;
+		}
+		.field input:focus { border-color: var(--accent); }
+		.field input.solved { color: var(--gold); background: var(--gold-dim); border-color: var(--border); }
+		.field input.user { color: var(--accent); }
+
+		.btns { display: flex; gap: 0.5rem; margin-top: 0.9rem; }
+		.btn {
+			padding: 0.45rem 1rem; font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 700;
+			border: 1px solid var(--border); border-radius: 4px; cursor: pointer; transition: all 0.15s;
+		}
+		.btn-primary { background: var(--accent); color: #0b1a2e; border-color: var(--accent); }
+		.btn-primary:hover { opacity: 0.85; }
+		.btn-ghost { background: none; color: var(--text-dim); }
+		.btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+
+		.formula-box {
+			background: var(--surface2); border: 1px solid var(--border);
+			border-radius: 6px; padding: 0.75rem; margin-top: 0.75rem;
+			font-size: 0.78rem; line-height: 1.7;
+		}
+		.formula-box .step { color: var(--text-dim); }
+		.formula-box .value { color: var(--gold); font-weight: 500; }
+		.formula-box .formula { color: var(--accent); }
+		.error-msg { color: var(--pink); font-size: 0.7rem; margin-top: 0.5rem; min-height: 1rem; }
+
+		/* SVG area */
+		.tri-card { display: flex; flex-direction: column; }
+		.tri-wrap { flex: 1; display: flex; justify-content: center; align-items: center; padding: 0.5rem 0; }
+
+		.soh-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+		.soh-box {
+			background: var(--surface2); border: 1px solid var(--border);
+			border-radius: 6px; padding: 0.6rem; text-align: center;
+		}
+		.soh-name { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 800; color: var(--accent); }
+		.soh-eq { font-size: 0.64rem; color: var(--text-dim); margin-top: 0.2rem; }
+		.soh-eq b { color: var(--gold); font-weight: 500; }
+
+		/* Functions panel */
+		.func-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1rem; }
+		.func-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-bottom: 1rem; }
+		.func-btn {
+			padding: 0.55rem 0.4rem; background: var(--surface2); border: 1px solid var(--border);
+			border-radius: 6px; color: var(--text-dim); font-family: 'Syne', sans-serif;
+			font-size: 0.72rem; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.12s;
+		}
+		.func-btn:hover, .func-btn.on { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+		.func-result {
+			background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+			padding: 1rem; font-size: 0.85rem;
+		}
+		.res-row { display: flex; justify-content: space-between; padding: 0.3rem 0;
+			border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+		.res-row:last-child { border-bottom: none; }
+		.res-label { color: var(--text-dim); }
+		.res-val { color: var(--gold); font-weight: 500; }
+
+		/* Reference panel */
+		.ref-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+		.ref-table th {
+			background: var(--surface2); color: var(--accent); font-family: 'Syne', sans-serif;
+			font-size: 0.66rem; padding: 0.5rem 0.75rem; text-align: center;
+			border-bottom: 1px solid var(--border); letter-spacing: 0.05em;
+		}
+		.ref-table td {
+			padding: 0.45rem 0.75rem; text-align: center; border-bottom: 1px solid var(--border);
+		}
+		.ref-table tr:last-child td { border-bottom: none; }
+		.ref-table tr:hover td { background: var(--surface2); }
+		.frac { color: var(--gold); }
+		.angle-col { color: var(--text-bright); font-weight: 500; }
+
+		@media (max-width: 680px) {
+			.layout-2, .func-layout { grid-template-columns: 1fr; }
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<header>
+		<div class="logo">Trigonometry</div>
+		<div class="tagline">GCSE right angled triangle solver · trig functions · reference table</div>
+	</header>
+
+	<div class="tabs">
+		<button class="tab active" onclick="switchTab('triangle')">Right Angled Triangle</button>
+		<button class="tab" onclick="switchTab('functions')">Functions</button>
+		<button class="tab" onclick="switchTab('reference')">Reference</button>
+	</div>
+
+	<!-- ======================== RIGHT ANGLED TRIANGLE ======================== -->
+	<div class="panel active" id="panel-triangle">
+		<div class="layout-2">
+			<div>
+				<div class="card">
+					<div class="card-title">Enter any two values</div>
+					<div class="unit-row">
+						<span>Units:</span>
+						<div class="toggle">
+							<button class="toggle-btn on" id="btn-deg" onclick="setUnit('deg')">°  Degrees</button>
+							<button class="toggle-btn" id="btn-rad" onclick="setUnit('rad')">rad Radians</button>
+						</div>
+					</div>
+					<div class="field">
+						<label><span>Angle</span><span class="key">θ</span></label>
+						<input type="number" id="in-a" placeholder="e.g. 30" step="any" oninput="solve()">
+					</div>
+					<div class="field">
+						<label><span>Hypotenuse</span><span class="key">H</span></label>
+						<input type="number" id="in-h" placeholder="longest side" step="any" min="0" oninput="solve()">
+					</div>
+					<div class="field">
+						<label><span>Opposite</span><span class="key">O</span></label>
+						<input type="number" id="in-o" placeholder="side opposite θ" step="any" min="0" oninput="solve()">
+					</div>
+					<div class="field">
+						<label><span>Adjacent</span><span class="key">A</span></label>
+						<input type="number" id="in-adj" placeholder="side next to θ" step="any" min="0" oninput="solve()">
+					</div>
+					<div class="btns">
+						<button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+					</div>
+					<div id="err" class="error-msg"></div>
+				</div>
+
+				<div class="card" id="result-card" style="display:none">
+					<div class="card-title">Working</div>
+					<div id="working"></div>
+				</div>
+			</div>
+
+			<div class="card tri-card">
+				<div class="card-title">Triangle</div>
+				<div class="tri-wrap">
+					<svg id="tri-svg" viewBox="0 0 270 230" width="270" height="230" style="overflow:visible">
+						<!-- Triangle -->
+						<polygon points="30,195 240,195 240,55"
+							fill="rgba(0,203,168,0.04)" stroke="#00cba8" stroke-width="1.8"/>
+
+						<!-- Right angle marker at (240,195) -->
+						<path d="M 225,195 L 225,180 L 240,180"
+							fill="none" stroke="rgba(61,90,120,0.7)" stroke-width="1.3"/>
+
+						<!-- Angle arc at (30,195) radius=36 -->
+						<!-- Triangle direction: right=0°, hyp goes to (240,55) = angle arctan(140/210)≈33.7° upward -->
+						<!-- Start: (66,195), End: (30+36cos(33.7°), 195-36sin(33.7°)) ≈ (60,175) -->
+						<path d="M 66,195 A 36,36 0 0,0 59.9,175.1"
+							fill="rgba(254,200,75,0.07)" stroke="#fec84b" stroke-width="1.3"/>
+
+						<!-- Side Labels -->
+						<text font-family="'Syne', sans-serif" font-weight="700" fill="#00cba8">
+							<!-- H label at midpoint of hyp (135,125), rotated -33.7° -->
+							<text x="120" y="128" font-size="13" transform="rotate(-34,120,128)">H</text>
+						</text>
+						<text font-family="'Syne', sans-serif" font-weight="700">
+							<!-- O label: midpoint of vertical right side (255,125) -->
+							<text x="252" y="129" font-size="13" fill="#a8c0d8">O</text>
+							<!-- A label: midpoint of horizontal bottom (135,211) -->
+							<text x="135" y="212" font-size="13" fill="#a8c0d8" text-anchor="middle">A</text>
+						</text>
+
+						<!-- θ label -->
+						<text x="72" y="194" font-family="'DM Mono', monospace" font-size="13" font-style="italic" fill="#fec84b">θ</text>
+						<!-- 90° -->
+						<text x="203" y="190" font-family="'DM Mono', monospace" font-size="8" fill="#3d5a78">90°</text>
+
+						<!-- Dynamic value labels -->
+						<text id="lbl-theta" x="90" y="193" font-family="'DM Mono', monospace" font-size="10" fill="#fec84b"></text>
+						<text id="lbl-other" x="230" y="60" font-family="'DM Mono', monospace" font-size="10" fill="#fec84b" text-anchor="end"></text>
+						<text id="lbl-h" x="105" y="152" font-family="'DM Mono', monospace" font-size="10" fill="#00cba8" transform="rotate(-34,105,152)"></text>
+						<text id="lbl-o" x="252" y="152" font-family="'DM Mono', monospace" font-size="10" fill="#a8c0d8"></text>
+						<text id="lbl-a" x="135" y="223" font-family="'DM Mono', monospace" font-size="10" fill="#a8c0d8" text-anchor="middle"></text>
+					</svg>
+				</div>
+
+				<div class="soh-row">
+					<div class="soh-box">
+						<div class="soh-name">SOH</div>
+						<div class="soh-eq">sin(θ) = <b>O ÷ H</b></div>
+					</div>
+					<div class="soh-box">
+						<div class="soh-name">CAH</div>
+						<div class="soh-eq">cos(θ) = <b>A ÷ H</b></div>
+					</div>
+					<div class="soh-box">
+						<div class="soh-name">TOA</div>
+						<div class="soh-eq">tan(θ) = <b>O ÷ A</b></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- ======================== FUNCTIONS ======================== -->
+	<div class="panel" id="panel-functions">
+		<div class="func-layout">
+			<div>
+				<div class="card">
+					<div class="card-title">Calculate</div>
+					<div class="unit-row">
+						<span>Input units:</span>
+						<div class="toggle">
+							<button class="toggle-btn on" id="fn-deg" onclick="setFnUnit('deg')">° Degrees</button>
+							<button class="toggle-btn" id="fn-rad" onclick="setFnUnit('rad')">rad</button>
+						</div>
+					</div>
+					<div class="field">
+						<label>Value</label>
+						<input type="number" id="fn-input" placeholder="e.g. 45" step="any" oninput="calcFn()">
+					</div>
+					<div class="func-btns">
+						<button class="func-btn on" id="fb-sin" onclick="selectFn('sin')">sin</button>
+						<button class="func-btn" id="fb-cos" onclick="selectFn('cos')">cos</button>
+						<button class="func-btn" id="fb-tan" onclick="selectFn('tan')">tan</button>
+						<button class="func-btn" id="fb-asin" onclick="selectFn('asin')">arcsin</button>
+						<button class="func-btn" id="fb-acos" onclick="selectFn('acos')">arccos</button>
+						<button class="func-btn" id="fb-atan" onclick="selectFn('atan')">arctan</button>
+					</div>
+					<div id="fn-error" class="error-msg"></div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-title">Result</div>
+				<div id="fn-result"></div>
+			</div>
+		</div>
+	</div>
+
+	<!-- ======================== REFERENCE ======================== -->
+	<div class="panel" id="panel-reference">
+		<div class="card" style="overflow-x:auto">
+			<div class="card-title">Common Angles</div>
+			<table class="ref-table">
+				<thead>
+					<tr>
+						<th>Angle (°)</th>
+						<th>Angle (rad)</th>
+						<th>sin θ</th>
+						<th>cos θ</th>
+						<th>tan θ</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td class="angle-col">0°</td><td>0</td><td class="frac">0</td><td class="frac">1</td><td class="frac">0</td></tr>
+					<tr><td class="angle-col">30°</td><td>π/6</td><td class="frac">1/2</td><td class="frac">√3/2</td><td class="frac">1/√3</td></tr>
+					<tr><td class="angle-col">45°</td><td>π/4</td><td class="frac">1/√2</td><td class="frac">1/√2</td><td class="frac">1</td></tr>
+					<tr><td class="angle-col">60°</td><td>π/3</td><td class="frac">√3/2</td><td class="frac">1/2</td><td class="frac">√3</td></tr>
+					<tr><td class="angle-col">90°</td><td>π/2</td><td class="frac">1</td><td class="frac">0</td><td>undefined</td></tr>
+					<tr><td class="angle-col">120°</td><td>2π/3</td><td class="frac">√3/2</td><td class="frac">−1/2</td><td class="frac">−√3</td></tr>
+					<tr><td class="angle-col">135°</td><td>3π/4</td><td class="frac">1/√2</td><td class="frac">−1/√2</td><td class="frac">−1</td></tr>
+					<tr><td class="angle-col">150°</td><td>5π/6</td><td class="frac">1/2</td><td class="frac">−√3/2</td><td class="frac">−1/√3</td></tr>
+					<tr><td class="angle-col">180°</td><td>π</td><td class="frac">0</td><td class="frac">−1</td><td class="frac">0</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="card" style="margin-top:0.75rem">
+			<div class="card-title">Identities</div>
+			<table class="ref-table">
+				<thead><tr><th>Identity</th><th>Formula</th></tr></thead>
+				<tbody>
+					<tr><td>Pythagorean</td><td class="frac">sin²θ + cos²θ = 1</td></tr>
+					<tr><td>Pythagorean</td><td class="frac">1 + tan²θ = sec²θ</td></tr>
+					<tr><td>Pythagorean</td><td class="frac">1 + cot²θ = csc²θ</td></tr>
+					<tr><td>Double angle</td><td class="frac">sin 2θ = 2 sin θ cos θ</td></tr>
+					<tr><td>Double angle</td><td class="frac">cos 2θ = cos²θ − sin²θ</td></tr>
+					<tr><td>Reciprocal</td><td class="frac">sec θ = 1/cos θ</td></tr>
+					<tr><td>Reciprocal</td><td class="frac">csc θ = 1/sin θ</td></tr>
+					<tr><td>Reciprocal</td><td class="frac">cot θ = 1/tan θ</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="card" style="margin-top:0.75rem">
+			<div class="card-title">Sine &amp; Cosine Rules (non-right angled triangles)</div>
+			<table class="ref-table">
+				<thead><tr><th>Rule</th><th>Formula</th><th>Use when you know</th></tr></thead>
+				<tbody>
+					<tr><td>Sine rule</td><td class="frac">a/sin A = b/sin B = c/sin C</td><td>AAS or ASA</td></tr>
+					<tr><td>Cosine rule</td><td class="frac">a² = b² + c² − 2bc cos A</td><td>SAS or SSS</td></tr>
+					<tr><td>Area</td><td class="frac">Area = ½ab sin C</td><td>two sides + included angle</td></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script>
+let unit = 'deg';
+let fnUnit = 'deg';
+let selectedFn = 'sin';
+
+function switchTab(name) {
+	document.querySelectorAll('.tab').forEach((t,i) => {
+		const names = ['triangle','functions','reference'];
+		t.classList.toggle('active', names[i] === name);
+	});
+	document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+	document.getElementById('panel-' + name).classList.add('active');
+}
+
+function setUnit(u) {
+	unit = u;
+	document.getElementById('btn-deg').classList.toggle('on', u === 'deg');
+	document.getElementById('btn-rad').classList.toggle('on', u === 'rad');
+	solve();
+}
+
+function setFnUnit(u) {
+	fnUnit = u;
+	document.getElementById('fn-deg').classList.toggle('on', u === 'deg');
+	document.getElementById('fn-rad').classList.toggle('on', u === 'rad');
+	calcFn();
+}
+
+function selectFn(fn) {
+	selectedFn = fn;
+	['sin','cos','tan','asin','acos','atan'].forEach(f => {
+		document.getElementById('fb-' + f).classList.toggle('on', f === fn);
+	});
+	calcFn();
+}
+
+function toRad(v) { return unit === 'deg' ? v * Math.PI / 180 : v; }
+function fromRad(v) { return unit === 'deg' ? v * 180 / Math.PI : v; }
+function fmt(n) {
+	if (Math.abs(n) < 1e-10) return '0';
+	let s = parseFloat(n.toFixed(6)).toString();
+	return s;
+}
+function fmtA(n) { return fmt(n) + (unit === 'deg' ? '°' : ' rad'); }
+
+function getVal(id) {
+	const v = document.getElementById(id).value;
+	return v === '' ? null : parseFloat(v);
+}
+
+function clearAll() {
+	['in-a','in-h','in-o','in-adj'].forEach(id => {
+		const el = document.getElementById(id);
+		el.value = '';
+		el.readOnly = false;
+		el.classList.remove('solved','user');
+	});
+	document.getElementById('err').textContent = '';
+	document.getElementById('result-card').style.display = 'none';
+	clearLabels();
+}
+
+function clearLabels() {
+	['lbl-theta','lbl-other','lbl-h','lbl-o','lbl-a'].forEach(id =>
+		document.getElementById(id).textContent = '');
+}
+
+function setResult(id, val, isSolved) {
+	const el = document.getElementById(id);
+	if (isSolved && el.value === '') {
+		el.value = val;
+		el.classList.add('solved');
+	} else if (!isSolved) {
+		el.classList.add('user');
+	}
+}
+
+function solve() {
+	// Reset solved styling
+	['in-a','in-h','in-o','in-adj'].forEach(id => {
+		const el = document.getElementById(id);
+		el.classList.remove('solved','user');
+	});
+
+	const a   = getVal('in-a');
+	const h   = getVal('in-h');
+	const o   = getVal('in-o');
+	const adj = getVal('in-adj');
+	const err = document.getElementById('err');
+	const resCard = document.getElementById('result-card');
+	const working = document.getElementById('working');
+	err.textContent = '';
+
+	const knownCount = [a,h,o,adj].filter(v => v !== null).length;
+	if (knownCount < 2) { resCard.style.display = 'none'; clearLabels(); return; }
+
+	let R = {}; // result
+	let steps = [];
+
+	try {
+		if (a !== null && h !== null) {
+			const ar = toRad(a);
+			R = { a, h, o: h*Math.sin(ar), adj: h*Math.cos(ar), otherA: 90 - (unit==='deg'?a:fromRad(a)) };
+			steps = [
+				`sin(θ) = O ÷ H  →  O = H × sin(${fmtA(a)}) = <span class="value">${fmt(R.o)}</span>`,
+				`cos(θ) = A ÷ H  →  A = H × cos(${fmtA(a)}) = <span class="value">${fmt(R.adj)}</span>`,
+			];
+		} else if (a !== null && o !== null) {
+			const ar = toRad(a);
+			if (Math.abs(Math.sin(ar)) < 1e-10) throw new Error('sin(θ) = 0 — division by zero');
+			R = { a, h: o/Math.sin(ar), o, adj: o/Math.tan(ar), otherA: 90 - (unit==='deg'?a:fromRad(a)) };
+			steps = [
+				`sin(θ) = O ÷ H  →  H = O ÷ sin(${fmtA(a)}) = <span class="value">${fmt(R.h)}</span>`,
+				`tan(θ) = O ÷ A  →  A = O ÷ tan(${fmtA(a)}) = <span class="value">${fmt(R.adj)}</span>`,
+			];
+		} else if (a !== null && adj !== null) {
+			const ar = toRad(a);
+			if (Math.abs(Math.cos(ar)) < 1e-10) throw new Error('cos(θ) = 0 — division by zero');
+			R = { a, h: adj/Math.cos(ar), o: adj*Math.tan(ar), adj, otherA: 90 - (unit==='deg'?a:fromRad(a)) };
+			steps = [
+				`cos(θ) = A ÷ H  →  H = A ÷ cos(${fmtA(a)}) = <span class="value">${fmt(R.h)}</span>`,
+				`tan(θ) = O ÷ A  →  O = A × tan(${fmtA(a)}) = <span class="value">${fmt(R.o)}</span>`,
+			];
+		} else if (o !== null && h !== null) {
+			if (h <= 0) throw new Error('H must be positive');
+			if (o > h) throw new Error('Opposite cannot be longer than hypotenuse');
+			const ar = Math.asin(o/h);
+			R = { a: fromRad(ar), h, o, adj: Math.sqrt(h*h - o*o), otherA: 90 - fromRad(ar) };
+			steps = [
+				`sin(θ) = O ÷ H  →  θ = arcsin(${fmt(o)} ÷ ${fmt(h)}) = <span class="value">${fmtA(R.a)}</span>`,
+				`A = √(H² − O²) = √(${fmt(h*h)} − ${fmt(o*o)}) = <span class="value">${fmt(R.adj)}</span>`,
+			];
+		} else if (adj !== null && h !== null) {
+			if (h <= 0) throw new Error('H must be positive');
+			if (adj > h) throw new Error('Adjacent cannot be longer than hypotenuse');
+			const ar = Math.acos(adj/h);
+			R = { a: fromRad(ar), h, o: Math.sqrt(h*h - adj*adj), adj, otherA: 90 - fromRad(ar) };
+			steps = [
+				`cos(θ) = A ÷ H  →  θ = arccos(${fmt(adj)} ÷ ${fmt(h)}) = <span class="value">${fmtA(R.a)}</span>`,
+				`O = √(H² − A²) = √(${fmt(h*h)} − ${fmt(adj*adj)}) = <span class="value">${fmt(R.o)}</span>`,
+			];
+		} else if (o !== null && adj !== null) {
+			const ar = Math.atan(o/adj);
+			R = { a: fromRad(ar), h: Math.sqrt(o*o + adj*adj), o, adj, otherA: 90 - fromRad(ar) };
+			steps = [
+				`tan(θ) = O ÷ A  →  θ = arctan(${fmt(o)} ÷ ${fmt(adj)}) = <span class="value">${fmtA(R.a)}</span>`,
+				`H = √(O² + A²) = √(${fmt(o*o)} + ${fmt(adj*adj)}) = <span class="value">${fmt(R.h)}</span>`,
+			];
+		} else {
+			return;
+		}
+	} catch(e) {
+		err.textContent = e.message;
+		resCard.style.display = 'none';
+		clearLabels();
+		return;
+	}
+
+	// Mark user inputs
+	if (a !== null)   document.getElementById('in-a').classList.add('user');
+	if (h !== null)   document.getElementById('in-h').classList.add('user');
+	if (o !== null)   document.getElementById('in-o').classList.add('user');
+	if (adj !== null) document.getElementById('in-adj').classList.add('user');
+
+	// Fill solved fields
+	if (a === null)   { const el = document.getElementById('in-a'); el.value = fmtA(R.a); el.classList.add('solved'); }
+	if (h === null)   { const el = document.getElementById('in-h'); el.value = fmt(R.h); el.classList.add('solved'); }
+	if (o === null)   { const el = document.getElementById('in-o'); el.value = fmt(R.o); el.classList.add('solved'); }
+	if (adj === null) { const el = document.getElementById('in-adj'); el.value = fmt(R.adj); el.classList.add('solved'); }
+
+	// Working steps
+	working.innerHTML = '<div class="formula-box">' +
+		steps.map(s => `<div class="step">${s}</div>`).join('') +
+		`<div class="step" style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--border)">Other angle = 90° − ${fmtA(R.a)} = <span class="value">${fmtA(R.otherA)}</span></div>` +
+		'</div>';
+	resCard.style.display = 'block';
+
+	// Update SVG labels
+	document.getElementById('lbl-theta').textContent = fmtA(R.a);
+	document.getElementById('lbl-other').textContent = fmtA(R.otherA);
+	document.getElementById('lbl-h').textContent = fmt(R.h);
+	document.getElementById('lbl-o').textContent = fmt(R.o);
+	document.getElementById('lbl-a').textContent = fmt(R.adj);
+}
+
+function calcFn() {
+	const raw = parseFloat(document.getElementById('fn-input').value);
+	const errEl = document.getElementById('fn-error');
+	const resEl = document.getElementById('fn-result');
+	errEl.textContent = '';
+
+	if (isNaN(raw)) { resEl.innerHTML = ''; return; }
+
+	let inputRad, result, label, degResult, radResult;
+
+	const isInverse = ['asin','acos','atan'].includes(selectedFn);
+
+	if (isInverse) {
+		// Input is a ratio (dimensionless), output is an angle
+		if ((selectedFn === 'asin' || selectedFn === 'acos') && (raw < -1 || raw > 1)) {
+			errEl.textContent = 'arcsin/arccos input must be between −1 and 1';
+			resEl.innerHTML = '';
+			return;
+		}
+		const rad = Math[selectedFn](raw);
+		const deg = rad * 180 / Math.PI;
+		resEl.innerHTML = `
+			<div class="res-row"><span class="res-label">${selectedFn}(${raw})</span><span class="res-val">${parseFloat(deg.toFixed(6))}°</span></div>
+			<div class="res-row"><span class="res-label">in radians</span><span class="res-val">${parseFloat(rad.toFixed(8))} rad</span></div>
+			<div class="res-row"><span class="res-label">in terms of π</span><span class="res-val">${parseFloat((rad/Math.PI).toFixed(6))}π rad</span></div>
+		`;
+	} else {
+		// Input is an angle
+		const rad = fnUnit === 'deg' ? raw * Math.PI / 180 : raw;
+		if (selectedFn === 'tan' && Math.abs(Math.cos(rad)) < 1e-10) {
+			errEl.textContent = 'tan is undefined at this angle (cos = 0)';
+			resEl.innerHTML = '';
+			return;
+		}
+		const val = Math[selectedFn](rad);
+		const degStr = fnUnit === 'deg' ? `${raw}°` : `${parseFloat((raw * 180 / Math.PI).toFixed(4))}°`;
+		resEl.innerHTML = `
+			<div class="res-row"><span class="res-label">${selectedFn}(${raw}${fnUnit==='deg'?'°':' rad'})</span><span class="res-val">${parseFloat(val.toFixed(8))}</span></div>
+			<div class="res-row"><span class="res-label">input in degrees</span><span class="res-val">${degStr}</span></div>
+			<div class="res-row"><span class="res-label">input in radians</span><span class="res-val">${parseFloat(rad.toFixed(8))} rad</span></div>
+		`;
+	}
+}
+</script>
+
+<script src="assets/shared-nav.js"></script>
+</body>
+</html>

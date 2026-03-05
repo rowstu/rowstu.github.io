@@ -1,0 +1,159 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Data Structures // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Data Structures</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/pythondata-structures/>Pythondata Structures</a></div><div class="card markdown-content"><h1 id=python-data-structures>Python Data Structures</h1><h2 id=lists>Lists</h2><p>Ordered, mutable, allows duplicates.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>fruits <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;apple&#34;</span>, <span style=color:#e6db74>&#34;banana&#34;</span>, <span style=color:#e6db74>&#34;cherry&#34;</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Access</span>
+</span></span><span style=display:flex><span>fruits[<span style=color:#ae81ff>0</span>]     <span style=color:#75715e># &#39;apple&#39;</span>
+</span></span><span style=display:flex><span>fruits[<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>]    <span style=color:#75715e># &#39;cherry&#39;</span>
+</span></span><span style=display:flex><span>fruits[<span style=color:#ae81ff>1</span>:<span style=color:#ae81ff>3</span>]   <span style=color:#75715e># [&#39;banana&#39;, &#39;cherry&#39;]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Modify</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>append(<span style=color:#e6db74>&#34;date&#34;</span>)           <span style=color:#75715e># add to end</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>insert(<span style=color:#ae81ff>1</span>, <span style=color:#e6db74>&#34;blueberry&#34;</span>)   <span style=color:#75715e># insert at index</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>extend([<span style=color:#e6db74>&#34;elderberry&#34;</span>])   <span style=color:#75715e># add multiple</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>remove(<span style=color:#e6db74>&#34;banana&#34;</span>)         <span style=color:#75715e># remove by value</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>del</span> fruits[<span style=color:#ae81ff>0</span>]                   <span style=color:#75715e># remove by index</span>
+</span></span><span style=display:flex><span>popped <span style=color:#f92672>=</span> fruits<span style=color:#f92672>.</span>pop()           <span style=color:#75715e># remove &amp; return last</span>
+</span></span><span style=display:flex><span>popped <span style=color:#f92672>=</span> fruits<span style=color:#f92672>.</span>pop(<span style=color:#ae81ff>0</span>)          <span style=color:#75715e># remove &amp; return index 0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Search</span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>&#34;apple&#34;</span> <span style=color:#f92672>in</span> fruits    <span style=color:#75715e># True</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>index(<span style=color:#e6db74>&#34;cherry&#34;</span>) <span style=color:#75715e># returns index or raises ValueError</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>count(<span style=color:#e6db74>&#34;apple&#34;</span>)  <span style=color:#75715e># count occurrences</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Sort</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>sort()                   <span style=color:#75715e># in-place, ascending</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>sort(reverse<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>)       <span style=color:#75715e># in-place, descending</span>
+</span></span><span style=display:flex><span>sorted_copy <span style=color:#f92672>=</span> sorted(fruits)    <span style=color:#75715e># returns new list</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>reverse()                <span style=color:#75715e># reverse in-place</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Other</span>
+</span></span><span style=display:flex><span>len(fruits)   <span style=color:#75715e># length</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>copy() <span style=color:#75715e># shallow copy</span>
+</span></span><span style=display:flex><span>fruits<span style=color:#f92672>.</span>clear() <span style=color:#75715e># empty the list</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Unpack</span>
+</span></span><span style=display:flex><span>a, b, c <span style=color:#f92672>=</span> [<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>]
+</span></span><span style=display:flex><span>first, <span style=color:#f92672>*</span>rest <span style=color:#f92672>=</span> [<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>4</span>]  <span style=color:#75715e># first=1, rest=[2,3,4]</span>
+</span></span></code></pre></div><hr><h2 id=tuples>Tuples</h2><p>Ordered, <strong>immutable</strong>, allows duplicates. Faster than lists for iteration.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>coords <span style=color:#f92672>=</span> (<span style=color:#ae81ff>10</span>, <span style=color:#ae81ff>20</span>)
+</span></span><span style=display:flex><span>single <span style=color:#f92672>=</span> (<span style=color:#ae81ff>42</span>,)       <span style=color:#75715e># note trailing comma for single element</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>x, y <span style=color:#f92672>=</span> coords        <span style=color:#75715e># unpack</span>
+</span></span><span style=display:flex><span>x <span style=color:#f92672>=</span> coords[<span style=color:#ae81ff>0</span>]        <span style=color:#75715e># index access</span>
+</span></span><span style=display:flex><span>len(coords)          <span style=color:#75715e># 2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Tuples as keys in dicts (lists cannot be)</span>
+</span></span><span style=display:flex><span>locations <span style=color:#f92672>=</span> {(<span style=color:#ae81ff>51.5</span>, <span style=color:#f92672>-</span><span style=color:#ae81ff>0.1</span>): <span style=color:#e6db74>&#34;London&#34;</span>, (<span style=color:#ae81ff>48.8</span>, <span style=color:#ae81ff>2.3</span>): <span style=color:#e6db74>&#34;Paris&#34;</span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Named tuples (more readable)</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> collections <span style=color:#f92672>import</span> namedtuple
+</span></span><span style=display:flex><span>Point <span style=color:#f92672>=</span> namedtuple(<span style=color:#e6db74>&#39;Point&#39;</span>, [<span style=color:#e6db74>&#39;x&#39;</span>, <span style=color:#e6db74>&#39;y&#39;</span>])
+</span></span><span style=display:flex><span>p <span style=color:#f92672>=</span> Point(<span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>4</span>)
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>x    <span style=color:#75715e># 3</span>
+</span></span><span style=display:flex><span>p<span style=color:#f92672>.</span>y    <span style=color:#75715e># 4</span>
+</span></span></code></pre></div><hr><h2 id=dictionaries>Dictionaries</h2><p>Key-value pairs, ordered (Python 3.7+), mutable.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>person <span style=color:#f92672>=</span> {<span style=color:#e6db74>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;Alice&#34;</span>, <span style=color:#e6db74>&#34;age&#34;</span>: <span style=color:#ae81ff>30</span>, <span style=color:#e6db74>&#34;city&#34;</span>: <span style=color:#e6db74>&#34;London&#34;</span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Access</span>
+</span></span><span style=display:flex><span>person[<span style=color:#e6db74>&#34;name&#34;</span>]               <span style=color:#75715e># &#39;Alice&#39;</span>
+</span></span><span style=display:flex><span>person<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;name&#34;</span>)           <span style=color:#75715e># &#39;Alice&#39; (safe, returns None if missing)</span>
+</span></span><span style=display:flex><span>person<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;email&#34;</span>, <span style=color:#e6db74>&#34;n/a&#34;</span>)   <span style=color:#75715e># &#39;n/a&#39; (default value)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Modify</span>
+</span></span><span style=display:flex><span>person[<span style=color:#e6db74>&#34;age&#34;</span>] <span style=color:#f92672>=</span> <span style=color:#ae81ff>31</span>           <span style=color:#75715e># update</span>
+</span></span><span style=display:flex><span>person[<span style=color:#e6db74>&#34;email&#34;</span>] <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;a@b.com&#34;</span>  <span style=color:#75715e># add new key</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>del</span> person[<span style=color:#e6db74>&#34;city&#34;</span>]           <span style=color:#75715e># delete key</span>
+</span></span><span style=display:flex><span>popped <span style=color:#f92672>=</span> person<span style=color:#f92672>.</span>pop(<span style=color:#e6db74>&#34;age&#34;</span>)   <span style=color:#75715e># remove &amp; return</span>
+</span></span><span style=display:flex><span>person<span style=color:#f92672>.</span>setdefault(<span style=color:#e6db74>&#34;role&#34;</span>, <span style=color:#e6db74>&#34;user&#34;</span>)  <span style=color:#75715e># set only if missing</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Iterate</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> key <span style=color:#f92672>in</span> person:
+</span></span><span style=display:flex><span>    print(key)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> key, val <span style=color:#f92672>in</span> person<span style=color:#f92672>.</span>items():
+</span></span><span style=display:flex><span>    print(key, val)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> key <span style=color:#f92672>in</span> person<span style=color:#f92672>.</span>keys():   <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> val <span style=color:#f92672>in</span> person<span style=color:#f92672>.</span>values(): <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Merge (Python 3.9+)</span>
+</span></span><span style=display:flex><span>merged <span style=color:#f92672>=</span> dict1 <span style=color:#f92672>|</span> dict2
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Dict comprehension</span>
+</span></span><span style=display:flex><span>squares <span style=color:#f92672>=</span> {n: n<span style=color:#f92672>**</span><span style=color:#ae81ff>2</span> <span style=color:#66d9ef>for</span> n <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>6</span>)}
+</span></span><span style=display:flex><span><span style=color:#75715e># {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Useful</span>
+</span></span><span style=display:flex><span>len(person)          <span style=color:#75715e># number of keys</span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>&#34;name&#34;</span> <span style=color:#f92672>in</span> person     <span style=color:#75715e># True (checks keys)</span>
+</span></span><span style=display:flex><span>person<span style=color:#f92672>.</span>copy()        <span style=color:#75715e># shallow copy</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># defaultdict — never raises KeyError</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> collections <span style=color:#f92672>import</span> defaultdict
+</span></span><span style=display:flex><span>counts <span style=color:#f92672>=</span> defaultdict(int)
+</span></span><span style=display:flex><span>counts[<span style=color:#e6db74>&#34;x&#34;</span>] <span style=color:#f92672>+=</span> <span style=color:#ae81ff>1</span>   <span style=color:#75715e># safe, defaults to 0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Counter — count occurrences</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> collections <span style=color:#f92672>import</span> Counter
+</span></span><span style=display:flex><span>c <span style=color:#f92672>=</span> Counter(<span style=color:#e6db74>&#34;abracadabra&#34;</span>)
+</span></span><span style=display:flex><span>c<span style=color:#f92672>.</span>most_common(<span style=color:#ae81ff>3</span>)    <span style=color:#75715e># [(&#39;a&#39;, 5), (&#39;b&#39;, 2), (&#39;r&#39;, 2)]</span>
+</span></span></code></pre></div><hr><h2 id=sets>Sets</h2><p>Unordered, <strong>unique</strong> values, mutable. No indexing.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>s <span style=color:#f92672>=</span> {<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>1</span>}   <span style=color:#75715e># {1, 2, 3} — duplicates removed</span>
+</span></span><span style=display:flex><span>s <span style=color:#f92672>=</span> set([<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>])  <span style=color:#75715e># same</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Add / remove</span>
+</span></span><span style=display:flex><span>s<span style=color:#f92672>.</span>add(<span style=color:#ae81ff>4</span>)
+</span></span><span style=display:flex><span>s<span style=color:#f92672>.</span>discard(<span style=color:#ae81ff>99</span>)    <span style=color:#75715e># safe (no error if missing)</span>
+</span></span><span style=display:flex><span>s<span style=color:#f92672>.</span>remove(<span style=color:#ae81ff>2</span>)      <span style=color:#75715e># raises KeyError if missing</span>
+</span></span><span style=display:flex><span>s<span style=color:#f92672>.</span>pop()          <span style=color:#75715e># remove arbitrary element</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Set operations</span>
+</span></span><span style=display:flex><span>a <span style=color:#f92672>=</span> {<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>4</span>}
+</span></span><span style=display:flex><span>b <span style=color:#f92672>=</span> {<span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>4</span>, <span style=color:#ae81ff>5</span>, <span style=color:#ae81ff>6</span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>a <span style=color:#f92672>|</span> b      <span style=color:#75715e># union:        {1, 2, 3, 4, 5, 6}</span>
+</span></span><span style=display:flex><span>a <span style=color:#f92672>&amp;</span> b      <span style=color:#75715e># intersection: {3, 4}</span>
+</span></span><span style=display:flex><span>a <span style=color:#f92672>-</span> b      <span style=color:#75715e># difference:   {1, 2}</span>
+</span></span><span style=display:flex><span>a <span style=color:#f92672>^</span> b      <span style=color:#75715e># symmetric diff: {1, 2, 5, 6}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>a<span style=color:#f92672>.</span>issubset(b)     <span style=color:#75715e># False</span>
+</span></span><span style=display:flex><span>a<span style=color:#f92672>.</span>issuperset(b)   <span style=color:#75715e># False</span>
+</span></span><span style=display:flex><span>a<span style=color:#f92672>.</span>isdisjoint(b)   <span style=color:#75715e># False (they share 3, 4)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Fast membership test (O(1) vs O(n) for lists)</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>1000</span> <span style=color:#f92672>in</span> some_set   <span style=color:#75715e># very fast</span>
+</span></span></code></pre></div><hr><h2 id=list-comprehensions>List Comprehensions</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># Basic</span>
+</span></span><span style=display:flex><span>squares <span style=color:#f92672>=</span> [x<span style=color:#f92672>**</span><span style=color:#ae81ff>2</span> <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>10</span>)]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># With filter</span>
+</span></span><span style=display:flex><span>evens <span style=color:#f92672>=</span> [x <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>20</span>) <span style=color:#66d9ef>if</span> x <span style=color:#f92672>%</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Nested</span>
+</span></span><span style=display:flex><span>pairs <span style=color:#f92672>=</span> [(x, y) <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>3</span>) <span style=color:#66d9ef>for</span> y <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>3</span>)]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Transform strings</span>
+</span></span><span style=display:flex><span>words <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;hello&#34;</span>, <span style=color:#e6db74>&#34;world&#34;</span>]
+</span></span><span style=display:flex><span>upper <span style=color:#f92672>=</span> [w<span style=color:#f92672>.</span>upper() <span style=color:#66d9ef>for</span> w <span style=color:#f92672>in</span> words]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Dict comprehension</span>
+</span></span><span style=display:flex><span>word_lengths <span style=color:#f92672>=</span> {w: len(w) <span style=color:#66d9ef>for</span> w <span style=color:#f92672>in</span> words}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Set comprehension</span>
+</span></span><span style=display:flex><span>unique_lengths <span style=color:#f92672>=</span> {len(w) <span style=color:#66d9ef>for</span> w <span style=color:#f92672>in</span> words}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Generator expression (lazy, no list built in memory)</span>
+</span></span><span style=display:flex><span>total <span style=color:#f92672>=</span> sum(x<span style=color:#f92672>**</span><span style=color:#ae81ff>2</span> <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>1000000</span>))
+</span></span></code></pre></div><hr><h2 id=sorting>Sorting</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>data <span style=color:#f92672>=</span> [<span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>4</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>5</span>, <span style=color:#ae81ff>9</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>6</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sorted(data)               <span style=color:#75715e># ascending</span>
+</span></span><span style=display:flex><span>sorted(data, reverse<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>) <span style=color:#75715e># descending</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Sort by key</span>
+</span></span><span style=display:flex><span>words <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;banana&#34;</span>, <span style=color:#e6db74>&#34;apple&#34;</span>, <span style=color:#e6db74>&#34;fig&#34;</span>, <span style=color:#e6db74>&#34;cherry&#34;</span>]
+</span></span><span style=display:flex><span>sorted(words, key<span style=color:#f92672>=</span>len)          <span style=color:#75715e># by length</span>
+</span></span><span style=display:flex><span>sorted(words, key<span style=color:#f92672>=</span>str<span style=color:#f92672>.</span>lower)    <span style=color:#75715e># case-insensitive</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Sort list of dicts</span>
+</span></span><span style=display:flex><span>people <span style=color:#f92672>=</span> [{<span style=color:#e6db74>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;Bob&#34;</span>, <span style=color:#e6db74>&#34;age&#34;</span>: <span style=color:#ae81ff>25</span>}, {<span style=color:#e6db74>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;Alice&#34;</span>, <span style=color:#e6db74>&#34;age&#34;</span>: <span style=color:#ae81ff>30</span>}]
+</span></span><span style=display:flex><span>sorted(people, key<span style=color:#f92672>=</span><span style=color:#66d9ef>lambda</span> p: p[<span style=color:#e6db74>&#34;age&#34;</span>])
+</span></span><span style=display:flex><span>sorted(people, key<span style=color:#f92672>=</span><span style=color:#66d9ef>lambda</span> p: p[<span style=color:#e6db74>&#34;name&#34;</span>])
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Multiple sort keys</span>
+</span></span><span style=display:flex><span>sorted(people, key<span style=color:#f92672>=</span><span style=color:#66d9ef>lambda</span> p: (p[<span style=color:#e6db74>&#34;age&#34;</span>], p[<span style=color:#e6db74>&#34;name&#34;</span>]))
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>

@@ -1,0 +1,135 @@
+<!doctype html><html lang=en-us><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Tools // rowstu.net</title><link rel=stylesheet href=/assets/shared-theme.css><style>.markdown-content{max-width:900px;margin:0 auto;line-height:1.7}.markdown-content h1{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-teal);border-bottom:2px solid var(--border);padding-bottom:.5rem}.markdown-content h2{font-size:2rem;margin-top:2rem;margin-bottom:1rem;color:var(--accent-orange)}.markdown-content h3{font-size:1.5rem;margin-top:1.5rem;margin-bottom:.75rem;color:var(--text-primary)}.markdown-content p{margin-bottom:1rem}.markdown-content code{background:var(--bg-light);padding:.2rem .4rem;border-radius:3px;font-family:jetbrains mono,monospace;font-size:.9em}.markdown-content pre{background:var(--bg-light);padding:1rem;border-radius:6px;overflow-x:auto;margin-bottom:1rem}.markdown-content pre code{background:0 0;padding:0}.markdown-content a{color:var(--accent-teal);text-decoration:none}.markdown-content a:hover{text-decoration:underline}.markdown-content ul,.markdown-content ol{margin-bottom:1rem;padding-left:2rem}.markdown-content li{margin-bottom:.5rem}.markdown-content blockquote{border-left:4px solid var(--accent-teal);padding-left:1rem;margin:1rem 0;color:var(--text-secondary);font-style:italic}.markdown-content table{width:100%;border-collapse:collapse;margin-bottom:1rem}.markdown-content th,.markdown-content td{border:1px solid var(--border);padding:.75rem;text-align:left}.markdown-content th{background:var(--bg-light);font-weight:600}.breadcrumb{padding:1rem 0;color:var(--text-secondary);font-size:.95rem}.breadcrumb a{color:var(--accent-teal);text-decoration:none}.breadcrumb a:hover{text-decoration:underline}</style></head><body><div class=app-header><h1 class=app-title>Tools</h1></div><div class=container><div class=breadcrumb><a href=/>Home</a> / <a href=/browse/>Browse</a>/ <a href=/osinttools/>Osinttools</a></div><div class="card markdown-content"><h1 id=osint-tools-reference>OSINT Tools Reference</h1><h2 id=command-line-tools>Command-Line Tools</h2><h3 id=sherlock>Sherlock</h3><p>Hunt down social media accounts by username across 300+ platforms.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install</span>
+</span></span><span style=display:flex><span>pip install sherlock-project
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Basic usage</span>
+</span></span><span style=display:flex><span>sherlock username
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Output to file</span>
+</span></span><span style=display:flex><span>sherlock username --output results.txt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Check specific sites</span>
+</span></span><span style=display:flex><span>sherlock username --site Twitter --site Instagram
+</span></span></code></pre></div><hr><h3 id=maigret>Maigret</h3><p>Username OSINT across 2000+ sites with detailed reports.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install</span>
+</span></span><span style=display:flex><span>pip install maigret
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run against username</span>
+</span></span><span style=display:flex><span>maigret username
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Generate PDF report</span>
+</span></span><span style=display:flex><span>maigret username --pdf
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># JSON output</span>
+</span></span><span style=display:flex><span>maigret username --json report.json
+</span></span></code></pre></div><hr><h3 id=holehe>Holehe</h3><p>Check whether an email address is registered on 120+ websites.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install</span>
+</span></span><span style=display:flex><span>pip install holehe
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Basic usage</span>
+</span></span><span style=display:flex><span>holehe email@example.com
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># CSV output</span>
+</span></span><span style=display:flex><span>holehe email@example.com --csv
+</span></span></code></pre></div><hr><h3 id=phoneinfoga>PhoneInfoga</h3><p>International phone number OSINT and carrier lookup.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install via Docker</span>
+</span></span><span style=display:flex><span>docker pull sundowndev/phoneinfoga
+</span></span><span style=display:flex><span>docker run --rm sundowndev/phoneinfoga scan -n <span style=color:#e6db74>&#34;+447911123456&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Or via binary</span>
+</span></span><span style=display:flex><span>phoneinfoga scan -n <span style=color:#e6db74>&#34;+447911123456&#34;</span>
+</span></span><span style=display:flex><span>phoneinfoga serve  <span style=color:#75715e># Web UI on localhost:5000</span>
+</span></span></code></pre></div><hr><h3 id=theharvester>theHarvester</h3><p>Gather emails, subdomains, IPs, and URLs from public sources.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install</span>
+</span></span><span style=display:flex><span>pip install theHarvester
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Search by domain</span>
+</span></span><span style=display:flex><span>theHarvester -d target.com -b google,bing,linkedin
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Available sources: google, bing, linkedin, twitter, hunter, shodan, etc.</span>
+</span></span><span style=display:flex><span>theHarvester -d target.com -b all -f output
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Limit results</span>
+</span></span><span style=display:flex><span>theHarvester -d target.com -b google -l <span style=color:#ae81ff>200</span>
+</span></span></code></pre></div><hr><h3 id=spiderfoot>SpiderFoot</h3><p>Automated OSINT collection with 200+ modules.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install</span>
+</span></span><span style=display:flex><span>pip install spiderfoot
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># CLI scan</span>
+</span></span><span style=display:flex><span>spiderfoot -s target.com -t INTERNET_NAME -m sfp_dnsresolve,sfp_whois
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Web UI</span>
+</span></span><span style=display:flex><span>spiderfoot -l 127.0.0.1:5001
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Scan types:</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># -t INTERNET_NAME  → domain</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># -t IP_ADDRESS     → IP</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># -t EMAILADDR      → email</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># -t USERNAME       → username</span>
+</span></span></code></pre></div><hr><h3 id=exiftool>ExifTool</h3><p>Extract and edit metadata from files.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install (Arch)</span>
+</span></span><span style=display:flex><span>sudo pacman -S perl-image-exiftool
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show all metadata</span>
+</span></span><span style=display:flex><span>exiftool image.jpg
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Extract GPS</span>
+</span></span><span style=display:flex><span>exiftool -GPS* image.jpg
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Strip all metadata</span>
+</span></span><span style=display:flex><span>exiftool -all<span style=color:#f92672>=</span> image.jpg
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Batch process</span>
+</span></span><span style=display:flex><span>exiftool -r -GPS* /path/to/folder/
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show specific tags</span>
+</span></span><span style=display:flex><span>exiftool -Make -Model -DateTimeOriginal image.jpg
+</span></span></code></pre></div><hr><h3 id=recon-ng>Recon-ng</h3><p>Modular web reconnaissance framework.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Install</span>
+</span></span><span style=display:flex><span>pip install recon-ng
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Start</span>
+</span></span><span style=display:flex><span>recon-ng
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Key commands</span>
+</span></span><span style=display:flex><span>marketplace install all          <span style=color:#75715e># install modules</span>
+</span></span><span style=display:flex><span>workspaces create target_name
+</span></span><span style=display:flex><span>db insert domains                <span style=color:#75715e># add target domain</span>
+</span></span><span style=display:flex><span>modules load recon/domains-hosts/google_site_web
+</span></span><span style=display:flex><span>run
+</span></span><span style=display:flex><span>show hosts
+</span></span></code></pre></div><hr><h3 id=maltego-gui>Maltego (GUI)</h3><p>Visual link analysis and pivot tool. Free Community Edition available.</p><p>Download from <a href=https://www.maltego.com/downloads/>maltego.com</a></p><p>Key transforms:</p><ul><li>Domain → IP, DNS records, MX, subdomains</li><li>Email → social profiles, breach data</li><li>Person → LinkedIn, Twitter, phone</li></ul><hr><h2 id=browser-extensions>Browser Extensions</h2><table><thead><tr><th>Extension</th><th>Purpose</th></tr></thead><tbody><tr><td><a href=https://skan.io>Skan.io</a></td><td>OSINT aggregator overlay</td></tr><tr><td><a href=https://chromewebstore.google.com/detail/wayback-machine/fpnmgdkabkmnadcjpehmlllkndpkmiak>Wayback Machine</a></td><td>Quick archive.org access</td></tr><tr><td><a href=https://github.com/gildas-lormeau/SingleFile>SingleFile</a></td><td>Save full page snapshots as evidence</td></tr><tr><td><a href=https://ublockorigin.com>uBlock Origin</a></td><td>Block tracking during investigations</td></tr><tr><td><a href=https://chrome.google.com/webstore/detail/reveye-reverse-image-sear/keaaclcjhehbbapnphnmpiklalfhelgf>RevEye</a></td><td>Multi-engine reverse image search</td></tr></tbody></table><hr><h2 id=online-platforms>Online Platforms</h2><h3 id=shodan>Shodan</h3><p>Internet-connected device search engine.</p><pre tabindex=0><code># Useful Shodan filters
+port:22 country:GB                          # SSH servers in UK
+product:&#34;Apache httpd&#34; version:&#34;2.4&#34;       # specific web server version
+hostname:target.com                         # by hostname
+org:&#34;Company Name&#34;                          # by organisation
+http.favicon.hash:116323821                 # by favicon hash
+ssl.cert.subject.cn:target.com             # by TLS certificate
+</code></pre><h3 id=censys>Censys</h3><p>Certificate and service discovery.</p><pre tabindex=0><code># Search syntax
+services.port: 22 AND location.country: GB
+parsed.names: target.com                    # TLS cert domain
+autonomous_system.name: &#34;AS Name&#34;
+</code></pre><h3 id=virustotal>VirusTotal</h3><pre tabindex=0><code># Search operators
+domain:target.com
+ip:1.2.3.4
+entity:filename.exe
+tag:signed AND tag:packed
+</code></pre><hr><h2 id=certificate-transparency>Certificate Transparency</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Query crt.sh for subdomains</span>
+</span></span><span style=display:flex><span>curl -s <span style=color:#e6db74>&#34;https://crt.sh/?q=%.target.com&amp;output=json&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  | jq -r <span style=color:#e6db74>&#39;.[].name_value&#39;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  | sed <span style=color:#e6db74>&#39;s/\*\.//g&#39;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span>  | sort -u
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Amass passive enumeration</span>
+</span></span><span style=display:flex><span>amass enum -passive -d target.com
+</span></span></code></pre></div><hr><h2 id=whois--dns>WHOIS & DNS</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># WHOIS</span>
+</span></span><span style=display:flex><span>whois target.com
+</span></span><span style=display:flex><span>whois 1.2.3.4
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># DNS records</span>
+</span></span><span style=display:flex><span>dig target.com ANY
+</span></span><span style=display:flex><span>dig +short MX target.com
+</span></span><span style=display:flex><span>dig +short NS target.com
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Reverse DNS</span>
+</span></span><span style=display:flex><span>dig -x 1.2.3.4
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Zone transfer attempt (educational)</span>
+</span></span><span style=display:flex><span>dig axfr @ns1.target.com target.com
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Historical DNS via CLI (requires API key)</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># SecurityTrails: https://securitytrails.com/app/api</span>
+</span></span><span style=display:flex><span>curl -H <span style=color:#e6db74>&#34;APIKEY: YOUR_KEY&#34;</span> <span style=color:#e6db74>&#34;https://api.securitytrails.com/v1/domain/target.com/dns/A&#34;</span>
+</span></span></code></pre></div></div></div><script src=/assets/shared-nav.js></script></body></html>
