@@ -496,7 +496,7 @@
 
     <script>
     let currentBase = 10;
-    let currentDecimal = 0;
+    let currentDecimal = 0n;
     let bitWidth = 8;
 
     const inputEl = document.getElementById('input-value');
@@ -520,7 +520,7 @@
         inputEl.classList.remove('error');
 
         if (!raw) {
-            currentDecimal = 0;
+            currentDecimal = 0n;
             updateResults();
             return;
         }
@@ -547,16 +547,18 @@
             return;
         }
 
-        currentDecimal = parseInt(cleaned, currentBase);
-
-        if (isNaN(currentDecimal) || currentDecimal < 0) {
+        try {
+            if (currentBase === 2) currentDecimal = BigInt('0b' + cleaned);
+            else if (currentBase === 10) currentDecimal = BigInt(cleaned);
+            else currentDecimal = BigInt('0x' + cleaned);
+        } catch {
             errorEl.textContent = 'Invalid number';
             inputEl.classList.add('error');
             return;
         }
 
-        if (currentDecimal > 4294967295) {
-            errorEl.textContent = 'Max value: 4,294,967,295 (32-bit unsigned)';
+        if (currentDecimal > 18446744073709551615n) {
+            errorEl.textContent = 'Max value: 18,446,744,073,709,551,615 (64-bit unsigned)';
             inputEl.classList.add('error');
             return;
         }
@@ -589,14 +591,15 @@
     }
 
     function formatDec(dec) {
-        return parseInt(dec).toLocaleString();
+        return BigInt(dec).toLocaleString();
     }
 
     // Bit visualiser
     function updateBitVisualiser() {
-        // Auto-size: 8, 16, or 32 bits
-        if (currentDecimal > 65535) bitWidth = 32;
-        else if (currentDecimal > 255) bitWidth = 16;
+        // Auto-size: 8, 16, 32, or 64 bits
+        if (currentDecimal > 4294967295n) bitWidth = 64;
+        else if (currentDecimal > 65535n) bitWidth = 32;
+        else if (currentDecimal > 255n) bitWidth = 16;
         else bitWidth = 8;
 
         const grid = document.getElementById('bit-grid');
@@ -618,11 +621,11 @@
         }
 
         grid.innerHTML = html;
-        document.getElementById('bit-info').innerHTML = `Click bits to toggle. Value: <strong>${currentDecimal}</strong> (${bitWidth}-bit)`;
+        document.getElementById('bit-info').innerHTML = `Click bits to toggle. Value: <strong>${currentDecimal.toLocaleString()}</strong> (${bitWidth}-bit)`;
     }
 
     function toggleBit(pos) {
-        currentDecimal ^= (1 << pos);
+        currentDecimal = currentDecimal ^ (1n << BigInt(pos));
         inputEl.value = currentDecimal.toString(currentBase === 2 ? 2 : currentBase === 16 ? 16 : 10).toUpperCase();
         convert();
     }
@@ -648,7 +651,7 @@
 
     function generateToBin() {
         const el = document.getElementById('work-to-bin');
-        if (currentDecimal === 0) {
+        if (currentDecimal === 0n) {
             el.innerHTML = '<div class="step"><div class="step-content"><span class="dim">0 in binary is</span> <span class="result">0</span></div></div>';
             return;
         }
@@ -677,21 +680,28 @@
 
             let n = currentDecimal;
             const remainders = [];
-            while (n > 0) {
-                const q = Math.floor(n / 2);
-                const r = n % 2;
+            const MAX_ROWS = 24;
+            let truncated = false;
+            while (n > 0n) {
+                const q = n / 2n;
+                const r = Number(n % 2n);
                 remainders.push(r);
-                html += `<div class="division-row">
-                    <span class="quotient">${n}</span>
-                    <span class="divider">&divide;</span>
-                    <span class="divisor">2</span>
-                    <span class="equals">=</span>
-                    <span class="quot-result">${q}</span>
-                    <span class="rem-label">remainder</span>
-                    <span class="rem-val">${r}</span>
-                </div>`;
+                if (remainders.length <= MAX_ROWS) {
+                    html += `<div class="division-row">
+                        <span class="quotient">${n}</span>
+                        <span class="divider">&divide;</span>
+                        <span class="divisor">2</span>
+                        <span class="equals">=</span>
+                        <span class="quot-result">${q}</span>
+                        <span class="rem-label">remainder</span>
+                        <span class="rem-val">${r}</span>
+                    </div>`;
+                } else {
+                    truncated = true;
+                }
                 n = q;
             }
+            if (truncated) html += `<div class="division-row" style="color:var(--text-dim);font-size:0.8rem;">(${remainders.length - MAX_ROWS} more rows…)</div>`;
 
             html += '</div></div></div>';
             html += `<div class="step"><div class="step-label">Read remainders bottom &uarr; top</div>`;
@@ -707,8 +717,12 @@
 
     function generateToDec() {
         const el = document.getElementById('work-to-dec');
-        if (currentDecimal === 0) {
+        if (currentDecimal === 0n) {
             el.innerHTML = '<div class="step"><div class="step-content"><span class="dim">0 in decimal is</span> <span class="result">0</span></div></div>';
+            return;
+        }
+        if (currentDecimal > 4294967295n) {
+            el.innerHTML = `<div class="step"><div class="step-content"><span class="dim">Value too large for step-by-step — result:</span> <span class="highlight">${formatDec(currentDecimal.toString())}</span></div></div>`;
             return;
         }
 
@@ -778,7 +792,7 @@
 
     function generateToHex() {
         const el = document.getElementById('work-to-hex');
-        if (currentDecimal === 0) {
+        if (currentDecimal === 0n) {
             el.innerHTML = '<div class="step"><div class="step-content"><span class="dim">0 in hexadecimal is</span> <span class="result">0</span></div></div>';
             return;
         }
@@ -810,22 +824,29 @@
 
             let n = currentDecimal;
             const remainders = [];
-            while (n > 0) {
-                const q = Math.floor(n / 16);
-                const r = n % 16;
+            const MAX_HEX_ROWS = 20;
+            let hexTruncated = false;
+            while (n > 0n) {
+                const q = n / 16n;
+                const r = Number(n % 16n);
                 const hexR = r.toString(16).toUpperCase();
                 remainders.push(hexR);
-                html += `<div class="division-row">
-                    <span class="quotient">${n}</span>
-                    <span class="divider">&divide;</span>
-                    <span class="divisor">16</span>
-                    <span class="equals">=</span>
-                    <span class="quot-result">${q}</span>
-                    <span class="rem-label">remainder</span>
-                    <span class="rem-val">${r}${r >= 10 ? ' (' + hexR + ')' : ''}</span>
-                </div>`;
+                if (remainders.length <= MAX_HEX_ROWS) {
+                    html += `<div class="division-row">
+                        <span class="quotient">${n}</span>
+                        <span class="divider">&divide;</span>
+                        <span class="divisor">16</span>
+                        <span class="equals">=</span>
+                        <span class="quot-result">${q}</span>
+                        <span class="rem-label">remainder</span>
+                        <span class="rem-val">${r}${r >= 10 ? ' (' + hexR + ')' : ''}</span>
+                    </div>`;
+                } else {
+                    hexTruncated = true;
+                }
                 n = q;
             }
+            if (hexTruncated) html += `<div class="division-row" style="color:var(--text-dim);font-size:0.8rem;">(${remainders.length - MAX_HEX_ROWS} more rows…)</div>`;
 
             html += '</div></div></div>';
             html += `<div class="step"><div class="step-label">Read remainders bottom &uarr; top</div>`;

@@ -517,8 +517,7 @@
 			e.preventDefault();
 			fileDrop.classList.remove('drag-over');
 			if (e.dataTransfer.files.length) {
-				fileInput.files = e.dataTransfer.files;
-				handleFile();
+				handleFile(e.dataTransfer.files[0]);
 			}
 		});
 
@@ -574,8 +573,8 @@
 			hashElements.sha512.classList.remove('empty');
 		}
 
-		function handleFile() {
-			const file = fileInput.files[0];
+		function handleFile(droppedFile) {
+			const file = droppedFile || fileInput.files[0];
 			if (!file) return;
 
 			fileInfo.textContent = `${file.name} (${formatFileSize(file.size)})`;

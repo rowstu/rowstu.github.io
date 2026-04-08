@@ -329,6 +329,19 @@
       </div>
 
       <div class="panel">
+        <h2>Parametric</h2>
+        <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.6rem;">Curves defined by x(t), y(t). Use <code style="color:var(--accent2)">t</code> as the parameter.</p>
+        <div id="parametricList"></div>
+        <div class="range-row" style="margin-top:0.5rem;">
+          <div><label>t Min</label><input type="number" id="tMin" value="0" step="0.1" onchange="plotAll()"></div>
+          <div><label>t Max</label><input type="number" id="tMax" value="6.284" step="0.1" onchange="plotAll()"></div>
+        </div>
+        <div class="btn-row" style="margin-top:0.5rem;">
+          <button class="btn btn-accent" onclick="addParametric()">+ Add Curve</button>
+        </div>
+      </div>
+
+      <div class="panel">
         <h2>View Range</h2>
         <div class="range-row">
           <div><label>X Min</label><input type="number" id="xMin" value="-10" onchange="plotAll()"></div>
@@ -367,6 +380,14 @@
           <button class="preset-btn" onclick="loadPreset(['x^2 - 4'])">Quadratic</button>
           <button class="preset-btn" onclick="loadPreset(['(x-2)*(x+1)*(x-3)'])">Cubic</button>
         </div>
+        <div style="font-size:0.75rem;color:var(--text-dim);margin:0.6rem 0 0.3rem;">Parametric presets:</div>
+        <div class="preset-list">
+          <button class="preset-btn" onclick="loadParametricPreset('circle')">Circle</button>
+          <button class="preset-btn" onclick="loadParametricPreset('ellipse')">Ellipse</button>
+          <button class="preset-btn" onclick="loadParametricPreset('lissajous')">Lissajous</button>
+          <button class="preset-btn" onclick="loadParametricPreset('spiral')">Spiral</button>
+          <button class="preset-btn" onclick="loadParametricPreset('rose')">Rose</button>
+        </div>
       </div>
 
       <div class="panel">
@@ -375,6 +396,7 @@
           <strong style="color: var(--text);">Operators:</strong> + - * / ^ ( )<br>
           <strong style="color: var(--text);">Functions:</strong> sin, cos, tan, sqrt, abs, log, ln, exp, floor, ceil<br>
           <strong style="color: var(--text);">Constants:</strong> pi, e<br>
+          <strong style="color: var(--text);">Parametric var:</strong> t<br>
           <strong style="color: var(--text);">Examples:</strong><br>
           <code style="color: var(--accent2);">2*x + 3</code><br>
           <code style="color: var(--accent2);">sin(2*pi*x)</code><br>
@@ -401,6 +423,8 @@
 const COLORS = ['#f472b6', '#a78bfa', '#38bdf8', '#34d399', '#fb923c', '#f87171', '#facc15', '#22d3ee'];
 let functions = [];
 let nextId = 0;
+let parametricFunctions = [];
+let nextParamId = 1000;
 
 const canvas = document.getElementById('graphCanvas');
 const ctx = canvas.getContext('2d');
@@ -577,6 +601,90 @@ function removeFunction(id) {
   functions = functions.filter(f => f.id !== id);
   renderFunctionList();
   plotAll();
+}
+
+// Parametric curves
+function addParametric(exprX, exprY) {
+  const id = nextParamId++;
+  const color = COLORS[parametricFunctions.length % COLORS.length];
+  parametricFunctions.push({ id, exprX: exprX || '', exprY: exprY || '', color, errorX: '', errorY: '', compiledX: null, compiledY: null });
+  renderParametricList();
+  if (exprX) updateParametric(id, 'x', exprX);
+  if (exprY) updateParametric(id, 'y', exprY);
+}
+
+function updateParametric(id, axis, expr) {
+  const fn = parametricFunctions.find(f => f.id === id);
+  if (!fn) return;
+  const compiled = { key: null, err: '' };
+  if (expr.trim()) {
+    try { compiled.key = compileExpr(expr.trim()); compiled.key(0); }
+    catch (e) { compiled.err = e.message; compiled.key = null; }
+  }
+  if (axis === 'x') { fn.exprX = expr; fn.errorX = compiled.err; fn.compiledX = compiled.key; }
+  else { fn.exprY = expr; fn.errorY = compiled.err; fn.compiledY = compiled.key; }
+  renderParametricList();
+  plotAll();
+}
+
+function removeParametric(id) {
+  parametricFunctions = parametricFunctions.filter(f => f.id !== id);
+  renderParametricList();
+  plotAll();
+}
+
+function cycleParamColor(id) {
+  const fn = parametricFunctions.find(f => f.id === id);
+  if (!fn) return;
+  const idx = COLORS.indexOf(fn.color);
+  fn.color = COLORS[(idx + 1) % COLORS.length];
+  renderParametricList();
+  plotAll();
+}
+
+function renderParametricList() {
+  const list = document.getElementById('parametricList');
+  if (parametricFunctions.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-dim);font-size:0.78rem;margin-bottom:0.4rem;">No parametric curves. Click + Add Curve.</div>';
+    return;
+  }
+  list.innerHTML = parametricFunctions.map(f => `
+    <div style="margin-bottom:0.6rem;padding:0.5rem;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">
+      <div class="function-entry">
+        <div class="color-dot" style="background:${f.color};" onclick="cycleParamColor(${f.id})"></div>
+        <span style="color:var(--text-dim);font-size:0.78rem;min-width:3rem;">x(t) =</span>
+        <input type="text" value="${f.exprX.replace(/"/g, '&quot;')}" placeholder="cos(t)"
+          oninput="updateParametric(${f.id}, 'x', this.value)">
+        <button class="remove-btn" onclick="removeParametric(${f.id})">×</button>
+      </div>
+      <div class="error-line">${f.errorX}</div>
+      <div class="function-entry" style="margin-top:0.2rem;">
+        <div style="width:1rem;"></div>
+        <span style="color:var(--text-dim);font-size:0.78rem;min-width:3rem;">y(t) =</span>
+        <input type="text" value="${f.exprY.replace(/"/g, '&quot;')}" placeholder="sin(t)"
+          oninput="updateParametric(${f.id}, 'y', this.value)">
+      </div>
+      <div class="error-line">${f.errorY}</div>
+    </div>
+  `).join('');
+}
+
+const PARAMETRIC_PRESETS = {
+  circle:    { x: 'cos(t)', y: 'sin(t)', tMin: 0, tMax: 6.284 },
+  ellipse:   { x: '3*cos(t)', y: 'sin(t)', tMin: 0, tMax: 6.284 },
+  lissajous: { x: 'sin(3*t)', y: 'sin(2*t)', tMin: 0, tMax: 6.284 },
+  spiral:    { x: 't*cos(t)', y: 't*sin(t)', tMin: 0, tMax: 18.85 },
+  rose:      { x: 'cos(4*t)*cos(t)', y: 'cos(4*t)*sin(t)', tMin: 0, tMax: 6.284 },
+};
+
+function loadParametricPreset(name) {
+  const p = PARAMETRIC_PRESETS[name];
+  if (!p) return;
+  parametricFunctions = [];
+  nextParamId = 1000;
+  document.getElementById('tMin').value = p.tMin;
+  document.getElementById('tMax').value = p.tMax;
+  addParametric(p.x, p.y);
 }
 
 function updateFunction(id, expr) {
@@ -762,6 +870,36 @@ function plotAll() {
     }
     ctx.stroke();
   }
+
+  // Plot parametric curves
+  const tMin = parseFloat(document.getElementById('tMin').value) ?? 0;
+  const tMax = parseFloat(document.getElementById('tMax').value) ?? (2 * Math.PI);
+  const tStep = (tMax - tMin) / (w * 3);
+
+  for (const fn of parametricFunctions) {
+    if (!fn.compiledX || !fn.compiledY) continue;
+    ctx.strokeStyle = fn.color;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    let pStarted = false;
+    let lastPX = null, lastPY = null;
+    for (let t = tMin; t <= tMax + tStep * 0.5; t += tStep) {
+      try {
+        const px = fn.compiledX(t);
+        const py = fn.compiledY(t);
+        if (!isFinite(px) || !isFinite(py)) { pStarted = false; continue; }
+        const sx = toScreenX(px);
+        const sy = toScreenY(py);
+        if (lastPX !== null && (Math.abs(px - lastPX) > (xMax - xMin) * 2 || Math.abs(py - lastPY) > (yMax - yMin) * 2)) {
+          pStarted = false;
+        }
+        if (!pStarted) { ctx.moveTo(sx, sy); pStarted = true; }
+        else { ctx.lineTo(sx, sy); }
+        lastPX = px; lastPY = py;
+      } catch { pStarted = false; lastPX = null; lastPY = null; }
+    }
+    ctx.stroke();
+  }
 }
 
 function niceStep(range) {
@@ -840,6 +978,7 @@ function loadPreset(exprs) {
 
 // Init
 addFunction('x^2');
+renderParametricList();
 setTimeout(resizeCanvas, 50);
 setTimeout(resizeCanvas, 200);
 </script>

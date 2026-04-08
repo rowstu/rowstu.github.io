@@ -655,8 +655,10 @@
 			if (field.includes('/')) {
 				const [range, step] = field.split('/');
 				const stepNum = parseInt(step);
+				if (isNaN(stepNum) || stepNum <= 0) return [min];
+				const start = (range === '*') ? min : Math.max(min, parseInt(range) || min);
 				const values = [];
-				for (let i = min; i <= max; i += stepNum) {
+				for (let i = start; i <= max; i += stepNum) {
 					values.push(i);
 				}
 				return values;
@@ -690,7 +692,7 @@
 			const maxIterations = 525600; // 1 year in minutes
 			let iterations = 0;
 
-			while (runs.length < 5 && iterations < maxIterations) {
+			while (runs.length < 10 && iterations < maxIterations) {
 				current = new Date(current.getTime() + 60000); // Add 1 minute
 				iterations++;
 

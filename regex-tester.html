@@ -122,6 +122,7 @@
 		.status-value { color: var(--text); font-weight: 500; }
 		.status-value.error { color: var(--danger); }
 		.status-value.success { color: var(--accent); }
+		.status-value.warning { color: var(--warning, #f59e0b); }
 
 		.editor-container {
 			display: grid;
@@ -393,30 +394,41 @@
 				regexStatus.textContent = 'Valid';
 				regexStatus.className = 'status-value success';
 
+				// Warn about potentially catastrophic backtracking patterns
+				if (/(\(.*[+*]\).*[+*]|\(.*[+*]\).*\{[0-9]|\[[^\]]+\][+*]\s*[+*?])/.test(pattern)) {
+					regexStatus.textContent = 'Valid (may be slow — nested quantifiers detected)';
+					regexStatus.className = 'status-value warning';
+				}
+
 				if (!text) {
 					matchCount.textContent = '0';
 					output.innerHTML = '<span style="color: var(--text-muted);">Enter test text...</span>';
 					return;
 				}
 
-				const matches = [...text.matchAll(new RegExp(pattern, flags.includes('g') ? flags : flags + 'g'))];
-				matchCount.textContent = matches.length;
+				// Guard against huge inputs causing UI freeze
+				const MAX_TEXT = 50000;
+				const truncated = text.length > MAX_TEXT;
+				const testText = truncated ? text.slice(0, MAX_TEXT) : text;
+
+				const matches = [...testText.matchAll(new RegExp(pattern, flags.includes('g') ? flags : flags + 'g'))];
+				matchCount.textContent = matches.length + (truncated ? '+' : '');
 
 				if (matches.length === 0) {
-					output.innerHTML = escapeHtml(text);
+					output.innerHTML = (truncated ? '<div style="color:var(--warning,#f59e0b);font-size:0.8rem;margin-bottom:0.5rem;">Input truncated to 50,000 chars for safety</div>' : '') + escapeHtml(testText);
 					return;
 				}
 
 				// Highlight matches in text
-				let highlighted = '';
+				let highlighted = truncated ? '<div style="color:var(--warning,#f59e0b);font-size:0.8rem;margin-bottom:0.5rem;">Input truncated to 50,000 chars for safety</div>' : '';
 				let lastIndex = 0;
 
 				matches.forEach((match, i) => {
-					highlighted += escapeHtml(text.slice(lastIndex, match.index));
+					highlighted += escapeHtml(testText.slice(lastIndex, match.index));
 					highlighted += `<span class="match">${escapeHtml(match[0])}</span>`;
 					lastIndex = match.index + match[0].length;
 				});
-				highlighted += escapeHtml(text.slice(lastIndex));
+				highlighted += escapeHtml(testText.slice(lastIndex));
 
 				// Build match details
 				let details = '<div class="match-info"><strong>Match Details:</strong>';
@@ -424,11 +436,18 @@
 					details += `<div class="match-item">`;
 					details += `<div class="match-index">Match ${i + 1} at index ${match.index}</div>`;
 					details += `<div class="match-text">"${escapeHtml(match[0])}"</div>`;
-					if (match.length > 1) {
+					if (match.length > 1 || match.groups) {
 						details += '<div class="match-groups">';
 						for (let j = 1; j < match.length; j++) {
 							if (match[j] !== undefined) {
 								details += `<div class="group"><span class="group-label">Group ${j}:</span> "${escapeHtml(match[j])}"</div>`;
+							}
+						}
+						if (match.groups) {
+							for (const [name, val] of Object.entries(match.groups)) {
+								if (val !== undefined) {
+									details += `<div class="group"><span class="group-label" style="color:var(--accent2);">(?&lt;${escapeHtml(name)}&gt;):</span> "${escapeHtml(val)}"</div>`;
+								}
 							}
 						}
 						details += '</div>';

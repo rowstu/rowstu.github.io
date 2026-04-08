@@ -390,6 +390,8 @@
 		const jwtInput = document.getElementById('jwtInput');
 		const resultsDiv = document.getElementById('results');
 
+		let _jwtDecoded = {};
+
 		// Sample tokens for demonstration
 		const sampleTokens = {
 			hs256: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.POstGetfAytaZS82wHcjoTyoqhMyxXiWdR7Nn7A29XU',
@@ -466,6 +468,7 @@
 		}
 
 		function displayResults(parts, header, payload, signature) {
+			_jwtDecoded = { header, payload };
 			const now = Math.floor(Date.now() / 1000);
 			const isExpired = payload.exp && payload.exp < now;
 			const notYetValid = payload.nbf && payload.nbf > now;
@@ -478,7 +481,7 @@
 					<div class="decoded-section">
 						<div class="section-header">
 							<span class="section-title header">Header</span>
-							<button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;" onclick="copyJson(${escapeHtml(JSON.stringify(JSON.stringify(header, null, 2)))})">Copy</button>
+							<button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;" onclick="copyDecoded('header')">Copy</button>
 						</div>
 						<div class="section-content">
 							<pre style="margin: 0; white-space: pre-wrap;">${syntaxHighlight(header)}</pre>
@@ -487,7 +490,7 @@
 					<div class="decoded-section">
 						<div class="section-header">
 							<span class="section-title payload">Payload</span>
-							<button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;" onclick="copyJson(${escapeHtml(JSON.stringify(JSON.stringify(payload, null, 2)))})">Copy</button>
+							<button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;" onclick="copyDecoded('payload')">Copy</button>
 						</div>
 						<div class="section-content">
 							<pre style="margin: 0; white-space: pre-wrap;">${syntaxHighlight(payload)}</pre>
@@ -633,9 +636,12 @@
 		}
 
 		function copyJson(json) {
-			navigator.clipboard.writeText(json).then(() => {
-				// Brief visual feedback could be added here
-			});
+			navigator.clipboard.writeText(json);
+		}
+
+		function copyDecoded(section) {
+			const obj = _jwtDecoded[section];
+			if (obj) navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
 		}
 
 		function escapeHtml(text) {

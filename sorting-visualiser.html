@@ -347,6 +347,8 @@
                 <button class="algo-btn" data-algo="selection">Selection</button>
                 <button class="algo-btn" data-algo="merge">Merge</button>
                 <button class="algo-btn" data-algo="quick">Quick</button>
+                <button class="algo-btn" data-algo="heap">Heap</button>
+                <button class="algo-btn" data-algo="shell">Shell</button>
             </div>
             <div class="ctrl-group">
                 <span class="ctrl-label">Size</span>
@@ -418,6 +420,16 @@
                 <div class="complexity">O(n log n) avg &middot; O(n&sup2;) worst</div>
                 <p>Picks a pivot, partitions around it, sorts each side. Very fast in practice. Not stable. Worst case with already-sorted data.</p>
             </div>
+            <div class="info-card">
+                <h4>Heap Sort</h4>
+                <div class="complexity">O(n log n) always</div>
+                <p>Builds a max-heap, then repeatedly extracts the maximum. Guaranteed O(n log n) in all cases. In-place but not stable. Good worst-case guarantee.</p>
+            </div>
+            <div class="info-card">
+                <h4>Shell Sort</h4>
+                <div class="complexity">O(n log&sup2; n) avg &middot; O(n&sup2;) worst</div>
+                <p>Generalises insertion sort by comparing elements far apart, reducing the gap until 1. Much faster than insertion sort for larger arrays. Not stable.</p>
+            </div>
         </div>
     </div>
 
@@ -443,7 +455,8 @@
             currentAlgo = btn.dataset.algo;
             document.getElementById('algo-name').textContent = {
                 bubble: 'Bubble Sort', insertion: 'Insertion Sort',
-                selection: 'Selection Sort', merge: 'Merge Sort', quick: 'Quick Sort'
+                selection: 'Selection Sort', merge: 'Merge Sort', quick: 'Quick Sort',
+                heap: 'Heap Sort', shell: 'Shell Sort'
             }[currentAlgo];
             resetArr();
         });
@@ -492,6 +505,8 @@
         else if (currentAlgo === 'selection') selectionSort(a);
         else if (currentAlgo === 'merge') mergeSortWrap(a);
         else if (currentAlgo === 'quick') quickSortWrap(a);
+        else if (currentAlgo === 'heap') heapSortWrap(a);
+        else if (currentAlgo === 'shell') shellSort(a);
         steps.push({ type: 'done', arr: [...a], sorted: new Set(a.map((_, i) => i)) });
     }
 
@@ -603,6 +618,63 @@
         [a[i], a[hi]] = [a[hi], a[i]];
         steps.push({ type: 'swap', arr: [...a], i: i, j: hi, sorted: new Set() });
         return i;
+    }
+
+    // Heap Sort
+    function heapSortWrap(a) {
+        const n = a.length;
+        // Build max heap
+        for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+            heapify(a, n, i);
+        }
+        // Extract elements one by one
+        for (let i = n - 1; i > 0; i--) {
+            [a[0], a[i]] = [a[i], a[0]];
+            steps.push({ type: 'swap', arr: [...a], i: 0, j: i, sorted: new Set(Array.from({ length: n - i }, (_, k) => i + k)) });
+            heapify(a, i, 0);
+        }
+    }
+
+    function heapify(a, n, i) {
+        let largest = i;
+        const l = 2 * i + 1;
+        const r = 2 * i + 2;
+        if (l < n) {
+            steps.push({ type: 'compare', arr: [...a], i: largest, j: l, sorted: new Set() });
+            if (a[l] > a[largest]) largest = l;
+        }
+        if (r < n) {
+            steps.push({ type: 'compare', arr: [...a], i: largest, j: r, sorted: new Set() });
+            if (a[r] > a[largest]) largest = r;
+        }
+        if (largest !== i) {
+            [a[i], a[largest]] = [a[largest], a[i]];
+            steps.push({ type: 'swap', arr: [...a], i: i, j: largest, sorted: new Set() });
+            heapify(a, n, largest);
+        }
+    }
+
+    // Shell Sort
+    function shellSort(a) {
+        const n = a.length;
+        let gap = Math.floor(n / 2);
+        while (gap > 0) {
+            for (let i = gap; i < n; i++) {
+                let j = i;
+                steps.push({ type: 'active', arr: [...a], i: i, sorted: new Set() });
+                while (j >= gap) {
+                    steps.push({ type: 'compare', arr: [...a], i: j - gap, j: j, sorted: new Set() });
+                    if (a[j - gap] > a[j]) {
+                        [a[j - gap], a[j]] = [a[j], a[j - gap]];
+                        steps.push({ type: 'swap', arr: [...a], i: j - gap, j: j, sorted: new Set() });
+                        j -= gap;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            gap = Math.floor(gap / 2);
+        }
     }
 
     function sortedFromEnd(a, count) {

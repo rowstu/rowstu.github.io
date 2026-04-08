@@ -441,14 +441,25 @@
         const eq = equations[idx];
         const vals = {};
         let filled = 0;
+        let inputError = false;
         eq.vars.forEach(v => {
             const el = document.getElementById(`eq-${idx}-${v.id}`);
             const raw = el.value.trim();
-            if (raw !== '') { vals[v.id] = parseFloat(raw); filled++; } else { vals[v.id] = ''; }
+            if (raw !== '') {
+                const num = parseFloat(raw);
+                if (isNaN(num)) { inputError = true; }
+                vals[v.id] = num;
+                filled++;
+            } else { vals[v.id] = ''; }
             el.classList.remove('result-field');
         });
 
         const resultEl = document.getElementById(`eq-result-${idx}`);
+        if (inputError) {
+            resultEl.innerHTML = '<div class="step" style="color:var(--danger,#f87171)">Invalid input — enter numeric values only</div>';
+            resultEl.classList.add('show');
+            return;
+        }
         if (filled < eq.vars.length - 1) {
             resultEl.classList.remove('show');
             return;
@@ -456,6 +467,12 @@
 
         const result = eq.solve(vals);
         if (!result) { resultEl.classList.remove('show'); return; }
+
+        if (!isFinite(result.val) || isNaN(result.val)) {
+            resultEl.innerHTML = '<div class="step" style="color:var(--danger,#f87171)">Cannot solve — check for division by zero</div>';
+            resultEl.classList.add('show');
+            return;
+        }
 
         // Fill in the result field
         const resInput = document.getElementById(`eq-${idx}-${result.id}`);

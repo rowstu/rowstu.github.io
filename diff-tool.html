@@ -356,6 +356,13 @@
 			const left = leftInput.value;
 			const right = rightInput.value;
 
+			const MAX_LINES = 5000;
+			if (left.split('\n').length > MAX_LINES || right.split('\n').length > MAX_LINES) {
+				diffOutput.innerHTML = `<div class="empty-state">Input too large — max ${MAX_LINES.toLocaleString()} lines per panel</div>`;
+				diffStats.innerHTML = '';
+				return;
+			}
+
 			if (!left && !right) {
 				diffOutput.innerHTML = '<div class="empty-state">Enter text in both panels and click Compare</div>';
 				diffStats.innerHTML = '';
